@@ -1,0 +1,53 @@
+"use client";
+
+import { profile, socials } from "@/lib/content";
+import Folder from "./Folder";
+
+export default function Contact() {
+  return (
+    <section id="contact" className="px-4 pb-28 sm:px-8">
+      <div className="mx-auto max-w-6xl">
+        <h2
+          id="contact-heading"
+          className="font-display mb-6 pl-2 text-xs font-bold tracking-[0.22em] text-fawn uppercase"
+        >
+          contact
+        </h2>
+
+        <Folder
+          tabs={[{ id: "contact", label: "get in touch", accent: "fawn" }]}
+          active="contact"
+          labelledBy="contact-heading"
+        >
+          <h3 className="font-display text-4xl font-black tracking-tighter sm:text-6xl">
+            Let&apos;s make something cool together.
+          </h3>
+
+          <p className="mt-5 max-w-2xl text-sm text-ink/80 sm:text-base">
+            Whether you need a brand refresh, event visuals, or just want to chat about design,
+            my inbox is always open.
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            {socials.map((s) => (
+              <a
+                key={s.label}
+                href={s.href}
+                target={s.href.startsWith("http") ? "_blank" : undefined}
+                rel="noreferrer"
+                className="font-display press flex min-h-[44px] cursor-pointer items-center rounded-full border-2 border-ink bg-maize px-6 text-sm font-bold shadow-hard-sm hover:bg-eminence hover:text-maize"
+              >
+                {s.label}
+              </a>
+            ))}
+          </div>
+
+          <p className="font-display mt-10 text-lg font-black tracking-tight">{profile.name}</p>
+          <p className="text-sm text-ink/70">
+            {profile.location} · {profile.email}
+          </p>
+        </Folder>
+      </div>
+    </section>
+  );
+}

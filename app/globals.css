@@ -1,0 +1,310 @@
+@import "tailwindcss";
+
+@theme {
+  /*
+   * Lavender-sunset palette.
+   *
+   * Contrast-driven role assignment (measured, not eyeballed):
+   *   maize on deep      11.74:1  display type, panel fills
+   *   fawn on deep        7.90:1  secondary text on dark
+   *   eminence on maize   7.00:1  small labels on light panels
+   *   lavender on deep    3.16:1  FAILS as text — decorative fills only
+   *
+   * `ink` is the one derived value: Deep Purple cannot serve as both the page
+   * ground and the border/shadow colour (1.27:1 against Purple Iris would make
+   * every border vanish), so this is a deeper shade of it.
+   */
+  --color-deep: #330c4b; /* Deep Purple      — page ground */
+  --color-iris: #51017c; /* Purple Iris      — lifted surface */
+  --color-eminence: #711e7b; /* Eminence     — accent, labels */
+  --color-lavender: #b9379d; /* Sunset Lavender — DECORATIVE ONLY, never behind text */
+  --color-fawn: #e3a88a; /* Fawn            — warm light accent */
+  --color-maize: #eedaa5; /* Maize           — light panels, display type */
+  --color-ink: #1b0730; /* derived         — borders, shadows, text on light */
+
+  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-deep);
+  color: var(--color-maize);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-fawn);
+  color: var(--color-deep);
+}
+
+@layer utilities {
+  /*
+   * Animated gradient field, fixed behind the whole page.
+   *
+   * Each blob is its own layer animated with transform only — never
+   * background-position or filter, which repaint on the main thread every frame.
+   * Blur is applied once as a static filter so the compositor can cache it.
+   * Long, offset, prime-ish durations keep the loop from visibly repeating.
+   */
+  .aurora-field {
+    position: fixed;
+    inset: -20%;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .aurora-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    will-change: transform;
+  }
+
+  @keyframes drift-a {
+    0%   { transform: translate3d(0, 0, 0) scale(1); }
+    50%  { transform: translate3d(14vw, 10vh, 0) scale(1.18); }
+    100% { transform: translate3d(0, 0, 0) scale(1); }
+  }
+
+  @keyframes drift-b {
+    0%   { transform: translate3d(0, 0, 0) scale(1.1); }
+    50%  { transform: translate3d(-16vw, 12vh, 0) scale(0.92); }
+    100% { transform: translate3d(0, 0, 0) scale(1.1); }
+  }
+
+  @keyframes drift-c {
+    0%   { transform: translate3d(0, 0, 0) scale(0.95); }
+    50%  { transform: translate3d(10vw, -14vh, 0) scale(1.22); }
+    100% { transform: translate3d(0, 0, 0) scale(0.95); }
+  }
+
+  .blob-1 {
+    top: 2%;
+    left: 6%;
+    width: 46vw;
+    height: 46vw;
+    background: var(--color-eminence);
+    opacity: 0.75;
+    animation: drift-a 29s ease-in-out infinite;
+  }
+
+  .blob-2 {
+    top: 24%;
+    right: 2%;
+    width: 40vw;
+    height: 40vw;
+    background: var(--color-lavender);
+    opacity: 0.5;
+    animation: drift-b 37s ease-in-out infinite;
+  }
+
+  .blob-3 {
+    bottom: 4%;
+    left: 22%;
+    width: 44vw;
+    height: 44vw;
+    background: var(--color-iris);
+    opacity: 0.7;
+    animation: drift-c 43s ease-in-out infinite;
+  }
+
+  /* Warm sunset glow low in the field, echoing the reference photo. */
+  .blob-4 {
+    bottom: 14%;
+    right: 16%;
+    width: 30vw;
+    height: 30vw;
+    background: var(--color-fawn);
+    opacity: 0.28;
+    animation: drift-a 53s ease-in-out infinite reverse;
+  }
+
+  .shadow-hard {
+    box-shadow: 8px 8px 0 0 var(--color-ink);
+  }
+
+  .shadow-hard-sm {
+    box-shadow: 4px 4px 0 0 var(--color-ink);
+  }
+
+  /* Wordmark glow — keeps the display type luminous without dropping contrast. */
+  .glow-maize {
+    text-shadow: 0 0 46px color-mix(in srgb, var(--color-maize) 50%, transparent);
+  }
+
+  /* Neo-brutalist mechanical press: travel equals the shadow offset, so the
+     element appears to physically depress onto the page. */
+  .press {
+    transition:
+      transform 180ms ease-out,
+      box-shadow 180ms ease-out,
+      background-color 180ms ease-out,
+      color 180ms ease-out;
+  }
+
+  .press:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 0 var(--color-ink);
+  }
+
+  .press-sm:active {
+    transform: translate(2px, 2px);
+  }
+
+  /* Scroll reveal — opacity + lift only, both compositor-friendly. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 620ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@layer utilities {
+  /* --- Manila folder drawer -------------------------------------------- */
+
+  /*
+   * Sheet placement: the incoming panel is released from just above the stack,
+   * drifts down with a hair of rotation, and settles. The shadow starts wide and
+   * soft (sheet is in the air) and tightens as it lands, which is what sells the
+   * depth. Overshoot easing keeps it fluid rather than mechanical.
+   */
+  @keyframes paper-drop {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px) rotate(-0.28deg) scale(1.006);
+      box-shadow: 0 34px 56px -14px rgb(0 0 0 / 0.42);
+    }
+    40% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) rotate(0deg) scale(1);
+      box-shadow: 8px 8px 0 0 var(--color-ink);
+    }
+  }
+
+  /*
+   * cubic-bezier(0.32, 0.72, 0, 1) — eases in gently instead of the near-vertical
+   * launch of an expo curve, then decelerates long. Reads as a sheet being lowered
+   * rather than dropped. Longer duration is what makes it feel smooth; a fast
+   * curve at 520ms was doing most of its travel in the first 80ms.
+   */
+  .paper-drop {
+    animation: paper-drop 640ms cubic-bezier(0.32, 0.72, 0, 1) both;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+  }
+
+  /* Content settles onto the sheet just after it lands. */
+  @keyframes paper-content {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .paper-content {
+    animation: paper-content 520ms cubic-bezier(0.32, 0.72, 0, 1) 110ms both;
+  }
+}
+
+@layer utilities {
+  /* --- Lightbox --------------------------------------------------------- */
+
+  @keyframes scrim-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Same sheet language as the folders: lowered in, not popped. */
+  @keyframes sheet-in {
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .scrim-in {
+    animation: scrim-in 260ms ease-out both;
+  }
+
+  .sheet-in {
+    animation: sheet-in 420ms cubic-bezier(0.32, 0.72, 0, 1) both;
+    will-change: transform, opacity;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paper-drop,
+  .paper-content,
+  .scrim-in,
+  .sheet-in {
+    animation: none;
+  }
+
+  /* Blobs stay — they are the background. Only the drifting stops. */
+  .aurora-blob {
+    animation: none !important;
+  }
+}
+
+/* Focus rings: never removed, always visible against the dark ground. */
+:focus-visible {
+  outline: 3px solid var(--color-maize);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Content must still appear — reveal without the movement. */
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .press,
+  .press:active,
+  .press-sm:active {
+    transition: none;
+    transform: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
