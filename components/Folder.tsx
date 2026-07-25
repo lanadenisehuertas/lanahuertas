@@ -12,17 +12,19 @@ export type FolderTab = {
  */
 export const folderColor = {
   eminence: { bg: "bg-eminence", text: "text-maize" }, //  7.00:1
-  iris: { bg: "bg-iris", text: "text-maize" },         //  9.24:1
-  deep: { bg: "bg-deep", text: "text-maize" },         // 11.74:1
-  fawn: { bg: "bg-fawn", text: "text-ink" },           //  9.14:1
-  maize: { bg: "bg-maize", text: "text-ink" },         // 13.58:1
+  iris: { bg: "bg-iris", text: "text-maize" }, //  9.24:1
+  deep: { bg: "bg-deep", text: "text-maize" }, // 11.74:1
+  fawn: { bg: "bg-fawn", text: "text-ink" }, //  9.14:1
+  maize: { bg: "bg-maize", text: "text-ink" }, // 13.58:1
 } as const;
 
 /**
  * A manila folder. Tabs are rounded rectangles overlapping along one top edge.
- * Switching re-keys the panel so it remounts and replays `paper-drop` — the new
- * sheet is placed onto the stack rather than swapping in place. Two decorative
- * sheets sit beneath so there is visibly a stack to land on.
+ *
+ * Switching re-keys the panel so React remounts it and the placement animation
+ * replays. The direction is derived from the tab's index, so pressing a
+ * different tab brings its folder in from a different side rather than
+ * repeating one motion.
  */
 export default function Folder({
   tabs,
@@ -37,9 +39,16 @@ export default function Folder({
   children: React.ReactNode;
   labelledBy?: string;
 }) {
-  const activeTab = tabs.find((t) => t.id === active) ?? tabs[0];
+  const activeIndex = Math.max(
+    0,
+    tabs.findIndex((t) => t.id === active)
+  );
+  const activeTab = tabs[activeIndex] ?? tabs[0];
   const body = folderColor[activeTab.accent];
   const interactive = tabs.length > 1 && onSelect;
+
+  // 4 directions, cycled by index: bottom-right, bottom-left, top-right, top-left.
+  const direction = activeIndex % 4;
 
   return (
     <div className="relative">
@@ -66,15 +75,20 @@ export default function Folder({
 
           return (
             <button
-              key={t.id}
+              // Key includes active state so the tab remounts when it becomes
+              // active, replaying `tab-in`. Without this the animation only
+              // ever runs on first render.
+              key={`${t.id}-${isActive}`}
               type="button"
               role="tab"
               aria-selected={isActive}
               aria-controls={`panel-${t.id}`}
               onClick={() => onSelect(t.id)}
               style={style}
-              className={`${shared} press-sm cursor-pointer transition-[transform,filter] duration-300 ease-out ${c.bg} ${c.text} ${
-                isActive ? "" : "brightness-90 hover:-translate-y-0.5 hover:brightness-100"
+              className={`${shared} press-sm cursor-pointer ${c.bg} ${c.text} ${
+                isActive
+                  ? "tab-in"
+                  : "brightness-90 transition-[transform,filter] duration-300 ease-out hover:-translate-y-0.5 hover:brightness-100"
               }`}
             >
               {t.label}
@@ -99,7 +113,7 @@ export default function Folder({
           id={`panel-${activeTab.id}`}
           role={interactive ? "tabpanel" : undefined}
           aria-labelledby={labelledBy}
-          className={`paper-drop relative z-30 rounded-2xl rounded-tl-none border-2 border-ink p-4 shadow-hard sm:p-5 ${body.bg}`}
+          className={`place-${direction} relative z-30 rounded-2xl rounded-tl-none border-2 border-ink p-4 shadow-hard sm:p-5 ${body.bg}`}
         >
           <div className="paper-content rounded-xl border-2 border-ink bg-maize p-6 text-ink sm:p-9">
             {children}

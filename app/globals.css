@@ -176,44 +176,129 @@ body {
   /* --- Manila folder drawer -------------------------------------------- */
 
   /*
-   * Sheet placement: the incoming panel is released from just above the stack,
-   * drifts down with a hair of rotation, and settles. The shadow starts wide and
-   * soft (sheet is in the air) and tightens as it lands, which is what sells the
-   * depth. Overshoot easing keeps it fluid rather than mechanical.
+   * Sheet placement, two-phase.
+   *
+   * Phase 1 (0 -> 64%): the sheet glides in from off-axis, visibly slanted and
+   *   slightly oversized, as if being carried into place by hand. Decelerating.
+   * Phase 2 (64 -> 100%): it squares up — rotation and residual offset snap to
+   *   zero on a fast curve. That late correction is the whole effect; without it
+   *   the sheet just slides and reads like a carousel.
+   *
+   * Per-keyframe `animation-timing-function` is what makes the two phases
+   * possible in one animation — the value declared in a keyframe governs the
+   * segment that STARTS there.
+   *
+   * The shadow travels with it: wide and soft while airborne, tightening to the
+   * hard offset shadow on landing. That does more for the sense of depth than
+   * the movement does.
    */
-  @keyframes paper-drop {
+  @keyframes place-br {
     0% {
       opacity: 0;
-      transform: translateY(-20px) rotate(-0.28deg) scale(1.006);
-      box-shadow: 0 34px 56px -14px rgb(0 0 0 / 0.42);
+      transform: translate3d(46px, 40px, 0) rotate(2deg) scale(1.02);
+      box-shadow: 0 36px 60px -14px rgb(0 0 0 / 0.45);
+      animation-timing-function: cubic-bezier(0.16, 0.62, 0.3, 0.98);
     }
-    40% {
+    64% {
       opacity: 1;
+      transform: translate3d(3px, 5px, 0) rotate(0.85deg) scale(1.004);
+      box-shadow: 0 12px 26px -8px rgb(0 0 0 / 0.34);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.24, 1);
     }
     100% {
       opacity: 1;
-      transform: translateY(0) rotate(0deg) scale(1);
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
       box-shadow: 8px 8px 0 0 var(--color-ink);
     }
   }
 
-  /*
-   * cubic-bezier(0.32, 0.72, 0, 1) — eases in gently instead of the near-vertical
-   * launch of an expo curve, then decelerates long. Reads as a sheet being lowered
-   * rather than dropped. Longer duration is what makes it feel smooth; a fast
-   * curve at 520ms was doing most of its travel in the first 80ms.
-   */
-  .paper-drop {
-    animation: paper-drop 640ms cubic-bezier(0.32, 0.72, 0, 1) both;
-    will-change: transform, opacity;
-    backface-visibility: hidden;
+  @keyframes place-bl {
+    0% {
+      opacity: 0;
+      transform: translate3d(-46px, 40px, 0) rotate(-2deg) scale(1.02);
+      box-shadow: 0 36px 60px -14px rgb(0 0 0 / 0.45);
+      animation-timing-function: cubic-bezier(0.16, 0.62, 0.3, 0.98);
+    }
+    64% {
+      opacity: 1;
+      transform: translate3d(-3px, 5px, 0) rotate(-0.85deg) scale(1.004);
+      box-shadow: 0 12px 26px -8px rgb(0 0 0 / 0.34);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.24, 1);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+      box-shadow: 8px 8px 0 0 var(--color-ink);
+    }
   }
 
-  /* Content settles onto the sheet just after it lands. */
+  @keyframes place-tr {
+    0% {
+      opacity: 0;
+      transform: translate3d(44px, -34px, 0) rotate(-1.8deg) scale(1.02);
+      box-shadow: 0 36px 60px -14px rgb(0 0 0 / 0.45);
+      animation-timing-function: cubic-bezier(0.16, 0.62, 0.3, 0.98);
+    }
+    64% {
+      opacity: 1;
+      transform: translate3d(3px, -4px, 0) rotate(-0.8deg) scale(1.004);
+      box-shadow: 0 12px 26px -8px rgb(0 0 0 / 0.34);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.24, 1);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+      box-shadow: 8px 8px 0 0 var(--color-ink);
+    }
+  }
+
+  @keyframes place-tl {
+    0% {
+      opacity: 0;
+      transform: translate3d(-44px, -34px, 0) rotate(1.8deg) scale(1.02);
+      box-shadow: 0 36px 60px -14px rgb(0 0 0 / 0.45);
+      animation-timing-function: cubic-bezier(0.16, 0.62, 0.3, 0.98);
+    }
+    64% {
+      opacity: 1;
+      transform: translate3d(-3px, -4px, 0) rotate(0.8deg) scale(1.004);
+      box-shadow: 0 12px 26px -8px rgb(0 0 0 / 0.34);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.24, 1);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+      box-shadow: 8px 8px 0 0 var(--color-ink);
+    }
+  }
+
+  .place-0 {
+    animation: place-br 700ms both;
+  }
+  .place-1 {
+    animation: place-bl 700ms both;
+  }
+  .place-2 {
+    animation: place-tr 700ms both;
+  }
+  .place-3 {
+    animation: place-tl 700ms both;
+  }
+
+  .place-0,
+  .place-1,
+  .place-2,
+  .place-3 {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    transform-origin: 50% 0;
+  }
+
+  /* Content settles onto the sheet just after it squares up. */
   @keyframes paper-content {
     from {
       opacity: 0;
-      transform: translateY(6px);
+      transform: translateY(8px);
     }
     to {
       opacity: 1;
@@ -222,7 +307,45 @@ body {
   }
 
   .paper-content {
-    animation: paper-content 520ms cubic-bezier(0.32, 0.72, 0, 1) 110ms both;
+    animation: paper-content 520ms cubic-bezier(0.32, 0.72, 0, 1) 200ms both;
+  }
+
+  /* Tabs re-enter alongside their folder, offset per position. */
+  @keyframes tab-in {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 14px, 0) rotate(-1.4deg);
+      animation-timing-function: cubic-bezier(0.16, 0.62, 0.3, 0.98);
+    }
+    62% {
+      opacity: 1;
+      transform: translate3d(0, 2px, 0) rotate(-0.5deg);
+      animation-timing-function: cubic-bezier(0.7, 0, 0.24, 1);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+  }
+
+  .tab-in {
+    animation: tab-in 560ms both;
+  }
+
+  /* Grid cards stagger in behind the panel as it squares up. */
+  @keyframes card-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .card-in {
+    animation: card-in 420ms cubic-bezier(0.32, 0.72, 0, 1) both;
   }
 }
 
@@ -261,7 +384,12 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .paper-drop,
+  .place-0,
+  .place-1,
+  .place-2,
+  .place-3,
+  .tab-in,
+  .card-in,
   .paper-content,
   .scrim-in,
   .sheet-in {
