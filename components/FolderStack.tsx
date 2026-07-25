@@ -1,20 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { workTabs, type Project } from "@/lib/content";
+import { workTabs, caseStudy, type Project } from "@/lib/content";
 import Folder, { type FolderTab } from "./Folder";
 import ProjectModal from "./ProjectModal";
+import MasonryGrid from "./MasonryGrid";
+import CaseStudy from "./CaseStudy";
+
+const CASE_ID = "case-study";
+
+/** Column spans per breakpoint, derived from the art-directed 12-col value. */
+function spanClass(span: 3 | 4 | 6 = 3) {
+  if (span === 6) return "col-span-4 sm:col-span-6 lg:col-span-6";
+  if (span === 4) return "col-span-2 sm:col-span-3 lg:col-span-4";
+  return "col-span-2 sm:col-span-3 lg:col-span-3";
+}
 
 export default function FolderStack() {
   const [active, setActive] = useState(workTabs[0].id);
   const [selected, setSelected] = useState<Project | null>(null);
 
-  const tab = workTabs.find((t) => t.id === active) ?? workTabs[0];
-  const tabs: FolderTab[] = workTabs.map((t) => ({
-    id: t.id,
-    label: t.label,
-    accent: t.accent,
-  }));
+  const tabs: FolderTab[] = [
+    ...workTabs.map((t) => ({ id: t.id, label: t.label, accent: t.accent })),
+    { id: CASE_ID, label: "case study", accent: "deep" as const },
+  ];
+
+  const tab = workTabs.find((t) => t.id === active);
+  const isCase = active === CASE_ID;
 
   return (
     <section id="work" className="px-4 pb-20 sm:px-8">
@@ -23,80 +35,104 @@ export default function FolderStack() {
           id="work-heading"
           className="font-display mb-6 pl-2 text-xs font-bold tracking-[0.22em] text-fawn uppercase"
         >
-          projects
+          selected work
         </h2>
 
         <Folder tabs={tabs} active={active} onSelect={setActive} labelledBy="work-heading">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h3 className="font-display text-3xl font-black tracking-tighter sm:text-5xl">
-              {tab.heading}
-            </h3>
-            <span className="text-xs font-semibold text-ink/45">
-              {tab.projects.length} {tab.projects.length === 1 ? "piece" : "pieces"}
-            </span>
-          </div>
+          {isCase ? (
+            <CaseStudy data={caseStudy} />
+          ) : (
+            tab && (
+              <>
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <h3 className="font-display text-3xl font-black tracking-tighter sm:text-5xl">
+                    {tab.heading}
+                  </h3>
+                  <span className="text-xs font-semibold text-ink/45">
+                    {tab.projects.length} {tab.projects.length === 1 ? "project" : "projects"}
+                  </span>
+                </div>
 
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/80 sm:text-base">
-            {tab.blurb}
-          </p>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/75 sm:text-base">
+                  {tab.blurb}
+                </p>
 
-          {/*
-           * Masonry columns. Each card keeps its source aspect ratio, so a 16:9
-           * banner and a 3:4 poster sit side by side at their true shapes
-           * instead of being cropped to a common box.
-           */}
-          <div className="mt-8 columns-2 gap-3 sm:columns-3 lg:columns-4">
-            {tab.projects.map((p, i) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => setSelected(p)}
-                style={{ animationDelay: `${Math.min(i * 32, 400)}ms` }}
-                className="group card-in relative mb-3 block w-full cursor-pointer overflow-hidden rounded-lg border-2 border-ink bg-lavender/25 text-left break-inside-avoid shadow-hard-sm transition-transform duration-200 hover:-translate-y-1 hover:rotate-[-1.2deg]"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={p.image}
-                  alt={p.title}
-                  width={p.w}
-                  height={p.h}
-                  loading={i < 4 ? "eager" : "lazy"}
-                  decoding="async"
-                  // width/height reserve the box, so nothing shifts as images load.
-                  className="block h-auto w-full"
-                />
+                <div className="mt-7">
+                  <MasonryGrid>
+                    {tab.projects.map((p, i) => {
+                      const cover = p.images[0];
+                      const extra = p.images.length - 1;
+                      return (
+                        <div key={p.id} className={spanClass(p.span)}>
+                          <button
+                            type="button"
+                            onClick={() => setSelected(p)}
+                            aria-label={`View ${p.title}${extra > 0 ? ` — ${p.images.length} pieces` : ""}`}
+                            style={{ animationDelay: `${Math.min(i * 28, 340)}ms` }}
+                            className="group card-in relative block w-full cursor-pointer overflow-hidden rounded-md border border-ink/60 bg-lavender/20 text-left transition-[transform,border-color] duration-300 ease-out hover:z-10 hover:-translate-y-1 hover:border-ink"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={cover.src}
+                              alt={p.title}
+                              width={cover.w}
+                              height={cover.h}
+                              loading={i < 6 ? "eager" : "lazy"}
+                              decoding="async"
+                              className="block h-auto w-full transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                            />
 
-                {p.isVideo && (
-                  <>
-                    <span
-                      aria-hidden
-                      className="pointer-events-none absolute inset-0 flex items-center justify-center"
-                    >
-                      <span className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-ink bg-maize/90 pl-0.5 shadow-hard-sm transition-transform duration-200 group-hover:scale-110">
-                        <svg viewBox="0 0 24 24" className="h-4 w-4 fill-ink">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </span>
-                    </span>
-                    {p.duration && (
-                      <span className="absolute top-2 right-2 rounded bg-ink/85 px-1.5 py-0.5 text-[10px] font-bold text-maize tabular-nums">
-                        {p.duration}
-                      </span>
-                    )}
-                  </>
-                )}
+                            {/* Set count */}
+                            {extra > 0 && (
+                              <span className="absolute top-1.5 left-1.5 rounded bg-ink/85 px-1.5 py-0.5 text-[10px] font-bold text-maize tabular-nums">
+                                +{extra}
+                              </span>
+                            )}
 
-                <span className="absolute inset-x-0 bottom-0 translate-y-full bg-ink/88 px-2.5 py-2 text-[11px] leading-tight font-semibold text-maize transition-transform duration-200 group-hover:translate-y-0 group-focus-visible:translate-y-0">
-                  {p.title}
-                  {p.year && <span className="ml-1.5 font-normal text-maize/60">{p.year}</span>}
-                </span>
-              </button>
-            ))}
-          </div>
+                            {p.isVideo && (
+                              <>
+                                <span
+                                  aria-hidden
+                                  className="pointer-events-none absolute inset-0 flex items-center justify-center"
+                                >
+                                  <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-ink bg-maize/90 pl-0.5 transition-transform duration-300 group-hover:scale-110">
+                                    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-ink">
+                                      <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                  </span>
+                                </span>
+                                {p.duration && (
+                                  <span className="absolute top-1.5 right-1.5 rounded bg-ink/85 px-1.5 py-0.5 text-[10px] font-bold text-maize tabular-nums">
+                                    {p.duration}
+                                  </span>
+                                )}
+                              </>
+                            )}
+
+                            {/* Caption — slides up on hover, always present for screen readers */}
+                            <span className="absolute inset-x-0 bottom-0 translate-y-full bg-gradient-to-t from-ink via-ink/95 to-transparent px-2.5 pt-5 pb-2 text-[11px] leading-tight font-semibold text-maize transition-transform duration-300 ease-out group-hover:translate-y-0 group-focus-visible:translate-y-0">
+                              {p.title}
+                              {p.year && (
+                                <span className="ml-1.5 font-normal text-maize/55">{p.year}</span>
+                              )}
+                            </span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </MasonryGrid>
+                </div>
+              </>
+            )
+          )}
         </Folder>
       </div>
 
-      <ProjectModal project={selected} categoryLabel={tab.heading} onClose={() => setSelected(null)} />
+      <ProjectModal
+        project={selected}
+        categoryLabel={tab?.heading ?? ""}
+        onClose={() => setSelected(null)}
+      />
     </section>
   );
 }

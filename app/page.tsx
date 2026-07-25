@@ -8,7 +8,7 @@ import Reveal from "@/components/Reveal";
 export default function Home() {
   return (
     <main>
-      {/* title -> short about -> projects -> extended about -> contact */}
+      {/* title -> short intro -> the work -> about -> contact */}
       <Hero />
       <Reveal>
         <ShortAbout />

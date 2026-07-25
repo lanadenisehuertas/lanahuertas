@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Project } from "@/lib/content";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])';
@@ -28,8 +28,14 @@ export default function ProjectModal({
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const restoreRef = useRef<HTMLElement | null>(null);
+  const [idx, setIdx] = useState(0);
 
   const open = project !== null;
+
+  // Reset the gallery whenever a different project opens.
+  useEffect(() => {
+    setIdx(0);
+  }, [project?.id]);
 
   const handleKey = useCallback(
     (e: KeyboardEvent) => {
@@ -92,6 +98,7 @@ export default function ProjectModal({
 
   const titleId = "project-modal-title";
   const embed = project.videoUrl ? toEmbed(project.videoUrl) : null;
+  const shown = project.images[Math.min(idx, project.images.length - 1)];
 
   return (
     <div
@@ -114,6 +121,11 @@ export default function ProjectModal({
         <div className="flex shrink-0 items-center justify-between gap-4 border-b-2 border-ink/15 px-5 py-3">
           <p className="font-display text-[11px] font-bold tracking-[0.18em] text-eminence uppercase">
             {categoryLabel}
+            {project.images.length > 1 && (
+              <span className="ml-2 font-normal text-ink/45">
+                {project.images.length} pieces
+              </span>
+            )}
           </p>
           <button
             ref={closeRef}
@@ -127,7 +139,7 @@ export default function ProjectModal({
 
         <div className="grid overflow-y-auto md:grid-cols-[1.3fr_1fr]">
           {/* Media */}
-          <div className="flex items-start justify-center bg-lavender/25 p-4 sm:p-6">
+          <div className="flex flex-col gap-3 bg-lavender/25 p-4 sm:p-6">
             {embed ? (
               <div className="w-full" style={{ aspectRatio: "16 / 9" }}>
                 <iframe
@@ -139,22 +151,51 @@ export default function ProjectModal({
                 />
               </div>
             ) : (
-              <figure className="w-full">
+              <figure>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={project.image}
-                  alt={project.title}
-                  width={project.w}
-                  height={project.h}
-                  className="mx-auto block max-h-[68vh] w-auto max-w-full rounded-xl border-2 border-ink object-contain"
+                  key={shown.src}
+                  src={shown.src}
+                  alt={shown.caption ?? project.title}
+                  width={shown.w}
+                  height={shown.h}
+                  className="paper-content mx-auto block max-h-[62vh] w-auto max-w-full rounded-xl border-2 border-ink object-contain"
                 />
-                {project.isVideo && (
-                  <figcaption className="mt-3 text-center text-xs text-ink/50">
-                    Still from the edit
-                    {project.duration ? ` · ${project.duration}` : ""} — full video coming soon.
-                  </figcaption>
-                )}
+                <figcaption className="mt-2.5 text-center text-xs text-ink/55">
+                  {shown.caption ??
+                    (project.isVideo
+                      ? `Still from the edit${project.duration ? ` · ${project.duration}` : ""} — full video coming soon.`
+                      : null)}
+                </figcaption>
               </figure>
+            )}
+
+            {/* Gallery strip — only when the project has more than one piece */}
+            {!embed && project.images.length > 1 && (
+              <div
+                className="flex flex-wrap justify-center gap-2"
+                role="tablist"
+                aria-label="Pieces in this project"
+              >
+                {project.images.map((im, i) => (
+                  <button
+                    key={im.src}
+                    type="button"
+                    role="tab"
+                    aria-selected={i === idx}
+                    aria-label={im.caption ?? `Piece ${i + 1}`}
+                    onClick={() => setIdx(i)}
+                    className={`h-14 w-14 shrink-0 cursor-pointer overflow-hidden rounded-md border-2 transition duration-200 ${
+                      i === idx
+                        ? "border-eminence ring-2 ring-eminence/35"
+                        : "border-ink/30 opacity-65 hover:opacity-100"
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={im.src} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 

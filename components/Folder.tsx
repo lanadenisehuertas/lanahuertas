@@ -52,17 +52,29 @@ export default function Folder({
 
   return (
     <div className="relative">
-      <div className="flex items-end pl-3" role={interactive ? "tablist" : undefined}>
+      {/*
+       * Scrollable tab strip. Four tabs no longer fit 375px, and wrapping puts a
+       * second row of tabs through the panel edge. `pb-[9px]` makes room for the
+       * inactive tabs' downward offset, which would otherwise overflow the
+       * scroll container and clip.
+       */}
+      <div
+        className="flex items-end overflow-x-auto pb-[9px] pl-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        role={interactive ? "tablist" : undefined}
+      >
         {tabs.map((t, i) => {
           const isActive = t.id === active;
           const c = folderColor[t.accent];
           const shared =
-            "font-display relative flex min-h-[44px] items-center rounded-t-xl border-2 border-b-0 border-ink px-5 text-[11px] font-bold tracking-wide whitespace-nowrap uppercase sm:text-xs";
+            "font-display relative flex min-h-[44px] shrink-0 items-center rounded-t-xl border-2 border-b-0 border-ink px-5 text-[11px] font-bold tracking-wide whitespace-nowrap uppercase sm:text-xs";
 
           const style = {
             marginLeft: i === 0 ? 0 : "-10px",
             zIndex: isActive ? 40 : 10 + i,
-            transform: isActive ? "translateY(0)" : "translateY(7px)",
+            // Inactive tabs sit lower AND further back. The brightness drop is
+            // what actually reads at a glance — position alone was too subtle
+            // once every tab carried its own accent colour.
+            transform: isActive ? "translateY(0)" : "translateY(9px) scale(0.97)",
           } as const;
 
           if (!interactive) {
@@ -88,7 +100,7 @@ export default function Folder({
               className={`${shared} press-sm cursor-pointer ${c.bg} ${c.text} ${
                 isActive
                   ? "tab-in"
-                  : "brightness-90 transition-[transform,filter] duration-300 ease-out hover:-translate-y-0.5 hover:brightness-100"
+                  : "brightness-[0.62] saturate-[0.75] transition-[transform,filter] duration-300 ease-out hover:brightness-90 hover:saturate-100"
               }`}
             >
               {t.label}
@@ -98,7 +110,7 @@ export default function Folder({
       </div>
 
       {/* The stack the new sheet lands on. Decorative only. */}
-      <div className="relative">
+      <div className="relative -mt-[9px]">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 translate-y-2.5 rotate-[0.5deg] rounded-2xl border-2 border-ink/35 bg-iris/50"

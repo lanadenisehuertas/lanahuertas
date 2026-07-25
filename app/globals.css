@@ -332,6 +332,26 @@ body {
     animation: tab-in 560ms both;
   }
 
+  /* Toolkit badges drifting around the portrait. Transform-only. */
+  @keyframes float-badge {
+    0% {
+      transform: translate3d(0, 0, 0) rotate(-3deg);
+    }
+    50% {
+      transform: translate3d(0, -12px, 0) rotate(3deg);
+    }
+    100% {
+      transform: translate3d(0, 0, 0) rotate(-3deg);
+    }
+  }
+
+  .float-badge {
+    animation-name: float-badge;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+
   /* Grid cards stagger in behind the panel as it squares up. */
   @keyframes card-in {
     from {
@@ -390,6 +410,7 @@ body {
   .place-3,
   .tab-in,
   .card-in,
+  .float-badge,
   .paper-content,
   .scrim-in,
   .sheet-in {

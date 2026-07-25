@@ -1,34 +1,32 @@
 // Single source of truth for all portfolio content.
 // Adding a work category = adding an entry to `workTabs`. Nothing else changes.
 
+export type ProjectImage = {
+  src: string;
+  /** Intrinsic pixel size — reserves layout space so nothing shifts on load. */
+  w: number;
+  h: number;
+  caption?: string;
+};
+
 export type Project = {
   id: string;
   title: string;
-  image: string;
-  /**
-   * Intrinsic pixel size of `image`. Cards render at this exact ratio rather
-   * than a fixed crop, so a 16:9 banner and a 3:4 poster keep their own shape.
-   * Also reserves layout space, which keeps CLS at zero while images load.
-   */
-  w: number;
-  h: number;
+  /** images[0] is the cover shown on the card; the rest open in the lightbox. */
+  images: ProjectImage[];
+  /** Columns out of 12. Art direction, not derived — some pieces earn more room. */
+  span?: 3 | 4 | 6;
 
-  // --- Detail view -------------------------------------------------------
-  /** Full write-up shown in the lightbox. */
   description?: string;
   client?: string;
   year?: string;
   role?: string;
-  /** Software/techniques used, e.g. ["Photoshop", "Illustrator"]. */
   tools?: string[];
-  /** External link — live site, repo, or case study. */
   href?: string;
   hrefLabel?: string;
 
   // --- Video only --------------------------------------------------------
-  /** Marks the card as a video and shows a play affordance. */
   isVideo?: boolean;
-  /** Runtime, e.g. "2:14". */
   duration?: string;
   /** YouTube/Vimeo watch URL. Until set, the lightbox shows the poster only. */
   videoUrl?: string;
@@ -50,26 +48,38 @@ export const profile = {
   // Street address deliberately omitted — full address lives on the resume only.
   location: "Manila, Philippines",
   email: "lanadenisehuertas@gmail.com",
-  tagline: "Let's create something great.",
   years: "7+ years",
 
-  // Title area: name first, then what I solve, then what I make.
   title: "Hi, I'm Lana.",
   titleRole: "Graphic designer, video editor, and problem solver.",
   welcome:
     "Welcome to my portfolio. Manila-based, 7+ years deep in Photoshop and Premiere Pro, turning rough ideas into work that holds attention.",
 
-  // Short version, for the card directly under the title.
   shortAbout:
     "Brand identities, publicity materials, and video edits that get looked at twice. Fast, detail-obsessed, always on time. Now studying Computer Science at FEU Tech — so I build what I design.",
 
-  intro:
-    "Manila-based designer and video editor with 7+ years across Photoshop and Premiere Pro. Highly adaptable, obsessed with the details, and always on time.",
+  // Long-form about, shown in the About Me folder tab.
+  aboutHeadline: "I build high-quality visual content and adaptable designs for brands that want to stand out.",
+  aboutKicker: "And I can do it for you, too.",
+  aboutBody:
+    "I pride myself on being a highly adaptable creative. I bring a meticulous eye for detail and a versatile skill set, backed by 7+ years in Photoshop, 6 years in Premiere Pro, and a sharp command of Illustrator. From crafting high-impact publicity materials and scalable templates to pacing dynamic video edits, I handle the creative heavy lifting so you don't have to.",
+
   summary:
     "Creative professional with 7+ years in graphic design, video editing, and social media content, dating back to 2019 through freelance, school, and organizational work. Advanced in Photoshop, Illustrator, Premiere Pro, After Effects, and Canva, producing branded graphics, promotional videos, and multi-platform social content aligned to client brand voice. Experienced managing content calendars and coordinating remote creative teams across Facebook, Instagram, TikTok, and X. Currently completing a B.S. in Computer Science — Software Engineering.",
 };
 
-// Most recent first.
+/** Tool badges shown floating around the portrait. */
+export const toolkit = [
+  { id: "ps", label: "Ps", name: "Adobe Photoshop", bg: "#001E36", fg: "#31A8FF" },
+  { id: "ai", label: "Ai", name: "Adobe Illustrator", bg: "#330000", fg: "#FF9A00" },
+  { id: "pr", label: "Pr", name: "Adobe Premiere Pro", bg: "#2A0634", fg: "#EA77FF" },
+  { id: "ae", label: "Ae", name: "Adobe After Effects", bg: "#1F0740", fg: "#9999FF" },
+  { id: "ca", label: "Ca", name: "Canva", bg: "#0B0F2B", fg: "#00C4CC" },
+  { id: "fg", label: "Fg", name: "Figma", bg: "#12111A", fg: "#F24E1E" },
+] as const;
+
+// Most recent first. Bullets kept to two lines each — the detail lives in the
+// projects, not here.
 export const experience = [
   {
     role: "Freelance Graphic Designer & Video Editor",
@@ -77,9 +87,8 @@ export const experience = [
     place: "Remote, PH",
     period: "2023 — Present",
     points: [
-      "Design branded graphics, publicity materials, and social content for clients across multiple industries.",
-      "Cut and finish video in Premiere Pro and After Effects, from short-form social edits to event recaps.",
-      "Deliver final assets as organized, editable Canva templates so clients can make small updates themselves.",
+      "Branded graphics, publicity materials, and social content for clients across several industries.",
+      "Video cut and finished in Premiere Pro and After Effects, delivered with editable Canva templates for handoff.",
     ],
   },
   {
@@ -88,21 +97,18 @@ export const experience = [
     place: "Bataan, PH",
     period: "2020 — 2025",
     points: [
-      "Produced weekly branded video content for digital outreach and live programs in Premiere Pro and After Effects.",
-      "Designed graphics, banners, and visual assets keeping a consistent brand identity across social platforms.",
-      "Managed content scheduling and publishing across Facebook, Instagram, and YouTube to grow engagement.",
-      "Coordinated remotely with teams on content calendars and weekly publishing deadlines.",
+      "Produced weekly video and graphics for digital outreach and live programs.",
+      "Ran content scheduling across Facebook, Instagram, and YouTube on a fixed weekly deadline.",
     ],
   },
   {
     role: "Creatives Committee Head",
-    org: "Student Coordinating Council & ACM Chapter — FEU Institute of Technology",
+    org: "Student Coordinating Council & ACM Chapter — FEU Tech",
     place: "Manila, PH",
     period: "Sep 2023 — Jul 2025",
     points: [
-      "Led creative teams producing video edits, motion graphics, and design assets for campus-wide events and interschool competitions.",
-      "Planned and ran multi-platform campaigns across Instagram, Facebook, and TikTok to drive attendance and engagement.",
-      "Maintained brand consistency across digital and print materials, managing production timelines across two organizations.",
+      "Led creative teams across two organizations, producing campaign art for campus-wide events.",
+      "Planned multi-platform campaigns on Instagram, Facebook, and TikTok, and held brand consistency across print and digital.",
     ],
   },
   {
@@ -111,8 +117,8 @@ export const experience = [
     place: "Zambales, PH",
     period: "Oct 2022 — Jul 2023",
     points: [
-      "Co-founded the school's inaugural Robotics Club and established its visual branding, logo, and design guidelines.",
-      "Managed a 10-member editing team producing promotional videos and graphic content for competitions.",
+      "Co-founded the club and built its visual identity — logo, palette, and design guidelines.",
+      "Managed a 10-member editing team producing competition video and graphics.",
     ],
   },
   {
@@ -121,8 +127,8 @@ export const experience = [
     place: "Philippines",
     period: "2019 — 2023",
     points: [
-      "Produced branded graphics and video edits for school organizations and community projects.",
-      "Built foundational skills across the Adobe Creative Suite and Canva.",
+      "Graphics and video edits for school organizations and community projects.",
+      "Where the Adobe Creative Suite habit started.",
     ],
   },
 ];
@@ -141,6 +147,21 @@ export const education = [
     period: "Graduated July 2023",
     detail: "Senior High School Diploma — Graduated with High Honors (GWA: 96)",
     honors: [],
+  },
+];
+
+export const certifications = [
+  {
+    name: "IT Specialist — Python",
+    issuer: "Certiport · Pearson VUE",
+    date: "July 2025",
+    detail: "Credential ID JdyU-4wb2 · verify.certiport.com",
+  },
+  {
+    name: "Complete Guide to Android Development with Kotlin",
+    issuer: "LinkedIn Learning",
+    date: "November 2025",
+    detail: "6h 45m · Kotlin, Android Development",
   },
 ];
 
@@ -179,7 +200,7 @@ export const skillGroups = [
   },
   {
     label: "technical",
-    items: ["Python", "JavaScript", "Google Workspace", "Microsoft Office"],
+    items: ["Python", "JavaScript", "Kotlin", "Google Workspace", "Microsoft Office"],
   },
 ];
 
@@ -188,8 +209,66 @@ export const software = ["Ps", "Ai", "Pr", "Ae", "Ca", "Py", "Js"];
 export const languages = ["Filipino (Native)", "English (Advanced)"];
 
 // ---------------------------------------------------------------------------
-// Work. Each tab renders identically — adding one is a data change.
+// Case study — rendered as its own layout, not a gallery card.
+// Mirrors the information architecture of the live product site.
 // ---------------------------------------------------------------------------
+
+export const caseStudy = {
+  eyebrow: "Undergraduate thesis · in clinical use",
+  product: "PsyClick",
+  headline: "Calmer clinical screening",
+  summary:
+    "A clinician-guided screening companion that turns questionnaires, typing rhythm, mouse dynamics, and emotional response tasks into clear decision-support reports.",
+  badges: ["PHQ-9 + GAD-7", "PSI + PAI biomarkers", "Clinician reviewed"],
+
+  problem:
+    "A first clinical session is spent finding out what to ask about. PsyClick captures millisecond-level keystroke and cursor telemetry while a client fills in a standard intake, then hands the psychologist a map of where they hesitated — so the interview can open on what actually registered.",
+
+  /** The sample report card from the product's own hero. */
+  report: {
+    label: "Session report",
+    metrics: [
+      { k: "PHQ-9", v: "7" },
+      { k: "GAD-7", v: "5" },
+      { k: "PSI", v: "0.82" },
+      { k: "PAI", v: "0.44" },
+      { k: "T²", v: "3.2" },
+    ],
+    flag: "Normal",
+  },
+
+  pillars: [
+    { title: "Psychomotor signals", body: "Eight behavioural biomarkers captured passively while the client types." },
+    { title: "PHQ-9 + GAD-7", body: "Validated depression and anxiety instruments, scored alongside the telemetry." },
+    { title: "Emotional response task", body: "Domain-tagged prompts that surface which topics cause hesitation." },
+    { title: "Exportable reports", body: "GREEN / AMBER / RED flags with an audit trail the clinician can file." },
+  ],
+
+  /** The eight-stage detection pipeline, condensed. */
+  pipeline: [
+    { n: "01", k: "Capture", d: "Raw keystroke and cursor telemetry, grid-aligned to 1 ms" },
+    { n: "02", k: "Smooth", d: "Gaussian-weighted filter strips hardware noise above 8 Hz" },
+    { n: "03", k: "Extract", d: "Eight biomarkers — flight, dwell, velocity, jerk, entropy, pauses" },
+    { n: "04", k: "Baseline", d: "EWMA builds a personal baseline during a 2-minute calibration" },
+    { n: "05", k: "Hotelling T²", d: "All eight evaluated at once, with Ledoit-Wolf shrinkage" },
+    { n: "06", k: "PSI & PAI", d: "T² decomposed into slowing and agitation indices" },
+    { n: "07", k: "Classify", d: "Fuzzy rule base resolves the pair into a clinical flag" },
+    { n: "08", k: "Normative", d: "Compared against a 100-person screened baseline" },
+  ],
+
+  design:
+    "The interface had to stay calm while doing something quite invasive underneath. Clinical tools tend to look like spreadsheets; this one had to be legible under time pressure, honest about uncertainty, and never imply a diagnosis it cannot make. Flags are three plain colours, every number is traceable back to the stage that produced it, and the client-facing side shows none of it.",
+
+  privacy:
+    "Privacy is architectural rather than promised — the behavioural baseline lives in session memory under 600 bytes and is discarded when the session ends.",
+
+  role: "Full-stack developer — pipeline, database layer, and interface",
+  stack: ["React", "Vite", "Electron", "Python", "NumPy", "SciPy", "Supabase", "SQLite"],
+  year: "2025 — 2026",
+  href: "https://psyclick-app.vercel.app/",
+  hrefLabel: "Visit the live site",
+  image: { src: "/work/psyclick.webp", w: 1600, h: 1317, caption: "Layered defense-in-depth architecture" },
+};
 
 export const workTabs: WorkTab[] = [
   {
@@ -197,417 +276,330 @@ export const workTabs: WorkTab[] = [
     label: "publicity materials",
     heading: "Publicity Materials",
     blurb:
-      "Event posters, campaign graphics, and announcement sets for student organizations and campus offices — built in Photoshop and Illustrator, sized for every platform they had to run on.",
+      "Campaign key art and announcement sets for student organizations and campus offices. Built in Photoshop and Illustrator, sized for every platform each one had to run on.",
     accent: "eminence",
     projects: [
       {
+        id: "technorun",
+        title: "TechnoRun 2025",
+        span: 4,
+        year: "2025",
+        client: "Student Coordinating Council — FEU Tech",
+        role: "Poster and information design",
+        tools: ["Photoshop", "Illustrator"],
+        description:
+          "Fun-run announcement carrying real logistics — four race distances with pricing, venue, call time, a six-step registration list, and a QR code — without losing the rainbow-track motion of the artwork. The hardest layout in the set, because everything on it had to survive being read at a glance on a phone.\n\nThe race kit that shipped alongside it lives under Brand Systems.",
+        images: [{ src: "/work/technorun-poster.webp", w: 1176, h: 1600 }],
+      },
+      {
+        id: "battle-of-the-bands",
+        title: "Battle of the Bands 2024",
+        span: 4,
+        year: "2024",
+        client: "Student Coordinating Council — FEU Tech",
+        role: "Campaign design",
+        tools: ["Photoshop", "Illustrator"],
+        description:
+          "Two-piece campaign for a campus band competition. The main poster is assembled as a print-and-tape collage — halftone amps, cassette decks, and vintage microphones under torn-paper lettering — deliberately rough where the rest of the campus material was clean. The merchandise banner reuses the instrument language in a hot pink and orange starburst so the drop still reads as the same event.",
+        images: [
+          { src: "/work/battle-of-the-bands.webp", w: 1200, h: 1600, caption: "Main event poster" },
+          { src: "/work/rock-of-sales.webp", w: 1600, h: 900, caption: "Rock of Sales — merch drop banner" },
+        ],
+      },
+      {
+        id: "feu-library",
+        title: "FEU Tech Library",
+        span: 4,
+        year: "2025",
+        client: "FEU Tech Library",
+        role: "Concept, copy, and design",
+        tools: ["Photoshop", "Illustrator"],
+        description:
+          "An ongoing series for the campus library, where the brief was almost always the same: make an administrative notice worth stopping for.\n\nThe database announcement became a what-this-means-for-you list. The Halloween reading activity became a detective corkboard, its game mechanics doubling as the layout. Finals-week opening hours arrived disguised as a multiple-choice question — the schedule only turns up after the joke has landed.",
+        images: [
+          { src: "/work/biblioboo.webp", w: 1600, h: 1600, caption: "Biblioboo's Haunted Book Nook" },
+          { src: "/work/finals-motivation.webp", w: 1600, h: 1600, caption: "You Can Do It, iTamaraw — finals hours" },
+          { src: "/work/ebsco-office365.webp", w: 1080, h: 1080, caption: "EBSCO in Office 365" },
+        ],
+      },
+      {
         id: "techibig",
         title: "TechIbig",
-        image: "/work/techibig.webp",
-        w: 1382,
-        h: 1600,
-        description:
-          "Valentine's event key art built around a Las Vegas-style marquee sign standing in a dusk landscape, with heart-shaped bulbs and arrow signage. The chrome-and-blush palette and dimensional lettering carry the season-of-love line without spelling it out twice.",
-        client: "FEU Institute of Technology",
+        span: 3,
         year: "2024",
+        client: "FEU Institute of Technology",
         role: "Key art and layout",
         tools: ["Photoshop", "Illustrator"],
+        description:
+          "Valentine's event key art built around a Las Vegas-style marquee standing in a dusk landscape, with heart-shaped bulbs and arrow signage. The chrome-and-blush palette carries the season-of-love line so the copy never has to say it twice.",
+        images: [{ src: "/work/techibig.webp", w: 1382, h: 1600 }],
       },
       {
         id: "acm-dystopia",
         title: "Dystopia",
-        image: "/work/acm-dystopia.webp",
-        w: 1600,
-        h: 1582,
-        description:
-          "Flagship poster for a week-long tech celebration. Distressed chrome lettering sits over a magenta-lit skyline, with the title echoed as a ghosted reflection underneath — a cyberpunk read that stayed legible when scaled down to a feed thumbnail.",
-        client: "ACM — FEU Tech Student Chapter",
+        span: 3,
         year: "2024",
-        role: "Poster design",
-        tools: ["Photoshop", "Illustrator"],
-      },
-      {
-        id: "acm-ignition",
-        title: "ACM Ignition",
-        image: "/work/acm-ignition.webp",
-        w: 1276,
-        h: 1600,
-        description:
-          "Officer engagement series poster. A lone silhouette stands at the end of a perspective corridor blowing open into a white burst, with inflatable-style title lettering on top. The vanishing point does the work of pointing at the headline.",
         client: "ACM — FEU Tech Student Chapter",
-        year: "2024",
         role: "Poster design",
         tools: ["Photoshop", "Illustrator"],
-      },
-      {
-        id: "acm-revival",
-        title: "ACM Revival",
-        image: "/work/acm-revival.webp",
-        w: 1347,
-        h: 1600,
         description:
-          "Three-day event announcement using reaching chrome hands and light-trail ribbons against deep blue. The liquid-metal title treatment ties the series to the chapter's other chrome-led key art.",
-        client: "ACM — FEU Tech Student Chapter",
-        year: "2025",
-        role: "Poster design",
-        tools: ["Photoshop", "Illustrator"],
+          "Flagship poster for a week-long tech celebration. Distressed chrome lettering over a magenta-lit skyline, with the title echoed as a ghosted reflection underneath — a cyberpunk read that stayed legible scaled down to a feed thumbnail.",
+        images: [{ src: "/work/acm-dystopia.webp", w: 1600, h: 1582 }],
       },
       {
         id: "women-in-cs",
         title: "Women in Computer Science",
-        image: "/work/women-in-cs.webp",
-        w: 1445,
-        h: 1600,
-        description:
-          "Women's History Month feature honouring seven computing pioneers — Grace Hopper, Ada Lovelace, Annie Easley, Margaret Hamilton, Gladys West, Dorothy Vaughan, and Sister Mary Keller. Archival portraits were cut out and unified under a single violet grade, so a century of source photography reads as one piece.",
-        client: "ACM — FEU Tech Student Chapter",
+        span: 3,
         year: "2025",
+        client: "ACM — FEU Tech Student Chapter",
         role: "Design and retouching",
         tools: ["Photoshop", "Illustrator"],
+        description:
+          "Women's History Month feature honouring seven computing pioneers — Grace Hopper, Ada Lovelace, Annie Easley, Margaret Hamilton, Gladys West, Dorothy Vaughan, and Sister Mary Keller. Archival portraits were cut out and unified under a single violet grade, so a century of source photography reads as one piece.",
+        images: [{ src: "/work/women-in-cs.webp", w: 1445, h: 1600 }],
       },
       {
-        id: "battle-of-the-bands",
-        title: "Battle of the Bands",
-        image: "/work/battle-of-the-bands.webp",
-        w: 1200,
-        h: 1600,
-        description:
-          "Poster assembled as a print-and-tape collage — halftone amps, cassette decks, and vintage microphones layered under torn-paper title lettering. Deliberately rough where the rest of the campus material was clean.",
-        client: "Student Coordinating Council — FEU Tech",
+        id: "acm-ignition",
+        title: "ACM Ignition",
+        span: 3,
         year: "2024",
+        client: "ACM — FEU Tech Student Chapter",
         role: "Poster design",
         tools: ["Photoshop", "Illustrator"],
-      },
-      {
-        id: "rock-of-sales",
-        title: "Rock of Sales",
-        image: "/work/rock-of-sales.webp",
-        w: 1600,
-        h: 900,
         description:
-          "Landscape banner for a Battle of the Bands merchandise drive. Instruments burst out of a halftone starburst in hot pink and orange, with the title set as stacked, outlined lettering.",
-        client: "Student Coordinating Council — FEU Tech",
-        year: "2024",
-        role: "Banner design",
-        tools: ["Photoshop", "Illustrator"],
-      },
-      {
-        id: "techno-week",
-        title: "Techno Week",
-        image: "/work/techno-week.webp",
-        w: 1208,
-        h: 1600,
-        description:
-          "Week-long festival poster in a pastel Memphis style — overlapping colour blocks, floating app icons, and a ribbon banner carrying the dates. Built to anchor a full set of matching sub-event graphics.",
-        client: "Student Coordinating Council — FEU Tech",
-        year: "2025",
-        role: "Poster design",
-        tools: ["Photoshop", "Illustrator"],
-      },
-      {
-        id: "technorun-poster",
-        title: "TechnoRun",
-        image: "/work/technorun-poster.webp",
-        w: 1176,
-        h: 1600,
-        description:
-          "Fun-run announcement carrying real logistics — four race distances with pricing, venue, call time, a six-step registration list, and a QR code — without losing the rainbow-track motion of the artwork. The hardest layout in the set, because everything on it had to be readable at a glance.",
-        client: "Student Coordinating Council — FEU Tech",
-        year: "2025",
-        role: "Poster and information design",
-        tools: ["Photoshop", "Illustrator"],
-      },
-      {
-        id: "spooktechular",
-        title: "Spooktechular",
-        image: "/work/spooktechular.webp",
-        w: 960,
-        h: 960,
-        description:
-          "Halloween event graphic — a candy-filled jack-o-lantern lit from below by a wedge of orange, framed by skeleton and monster hands reaching in from the edges.",
-        client: "Student Coordinating Council — FEU Tech",
-        year: "2024",
-        role: "Poster design",
-        tools: ["Photoshop", "Illustrator"],
-      },
-      {
-        id: "student-orgs-fair",
-        title: "Student Organizations Fair",
-        image: "/work/student-orgs-fair.webp",
-        w: 1600,
-        h: 900,
-        description:
-          "Landscape header for a week-long org fair. An illustrated skyline of oversized objects — chess piece, molecule, telescope, guitar — stands in for the range of organizations, with the title held in a clean centre panel so it survives being cropped by social platforms.",
-        client: "Student Coordinating Council — FEU Tech",
-        year: "2024",
-        role: "Banner design",
-        tools: ["Photoshop", "Illustrator"],
+          "Officer engagement series poster. A lone silhouette stands at the end of a perspective corridor blowing open into a white burst — the vanishing point doing the work of pointing at the headline.",
+        images: [{ src: "/work/acm-ignition.webp", w: 1276, h: 1600 }],
       },
       {
         id: "cs-night",
         title: "CS Night",
-        image: "/work/cs-night.webp",
-        w: 1280,
-        h: 1600,
-        description:
-          "Masquerade-themed performer lineup. Each act sits in its own gilded frame arranged up a staircase, with hosts anchored at the base — a hierarchy that reads instantly without labels for billing order.",
-        client: "FEU Institute of Technology",
+        span: 3,
         year: "2025",
+        client: "FEU Institute of Technology",
         role: "Design and compositing",
         tools: ["Photoshop"],
+        description:
+          "Masquerade-themed performer lineup. Each act sits in its own gilded frame arranged up a staircase, hosts anchored at the base — a billing hierarchy that reads instantly without a single label.",
+        images: [{ src: "/work/cs-night.webp", w: 1280, h: 1600 }],
       },
       {
-        id: "acm-kickoff",
-        title: "Kick-Off Celebration",
-        image: "/work/acm-kickoff.webp",
-        w: 1440,
-        h: 1440,
-        description:
-          "Academic-year opener. Chrome and script lettering over a soft violet gradient, with a full contact footer — email, socials, site, and QR — kept quiet at the base so it never competes with the date.",
-        client: "ACM — FEU Tech Student Chapter",
-        year: "2024",
+        id: "techno-week",
+        title: "Techno Week",
+        span: 3,
+        year: "2025",
+        client: "Student Coordinating Council — FEU Tech",
         role: "Poster design",
         tools: ["Photoshop", "Illustrator"],
+        description:
+          "Week-long festival poster in a pastel Memphis style — overlapping colour blocks, floating app icons, and a ribbon banner carrying the dates. Built to anchor a full set of matching sub-event graphics.",
+        images: [{ src: "/work/techno-week.webp", w: 1208, h: 1600 }],
       },
       {
-        id: "junior-officer-perks",
-        title: "Perks of Being a Junior Officer",
-        image: "/work/junior-officer-perks.webp",
-        w: 1600,
-        h: 1599,
-        description:
-          "Recruitment infographic breaking four benefits into translucent glass panels over a violet event photo. Body copy is justified and evenly ragged so the four blocks read as a set rather than a list.",
-        client: "ACM — FEU Tech Student Chapter",
-        year: "2024",
-        role: "Infographic design",
-        tools: ["Photoshop", "Illustrator"],
-      },
-      {
-        id: "startup-qc-winners",
-        title: "StartUp QC — 2nd Runner Up",
-        image: "/work/startup-qc-winners.webp",
-        w: 1600,
-        h: 1600,
-        description:
-          "Congratulations post for a chapter team placing third at a startup competition. The awarding photo is graded into the chapter violet palette and framed with sparkle accents, so a phone-shot documentation image sits comfortably beside polished key art.",
-        client: "ACM — FEU Tech Student Chapter",
+        id: "acm-revival",
+        title: "ACM Revival",
+        span: 3,
         year: "2025",
-        role: "Design and retouching",
-        tools: ["Photoshop"],
+        client: "ACM — FEU Tech Student Chapter",
+        role: "Poster design",
+        tools: ["Photoshop", "Illustrator"],
+        description:
+          "Three-day event announcement using reaching chrome hands and light-trail ribbons against deep blue. The liquid-metal title ties it to the chapter's other chrome-led key art.",
+        images: [{ src: "/work/acm-revival.webp", w: 1347, h: 1600 }],
       },
       {
-        id: "project-horizon",
-        title: "Project Horizon",
-        image: "/work/project-horizon.webp",
-        w: 1131,
-        h: 1600,
-        description:
-          "Vector illustration of hikers cresting a ridge at sunrise, layered into depth planes with a radiating sky behind the title. Flat-colour work throughout — no photography.",
+        id: "student-orgs-fair",
+        title: "Student Organizations Fair",
+        span: 6,
         year: "2024",
-        role: "Illustration and layout",
-        tools: ["Illustrator", "Photoshop"],
+        client: "Student Coordinating Council — FEU Tech",
+        role: "Banner design",
+        tools: ["Photoshop", "Illustrator"],
+        description:
+          "Landscape header for a week-long org fair. An illustrated skyline of oversized objects — chess piece, molecule, telescope, guitar — stands in for the range of organizations, with the title held in a clean centre panel so it survives social-platform cropping.",
+        images: [{ src: "/work/student-orgs-fair.webp", w: 1600, h: 900 }],
       },
       {
         id: "pacsa-speakers",
         title: "PACSA Guest Speakers",
-        image: "/work/pacsa-speakers.webp",
-        w: 1600,
-        h: 900,
-        description:
-          "Speaker lineup for a national convention. Five portraits sit in alternating colour panels inside a woven, festival-inspired border, each with name and role — an established layout that could absorb late additions without a redesign.",
-        client: "Philippine Association of Campus Student Advisers",
+        span: 6,
         year: "2025",
+        client: "Philippine Association of Campus Student Advisers",
         role: "Layout and compositing",
         tools: ["Photoshop", "Illustrator"],
+        description:
+          "Speaker lineup for a national convention. Five portraits sit in alternating colour panels inside a woven, festival-inspired border — a layout that could absorb late additions without a redesign.\n\nThe certificate and delegate frame from the same convention are under Brand Systems.",
+        images: [{ src: "/work/pacsa-speakers.webp", w: 1600, h: 900 }],
       },
       {
         id: "back-to-school",
         title: "Back to School Essentials",
-        image: "/work/back-to-school.webp",
-        w: 1080,
-        h: 1321,
+        span: 3,
+        year: "2025",
+        client: "FEU Institute of Technology",
+        role: "Concept, copy, and design",
+        tools: ["Photoshop", "Illustrator"],
         description:
           "Semester-opening post built as an annotated flat-lay. Each item gets a hand-drawn callout with a joke attached — headphones that cancel noise, not responsibilities — which turned a routine announcement into something students actually shared.",
-        client: "FEU Institute of Technology",
-        year: "2025",
-        role: "Concept, copy, and design",
-        tools: ["Photoshop", "Illustrator"],
+        images: [{ src: "/work/back-to-school.webp", w: 1080, h: 1321 }],
       },
       {
-        id: "ebsco-office365",
-        title: "EBSCO in Office 365",
-        image: "/work/ebsco-office365.webp",
-        w: 1080,
-        h: 1080,
-        description:
-          "Library service announcement. A dry integration notice is restructured into a what-this-means-for-you list of three plain-language benefits, in institutional green with the Tamaraw mascot as the friendly note.",
-        client: "FEU Tech Library",
-        year: "2025",
+        id: "junior-officer-perks",
+        title: "Perks of Being a Junior Officer",
+        span: 3,
+        year: "2024",
+        client: "ACM — FEU Tech Student Chapter",
         role: "Infographic design",
         tools: ["Photoshop", "Illustrator"],
-      },
-      {
-        id: "biblioboo",
-        title: "Bibliobooo Haunted Book Nook",
-        image: "/work/biblioboo.webp",
-        w: 1600,
-        h: 1600,
         description:
-          "Library Halloween activity laid out as a detective corkboard — pinned index cards connected by red string, a spotlight from the corner, and a ghost mascot reading in the centre. The mechanics of the game are the layout.",
-        client: "FEU Tech Library",
-        year: "2025",
-        role: "Concept and design",
-        tools: ["Photoshop", "Illustrator"],
-      },
-      {
-        id: "finals-motivation",
-        title: "You Can Do It, iTamaraw",
-        image: "/work/finals-motivation.webp",
-        w: 1600,
-        h: 1600,
-        description:
-          "Finals-week library hours disguised as a multiple-choice question, answers running from Of course! to Whatever happens, happens. Set over a blurred exam page with a red-pen circle — the schedule arrives after the joke has landed.",
-        client: "FEU Tech Library",
-        year: "2025",
-        role: "Concept, copy, and design",
-        tools: ["Photoshop"],
+          "Recruitment infographic breaking four benefits into translucent glass panels over a violet event photo. Body copy is evenly ragged so the four blocks read as a set rather than a list.",
+        images: [{ src: "/work/junior-officer-perks.webp", w: 1600, h: 1599 }],
       },
       {
         id: "never-again",
         title: "Never Again, Never Forget",
-        image: "/work/never-again.webp",
-        w: 1440,
-        h: 1440,
-        description:
-          "Martial Law commemoration. Archival protest photography and headline clippings are collaged under a hard red wash, with the title reversed out of a black block at centre — restrained on purpose, given the subject.",
-        client: "Student Coordinating Council — FEU Tech",
+        span: 3,
         year: "2024",
+        client: "Student Coordinating Council — FEU Tech",
         role: "Design and compositing",
         tools: ["Photoshop"],
-      },
-      {
-        id: "certified-organization",
-        title: "Certified Organization",
-        image: "/work/certified-organization.webp",
-        w: 1600,
-        h: 1600,
         description:
-          "Recognition post for a student-adviser accreditation. Condensed green display type is knocked back behind a cut-out portrait, with a script signature line carrying the honouree name.",
-        client: "Student Coordinating Council — FEU Tech",
-        year: "2025",
-        role: "Design and retouching",
-        tools: ["Photoshop"],
+          "Martial Law commemoration. Archival protest photography and headline clippings collaged under a hard red wash, with the title reversed out of a black block at centre — restrained on purpose, given the subject.",
+        images: [{ src: "/work/never-again.webp", w: 1440, h: 1440 }],
       },
       {
         id: "pride-month",
         title: "Pride is Everywhere",
-        image: "/work/pride-month.webp",
-        w: 1600,
-        h: 1600,
-        description:
-          "Pride Month post. A desaturated classroom photo has its students painted back in as flat rainbow silhouettes, with a ribbon sweeping through the frame — colour used as the entire argument.",
-        client: "FEU Institute of Technology",
+        span: 3,
         year: "2025",
+        client: "FEU Institute of Technology",
         role: "Concept and design",
         tools: ["Photoshop", "Illustrator"],
+        description:
+          "Pride Month post. A desaturated classroom photo has its students painted back in as flat rainbow silhouettes, with a ribbon sweeping through the frame — colour used as the entire argument.",
+        images: [{ src: "/work/pride-month.webp", w: 1600, h: 1600 }],
+      },
+      {
+        id: "spooktechular",
+        title: "Spooktechular",
+        span: 3,
+        year: "2024",
+        client: "Student Coordinating Council — FEU Tech",
+        role: "Poster design",
+        tools: ["Photoshop", "Illustrator"],
+        description:
+          "Halloween event graphic — a candy-filled jack-o-lantern lit from below by a wedge of orange, framed by skeleton and monster hands reaching in from the edges.",
+        images: [{ src: "/work/spooktechular.webp", w: 960, h: 960 }],
+      },
+      {
+        id: "acm-kickoff",
+        title: "Kick-Off Celebration",
+        span: 3,
+        year: "2024",
+        client: "ACM — FEU Tech Student Chapter",
+        role: "Poster design",
+        tools: ["Photoshop", "Illustrator"],
+        description:
+          "Academic-year opener. Chrome and script lettering over a soft violet gradient, with a full contact footer kept quiet at the base so it never competes with the date.",
+        images: [{ src: "/work/acm-kickoff.webp", w: 1440, h: 1440 }],
+      },
+      {
+        id: "project-horizon",
+        title: "Project Horizon",
+        span: 3,
+        year: "2024",
+        role: "Illustration and layout",
+        tools: ["Illustrator", "Photoshop"],
+        description:
+          "Vector illustration of hikers cresting a ridge at sunrise, layered into depth planes with a radiating sky behind the title. Flat-colour work throughout — no photography.",
+        images: [{ src: "/work/project-horizon.webp", w: 1131, h: 1600 }],
+      },
+      {
+        id: "startup-qc-winners",
+        title: "StartUp QC — 2nd Runner Up",
+        span: 3,
+        year: "2025",
+        client: "ACM — FEU Tech Student Chapter",
+        role: "Design and retouching",
+        tools: ["Photoshop"],
+        description:
+          "Congratulations post for a chapter team placing third at a startup competition. The awarding photo is graded into the chapter palette and framed with sparkle accents, so a phone-shot documentation image sits comfortably beside polished key art.",
+        images: [{ src: "/work/startup-qc-winners.webp", w: 1600, h: 1600 }],
+      },
+      {
+        id: "certified-organization",
+        title: "Certified Organization",
+        span: 3,
+        year: "2025",
+        client: "Student Coordinating Council — FEU Tech",
+        role: "Design and retouching",
+        tools: ["Photoshop"],
+        description:
+          "Recognition post for a student-adviser accreditation. Condensed green display type knocked back behind a cut-out portrait, with a script signature line carrying the honouree name.",
+        images: [{ src: "/work/certified-organization.webp", w: 1600, h: 1600 }],
       },
     ],
   },
   {
-    id: "mockups",
-    label: "mockups",
-    heading: "Mockups",
+    id: "systems",
+    label: "brand systems",
+    heading: "Brand Systems",
     blurb:
-      "Apparel, print, and interface mockups — built so a client can see the thing existing in the world before committing to production.",
+      "Apparel, print, and template systems built for handoff — production-ready artwork and files a client can keep using without coming back to me.",
     accent: "fawn",
     projects: [
       {
-        id: "technorun-jerseys",
-        title: "TechnoRun Race Singlets",
-        image: "/work/technorun-jerseys.webp",
-        w: 1500,
-        h: 1500,
-        description:
-          "Four race-singlet colourways shown front and back, each keyed to a distance category. The wave that splits each garment is the same curve across all four, so the set reads as one system while staying instantly sortable by colour at a start line.",
-        client: "Student Coordinating Council — FEU Tech",
+        id: "technorun-kit",
+        title: "TechnoRun Race Kit",
+        span: 6,
         year: "2025",
-        role: "Apparel design and mockup",
-        tools: ["Photoshop", "Illustrator"],
+        client: "Student Coordinating Council — FEU Tech",
+        role: "Apparel and print design",
+        tools: ["Illustrator", "Photoshop"],
+        description:
+          "Production artwork for a campus fun run, in four colourways keyed to the four race distances.\n\nThe wave that splits each singlet is the same curve across all four, so the set reads as one system while staying instantly sortable by colour at a start line. The bibs carry the same colourways, with the number block sized to stay readable in motion and a rotated repeat along the edge for side-on photography.",
+        images: [
+          { src: "/work/technorun-jerseys.webp", w: 1500, h: 1500, caption: "Race singlets — front and back, four colourways" },
+          { src: "/work/technorun-race-bibs.webp", w: 1500, h: 1500, caption: "Race bibs — matching colourways" },
+        ],
       },
       {
-        id: "technorun-race-bibs",
-        title: "TechnoRun Race Bibs",
-        image: "/work/technorun-race-bibs.webp",
-        w: 1500,
-        h: 1500,
-        description:
-          "Matching race bibs in the same four colourways, with the number block sized to stay readable in motion and a rotated repeat along the edge for side-on photography. Designed as production artwork, not just a visual.",
-        client: "Student Coordinating Council — FEU Tech",
+        id: "pacsa-kit",
+        title: "PACSA Convention Kit",
+        span: 6,
         year: "2025",
-        role: "Print design",
+        client: "Philippine Association of Campus Student Advisers",
+        role: "Template design",
         tools: ["Illustrator", "Photoshop"],
+        description:
+          "Two reusable pieces for a national convention, sharing one border drawn from Filipino woven textile motifs.\n\nThe certificate centres on a fixed text well with a set type scale, so hundreds could be filled in without the layout drifting. The delegate frame clears that same centre for a profile photo and shipped as a transparent PNG, so attendees could drop their own image in behind it.",
+        images: [
+          { src: "/work/pacsa-certificate.webp", w: 1500, h: 1500, caption: "Certificate template" },
+          { src: "/work/pacsa-photo-frame.webp", w: 1500, h: 1500, caption: "Delegate photo frame" },
+        ],
       },
       {
         id: "tabitayo-app",
         title: "Tabitayo — Seat Finder",
-        image: "/work/tabitayo-app.webp",
-        w: 1297,
-        h: 1600,
-        description:
-          "Product announcement for an event seat-finding platform, presented as an annotated device mockup. Four callouts point at real interface regions rather than floating as generic bullet points, so the feature list and the screenshot explain each other.",
-        client: "Tabitayo",
+        span: 6,
         year: "2026",
+        client: "Tabitayo",
         role: "Product marketing design",
         tools: ["Photoshop", "Illustrator"],
-      },
-    ],
-  },
-  {
-    id: "templates",
-    label: "templates",
-    heading: "Templates",
-    blurb:
-      "Reusable systems designed for handoff — built in Photoshop and Illustrator, delivered so the client can update them without coming back to me.",
-    accent: "maize",
-    projects: [
-      {
-        id: "pacsa-certificate",
-        title: "PACSA Certificate Template",
-        image: "/work/pacsa-certificate.webp",
-        w: 1500,
-        h: 1500,
         description:
-          "Certificate template for a national convention, bordered in woven geometric patterning drawn from Filipino textile motifs. The centre is a fixed text well with a set type scale, so hundreds of certificates could be filled in without the layout drifting.",
-        client: "Philippine Association of Campus Student Advisers",
-        year: "2025",
-        role: "Template design",
-        tools: ["Illustrator", "Photoshop"],
-      },
-      {
-        id: "pacsa-photo-frame",
-        title: "PACSA Photo Frame",
-        image: "/work/pacsa-photo-frame.webp",
-        w: 1500,
-        h: 1500,
-        description:
-          "Social media photo frame for convention delegates — the same patterned border with a cleared centre for a profile photo. Handed over as a transparent PNG so attendees could drop their own image behind it.",
-        client: "Philippine Association of Campus Student Advisers",
-        year: "2025",
-        role: "Template design",
-        tools: ["Illustrator", "Photoshop"],
+          "Product announcement for an event seat-finding platform, presented as an annotated device mockup. Four callouts point at real interface regions rather than floating as generic bullets, so the feature list and the screenshot explain each other.",
+        images: [{ src: "/work/tabitayo-app.webp", w: 1297, h: 1600 }],
       },
       {
         id: "artist-connection-sizes",
         title: "Merch Size Chart",
-        image: "/work/artist-connection-sizes.webp",
-        w: 1600,
-        h: 1600,
-        description:
-          "Apparel size chart for a merchandise drop. Measurements sit in a dark table with a gold header rule over an ember-lit background — built so future drops could reuse the frame and swap only the numbers.",
-        client: "Artist Connection",
+        span: 6,
         year: "2025",
+        client: "Artist Connection",
         role: "Template design",
         tools: ["Photoshop"],
+        description:
+          "Apparel size chart for a merchandise drop. Measurements sit in a dark table with a gold header rule over an ember-lit background — built so future drops reuse the frame and swap only the numbers.",
+        images: [{ src: "/work/artist-connection-sizes.webp", w: 1600, h: 1600 }],
       },
     ],
   },
@@ -616,182 +608,138 @@ export const workTabs: WorkTab[] = [
     label: "videos",
     heading: "Videos",
     blurb:
-      "Motion, pacing, and impact — cut in Premiere Pro and finished in After Effects. Documentary essays, instructional series, retrospectives, and narrative shorts.",
+      "Documentary essays, instructional series, retrospectives, and narrative shorts — cut in Premiere Pro, finished in After Effects.",
     accent: "iris",
     projects: [
       {
         id: "breaking-barriers",
         title: "Breaking Barriers",
-        image: "/work/breaking-barriers.webp",
-        w: 1280,
-        h: 720,
+        span: 6,
         isVideo: true,
         duration: "4:04",
-        description:
-          "Documentary video essay on Geraldine Roman, the first transgender woman elected to the Philippine Congress. Cuts between interview footage, mapped geography, and Pride march coverage, with torn-paper title cards holding the chapter breaks. The longest-form edit in this set and the one with the most archival sourcing behind it.",
         year: "2023",
         role: "Editor",
         tools: ["Premiere Pro", "After Effects"],
+        description:
+          "Documentary video essay on Geraldine Roman, the first transgender woman elected to the Philippine Congress. Cuts between interview footage, mapped geography, and Pride march coverage, with torn-paper title cards holding the chapter breaks. The longest-form edit here and the one with the most archival sourcing behind it.",
+        images: [{ src: "/work/breaking-barriers.webp", w: 1280, h: 720 }],
       },
       {
         id: "basick-math",
         title: "BaSICK Math",
-        image: "/work/basick-math.webp",
-        w: 1280,
-        h: 720,
+        span: 6,
         isVideo: true,
         duration: "4:25",
-        description:
-          "Branded instructional series — identity, animated logo sting, and lesson edit. The presenter is keyed onto a blackboard field of live equations, and the mark itself is built from a puzzle piece to carry the math-made-easy line.",
         year: "2023",
         role: "Editor and brand design",
         tools: ["Premiere Pro", "After Effects", "Illustrator"],
+        description:
+          "Branded instructional series — identity, animated logo sting, and lesson edit. The presenter is keyed onto a blackboard field of live equations, and the mark itself is built from a puzzle piece to carry the math-made-easy line.",
+        images: [{ src: "/work/basick-math.webp", w: 1280, h: 720 }],
       },
       {
         id: "solar-system-song",
         title: "Solar System Song",
-        image: "/work/solar-system-song.webp",
-        w: 1280,
-        h: 720,
+        span: 4,
         isVideo: true,
         duration: "3:00",
-        description:
-          "Educational music video with original music production alongside the edit. Animated planets perform the lyrics against a nebula field, with karaoke-style highlighting timed to the vocal. Scoring and cutting were done together rather than one after the other.",
         year: "2022",
         role: "Editor, animator, and music production",
         tools: ["Premiere Pro", "After Effects"],
+        description:
+          "Educational music video with original music production alongside the edit. Animated planets perform the lyrics against a nebula field, with karaoke-style highlighting timed to the vocal. Scoring and cutting happened together rather than one after the other.",
+        images: [{ src: "/work/solar-system-song.webp", w: 1280, h: 720 }],
       },
       {
         id: "horror-trailer",
         title: "Horror Short Trailer",
-        image: "/work/horror-trailer.webp",
-        w: 1280,
-        h: 720,
+        span: 4,
         isVideo: true,
         duration: "2:05",
-        description:
-          "Trailer for a narrative horror short, opening on a production title card in rolling fog. Cold interior grade, held wides on a corridor of framed portraits, and cuts timed to the sound design rather than the dialogue.",
         year: "2023",
         role: "Editor",
         tools: ["Premiere Pro", "After Effects"],
+        description:
+          "Trailer for a narrative horror short, opening on a production title card in rolling fog. Cold interior grade, held wides on a corridor of framed portraits, and cuts timed to the sound design rather than the dialogue.",
+        images: [{ src: "/work/horror-trailer.webp", w: 1280, h: 720 }],
       },
       {
         id: "workout-series",
         title: "Exercise Series",
-        image: "/work/workout-series.webp",
-        w: 1280,
-        h: 720,
+        span: 4,
         isVideo: true,
         duration: "5:51",
-        description:
-          "Instructional fitness series shot in a spin studio. Each exercise gets a named lower-third listing its benefits, and the script title uses a soft glow so it stays readable over a moving frame. Long-form, with every movement demonstrated end to end.",
         year: "2024",
         role: "Editor",
         tools: ["Premiere Pro", "After Effects"],
-      },
-      {
-        id: "brenia-18",
-        title: "Brenia — 18 Years",
-        image: "/work/brenia-18.webp",
-        w: 1280,
-        h: 720,
-        isVideo: true,
-        duration: "2:14",
         description:
-          "Debut retrospective spanning childhood photographs to the present, opening on a hand-lettered title card. Stills are threaded through a scrolling film-strip treatment and set inside rounded vintage-television frames with chromatic fringing and year stamps, so the montage carries its own timeline without narration.",
-        year: "2023",
-        role: "Editor",
-        tools: ["Premiere Pro", "After Effects"],
-      },
-      {
-        id: "nobody-mitski",
-        title: "Nobody — Song Interpretation",
-        image: "/work/nobody-mitski.webp",
-        w: 640,
-        h: 360,
-        isVideo: true,
-        duration: "3:24",
-        description:
-          "Visual interpretation of a Mitski track, built as a letterboxed sequence of wide landscape shots with a single figure held small in frame. Typography enters slowly and off-centre, letting the isolation in the composition do the reading.",
-        year: "2023",
-        role: "Editor",
-        tools: ["Premiere Pro", "After Effects"],
-      },
-      {
-        id: "arduino-trailer",
-        title: "Arduino Trailer",
-        image: "/work/arduino-trailer.webp",
-        w: 1280,
-        h: 720,
-        isVideo: true,
-        duration: "0:22",
-        description:
-          "Short explainer trailer opening on an animated circuit-trace field. Copy is built as kinetic type with key terms colour-lifted out of the sentence — twenty-two seconds, structured as a question and its answer.",
-        year: "2024",
-        role: "Editor and motion graphics",
-        tools: ["After Effects", "Premiere Pro"],
-      },
-      {
-        id: "vb-hand-signals",
-        title: "Volleyball Hand Signals",
-        image: "/work/vb-hand-signals.webp",
-        w: 1280,
-        h: 721,
-        isVideo: true,
-        duration: "0:50",
-        description:
-          "Officiating reference video styled as a sports-game parody — rounded frame, clean white staging, and bubble callouts on each correct signal. A dry rulebook exercise given a format people would actually finish.",
-        year: "2023",
-        role: "Editor and motion graphics",
-        tools: ["Premiere Pro", "After Effects"],
+          "Instructional fitness series shot in a spin studio. Each exercise gets a named lower-third listing its benefits, and the script title uses a soft glow so it stays readable over a moving frame.",
+        images: [{ src: "/work/workout-series.webp", w: 1280, h: 720 }],
       },
       {
         id: "self-portrait",
         title: "All My Life, I've Known Women As",
-        image: "/work/self-portrait.webp",
-        w: 1280,
-        h: 960,
+        span: 4,
         isVideo: true,
         duration: "0:27",
-        description:
-          "Short video essay on how women are talked about and how that language gets internalised. Collected posts and comments are stacked and overlapped as layered cards, crowding the frame until they are almost unreadable — then the pile clears for a single italic line, and the piece closes on a montage of real women in the maker's own life.\n\nThe edit argues by density: the noise is built up visually before it is answered.",
         year: "2022",
         role: "Editor",
         tools: ["Premiere Pro"],
-      },
-    ],
-  },
-  {
-    id: "engineering",
-    label: "engineering",
-    heading: "Software Engineering",
-    blurb:
-      "Computer Science at FEU Tech, specialising in Software Engineering. Python and JavaScript, with an interest in the point where clinical rigour meets interface design.",
-    accent: "deep",
-    projects: [
-      {
-        id: "psyclick",
-        title: "PsyClick",
-        image: "/work/psyclick.webp",
-        w: 1600,
-        h: 1317,
         description:
-          "A clinician-guided screening companion that combines questionnaires, typing rhythm, mouse dynamics, and emotional response tasks into clear decision-support reports.\n\nPsyClick captures millisecond-level keystroke and cursor telemetry during a clinical intake session and turns it into an objective map of where a client hesitated — so the psychologist can open the interview on the topics that actually registered, instead of working through generic questions.\n\nEight behavioural biomarkers — flight time, dwell time, typing velocity, error rate, cursor velocity, jerk, path entropy, and pause frequency — are evaluated together using Hotelling T-squared with Ledoit-Wolf shrinkage. That single statistic is then decomposed into a Psychomotor Slowing Index and an Agitation Index, and a fuzzy classifier resolves the pair into GREEN, AMBER, or RED decision-support flags. A 100-person normative baseline, screened for stable wellbeing, provides the population reference. The system reports and flags; it does not diagnose.\n\nPrivacy is architectural rather than promised: the behavioural baseline lives in session memory under 600 bytes and is discarded when the session ends.",
-        client: "Undergraduate thesis — adopted by a practising clinical psychologist",
-        year: "2025–2026",
-        role: "Full-stack developer",
-        tools: [
-          "React",
-          "Vite",
-          "Electron",
-          "Python",
-          "NumPy",
-          "SciPy",
-          "Supabase",
-          "SQLite",
-        ],
-        href: "https://psyclick-app.vercel.app/",
-        hrefLabel: "Visit psyclick-app.vercel.app",
+          "Short video essay on how women are talked about, and how that language gets internalised. Collected posts and comments are stacked as layered cards until the frame is almost unreadable — then the pile clears for a single italic line, and the piece closes on a montage of real women in the maker's own life.\n\nThe edit argues by density: the noise is built up visually before it is answered.",
+        images: [{ src: "/work/self-portrait.webp", w: 1280, h: 960 }],
+      },
+      {
+        id: "brenia-18",
+        title: "Brenia — 18 Years",
+        span: 4,
+        isVideo: true,
+        duration: "2:14",
+        year: "2023",
+        role: "Editor",
+        tools: ["Premiere Pro", "After Effects"],
+        description:
+          "Debut retrospective spanning childhood photographs to the present, opening on a hand-lettered title card. Stills are threaded through a scrolling film-strip treatment and set inside rounded vintage-television frames with chromatic fringing and year stamps, so the montage carries its own timeline without narration.",
+        images: [{ src: "/work/brenia-18.webp", w: 1280, h: 720 }],
+      },
+      {
+        id: "nobody-mitski",
+        title: "Nobody — Song Interpretation",
+        span: 4,
+        isVideo: true,
+        duration: "3:24",
+        year: "2023",
+        role: "Editor",
+        tools: ["Premiere Pro", "After Effects"],
+        description:
+          "Visual interpretation of a Mitski track, built as a letterboxed sequence of wide landscape shots with a single figure held small in frame. Typography enters slowly and off-centre, letting the isolation in the composition do the reading.",
+        images: [{ src: "/work/nobody-mitski.webp", w: 640, h: 360 }],
+      },
+      {
+        id: "vb-hand-signals",
+        title: "Volleyball Hand Signals",
+        span: 4,
+        isVideo: true,
+        duration: "0:50",
+        year: "2023",
+        role: "Editor and motion graphics",
+        tools: ["Premiere Pro", "After Effects"],
+        description:
+          "Officiating reference video styled as a sports-game parody — rounded frame, clean white staging, and bubble callouts on each correct signal. A dry rulebook exercise given a format people would actually finish.",
+        images: [{ src: "/work/vb-hand-signals.webp", w: 1280, h: 721 }],
+      },
+      {
+        id: "arduino-trailer",
+        title: "Arduino Trailer",
+        span: 4,
+        isVideo: true,
+        duration: "0:22",
+        year: "2024",
+        role: "Editor and motion graphics",
+        tools: ["After Effects", "Premiere Pro"],
+        description:
+          "Short explainer trailer opening on an animated circuit-trace field. Copy is built as kinetic type with key terms colour-lifted out of the sentence — twenty-two seconds, structured as a question and its answer.",
+        images: [{ src: "/work/arduino-trailer.webp", w: 1280, h: 720 }],
       },
     ],
   },

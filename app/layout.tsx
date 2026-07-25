@@ -12,7 +12,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: `${profile.name} — Graphic Designer & Video Editor`,
-  description: profile.intro,
+  description: profile.welcome,
 };
 
 export default function RootLayout({
