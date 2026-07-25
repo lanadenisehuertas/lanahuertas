@@ -1,19 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { workTabs, caseStudy, type Project } from "@/lib/content";
+import { workTabs, type Project } from "@/lib/content";
 import Folder, { type FolderTab } from "./Folder";
 import ProjectModal from "./ProjectModal";
 import MasonryGrid from "./MasonryGrid";
 import CaseStudy from "./CaseStudy";
 
-const CASE_ID = "case-study";
+const CASE_ID = "projects";
 
 /** Column spans per breakpoint, derived from the art-directed 12-col value. */
-function spanClass(span: 3 | 4 | 6 = 3) {
-  if (span === 6) return "col-span-4 sm:col-span-6 lg:col-span-6";
-  if (span === 4) return "col-span-2 sm:col-span-3 lg:col-span-4";
-  return "col-span-2 sm:col-span-3 lg:col-span-3";
+function spanClass(span: 3 | 6 = 3) {
+  // Only 3 and 6 — both divide 12 evenly. Mixing in 4s left unfillable holes
+  // at laptop widths, which is what made the grid look misaligned there.
+  // Column counts: 4 (base) -> 6 (sm) -> 12 (md+). At every step both spans
+  // divide the count evenly, so rows always fill: 2/row on phones, 2/row on
+  // small tablets, 4/row from tablet up, with features at double width.
+  return span === 6
+    ? "col-span-4 sm:col-span-6 md:col-span-6"
+    : "col-span-2 sm:col-span-3 md:col-span-3";
 }
 
 export default function FolderStack() {
@@ -22,7 +27,7 @@ export default function FolderStack() {
 
   const tabs: FolderTab[] = [
     ...workTabs.map((t) => ({ id: t.id, label: t.label, accent: t.accent })),
-    { id: CASE_ID, label: "case study", accent: "deep" as const },
+    { id: CASE_ID, label: "projects", accent: "deep" as const },
   ];
 
   const tab = workTabs.find((t) => t.id === active);
@@ -40,7 +45,7 @@ export default function FolderStack() {
 
         <Folder tabs={tabs} active={active} onSelect={setActive} labelledBy="work-heading">
           {isCase ? (
-            <CaseStudy data={caseStudy} />
+            <CaseStudy />
           ) : (
             tab && (
               <>

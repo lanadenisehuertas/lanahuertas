@@ -352,6 +352,22 @@ body {
     will-change: transform;
   }
 
+  /* Heatmap cells settle in one at a time. */
+  @keyframes heat-in {
+    from {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .heat-cell {
+    animation: heat-in 380ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+
   /* Grid cards stagger in behind the panel as it squares up. */
   @keyframes card-in {
     from {
@@ -411,6 +427,7 @@ body {
   .tab-in,
   .card-in,
   .float-badge,
+  .heat-cell,
   .paper-content,
   .scrim-in,
   .sheet-in {

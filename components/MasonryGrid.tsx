@@ -79,7 +79,7 @@ export default function MasonryGrid({ children }: { children: React.ReactNode })
   return (
     <div
       ref={ref}
-      className="mosaic grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12"
+      className="mosaic grid grid-flow-row-dense grid-cols-4 sm:grid-cols-6 md:grid-cols-12"
       style={{ gap: GAP, gridAutoRows: `${ROW}px` }}
     >
       {children}

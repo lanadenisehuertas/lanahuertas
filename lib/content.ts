@@ -15,7 +15,7 @@ export type Project = {
   /** images[0] is the cover shown on the card; the rest open in the lightbox. */
   images: ProjectImage[];
   /** Columns out of 12. Art direction, not derived — some pieces earn more room. */
-  span?: 3 | 4 | 6;
+  span?: 3 | 6;
 
   description?: string;
   client?: string;
@@ -213,68 +213,47 @@ export const languages = ["Filipino (Native)", "English (Advanced)"];
 // Mirrors the information architecture of the live product site.
 // ---------------------------------------------------------------------------
 
-export const caseStudy = {
-  eyebrow: "Undergraduate thesis · in clinical use",
-  product: "PsyClick",
-  headline: "Calmer clinical screening",
-  summary:
-    "A clinician-guided screening companion that turns questionnaires, typing rhythm, mouse dynamics, and emotional response tasks into clear decision-support reports.",
-  badges: ["PHQ-9 + GAD-7", "PSI + PAI biomarkers", "Clinician reviewed"],
+// ---------------------------------------------------------------------------
+// Software engineering. A numbered list — add the next project to the array.
+// ---------------------------------------------------------------------------
 
-  problem:
-    "A first clinical session is spent finding out what to ask about. PsyClick captures millisecond-level keystroke and cursor telemetry while a client fills in a standard intake, then hands the psychologist a map of where they hesitated — so the interview can open on what actually registered.",
-
-  /** The sample report card from the product's own hero. */
-  report: {
-    label: "Session report",
-    metrics: [
-      { k: "PHQ-9", v: "7" },
-      { k: "GAD-7", v: "5" },
-      { k: "PSI", v: "0.82" },
-      { k: "PAI", v: "0.44" },
-      { k: "T²", v: "3.2" },
-    ],
-    flag: "Normal",
-  },
-
-  pillars: [
-    { title: "Psychomotor signals", body: "Eight behavioural biomarkers captured passively while the client types." },
-    { title: "PHQ-9 + GAD-7", body: "Validated depression and anxiety instruments, scored alongside the telemetry." },
-    { title: "Emotional response task", body: "Domain-tagged prompts that surface which topics cause hesitation." },
-    { title: "Exportable reports", body: "GREEN / AMBER / RED flags with an audit trail the clinician can file." },
-  ],
-
-  /** The eight-stage detection pipeline, condensed. */
-  pipeline: [
-    { n: "01", k: "Capture", d: "Raw keystroke and cursor telemetry, grid-aligned to 1 ms" },
-    { n: "02", k: "Smooth", d: "Gaussian-weighted filter strips hardware noise above 8 Hz" },
-    { n: "03", k: "Extract", d: "Eight biomarkers — flight, dwell, velocity, jerk, entropy, pauses" },
-    { n: "04", k: "Baseline", d: "EWMA builds a personal baseline during a 2-minute calibration" },
-    { n: "05", k: "Hotelling T²", d: "All eight evaluated at once, with Ledoit-Wolf shrinkage" },
-    { n: "06", k: "PSI & PAI", d: "T² decomposed into slowing and agitation indices" },
-    { n: "07", k: "Classify", d: "Fuzzy rule base resolves the pair into a clinical flag" },
-    { n: "08", k: "Normative", d: "Compared against a 100-person screened baseline" },
-  ],
-
-  design:
-    "The interface had to stay calm while doing something quite invasive underneath. Clinical tools tend to look like spreadsheets; this one had to be legible under time pressure, honest about uncertainty, and never imply a diagnosis it cannot make. Flags are three plain colours, every number is traceable back to the stage that produced it, and the client-facing side shows none of it.",
-
-  privacy:
-    "Privacy is architectural rather than promised — the behavioural baseline lives in session memory under 600 bytes and is discarded when the session ends.",
-
-  role: "Full-stack developer — pipeline, database layer, and interface",
-  stack: ["React", "Vite", "Electron", "Python", "NumPy", "SciPy", "Supabase", "SQLite"],
-  year: "2025 — 2026",
-  href: "https://psyclick-app.vercel.app/",
-  hrefLabel: "Visit the live site",
-  image: { src: "/work/psyclick.webp", w: 1600, h: 1317, caption: "Layered defense-in-depth architecture" },
+export type EngineeringProject = {
+  n: string;
+  id: string;
+  title: string;
+  tagline: string;
+  description: string;
+  role: string;
+  year: string;
+  stack: string[];
+  href?: string;
+  hrefLabel?: string;
+  /** Which visual to render beside it. */
+  visual: "psyclick";
 };
+
+export const engineeringProjects: EngineeringProject[] = [
+  {
+    n: "01",
+    id: "psyclick",
+    title: "PsyClick",
+    tagline: "Calmer clinical screening",
+    description:
+      "A clinician-guided screening companion that combines questionnaires, typing rhythm, and mouse dynamics into clear decision-support reports. It captures keystroke and cursor telemetry during a clinical intake, then shows the psychologist where the client hesitated — so the session can open on what actually registered. It flags; it does not diagnose. In use by a practising clinical psychologist.",
+    role: "Project manager · Full-stack developer",
+    year: "2025 — 2026",
+    stack: ["React", "Vite", "Electron", "Python", "NumPy", "SciPy", "Supabase", "SQLite"],
+    href: "https://psyclick-app.vercel.app/",
+    hrefLabel: "Visit the live site",
+    visual: "psyclick",
+  },
+];
 
 export const workTabs: WorkTab[] = [
   {
     id: "publicity",
-    label: "publicity materials",
-    heading: "Publicity Materials",
+    label: "graphic design",
+    heading: "Graphic Design",
     blurb:
       "Campaign key art and announcement sets for student organizations and campus offices. Built in Photoshop and Illustrator, sized for every platform each one had to run on.",
     accent: "eminence",
@@ -282,7 +261,7 @@ export const workTabs: WorkTab[] = [
       {
         id: "technorun",
         title: "TechnoRun 2025",
-        span: 4,
+        span: 3,
         year: "2025",
         client: "Student Coordinating Council — FEU Tech",
         role: "Poster and information design",
@@ -293,23 +272,32 @@ export const workTabs: WorkTab[] = [
       },
       {
         id: "battle-of-the-bands",
-        title: "Battle of the Bands 2024",
-        span: 4,
+        title: "Battle of the Bands",
+        span: 3,
         year: "2024",
         client: "Student Coordinating Council — FEU Tech",
-        role: "Campaign design",
+        role: "Poster design",
         tools: ["Photoshop", "Illustrator"],
         description:
-          "Two-piece campaign for a campus band competition. The main poster is assembled as a print-and-tape collage — halftone amps, cassette decks, and vintage microphones under torn-paper lettering — deliberately rough where the rest of the campus material was clean. The merchandise banner reuses the instrument language in a hot pink and orange starburst so the drop still reads as the same event.",
-        images: [
-          { src: "/work/battle-of-the-bands.webp", w: 1200, h: 1600, caption: "Main event poster" },
-          { src: "/work/rock-of-sales.webp", w: 1600, h: 900, caption: "Rock of Sales — merch drop banner" },
-        ],
+          "Poster assembled as a print-and-tape collage — halftone amps, cassette decks, and vintage microphones layered under torn-paper title lettering. Deliberately rough where the rest of the campus material was clean.",
+        images: [{ src: "/work/battle-of-the-bands.webp", w: 1200, h: 1600 }],
+      },
+      {
+        id: "rock-of-aces",
+        title: "Rock of Aces",
+        span: 6,
+        year: "2025",
+        client: "Student Coordinating Council — FEU Tech",
+        role: "Banner design",
+        tools: ["Photoshop", "Illustrator"],
+        description:
+          "Landscape key art for a music event. Guitars, drums, and a keyboard burst out of a halftone starburst in hot pink and orange, with the title set as stacked, outlined lettering over the collage.",
+        images: [{ src: "/work/rock-of-sales.webp", w: 1600, h: 900 }],
       },
       {
         id: "feu-library",
         title: "FEU Tech Library",
-        span: 4,
+        span: 3,
         year: "2025",
         client: "FEU Tech Library",
         role: "Concept, copy, and design",
@@ -640,7 +628,7 @@ export const workTabs: WorkTab[] = [
       {
         id: "solar-system-song",
         title: "Solar System Song",
-        span: 4,
+        span: 3,
         isVideo: true,
         duration: "3:00",
         year: "2022",
@@ -653,7 +641,7 @@ export const workTabs: WorkTab[] = [
       {
         id: "horror-trailer",
         title: "Horror Short Trailer",
-        span: 4,
+        span: 3,
         isVideo: true,
         duration: "2:05",
         year: "2023",
@@ -666,7 +654,7 @@ export const workTabs: WorkTab[] = [
       {
         id: "workout-series",
         title: "Exercise Series",
-        span: 4,
+        span: 3,
         isVideo: true,
         duration: "5:51",
         year: "2024",
@@ -679,7 +667,7 @@ export const workTabs: WorkTab[] = [
       {
         id: "self-portrait",
         title: "All My Life, I've Known Women As",
-        span: 4,
+        span: 3,
         isVideo: true,
         duration: "0:27",
         year: "2022",
@@ -692,7 +680,7 @@ export const workTabs: WorkTab[] = [
       {
         id: "brenia-18",
         title: "Brenia — 18 Years",
-        span: 4,
+        span: 3,
         isVideo: true,
         duration: "2:14",
         year: "2023",
@@ -705,7 +693,7 @@ export const workTabs: WorkTab[] = [
       {
         id: "nobody-mitski",
         title: "Nobody — Song Interpretation",
-        span: 4,
+        span: 3,
         isVideo: true,
         duration: "3:24",
         year: "2023",
@@ -718,7 +706,7 @@ export const workTabs: WorkTab[] = [
       {
         id: "vb-hand-signals",
         title: "Volleyball Hand Signals",
-        span: 4,
+        span: 3,
         isVideo: true,
         duration: "0:50",
         year: "2023",
@@ -731,7 +719,7 @@ export const workTabs: WorkTab[] = [
       {
         id: "arduino-trailer",
         title: "Arduino Trailer",
-        span: 4,
+        span: 3,
         isVideo: true,
         duration: "0:22",
         year: "2024",
