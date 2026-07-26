@@ -1,21 +1,26 @@
 import type { Metadata } from "next";
-import { Poppins, Style_Script, Silkscreen } from "next/font/google";
+import { Bricolage_Grotesque, Yellowtail, Poppins, Silkscreen } from "next/font/google";
 import "./globals.css";
 import { profile } from "@/lib/content";
 import AuroraField from "@/components/AuroraField";
 
 /*
- * Three voices — the heavy / script / mono formula the reference sheets run on.
+ * Display / script / body — the formula the reference sheets run on.
  *
- *  Poppins      — the workhorse. Black weight set LARGE for display, regular
- *                 for body. Carries the whole page; nothing competes with it.
- *  Style Script — one bold connected script, used for a single accent word per
- *                 lockup. It only works because it is rationed.
- *  Silkscreen   — pixel face for tracked-out uppercase marginalia: dates,
- *                 TM marks, corner labels, tab labels. Never above 13px.
+ *  Bricolage Grotesque — display. A grotesque with deliberately irregular
+ *      curves and tight joins, so headings have character of their own rather
+ *      than reading as neutral geometry.
+ *  Yellowtail — the overlapping accent word. A brush script with real stroke
+ *      weight, so it holds its ground against a heavy sans instead of
+ *      thinning out beside it.
+ *  Poppins — body copy only. Neutral on purpose; nothing in a paragraph
+ *      should compete with the lockups.
+ *  Silkscreen — marginalia only. Corner labels and stamps, never above 13px.
  *
- * Bodoni was tried here and pulled: it read as editorial-elegant rather than
- * scrapbook, and its hairlines disappeared against the panel textures.
+ * Two earlier attempts and why they were pulled: Bodoni read
+ * editorial-elegant rather than scrapbook and its hairlines vanished against
+ * the grain; Style Script was too thin and too formal to pair with a heavy
+ * sans — the two never fused into one mark.
  */
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -24,7 +29,14 @@ const poppins = Poppins({
   display: "swap",
 });
 
-const script = Style_Script({
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const script = Yellowtail({
   variable: "--font-script",
   subsets: ["latin"],
   weight: ["400"],
@@ -51,7 +63,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${script.variable} ${silkscreen.variable} h-full antialiased`}
+      className={`${poppins.variable} ${bricolage.variable} ${script.variable} ${silkscreen.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <AuroraField />

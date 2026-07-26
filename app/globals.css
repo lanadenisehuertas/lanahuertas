@@ -22,9 +22,10 @@
   --color-maize: #eedaa5; /* Maize           — light panels, display type */
   --color-ink: #1b0730; /* derived         — borders, shadows, text on light */
 
-  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-poppins), ui-sans-serif, sans-serif;
   --font-body: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   --font-script: var(--font-script), "Brush Script MT", cursive;
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   --font-pixel: var(--font-pixel), "Courier New", monospace;
 }
 
@@ -494,9 +495,11 @@ body {
   /* Display: Poppins Black, set large and tight. */
   .type-display {
     font-family: var(--font-display);
-    font-weight: 900;
-    letter-spacing: -0.035em;
-    line-height: 0.88;
+    font-weight: 800;
+    /* Bricolage sets wide by default; pulling it tight is what makes the
+       lockups feel drawn rather than typed. */
+    letter-spacing: -0.045em;
+    line-height: 0.86;
   }
 
   /* One accent word per lockup, never a whole line. */
@@ -504,8 +507,9 @@ body {
     font-family: var(--font-script);
     font-weight: 400;
     line-height: 1;
-    /* Script faces sit high in their em box; this re-centres them optically. */
-    padding-bottom: 0.08em;
+    /* Yellowtail carries a long descender tail; this keeps it from clipping
+       and re-centres the word optically against the sans above it. */
+    padding-bottom: 0.16em;
   }
 
   .type-pixel {
