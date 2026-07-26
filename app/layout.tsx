@@ -3,6 +3,7 @@ import { Bricolage_Grotesque, Yellowtail, Poppins, Silkscreen } from "next/font/
 import "./globals.css";
 import { profile } from "@/lib/content";
 import AuroraField from "@/components/AuroraField";
+import SparkleField from "@/components/SparkleField";
 
 /*
  * Display / script / body — the formula the reference sheets run on.
@@ -67,6 +68,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <AuroraField />
+        <SparkleField />
         <div className="spec-grid pointer-events-none fixed inset-0 -z-10" aria-hidden />
         {children}
         <div className="grain-plate" aria-hidden />

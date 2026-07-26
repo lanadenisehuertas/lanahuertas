@@ -99,7 +99,7 @@ body {
     height: 46vw;
     background: var(--color-eminence);
     opacity: 0.3;
-    animation: drift-a 29s ease-in-out infinite;
+    animation: drift-a 17s ease-in-out infinite;
   }
 
   .blob-2 {
@@ -109,7 +109,7 @@ body {
     height: 40vw;
     background: var(--color-lavender);
     opacity: 0.2;
-    animation: drift-b 37s ease-in-out infinite;
+    animation: drift-b 23s ease-in-out infinite;
   }
 
   .blob-3 {
@@ -119,7 +119,7 @@ body {
     height: 44vw;
     background: var(--color-iris);
     opacity: 0.3;
-    animation: drift-c 43s ease-in-out infinite;
+    animation: drift-c 26s ease-in-out infinite;
   }
 
   /* Warm sunset glow low in the field, echoing the reference photo. */
@@ -130,7 +130,62 @@ body {
     height: 30vw;
     background: var(--color-fawn);
     opacity: 0.14;
-    animation: drift-a 53s ease-in-out infinite reverse;
+    animation: drift-a 31s ease-in-out infinite reverse;
+  }
+
+  /*
+   * Drifting sparkles.
+   *
+   * Two animations on two elements rather than one: the wrapper owns the
+   * travel, the svg inside owns the twinkle. Putting both on a single node
+   * would mean two `transform` animations fighting over the same property,
+   * and the last one declared simply wins.
+   *
+   * Positions and timings are hand-set rather than random — random values
+   * differ between the server render and the client render, and React
+   * discards the whole tree when they disagree.
+   *
+   * z-index sits with the aurora, so sparkles drift through the background
+   * behind the paper panels instead of over the work.
+   */
+  .sparkle-field {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  @keyframes sparkle-drift {
+    from {
+      transform: translate3d(0, 16vh, 0);
+    }
+    to {
+      transform: translate3d(var(--sx, 3vw), -16vh, 0);
+    }
+  }
+
+  @keyframes sparkle-twinkle {
+    0%,
+    100% {
+      opacity: 0;
+      transform: scale(0.55) rotate(0deg);
+    }
+    50% {
+      opacity: var(--so, 0.5);
+      transform: scale(1) rotate(40deg);
+    }
+  }
+
+  .sparkle {
+    position: absolute;
+    will-change: transform;
+    animation: sparkle-drift var(--sd, 40s) linear infinite;
+  }
+
+  .sparkle > svg {
+    display: block;
+    animation: sparkle-twinkle var(--st, 7s) ease-in-out infinite;
   }
 
   .shadow-hard {
@@ -461,6 +516,12 @@ body {
   /* Blobs stay — they are the background. Only the drifting stops. */
   .aurora-blob {
     animation: none !important;
+  }
+
+  /* Sparkles are pure decoration, so they go entirely rather than freeze
+     mid-twinkle at whatever opacity they happened to be holding. */
+  .sparkle-field {
+    display: none;
   }
 }
 
