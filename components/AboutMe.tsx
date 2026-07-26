@@ -13,32 +13,34 @@ import ToolBadge from "./ToolBadge";
  * pixels so they can't creep inward when the photo scales.
  */
 const FLOATERS = [
-  // Each offset is at least the badge's own width, so they sit fully clear of
-  // the subject rather than on her. Verified at 0% overlap.
-  { i: 0, size: 64, style: { top: "6%", left: -70 }, dur: "7s", delay: "0s" }, // Ps
-  { i: 2, size: 58, style: { top: "38%", left: -64 }, dur: "9s", delay: "-2s" }, // Pr
-  { i: 1, size: 54, style: { top: "70%", left: -60 }, dur: "11s", delay: "-4s" }, // Ai
-  { i: 3, size: 64, style: { top: "14%", right: -70 }, dur: "8.5s", delay: "-1s" }, // Ae
-  { i: 4, size: 58, style: { top: "46%", right: -64 }, dur: "10s", delay: "-3s" }, // Ca
-  { i: 5, size: 54, style: { top: "76%", right: -60 }, dur: "9.5s", delay: "-5s" }, // Fg
+  // Offsets straddle the photo edge — roughly three-quarters of each badge hangs
+  // outside, the rest overlaps the frame. GUTTER below is set to the largest of
+  // these, so the badges never push the page wider than the column.
+  { i: 0, size: 64, style: { top: "6%", left: -48 }, dur: "7s", delay: "0s" }, // Ps
+  { i: 2, size: 58, style: { top: "38%", left: -44 }, dur: "9s", delay: "-2s" }, // Pr
+  { i: 1, size: 54, style: { top: "70%", left: -41 }, dur: "11s", delay: "-4s" }, // Ai
+  { i: 3, size: 64, style: { top: "14%", right: -48 }, dur: "8.5s", delay: "-1s" }, // Ae
+  { i: 4, size: 58, style: { top: "46%", right: -44 }, dur: "10s", delay: "-3s" }, // Ca
+  { i: 5, size: 54, style: { top: "76%", right: -41 }, dur: "9.5s", delay: "-5s" }, // Fg
   // Py and Js are named in the list below rather than floated — eight badges
   // around one portrait is a crowd, and the code tools are not design tools.
 ] as const;
 
 export default function AboutMe() {
   return (
-    <div className="grid items-stretch gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16">
+    <div className="grid items-stretch gap-12 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-14">
       {/* Portrait + floating toolkit */}
-      {/* Gutters are sized to the widest badge offset (70px), so the floating
-          toolkit straddles the photo edge without pushing the page wider. */}
-      <div className="mx-auto w-full max-w-[300px] px-0 sm:max-w-[520px] sm:px-[70px]">
+      {/* Gutters equal the widest badge offset (48px), so the floating toolkit
+          straddles the photo edge without pushing the page wider. Every pixel
+          here is width the photo does not get, so it is kept tight. */}
+      <div className="mx-auto w-full max-w-[300px] px-0 sm:max-w-[660px] sm:px-12">
         <div className="relative h-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/work/lana-portrait.webp"
             alt="Lana Denise Huertas"
-            width={1000}
-            height={1500}
+            width={1136}
+            height={1200}
             className="block h-full w-full object-cover object-top ring-2 ring-maize/60"
           />
 
