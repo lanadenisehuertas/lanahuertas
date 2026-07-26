@@ -6,7 +6,7 @@ import Reveal from "@/components/Reveal";
 
 export default function Home() {
   return (
-    <main>
+    <main id="top">
       {/* intro -> the work -> about -> contact */}
       <Hero />
       <Reveal>

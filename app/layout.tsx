@@ -51,7 +51,7 @@ const silkscreen = Silkscreen({
 });
 
 export const metadata: Metadata = {
-  title: `${profile.name} — Graphic Designer & Video Editor`,
+  title: "lana denise huertas",
   description: profile.welcome,
 };
 

@@ -23,7 +23,7 @@ export default function Hero() {
           items={[
             { label: profile.email, href: `mailto:${profile.email}` },
             { label: "Manila, PH" },
-            { label: "Available for freelance" },
+            { label: "Graphic design · Video · Code" },
             { label: "Portfolio Vol. 01" },
           ]}
         />

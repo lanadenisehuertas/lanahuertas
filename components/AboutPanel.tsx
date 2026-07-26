@@ -48,8 +48,9 @@ export default function AboutPanel() {
                     </div>
                     <div className="border-l-2 border-eminence/30 pl-4">
                     <p className="type-display text-[1.25rem] leading-tight">{e.role}</p>
-                    <p className="mt-0.5 text-[15px] text-ink/60">
-                      {e.org} — {e.place}
+                    <p className="mt-1 text-[15px] font-semibold text-eminence">
+                      {e.org}
+                      <span className="font-normal text-ink/50"> — {e.place}</span>
                     </p>
                     <ul className="mt-2 space-y-1">
                       {e.points.map((pt) => (
@@ -76,7 +77,7 @@ export default function AboutPanel() {
                   <div key={e.school} className="border-l-2 border-eminence pl-4">
                     <p className="text-xs font-semibold text-eminence">{e.period}</p>
                     <p className="type-display mt-1 text-[1.25rem] leading-tight">{e.school}</p>
-                    <p className="text-sm text-ink/70">{e.detail}</p>
+                    <p className="mt-0.5 text-[15px] font-semibold text-eminence">{e.detail}</p>
                     {e.honors.length > 0 && (
                       <ul className="mt-2 space-y-1">
                         {e.honors.map((h) => (
