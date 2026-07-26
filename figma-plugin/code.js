@@ -1,125 +1,87 @@
-// Builds the portfolio as editable Figma layers, with working in-place
-// tab-switching.
+// Builds the current portfolio design as editable Figma layers.
 //
-// Figma cannot run the site's React state. What it CAN do is interactive
-// components: the work section is a COMPONENT SET with one variant per tab, and
-// each tab pill fires CHANGE_TO to swap the variant in place.
+// Figma has no write REST API — a plugin running inside Figma is the only way
+// to author a file programmatically.
 //
-// This replaced an earlier NAVIGATE-between-pages approach that jumped to the
-// top of the page on every click. preserveScrollPosition is unreliable when
-// destination frames differ in height, and these do (blurbs vary in length).
-// CHANGE_TO never navigates, so there is no scroll position to lose.
+// Install: Figma Desktop -> Tools (or main menu) -> Development ->
+// Import plugin from manifest... -> pick figma-plugin/manifest.json
 //
-// Install: Figma Desktop -> Tools -> Development -> Import plugin from
-// manifest... -> pick figma-plugin/manifest.json
-//
-// SIZING RULES:
+// SIZING RULES, learned from earlier versions that shipped broken:
 //  1. resize() on an auto-layout frame FORCES that axis to FIXED. Never use it
-//     on a frame that must hug. Use layoutSizing* instead.
-//  2. layoutSizing* only works AFTER the node is appended to an auto-layout parent.
-//  3. Decorative shapes inside auto-layout need layoutPositioning = "ABSOLUTE".
+//     on a frame that must hug. Create plain -> resize -> THEN set layoutMode.
+//  2. layoutSizing* only applies AFTER the node is appended to a layout parent.
+//  3. Decorative shapes inside auto-layout need layoutPositioning = "ABSOLUTE",
+//     or they become flow items and displace their siblings.
 
-const HEX = {
-  honeydew: "F6FFE9",
-  custard: "F2E0A4",
-  periwinkle: "CAC5E5",
-  amethyst: "A230A4",
-  ultramarine: "290087",
-  ink: "180047",
+// --- Palette (matches app/globals.css @theme) -----------------------------
+const C = {
+  deep: "330C4B", // page ground
+  iris: "51017C", // lifted surface
+  eminence: "711E7B", // accent, labels
+  lavender: "B9379D", // DECORATIVE ONLY — 3.16:1, never behind text
+  fawn: "E3A88A", // warm accent, secondary text on dark
+  maize: "EEDAA5", // light panels, display type
+  ink: "1B0730", // borders, shadows, text on light
 };
 
 const W = 1440;
 const PAD = 80;
 const PANEL_W = W - PAD * 2;
 
-// ---------------------------------------------------------------------------
-// Content — mirrors lib/content.ts
-// ---------------------------------------------------------------------------
-
+// --- Content (mirrors lib/content.ts) -------------------------------------
 const PROFILE = {
-  years: "7+ years",
-  heading: "Hi! I am Lana, a graphic designer and video editor from Manila.",
-  summary:
-    "Detail-oriented and versatile creative professional with hands-on experience in video editing, graphic design, and digital marketing. I work across Adobe Premiere Pro, After Effects, Photoshop, and Illustrator, building promotional videos, social content, and branded assets. Currently pursuing a B.S. in Computer Science - Software Engineering, adding Python and JavaScript to a creative skill set.",
+  name: "Lana Denise Huertas",
   email: "lanadenisehuertas@gmail.com",
-  location: "Manila, Philippines",
+  location: "Manila, PH",
+  heroLead: "I make work that's",
+  heroAccent: "hard to scroll past.",
+  heroSub:
+    "Manila-based · 7+ years in Photoshop and Premiere · CS student building what she designs.",
+  aboutHeadline:
+    "I build high-quality visual content and adaptable designs for brands that want to stand out.",
+  aboutKicker: "And I can do it for you, too.",
 };
 
-const EXPERIENCE = [
-  ["2020 - Present", "Multimedia Team Editor", "Lord Jesus Fellowship Church - Bataan, PH"],
-  [
-    "Sep 2023 - Jul 2025",
-    "Creatives Committee Head",
-    "Student Coordinating Council, FEU Tech - Manila, PH",
-  ],
-  ["Sep 2023 - Jul 2025", "Creatives Committee Head", "ACM FEU Tech Chapter - Manila, PH"],
-  [
-    "Oct 2022 - Jul 2023",
-    "Editing Committee Leader",
-    "CybeRS Robotics Club, RSHS III - Zambales, PH",
-  ],
-];
-
-const EDUCATION = [
-  [
-    "Aug 2023 - Present",
-    "FEU Institute of Technology",
-    "B.S. Computer Science - Software Engineering (Expected July 2027)",
-    ["Elite Scholar - FEU Tech", "DOST Scholar - Dept. of Science and Technology"],
-  ],
-  [
-    "Graduated July 2023",
-    "Regional Science High School III",
-    "Senior High School Diploma - High Honors (GWA: 96)",
-    [],
-  ],
-];
-
-const SKILLS = [
-  ["video editing", ["Premiere Pro", "After Effects", "color grading", "motion graphics"]],
-  ["graphic design", ["Photoshop", "Illustrator", "Canva", "brand identity", "typography"]],
-  ["marketing", ["social media management", "content strategy", "copywriting"]],
-  ["technical", ["Python", "JavaScript", "Google Workspace"]],
-];
-
-const SOFTWARE = ["Ps", "Ai", "Pr", "Ae", "Ca", "Py", "Js"];
+const TOOLS = ["Ps", "Ai", "Pr", "Ae", "Ca", "Py", "Js"];
 
 const WORK_TABS = [
-  [
-    "publicity materials",
-    "Publicity Materials",
-    "Crafted with Photoshop and Illustrator for high-impact design, and delivered as Canva templates for seamless, on-the-go client editing.",
-    8,
-  ],
-  [
-    "mockups",
-    "Mockups",
-    "A look at recent design mockups showing how these brands live and breathe off the screen. Crafted in Photoshop to give clients a true sense of their visual identity in action.",
-    8,
-  ],
-  [
-    "templates",
-    "Templates",
-    "Recent template systems designed for seamless client handoff. Crafted in Ps and Ai, delivered in Canva for easy, on-the-go editing.",
-    8,
-  ],
-  [
-    "videos",
-    "Videos",
-    "Motion, pacing, and impact. Cut in Premiere Pro and polished in After Effects to keep eyes glued to the screen.",
-    8,
-  ],
-  [
-    "engineering",
-    "Software Engineering",
-    "Computer Science at FEU Tech, specialising in Software Engineering. Building in Python and JavaScript - projects landing here as they ship.",
-    8,
-  ],
+  {
+    label: "graphic design",
+    heading: "Graphic Design",
+    accent: "eminence",
+    blurb:
+      "Campaign key art and announcement sets for student organizations and campus offices. Built in Photoshop and Illustrator, sized for every platform each one had to run on.",
+    count: 21,
+  },
+  {
+    label: "brand systems",
+    heading: "Brand Systems",
+    accent: "fawn",
+    blurb:
+      "Apparel, print, and template systems built for handoff — production-ready artwork and files a client can keep using without coming back to me.",
+    count: 4,
+  },
+  {
+    label: "videos",
+    heading: "Videos",
+    accent: "iris",
+    blurb:
+      "Documentary essays, instructional series, retrospectives, and narrative shorts — cut in Premiere Pro, finished in After Effects.",
+    count: 10,
+  },
+  {
+    label: "projects",
+    heading: "PsyClick",
+    accent: "deep",
+    blurb:
+      "Calmer clinical screening. A clinician-guided companion that turns questionnaires, typing rhythm, and mouse dynamics into decision-support reports.",
+    count: 1,
+  },
 ];
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+const ABOUT_TABS = ["about me", "experience", "education & certs", "skills"];
+
+// --- Helpers ---------------------------------------------------------------
 
 function rgb(hex) {
   return {
@@ -133,34 +95,68 @@ function solid(hex) {
   return [{ type: "SOLID", color: rgb(hex) }];
 }
 
-let FAMILY = "Poppins";
-const WEIGHTS = ["Regular", "SemiBold", "Bold", "ExtraBold", "Black"];
+// Resolved at run time. Figma ships the Google Fonts library, but a user may
+// not have them cached, so every face falls back rather than throwing.
+const F = { display: "Inter", script: "Inter", pixel: "Inter", body: "Inter" };
 
-async function tryFamily(family) {
-  for (const style of WEIGHTS) {
-    await figma.loadFontAsync({ family: family, style: style });
+async function pick(candidates, styles) {
+  for (const family of candidates) {
+    try {
+      for (const style of styles) {
+        await figma.loadFontAsync({ family: family, style: style });
+      }
+      return family;
+    } catch (e) {
+      /* try the next one */
+    }
   }
+  return null;
 }
 
 async function loadFonts() {
-  try {
-    await tryFamily("Poppins");
-    FAMILY = "Poppins";
-  } catch (e) {
-    await tryFamily("Inter");
-    FAMILY = "Inter";
-  }
+  F.display = (await pick(["Bricolage Grotesque", "Archivo", "Inter"], ["Regular", "Bold", "ExtraBold"])) || "Inter";
+  F.body = (await pick(["Poppins", "Inter"], ["Regular", "Medium", "SemiBold", "Bold"])) || "Inter";
+  F.script = (await pick(["Yellowtail", "Pacifico", "Inter"], ["Regular"])) || "Inter";
+  F.pixel = (await pick(["Silkscreen", "VT323", "Inter"], ["Regular"])) || "Inter";
 }
 
 function text(chars, opts) {
   const t = figma.createText();
-  t.fontName = { family: FAMILY, style: opts.style || "Bold" };
+  t.fontName = { family: opts.family || F.body, style: opts.style || "Regular" };
   t.characters = chars;
   t.fontSize = opts.size;
-  t.fills = solid(opts.color || HEX.honeydew);
-  if (opts.spacing) t.letterSpacing = { unit: "PERCENT", value: opts.spacing };
+  t.fills = solid(opts.color || C.maize);
+  if (opts.spacing !== undefined) t.letterSpacing = { unit: "PERCENT", value: opts.spacing };
   if (opts.lineHeight) t.lineHeight = { unit: "PERCENT", value: opts.lineHeight };
   return t;
+}
+
+/** Display type: Bricolage ExtraBold, tight. */
+function display(chars, size, color, lh) {
+  return text(chars, {
+    family: F.display,
+    style: "ExtraBold",
+    size: size,
+    color: color || C.maize,
+    spacing: -4.5,
+    lineHeight: lh || 88,
+  });
+}
+
+/** The overlapping accent word. */
+function script(chars, size, color) {
+  return text(chars, { family: F.script, style: "Regular", size: size, color: color || C.fawn });
+}
+
+/** Tracked-out uppercase marginalia. */
+function pixel(chars, size, color) {
+  return text(chars.toUpperCase(), {
+    family: F.pixel,
+    style: "Regular",
+    size: size || 10,
+    color: color || C.maize,
+    spacing: 16,
+  });
 }
 
 function frame(name, direction, opts) {
@@ -173,7 +169,8 @@ function frame(name, direction, opts) {
   f.itemSpacing = opts.gap === undefined ? 16 : opts.gap;
   f.paddingTop = opts.padTop === undefined ? opts.padY || 0 : opts.padTop;
   f.paddingBottom = opts.padBottom === undefined ? opts.padY || 0 : opts.padBottom;
-  f.paddingLeft = f.paddingRight = opts.padX || 0;
+  f.paddingLeft = opts.padLeft === undefined ? opts.padX || 0 : opts.padLeft;
+  f.paddingRight = opts.padRight === undefined ? opts.padX || 0 : opts.padRight;
   f.fills = opts.fill ? solid(opts.fill) : [];
   f.cornerRadius = opts.radius || 0;
   f.clipsContent = false;
@@ -183,479 +180,513 @@ function frame(name, direction, opts) {
   return f;
 }
 
-/** Append first, then set sizing — layoutSizing* requires a layout parent. */
-function add(parent, child, horizontal, vertical) {
+/** Append first, then set sizing — layoutSizing* needs a layout parent. */
+function add(parent, child, h, v) {
   parent.appendChild(child);
-  if (horizontal) child.layoutSizingHorizontal = horizontal;
-  if (vertical) child.layoutSizingVertical = vertical;
+  if (h) child.layoutSizingHorizontal = h;
+  if (v) child.layoutSizingVertical = v;
   return child;
 }
 
 function pill(label, bg, fg, size, radius) {
   const f = frame("pill", "HORIZONTAL", { padX: 18, padY: 9, gap: 0, fill: bg });
   f.cornerRadius = radius === undefined ? 999 : radius;
-  f.appendChild(text(label, { size: size || 14, style: "Bold", color: fg }));
+  f.appendChild(pixel(label, size || 10, fg));
   return f;
 }
 
-function outlineChip(label) {
+function chip(label) {
   const f = frame("chip", "HORIZONTAL", { padX: 14, padY: 7, gap: 0 });
   f.cornerRadius = 999;
   f.fills = [];
-  f.strokes = solid(HEX.ink);
+  f.strokes = solid(C.ink);
   f.strokeWeight = 1;
-  f.appendChild(text(label, { size: 13, style: "Regular", color: HEX.ink }));
+  f.appendChild(text(label, { size: 12, color: C.ink }));
   return f;
 }
 
 function sparkle(size, hex) {
-  const star = figma.createStar();
-  star.pointCount = 4;
-  star.innerRadius = 0.28;
-  star.resize(size, size);
-  star.fills = solid(hex);
-  star.name = "sparkle";
-  return star;
+  const s = figma.createStar();
+  s.pointCount = 4;
+  s.innerRadius = 0.28;
+  s.resize(size, size);
+  s.fills = solid(hex);
+  s.name = "sparkle";
+  return s;
 }
 
-function panelHeading(parent, label) {
-  return add(
-    parent,
-    text(label, { size: 30, style: "Black", color: HEX.ink, spacing: -1 }),
-    "HUG",
-    "HUG"
-  );
+/** Full-width micro rail of contact details. */
+function edgeRail(items, ruleOnTop) {
+  const wrap = frame("edge rail", "VERTICAL", { gap: 12 });
+  if (ruleOnTop) {
+    const r = figma.createRectangle();
+    r.resize(PANEL_W, 1);
+    r.fills = solid(C.maize);
+    r.opacity = 0.15;
+    r.name = "rule";
+    add(wrap, r, "FILL", "FIXED");
+    r.resize(r.width, 1);
+  }
+  const row = frame("items", "HORIZONTAL", { gap: 24 });
+  row.primaryAxisAlignItems = "SPACE_BETWEEN";
+  add(wrap, row, "FILL", "HUG");
+  items.forEach(function (s) {
+    const t = pixel(s, 10, C.maize);
+    t.opacity = 0.55;
+    row.appendChild(t);
+  });
+  if (!ruleOnTop) {
+    const r = figma.createRectangle();
+    r.resize(PANEL_W, 1);
+    r.fills = solid(C.maize);
+    r.opacity = 0.15;
+    r.name = "rule";
+    add(wrap, r, "FILL", "FIXED");
+    r.resize(r.width, 1);
+  }
+  return wrap;
 }
 
-// ---------------------------------------------------------------------------
-// Work section: one COMPONENT per tab, combined into a variant set.
-// ---------------------------------------------------------------------------
+/**
+ * Section title lockup: heavy word with a script word overlapping from
+ * below-right. The overlap is the point — stacked they read as heading plus
+ * subtitle; overlapped they read as one drawn mark.
+ */
+function sectionTitle(lead, accent) {
+  const wrap = frame("title: " + lead + " " + accent, "VERTICAL", { gap: 0 });
+  const leadT = display(lead, 72, C.maize, 86);
+  add(wrap, leadT, "HUG", "HUG");
 
-function buildWorkVariant(activeIdx) {
-  // Plain component first: resize for width, THEN auto-layout so height hugs.
-  const c = figma.createComponent();
-  c.name = "tab=" + WORK_TABS[activeIdx][0];
-  c.resize(PANEL_W, 100);
-  c.layoutMode = "VERTICAL";
-  c.counterAxisSizingMode = "FIXED";
-  c.primaryAxisSizingMode = "AUTO";
-  c.itemSpacing = 0;
-  c.fills = [];
-  c.clipsContent = false;
+  const acc = script(accent, 72, C.fawn);
+  wrap.appendChild(acc);
+  acc.layoutPositioning = "ABSOLUTE";
+  acc.x = leadT.width - 40;
+  acc.y = leadT.height - 46;
 
-  const tabRow = frame("work tabs", "HORIZONTAL", { gap: 8 });
-  tabRow.paddingLeft = 28;
-  add(c, tabRow, "HUG", "HUG");
+  return wrap;
+}
+
+/**
+ * A folder: tab strip along one edge, then the panel. Tabs overlap by 10px;
+ * the active one sits flush while the rest drop 9px and dim.
+ */
+function folder(tabs, activeIdx, accentOf, buildBody) {
+  const wrap = frame("folder", "VERTICAL", { gap: 0 });
+
+  // Negative spacing is the only way to overlap auto-layout children;
+  // setting .x on them is ignored by the layout engine.
+  const strip = frame("tabs", "HORIZONTAL", { gap: -10, padLeft: 12 });
+  strip.counterAxisAlignItems = "MAX";
+  add(wrap, strip, "HUG", "HUG");
 
   const tabNodes = [];
-  WORK_TABS.forEach(function (t, i) {
+  tabs.forEach(function (label, i) {
     const active = i === activeIdx;
-    const p = pill(
-      t[0],
-      active ? HEX.amethyst : HEX.ink,
-      active ? HEX.honeydew : HEX.periwinkle,
-      14,
-      14
+    const acc = accentOf(i);
+    const onDark = acc === "eminence" || acc === "iris" || acc === "deep";
+    const t = frame("tab: " + label, "HORIZONTAL", {
+      padX: 20,
+      padY: 14,
+      gap: 0,
+      fill: C[acc],
+    });
+    t.cornerRadius = 12;
+    t.bottomLeftRadius = 0;
+    t.bottomRightRadius = 0;
+    t.strokes = solid(C.ink);
+    t.strokeWeight = 2;
+    t.strokeBottomWeight = 0;
+    t.appendChild(
+      text(label, {
+        family: F.display,
+        style: "ExtraBold",
+        size: 13,
+        color: onDark ? C.maize : C.ink,
+      })
     );
-    p.name = "tab:" + i;
-    tabRow.appendChild(p);
-    tabNodes.push(p);
+    strip.appendChild(t);
+    if (!active) t.opacity = 0.62;
+    tabNodes.push(t);
   });
 
-  const panel = frame("Work panel", "VERTICAL", {
-    gap: 22,
-    padX: 56,
-    padY: 56,
-    fill: HEX.honeydew,
-    radius: 28,
+  // Folder front
+  const front = frame("folder front", "VERTICAL", {
+    gap: 0,
+    padX: 18,
+    padY: 18,
+    fill: C[accentOf(activeIdx)],
+    radius: 24,
   });
-  add(c, panel, "FILL", "HUG");
+  front.topLeftRadius = 0;
+  front.strokes = solid(C.ink);
+  front.strokeWeight = 2;
+  front.effects = [
+    {
+      type: "DROP_SHADOW",
+      color: Object.assign({}, rgb(C.ink), { a: 1 }),
+      offset: { x: 8, y: 8 },
+      radius: 0,
+      spread: 0,
+      visible: true,
+      blendMode: "NORMAL",
+    },
+  ];
+  add(wrap, front, "FILL", "HUG");
 
-  add(
-    panel,
-    text(WORK_TABS[activeIdx][1], {
-      size: 62,
-      style: "Black",
-      color: HEX.ink,
-      spacing: -2,
-      lineHeight: 105,
-    }),
-    "HUG",
-    "HUG"
-  );
-
-  const wb = text(WORK_TABS[activeIdx][2], {
-    size: 18,
-    style: "Regular",
-    color: HEX.ink,
-    lineHeight: 155,
+  const sheet = frame("sheet", "VERTICAL", {
+    gap: 24,
+    padX: 40,
+    padY: 40,
+    fill: C.maize,
+    radius: 16,
   });
-  add(panel, wb, "FILL", "HUG");
-  wb.textAutoResize = "HEIGHT";
+  sheet.strokes = solid(C.ink);
+  sheet.strokeWeight = 2;
+  add(front, sheet, "FILL", "HUG");
 
-  const total = WORK_TABS[activeIdx][3];
-  let rowFrame = null;
-  for (let i = 0; i < total; i++) {
-    if (i % 4 === 0) {
-      rowFrame = frame("grid row", "HORIZONTAL", { gap: 18 });
-      add(panel, rowFrame, "FILL", "HUG");
-    }
-    const cell = figma.createFrame();
-    cell.name = "work " + String(i + 1).padStart(2, "0");
-    cell.cornerRadius = 14;
-    cell.fills = solid(HEX.periwinkle);
-    add(rowFrame, cell, "FILL", "FIXED");
-    cell.resize(cell.width, 340);
-  }
-
-  return { component: c, tabs: tabNodes };
+  buildBody(sheet);
+  return { wrap: wrap, tabs: tabNodes, sheet: sheet };
 }
 
-// ---------------------------------------------------------------------------
-// The single page
-// ---------------------------------------------------------------------------
+// --- Sections --------------------------------------------------------------
 
-function buildPage(workInstance) {
+function buildHero(page) {
+  const hero = frame("Hero", "VERTICAL", {
+    gap: 0,
+    padY: 100,
+    padX: PAD,
+    fill: C.deep,
+  });
+  add(page, hero, "FILL", "HUG");
+
+  add(hero, edgeRail([PROFILE.email, PROFILE.location, "Graphic design · Video · Code", "Portfolio Vol. 01"], false), "FILL", "HUG");
+
+  const spacerA = frame("s", "VERTICAL", { gap: 0, padY: 24 });
+  add(hero, spacerA, "FILL", "HUG");
+
+  add(hero, pixel("Hi, I'm", 12, C.fawn), "HUG", "HUG");
+
+  const nameT = display("Lana", 208, C.maize, 80);
+  add(hero, nameT, "HUG", "HUG");
+
+  const spacerB = frame("s", "VERTICAL", { gap: 0, padY: 10 });
+  add(hero, spacerB, "FILL", "HUG");
+
+  add(hero, display(PROFILE.heroLead, 72, C.maize, 95), "HUG", "HUG");
+  add(hero, script(PROFILE.heroAccent, 128, C.fawn), "HUG", "HUG");
+
+  const spacerC = frame("s", "VERTICAL", { gap: 0, padY: 16 });
+  add(hero, spacerC, "FILL", "HUG");
+
+  const sub = text(PROFILE.heroSub, { size: 18, color: C.maize, lineHeight: 160 });
+  add(hero, sub, "FILL", "HUG");
+  sub.textAutoResize = "HEIGHT";
+  sub.opacity = 0.9;
+
+  const spacerD = frame("s", "VERTICAL", { gap: 0, padY: 16 });
+  add(hero, spacerD, "FILL", "HUG");
+
+  const toolRow = frame("tools", "HORIZONTAL", { gap: 8 });
+  add(hero, toolRow, "HUG", "HUG");
+  TOOLS.forEach(function (s) {
+    const box = frame("tool", "HORIZONTAL", {
+      gap: 0,
+      fill: C.ink,
+      align: "CENTER",
+      justify: "CENTER",
+    });
+    box.cornerRadius = 10;
+    add(toolRow, box, "FIXED", "FIXED");
+    box.resize(40, 40);
+    box.appendChild(
+      text(s, { family: F.display, style: "ExtraBold", size: 12, color: C.maize })
+    );
+  });
+
+  const spacerE = frame("s", "VERTICAL", { gap: 0, padY: 18 });
+  add(hero, spacerE, "FILL", "HUG");
+
+  const ctas = frame("ctas", "HORIZONTAL", { gap: 12 });
+  add(hero, ctas, "HUG", "HUG");
+  const primary = pill("See the work →", C.fawn, C.ink, 11);
+  primary.paddingLeft = primary.paddingRight = 34;
+  primary.paddingTop = primary.paddingBottom = 18;
+  primary.strokes = solid(C.ink);
+  primary.strokeWeight = 2;
+  ctas.appendChild(primary);
+
+  const secondary = pill("Contact me", C.deep, C.maize, 11);
+  secondary.paddingLeft = secondary.paddingRight = 34;
+  secondary.paddingTop = secondary.paddingBottom = 18;
+  secondary.strokes = solid(C.maize);
+  secondary.strokeWeight = 2;
+  secondary.opacity = 0.9;
+  ctas.appendChild(secondary);
+
+  const spacerF = frame("s", "VERTICAL", { gap: 0, padY: 28 });
+  add(hero, spacerF, "FILL", "HUG");
+
+  add(hero, edgeRail(["Graphic design", "Video editing", "Software engineering", "Est. 2019"], true), "FILL", "HUG");
+
+  // Decoration
+  const sp = sparkle(52, C.maize);
+  hero.appendChild(sp);
+  sp.layoutPositioning = "ABSOLUTE";
+  sp.x = 1160;
+  sp.y = 240;
+  sp.opacity = 0.55;
+  return hero;
+}
+
+function buildWork(page) {
+  const sec = frame("Selected work", "VERTICAL", {
+    gap: 28,
+    padX: PAD,
+    padBottom: 110,
+    fill: C.deep,
+  });
+  add(page, sec, "FILL", "HUG");
+  add(sec, sectionTitle("selected", "work"), "HUG", "HUG");
+
+  const f = folder(
+    WORK_TABS.map(function (t) {
+      return t.label;
+    }),
+    0,
+    function (i) {
+      return WORK_TABS[i].accent;
+    },
+    function (sheet) {
+      const head = frame("head", "HORIZONTAL", { gap: 16 });
+      head.primaryAxisAlignItems = "SPACE_BETWEEN";
+      head.counterAxisAlignItems = "CENTER";
+      add(sheet, head, "FILL", "HUG");
+      head.appendChild(display(WORK_TABS[0].heading, 60, C.ink, 94));
+      head.appendChild(pixel(WORK_TABS[0].count + " projects", 10, C.ink));
+
+      const blurb = text(WORK_TABS[0].blurb, { size: 17, color: C.ink, lineHeight: 165 });
+      add(sheet, blurb, "FILL", "HUG");
+      blurb.textAutoResize = "HEIGHT";
+      blurb.opacity = 0.7;
+
+      // Mosaic: two card widths, the wide one exactly double the narrow plus
+      // the gutter — the same rule the site's grid follows.
+      const NARROW = 250;
+      const WIDE = NARROW * 2 + 6;
+      const rows = [
+        [NARROW, NARROW, WIDE],
+        [WIDE, NARROW, NARROW],
+        [NARROW, NARROW, NARROW, NARROW],
+      ];
+      rows.forEach(function (r, ri) {
+        const row = frame("grid row", "HORIZONTAL", { gap: 6 });
+        add(sheet, row, "FILL", "HUG");
+        r.forEach(function (w, ci) {
+          const cell = figma.createFrame();
+          cell.name = "work " + (ri * 4 + ci + 1);
+          cell.cornerRadius = 3;
+          cell.fills = solid(C.lavender);
+          cell.opacity = 0.25;
+          cell.strokes = solid(C.ink);
+          cell.strokeWeight = 2;
+          row.appendChild(cell);
+          cell.resize(w, ri === 1 ? 200 : 320);
+        });
+      });
+    }
+  );
+  add(sec, f.wrap, "FILL", "HUG");
+  return sec;
+}
+
+function buildAbout(page) {
+  const sec = frame("About me", "VERTICAL", {
+    gap: 28,
+    padX: PAD,
+    padBottom: 110,
+    fill: C.deep,
+  });
+  add(page, sec, "FILL", "HUG");
+  add(sec, sectionTitle("about", "me"), "HUG", "HUG");
+
+  const f = folder(
+    ABOUT_TABS,
+    0,
+    function (i) {
+      return ["eminence", "iris", "deep", "fawn"][i];
+    },
+    function (sheet) {
+      const cols = frame("about cols", "HORIZONTAL", { gap: 80 });
+      cols.counterAxisAlignItems = "CENTER";
+      add(sheet, cols, "FILL", "HUG");
+
+      // Portrait with badges floating clear on both sides
+      const left = frame("portrait col", "VERTICAL", { gap: 0, padX: 78 });
+      add(cols, left, "HUG", "HUG");
+
+      const photo = figma.createFrame();
+      photo.name = "portrait — replace with photo";
+      photo.fills = solid(C.iris);
+      photo.strokes = solid(C.maize);
+      photo.strokeWeight = 2;
+      add(left, photo, "FIXED", "FIXED");
+      photo.resize(300, 437);
+
+      const badges = [
+        { l: "Ps", s: 64, x: -70, y: 26 },
+        { l: "Pr", s: 58, x: -64, y: 166 },
+        { l: "Ai", s: 54, x: -60, y: 306 },
+        { l: "Ae", s: 64, x: 306, y: 61 },
+        { l: "Ca", s: 58, x: 306, y: 201 },
+        { l: "Fg", s: 54, x: 306, y: 332 },
+      ];
+      badges.forEach(function (b) {
+        const box = frame("badge " + b.l, "HORIZONTAL", {
+          gap: 0,
+          fill: C.ink,
+          align: "CENTER",
+          justify: "CENTER",
+        });
+        box.cornerRadius = Math.round(b.s * 0.22);
+        photo.appendChild(box);
+        box.layoutPositioning = "ABSOLUTE";
+        box.resize(b.s, b.s);
+        box.x = b.x;
+        box.y = b.y;
+        box.appendChild(
+          text(b.l, { family: F.display, style: "ExtraBold", size: 18, color: C.maize })
+        );
+      });
+
+      // Copy
+      const right = frame("copy col", "VERTICAL", { gap: 16 });
+      add(cols, right, "FILL", "HUG");
+
+      const h = display(PROFILE.aboutHeadline, 37, C.ink, 114);
+      add(right, h, "FILL", "HUG");
+      h.textAutoResize = "HEIGHT";
+
+      add(right, script(PROFILE.aboutKicker, 45, C.eminence), "HUG", "HUG");
+
+      const body = text(
+        "I pride myself on being a highly adaptable creative. I bring a meticulous eye for detail and a versatile skill set, backed by 7+ years of experience in Adobe Photoshop, 6 years in Premiere Pro, and a sharp command of Illustrator. From crafting high-impact publicity materials and scalable templates to pacing dynamic video edits, I handle the creative heavy lifting so you don't have to.",
+        { size: 17, color: C.ink, lineHeight: 180 }
+      );
+      add(right, body, "FILL", "HUG");
+      body.textAutoResize = "HEIGHT";
+      body.textAlignHorizontal = "JUSTIFIED";
+      body.opacity = 0.85;
+    }
+  );
+  add(sec, f.wrap, "FILL", "HUG");
+  return sec;
+}
+
+function buildContact(page) {
+  const sec = frame("Contact", "VERTICAL", {
+    gap: 28,
+    padX: PAD,
+    padBottom: 96,
+    fill: C.deep,
+  });
+  add(page, sec, "FILL", "HUG");
+  add(sec, sectionTitle("get in", "touch"), "HUG", "HUG");
+
+  const f = folder(
+    ["get in touch"],
+    0,
+    function () {
+      return "fawn";
+    },
+    function (sheet) {
+      const cols = frame("contact cols", "HORIZONTAL", { gap: 40 });
+      add(sheet, cols, "FILL", "HUG");
+
+      const left = frame("left", "VERTICAL", { gap: 20 });
+      add(cols, left, "FILL", "HUG");
+      const h = display("Let's make something cool together.", 60, C.ink, 100);
+      add(left, h, "FILL", "HUG");
+      h.textAutoResize = "HEIGHT";
+      const p = text(
+        "Whether you need a brand refresh, event visuals, or just want to chat about design, my inbox is always open.",
+        { size: 16, color: C.ink, lineHeight: 165 }
+      );
+      add(left, p, "FILL", "HUG");
+      p.textAutoResize = "HEIGHT";
+      p.opacity = 0.75;
+
+      const links = frame("links", "HORIZONTAL", { gap: 12 });
+      add(left, links, "HUG", "HUG");
+      ["email", "portfolio"].forEach(function (l) {
+        const b = pill(l, C.maize, C.ink, 11);
+        b.strokes = solid(C.ink);
+        b.strokeWeight = 2;
+        b.paddingLeft = b.paddingRight = 28;
+        b.paddingTop = b.paddingBottom = 16;
+        links.appendChild(b);
+      });
+
+      const card = frame("card", "VERTICAL", {
+        gap: 14,
+        padX: 24,
+        padY: 24,
+        radius: 12,
+      });
+      card.fills = solid(C.lavender);
+      card.opacity = 1;
+      card.strokes = solid(C.ink);
+      card.strokeWeight = 2;
+      add(cols, card, "FIXED", "HUG");
+      card.resize(360, card.height);
+      card.appendChild(display(PROFILE.name, 22, C.ink, 110));
+      card.appendChild(text(PROFILE.location, { size: 14, color: C.ink }));
+      card.appendChild(text(PROFILE.email, { size: 14, color: C.ink }));
+    }
+  );
+  add(sec, f.wrap, "FILL", "HUG");
+
+  add(sec, edgeRail(["lana denise huertas", "Portfolio Vol. 01", "Manila, PH", "Back to top"], true), "FILL", "HUG");
+  return sec;
+}
+
+// --- Entry -----------------------------------------------------------------
+
+async function build() {
+  await loadFonts();
+
+  // Plain frame first: resize for width, THEN auto-layout so height hugs.
   const page = figma.createFrame();
-  page.name = "Portfolio";
+  page.name = "lana denise huertas — portfolio";
   page.resize(W, 100);
   page.layoutMode = "VERTICAL";
   page.counterAxisSizingMode = "FIXED";
   page.primaryAxisSizingMode = "AUTO";
   page.itemSpacing = 0;
-  page.fills = solid(HEX.ultramarine);
+  page.fills = solid(C.deep);
   page.clipsContent = true;
   figma.currentPage.appendChild(page);
 
-  // ---- Hero -----------------------------------------------------------
-  const hero = frame("Hero", "VERTICAL", {
-    gap: 10,
-    padY: 150,
-    padX: PAD,
-    fill: HEX.ultramarine,
-    align: "CENTER",
-    justify: "CENTER",
-  });
-  add(page, hero, "FILL", "HUG");
+  buildHero(page);
+  buildWork(page);
+  buildAbout(page);
+  buildContact(page);
 
-  const bloom = figma.createEllipse();
-  bloom.name = "aurora bloom";
-  bloom.fills = [
-    {
-      type: "GRADIENT_RADIAL",
-      gradientTransform: [
-        [1, 0, 0],
-        [0, 1, 0],
-      ],
-      gradientStops: [
-        { position: 0, color: Object.assign({}, rgb(HEX.amethyst), { a: 0.7 }) },
-        { position: 1, color: Object.assign({}, rgb(HEX.amethyst), { a: 0 }) },
-      ],
-    },
-  ];
-  hero.appendChild(bloom);
-  bloom.layoutPositioning = "ABSOLUTE";
-  bloom.resize(1180, 640);
-  bloom.x = -60;
-  bloom.y = -110;
-
-  const s1 = sparkle(58, HEX.custard);
-  hero.appendChild(s1);
-  s1.layoutPositioning = "ABSOLUTE";
-  s1.x = 150;
-  s1.y = 190;
-
-  const s2 = sparkle(34, HEX.periwinkle);
-  hero.appendChild(s2);
-  s2.layoutPositioning = "ABSOLUTE";
-  s2.x = 1180;
-  s2.y = 470;
-
-  add(hero, text("graphic design", { size: 54, style: "ExtraBold" }), "HUG", "HUG");
-  add(
-    hero,
-    text("PORTFOLIO", {
-      size: 200,
-      style: "Black",
-      color: HEX.custard,
-      spacing: -4,
-      lineHeight: 88,
-    }),
-    "HUG",
-    "HUG"
-  );
-  add(hero, text("video editing", { size: 54, style: "ExtraBold" }), "HUG", "HUG");
-
-  const badge = frame("badge", "HORIZONTAL", {
-    gap: 10,
-    padX: 26,
-    padY: 12,
-    fill: HEX.ink,
-    align: "CENTER",
-  });
-  badge.cornerRadius = 999;
-  add(hero, badge, "HUG", "HUG");
-  badge.appendChild(text("lana huertas", { size: 17, style: "SemiBold" }));
-  badge.appendChild(sparkle(15, HEX.custard));
-  badge.appendChild(text("2026", { size: 17, style: "SemiBold" }));
-
-  add(
-    hero,
-    text("Let us create something great.", {
-      size: 19,
-      style: "Regular",
-      color: HEX.periwinkle,
-    }),
-    "HUG",
-    "HUG"
-  );
-
-  // ---- About ----------------------------------------------------------
-  const aboutWrap = frame("About", "VERTICAL", {
-    gap: 0,
-    padX: PAD,
-    padBottom: 110,
-    fill: HEX.ultramarine,
-  });
-  add(page, aboutWrap, "FILL", "HUG");
-
-  const aboutTabs = frame("about tabs", "HORIZONTAL", { gap: 8 });
-  aboutTabs.paddingLeft = 28;
-  add(aboutWrap, aboutTabs, "HUG", "HUG");
-  aboutTabs.appendChild(pill("about me", HEX.amethyst, HEX.honeydew, 14, 14));
-  aboutTabs.appendChild(pill(PROFILE.years, HEX.custard, HEX.ink, 14, 14));
-
-  const about = frame("About panel", "VERTICAL", {
-    gap: 44,
-    padX: 56,
-    padY: 56,
-    fill: HEX.honeydew,
-    radius: 28,
-  });
-  add(aboutWrap, about, "FILL", "HUG");
-
-  const introRow = frame("intro", "HORIZONTAL", { gap: 40 });
-  add(about, introRow, "FILL", "HUG");
-
-  const portrait = figma.createFrame();
-  portrait.name = "portrait - replace with photo";
-  portrait.cornerRadius = 16;
-  portrait.fills = solid(HEX.custard);
-  add(introRow, portrait, "FIXED", "FIXED");
-  portrait.resize(240, 320);
-
-  const bio = frame("bio", "VERTICAL", { gap: 16 });
-  add(introRow, bio, "FILL", "HUG");
-  const bioH = text(PROFILE.heading, {
-    size: 34,
-    style: "Black",
-    color: HEX.ink,
-    spacing: -1,
-    lineHeight: 120,
-  });
-  add(bio, bioH, "FILL", "HUG");
-  bioH.textAutoResize = "HEIGHT";
-  const bioB = text(PROFILE.summary, {
-    size: 17,
-    style: "Regular",
-    color: HEX.ink,
-    lineHeight: 160,
-  });
-  add(bio, bioB, "FILL", "HUG");
-  bioB.textAutoResize = "HEIGHT";
-
-  const histRow = frame("history", "HORIZONTAL", { gap: 40 });
-  add(about, histRow, "FILL", "HUG");
-
-  const expCol = frame("experience", "VERTICAL", { gap: 18 });
-  add(histRow, expCol, "FILL", "HUG");
-  panelHeading(expCol, "experience");
-  EXPERIENCE.forEach(function (e) {
-    const item = frame("item", "VERTICAL", { gap: 3 });
-    add(expCol, item, "FILL", "HUG");
-    add(item, text(e[0], { size: 12, style: "SemiBold", color: HEX.amethyst }), "HUG", "HUG");
-    add(item, text(e[1], { size: 15, style: "Bold", color: HEX.ink }), "HUG", "HUG");
-    const org = text(e[2], { size: 14, style: "Regular", color: HEX.ink });
-    add(item, org, "FILL", "HUG");
-    org.textAutoResize = "HEIGHT";
-  });
-
-  const eduCol = frame("education", "VERTICAL", { gap: 18 });
-  add(histRow, eduCol, "FILL", "HUG");
-  panelHeading(eduCol, "education");
-  EDUCATION.forEach(function (e) {
-    const item = frame("item", "VERTICAL", { gap: 3 });
-    add(eduCol, item, "FILL", "HUG");
-    add(item, text(e[0], { size: 12, style: "SemiBold", color: HEX.amethyst }), "HUG", "HUG");
-    add(item, text(e[1], { size: 15, style: "Bold", color: HEX.ink }), "HUG", "HUG");
-    const det = text(e[2], { size: 14, style: "Regular", color: HEX.ink });
-    add(item, det, "FILL", "HUG");
-    det.textAutoResize = "HEIGHT";
-    e[3].forEach(function (h) {
-      add(item, text("* " + h, { size: 12, style: "Regular", color: HEX.ink }), "HUG", "HUG");
-    });
-  });
-
-  const skillRow = frame("skills row", "HORIZONTAL", { gap: 40 });
-  add(about, skillRow, "FILL", "HUG");
-
-  const skillCol = frame("skills", "VERTICAL", { gap: 16 });
-  add(skillRow, skillCol, "FILL", "HUG");
-  panelHeading(skillCol, "skills");
-  SKILLS.forEach(function (g) {
-    const grp = frame("group", "VERTICAL", { gap: 8 });
-    add(skillCol, grp, "FILL", "HUG");
-    add(
-      grp,
-      text(g[0].toUpperCase(), { size: 11, style: "Bold", color: HEX.amethyst, spacing: 6 }),
-      "HUG",
-      "HUG"
-    );
-    const chips = frame("chips", "HORIZONTAL", { gap: 7, wrap: true });
-    add(grp, chips, "FILL", "HUG");
-    g[1].forEach(function (sk) {
-      chips.appendChild(outlineChip(sk));
-    });
-  });
-
-  const softCol = frame("software", "VERTICAL", { gap: 16 });
-  add(skillRow, softCol, "HUG", "HUG");
-  panelHeading(softCol, "software");
-  const softRow = frame("software chips", "HORIZONTAL", { gap: 8, wrap: true });
-  add(softCol, softRow, "HUG", "HUG");
-  SOFTWARE.forEach(function (sw) {
-    const box = frame("sw", "HORIZONTAL", {
-      gap: 0,
-      fill: HEX.ink,
-      align: "CENTER",
-      justify: "CENTER",
-    });
-    box.cornerRadius = 10;
-    add(softRow, box, "FIXED", "FIXED");
-    box.resize(46, 46);
-    box.appendChild(text(sw, { size: 14, style: "Black", color: HEX.custard }));
-  });
-
-  // ---- Work: instance of the variant set --------------------------------
-  const workWrap = frame("Work", "VERTICAL", {
-    gap: 0,
-    padX: PAD,
-    padBottom: 110,
-    fill: HEX.ultramarine,
-  });
-  add(page, workWrap, "FILL", "HUG");
-  add(workWrap, workInstance, "FILL", "HUG");
-
-  // ---- Contact ----------------------------------------------------------
-  const contactWrap = frame("Contact", "VERTICAL", {
-    gap: 0,
-    padX: PAD,
-    padBottom: 120,
-    fill: HEX.ultramarine,
-  });
-  add(page, contactWrap, "FILL", "HUG");
-
-  const card = frame("Contact card", "VERTICAL", {
-    gap: 20,
-    padX: 56,
-    padY: 56,
-    fill: HEX.custard,
-    radius: 28,
-  });
-  add(contactWrap, card, "FILL", "HUG");
-
-  const ch = text("Let us make something cool together.", {
-    size: 58,
-    style: "Black",
-    color: HEX.ink,
-    spacing: -2,
-    lineHeight: 105,
-  });
-  add(card, ch, "FILL", "HUG");
-  ch.textAutoResize = "HEIGHT";
-
-  const cb = text(
-    "Whether you need a brand refresh, event visuals, or just want to chat about design, my inbox is always open.",
-    { size: 18, style: "Regular", color: HEX.ink, lineHeight: 155 }
-  );
-  add(card, cb, "FILL", "HUG");
-  cb.textAutoResize = "HEIGHT";
-
-  const links = frame("links", "HORIZONTAL", { gap: 10 });
-  add(card, links, "HUG", "HUG");
-  links.appendChild(pill(PROFILE.email, HEX.honeydew, HEX.ink));
-  links.appendChild(pill(PROFILE.location, HEX.honeydew, HEX.ink));
-
-  return page;
-}
-
-// ---------------------------------------------------------------------------
-
-async function build() {
-  await loadFonts();
-
-  // 1. One component per tab, combined into a variant set.
-  const variants = WORK_TABS.map(function (_, i) {
-    return buildWorkVariant(i);
-  });
-
-  const set = figma.combineAsVariants(
-    variants.map(function (v) {
-      return v.component;
-    }),
-    figma.currentPage
-  );
-  set.name = "Work Section";
-  set.layoutMode = "VERTICAL";
-  set.itemSpacing = 60;
-  set.paddingTop = 60;
-  set.paddingBottom = 60;
-  set.paddingLeft = 60;
-  set.paddingRight = 60;
-
-  // 2. Tab clicks swap the variant IN PLACE. CHANGE_TO does not navigate, so
-  //    scroll position is never touched.
-  for (let v = 0; v < variants.length; v++) {
-    for (let t = 0; t < variants[v].tabs.length; t++) {
-      if (t === v) continue;
-      await variants[v].tabs[t].setReactionsAsync([
-        {
-          trigger: { type: "ON_CLICK" },
-          actions: [
-            {
-              type: "NODE",
-              destinationId: variants[t].component.id,
-              navigation: "CHANGE_TO",
-              transition: {
-                type: "SMART_ANIMATE",
-                easing: { type: "EASE_IN_AND_OUT" },
-                duration: 0.25,
-              },
-              preserveScrollPosition: false,
-              resetVideoPosition: false,
-              resetScrollPosition: false,
-              resetInteractiveComponents: false,
-            },
-          ],
-        },
-      ]);
-    }
-  }
-
-  // 3. One page holding one instance of the set.
-  const instance = variants[0].component.createInstance();
-  const page = buildPage(instance);
   page.x = 0;
   page.y = 0;
 
-  // Park the component set beside the page.
-  set.x = W + 260;
-  set.y = 0;
-
   figma.currentPage.flowStartingPoints = [{ nodeId: page.id, name: "Portfolio" }];
   figma.viewport.scrollAndZoomIntoView([page]);
+
+  const missing = [];
+  if (F.display !== "Bricolage Grotesque") missing.push("Bricolage Grotesque");
+  if (F.script !== "Yellowtail") missing.push("Yellowtail");
+  if (F.pixel !== "Silkscreen") missing.push("Silkscreen");
+  if (F.body !== "Poppins") missing.push("Poppins");
+
   figma.closePlugin(
-    "Built in " + FAMILY + " - 1 page + " + variants.length + " tab variants."
+    missing.length
+      ? "Built with substitutes for: " + missing.join(", ") + ". Install them for the real thing."
+      : "Built " + Math.round(page.width) + "x" + Math.round(page.height) + " with all four fonts."
   );
 }
 

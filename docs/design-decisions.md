@@ -152,24 +152,18 @@ or descriptions stand in for real work.
   ("Testimonials are short quotes from people who love your brand…") attributed to
   Alaia Domingo. Not carried over. Restore only with a real quote.
 
-## Figma plugin: intentionally out of date
+## Figma plugin
 
-`figma-plugin/` is **knowingly stale** as of 2026-07-18. It still builds the old
-layout: the giant `PORTFOLIO` wordmark instead of the name-led title, one monolithic
-about panel instead of short + extended, software tiles in the wrong section, and the
-old tab styling. It has no equivalent of the project lightbox.
+`figma-plugin/` was regenerated on 2026-07-26 against the current design —
+lavender-sunset palette, Bricolage/Yellowtail/Silkscreen/Poppins, folder tabs,
+edge rails, and the section-title lockups.
 
-This is a decision, not neglect. The Figma file is a snapshot with no live link to the
-site, so re-syncing during active design iteration means rewriting ~20KB repeatedly —
-and each rewrite risks regressions (the sizing bug and the scroll-jump bug both came
-from plugin rewrites).
+It remains a **snapshot, not a sync**: Figma edits do not reach the site and
+site changes do not reach Figma. The grain, aurora, placement animation, hover
+states, and responsive behaviour have no Figma equivalent and are absent.
 
-**Resync when the design settles**, which realistically means after the real work images
-land, since those will drive final grid and card decisions.
-
-The architecture in `figma-plugin/README.md` is still correct and should be kept on any
-rewrite: component set + `CHANGE_TO` for tab switching, and the three sizing rules at
-the top of `code.js`.
+Re-run it after any significant design change, and delete the old frame first
+since it appends rather than replaces.
 
 ## Outstanding
 
