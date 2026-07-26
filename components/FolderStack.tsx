@@ -53,7 +53,7 @@ export default function FolderStack() {
                   <h3 className="type-display text-4xl sm:text-6xl">
                     {tab.heading}
                   </h3>
-                  <span className="type-pixel text-[10px] text-ink/40">
+                  <span className="type-pixel text-[10px] text-ink/65">
                     {tab.projects.length} {tab.projects.length === 1 ? "project" : "projects"}
                   </span>
                 </div>
@@ -118,7 +118,7 @@ export default function FolderStack() {
                             <span className="font-display absolute inset-x-0 bottom-0 translate-y-full bg-ink px-2.5 py-2.5 text-[13px] leading-tight font-bold text-maize transition-transform duration-300 ease-out group-hover:translate-y-0 group-focus-visible:translate-y-0">
                               {p.title}
                               {p.year && (
-                                <span className="ml-1.5 text-xs font-normal text-maize/55">{p.year}</span>
+                                <span className="ml-1.5 text-xs font-normal text-maize/60">{p.year}</span>
                               )}
                             </span>
                           </button>

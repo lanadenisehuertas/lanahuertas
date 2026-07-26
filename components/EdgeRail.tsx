@@ -26,14 +26,14 @@ export default function EdgeRail({
             key={it.label}
             href={it.href}
             target={it.href.startsWith("http") ? "_blank" : undefined}
-            rel="noreferrer"
+            rel="noopener noreferrer"
             // -my-3 py-3 keeps the tap target at 44px without adding rail height.
-            className="type-pixel -my-3 inline-flex min-h-[44px] items-center py-3 text-[10px] text-maize/55 transition-colors duration-200 hover:text-maize"
+            className="type-pixel -my-3 inline-flex min-h-[44px] items-center py-3 text-[10px] text-maize/60 transition-colors duration-200 hover:text-maize"
           >
             {it.label}
           </a>
         ) : (
-          <span key={it.label} className="type-pixel text-[10px] text-maize/40">
+          <span key={it.label} className="type-pixel text-[10px] text-maize/60">
             {it.label}
           </span>
         )

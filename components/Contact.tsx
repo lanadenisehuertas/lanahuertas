@@ -21,8 +21,8 @@ export default function Contact() {
       </GhostWord>
       <RegMark className="top-[12%] right-[5%]" />
       <RegMark className="bottom-[22%] left-[7%]" />
-      <Sparkle size={34} className="absolute top-[8%] left-[10%] text-fawn/45 sm:size-10" />
-      <Sparkle size={20} className="absolute right-[12%] bottom-[30%] text-maize/40 sm:size-7" />
+      <Sparkle size={34} className="absolute top-[8%] left-[10%] text-fawn/70 sm:size-10" />
+      <Sparkle size={20} className="absolute right-[12%] bottom-[30%] text-maize/60 sm:size-7" />
 
       <div className="relative mx-auto max-w-6xl">
         <SectionTitle id="contact-heading" lead="get in" accent="touch" />
@@ -49,7 +49,7 @@ export default function Contact() {
                     key={s.label}
                     href={s.href}
                     target={s.href.startsWith("http") ? "_blank" : undefined}
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="type-pixel press flex min-h-[50px] cursor-pointer items-center rounded-full border-2 border-ink bg-maize px-7 text-[11px] shadow-hard-sm hover:bg-eminence hover:text-maize"
                   >
                     {s.label}
@@ -63,11 +63,11 @@ export default function Contact() {
               <p className="type-display text-xl">{profile.name}</p>
               <dl className="mt-4 space-y-1.5 text-sm">
                 <div className="flex gap-2">
-                  <dt className="type-pixel w-14 shrink-0 pt-0.5 text-[10px] text-ink/40">Based</dt>
+                  <dt className="type-pixel w-14 shrink-0 pt-0.5 text-[10px] text-ink/65">Based</dt>
                   <dd className="text-ink/75">{profile.location}</dd>
                 </div>
                 <div className="flex gap-2">
-                  <dt className="type-pixel w-14 shrink-0 pt-0.5 text-[10px] text-ink/40">Email</dt>
+                  <dt className="type-pixel w-14 shrink-0 pt-0.5 text-[10px] text-ink/65">Email</dt>
                   <dd>
                     <a
                       href={`mailto:${profile.email}`}

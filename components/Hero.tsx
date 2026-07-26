@@ -14,8 +14,8 @@ export default function Hero() {
         design
       </GhostWord>
 
-      <Sparkle size={40} className="absolute top-[20%] right-[16%] text-maize/55 sm:size-12" />
-      <Sparkle size={22} className="absolute bottom-[20%] left-[6%] text-fawn/45 sm:size-7" />
+      <Sparkle size={40} className="absolute top-[20%] right-[16%] text-maize/60 sm:size-12" />
+      <Sparkle size={22} className="absolute bottom-[20%] left-[6%] text-fawn/70 sm:size-7" />
 
       <div className="relative mx-auto max-w-5xl">
         <EdgeRail
@@ -37,7 +37,10 @@ export default function Hero() {
          */}
         <p className="type-pixel mb-2 text-[10px] text-fawn sm:text-xs">Hi, I&apos;m</p>
 
-        <h1 className="text-maize">
+        <h1
+          className="text-maize"
+          aria-label={`${profile.name} — ${profile.heroLead} ${profile.heroAccent}`}
+        >
           <SelectionBox className="type-display type-fringe text-[24vw] sm:text-[13rem] sm:leading-[0.8]">
             Lana
           </SelectionBox>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Yellowtail, Poppins, Silkscreen } from "next/font/google";
 import "./globals.css";
 import { profile } from "@/lib/content";
@@ -51,9 +51,59 @@ const silkscreen = Silkscreen({
   display: "swap",
 });
 
+/*
+ * Absolute URLs are required for share previews — a relative /og.png resolves
+ * against the scraper's own host, not this site, and the preview comes back
+ * blank. Vercel injects VERCEL_URL per deployment; set NEXT_PUBLIC_SITE_URL
+ * once a custom domain is attached so previews point at the real address.
+ */
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "lana denise huertas",
   description: profile.welcome,
+  applicationName: "Lana Denise Huertas — Portfolio",
+  authors: [{ name: profile.name }],
+  creator: profile.name,
+  keywords: [
+    "graphic design",
+    "video editing",
+    "UI/UX design",
+    "software engineering",
+    "portfolio",
+    "Manila",
+    "Philippines",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: profile.name,
+    title: `${profile.name} — Graphic Designer, Video Editor, Software Engineer`,
+    description: profile.welcome,
+    url: siteUrl,
+    locale: "en_PH",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: `${profile.name} — portfolio. ${profile.heroLead} ${profile.heroAccent}`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${profile.name} — Graphic Designer, Video Editor, Software Engineer`,
+    description: profile.welcome,
+    images: ["/og.png"],
+  },
+  robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#330c4b",
 };
 
 export default function RootLayout({

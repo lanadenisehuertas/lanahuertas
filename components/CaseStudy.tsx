@@ -23,7 +23,7 @@ export default function CaseStudy() {
               {/* Copy */}
               <div>
                 <div className="flex items-baseline gap-3">
-                  <span className="type-pixel text-lg text-eminence/50 tabular-nums">
+                  <span className="type-pixel text-lg text-eminence/85 tabular-nums">
                     {p.n}
                   </span>
                   <h3 className="type-display text-5xl sm:text-6xl">
@@ -73,7 +73,7 @@ export default function CaseStudy() {
                   <a
                     href={p.href}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="font-display press mt-7 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border-2 border-ink bg-fawn px-6 text-sm font-bold shadow-hard-sm hover:bg-eminence hover:text-maize"
                   >
                     {p.hrefLabel ?? "View project"}

@@ -129,7 +129,7 @@ export default function ProjectModal({
           <p className="font-display type-pixel text-[10px] text-eminence">
             {categoryLabel}
             {project.images.length > 1 && (
-              <span className="ml-2 font-normal text-ink/45">
+              <span className="ml-2 font-normal text-ink/65">
                 {project.images.length} pieces
               </span>
             )}
@@ -168,7 +168,7 @@ export default function ProjectModal({
                   height={shown.h}
                   className="paper-content mx-auto block max-h-[62vh] w-auto max-w-full rounded-xl border-2 border-ink object-contain"
                 />
-                <figcaption className="mt-2.5 text-center text-xs text-ink/55">
+                <figcaption className="mt-2.5 text-center text-xs text-ink/65">
                   {shown.caption ??
                     (project.isVideo
                       ? `Still from the edit${project.duration ? ` · ${project.duration}` : ""} — full video coming soon.`
@@ -278,7 +278,7 @@ export default function ProjectModal({
               <a
                 href={project.href}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="font-display press mt-8 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border-2 border-ink bg-fawn px-6 text-sm font-bold shadow-hard-sm hover:bg-eminence hover:text-maize"
               >
                 {project.hrefLabel ?? "View project"}

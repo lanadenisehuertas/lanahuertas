@@ -28,7 +28,7 @@ export function CornerLabel({
   return (
     <span
       aria-hidden
-      className={`type-pixel pointer-events-none absolute text-[10px] leading-tight text-maize/50 sm:text-[10px] ${className}`}
+      className={`type-pixel pointer-events-none absolute text-[10px] leading-tight text-maize/60 sm:text-[10px] ${className}`}
     >
       {children}
     </span>
