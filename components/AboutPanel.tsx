@@ -21,7 +21,7 @@ export default function AboutPanel() {
       <div className="mx-auto max-w-6xl">
         <h2
           id="about-heading"
-          className="font-display mb-6 pl-2 text-xs font-bold tracking-[0.22em] text-fawn uppercase"
+          className="type-pixel mb-6 pl-2 text-[10px] text-fawn"
         >
           about me
         </h2>
@@ -31,7 +31,7 @@ export default function AboutPanel() {
 
           {active === "experience" && (
             <div>
-              <h3 className="font-display text-3xl font-black tracking-tighter sm:text-4xl">
+              <h3 className="type-display-roman text-4xl sm:text-5xl">
                 Where I&apos;ve worked
               </h3>
               <div className="mt-7 space-y-6">
@@ -57,7 +57,7 @@ export default function AboutPanel() {
 
           {active === "education" && (
             <div>
-              <h3 className="font-display text-3xl font-black tracking-tighter sm:text-4xl">
+              <h3 className="type-display-roman text-4xl sm:text-5xl">
                 Where I studied
               </h3>
               <div className="mt-7 space-y-6">
@@ -80,7 +80,7 @@ export default function AboutPanel() {
                 ))}
               </div>
 
-              <h4 className="font-display mt-10 text-[11px] font-bold tracking-[0.2em] text-eminence uppercase">
+              <h4 className="type-pixel mt-10 text-[9px] text-eminence">
                 Certifications
               </h4>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -101,14 +101,14 @@ export default function AboutPanel() {
 
           {active === "skills" && (
             <div>
-              <h3 className="font-display text-3xl font-black tracking-tighter sm:text-4xl">
+              <h3 className="type-display-roman text-4xl sm:text-5xl">
                 What I work with
               </h3>
 
               <div className="mt-7 space-y-4">
                 {skillGroups.map((g) => (
                   <div key={g.label}>
-                    <p className="text-[11px] font-bold tracking-wide text-eminence uppercase">
+                    <p className="type-pixel text-[9px] text-eminence">
                       {g.label}
                     </p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
@@ -126,7 +126,7 @@ export default function AboutPanel() {
               </div>
 
               <div className="mt-8">
-                <p className="text-[11px] font-bold tracking-wide text-eminence uppercase">
+                <p className="type-pixel text-[9px] text-eminence">
                   languages
                 </p>
                 <p className="mt-1 text-sm text-ink/75">{languages.join("  ·  ")}</p>

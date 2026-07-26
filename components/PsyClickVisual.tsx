@@ -59,7 +59,7 @@ export default function PsyClickVisual() {
           <div className="min-w-0 flex-1 p-4 sm:p-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-[9px] font-bold tracking-[0.18em] text-eminence uppercase">
+                <p className="type-pixel text-[8px] text-eminence">
                   Clinical overview
                 </p>
                 <p className="font-display mt-0.5 text-lg font-black tracking-tight text-ink">

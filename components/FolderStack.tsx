@@ -38,7 +38,7 @@ export default function FolderStack() {
       <div className="mx-auto max-w-6xl">
         <h2
           id="work-heading"
-          className="font-display mb-6 pl-2 text-xs font-bold tracking-[0.22em] text-fawn uppercase"
+          className="type-pixel mb-6 pl-2 text-[10px] text-fawn"
         >
           selected work
         </h2>
@@ -50,7 +50,7 @@ export default function FolderStack() {
             tab && (
               <>
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <h3 className="font-display text-3xl font-black tracking-tighter sm:text-5xl">
+                  <h3 className="type-display-roman text-4xl sm:text-6xl">
                     {tab.heading}
                   </h3>
                   <span className="text-xs font-semibold text-ink/45">

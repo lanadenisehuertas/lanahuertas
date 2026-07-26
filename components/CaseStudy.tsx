@@ -21,15 +21,15 @@ export default function CaseStudy() {
               {/* Copy */}
               <div>
                 <div className="flex items-baseline gap-3">
-                  <span className="font-display text-3xl font-black text-eminence/45 tabular-nums">
+                  <span className="type-pixel text-lg text-eminence/50 tabular-nums">
                     {p.n}
                   </span>
-                  <h3 className="font-display text-4xl font-black tracking-tighter sm:text-5xl">
+                  <h3 className="type-display-roman text-5xl sm:text-6xl">
                     {p.title}
                   </h3>
                 </div>
 
-                <p className="font-display mt-1.5 pl-[3.1rem] text-lg font-bold text-eminence">
+                <p className="type-display mt-2 pl-[2.6rem] text-2xl text-eminence sm:text-3xl">
                   {p.tagline}
                 </p>
 
@@ -39,19 +39,19 @@ export default function CaseStudy() {
 
                 <dl className="mt-7 space-y-3">
                   <div>
-                    <dt className="text-[11px] font-bold tracking-wide text-eminence uppercase">
+                    <dt className="type-pixel text-[9px] text-eminence">
                       Role
                     </dt>
                     <dd className="text-sm">{p.role}</dd>
                   </div>
                   <div>
-                    <dt className="text-[11px] font-bold tracking-wide text-eminence uppercase">
+                    <dt className="type-pixel text-[9px] text-eminence">
                       Year
                     </dt>
                     <dd className="text-sm tabular-nums">{p.year}</dd>
                   </div>
                   <div>
-                    <dt className="text-[11px] font-bold tracking-wide text-eminence uppercase">
+                    <dt className="type-pixel text-[9px] text-eminence">
                       Built with
                     </dt>
                     <dd className="mt-1.5 flex flex-wrap gap-1.5">

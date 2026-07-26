@@ -9,7 +9,7 @@ export default function Contact() {
       <div className="mx-auto max-w-6xl">
         <h2
           id="contact-heading"
-          className="font-display mb-6 pl-2 text-xs font-bold tracking-[0.22em] text-fawn uppercase"
+          className="type-pixel mb-6 pl-2 text-[10px] text-fawn"
         >
           contact
         </h2>
@@ -19,7 +19,7 @@ export default function Contact() {
           active="contact"
           labelledBy="contact-heading"
         >
-          <h3 className="font-display text-4xl font-black tracking-tighter sm:text-6xl">
+          <h3 className="type-display-roman text-4xl sm:text-6xl">
             Let&apos;s make something cool together.
           </h3>
 

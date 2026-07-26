@@ -55,10 +55,8 @@ export default function AboutMe() {
 
       {/* Copy */}
       <div>
-        <h3 className="font-display text-2xl leading-tight font-black tracking-tight sm:text-3xl">
-          {profile.aboutHeadline}
-        </h3>
-        <p className="font-display mt-3 text-xl font-bold text-eminence italic sm:text-2xl">
+        <h3 className="type-display-roman text-3xl sm:text-4xl">{profile.aboutHeadline}</h3>
+        <p className="type-display type-fringe mt-3 text-3xl text-eminence sm:text-4xl">
           {profile.aboutKicker}
         </p>
 

@@ -24,6 +24,8 @@
 
   --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif), "Didot", "Bodoni MT", Georgia, serif;
+  --font-pixel: var(--font-pixel), "Courier New", monospace;
 }
 
 html {
@@ -472,5 +474,74 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@layer utilities {
+  /* --- Typographic system ------------------------------------------------
+   *
+   * .type-display  Didone italic. Large sizes only — the hairlines vanish
+   *                below about 28px on this ground.
+   * .type-pixel    Silkscreen. Tiny, uppercase, heavily tracked. Anything
+   *                above ~13px starts to look like a broken image.
+   */
+
+  .type-display {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 0.92;
+  }
+
+  .type-display-roman {
+    font-family: var(--font-serif);
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 0.94;
+  }
+
+  .type-pixel {
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    /* Pixel faces render soft under subpixel AA; this keeps the edges square. */
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+  }
+
+  /* Chromatic fringe from the reference — a warm ghost offset behind the
+     glyphs. Kept subtle: two soft shadows, no blur on the text itself, so it
+     never costs legibility. */
+  .type-fringe {
+    text-shadow:
+      0.02em 0 0 color-mix(in srgb, var(--color-lavender) 55%, transparent),
+      -0.015em 0 0 color-mix(in srgb, var(--color-fawn) 40%, transparent),
+      0 0 38px color-mix(in srgb, var(--color-maize) 28%, transparent);
+  }
+
+  /* --- Background marginalia -------------------------------------------- */
+
+  /* Oversized outlined word sitting behind a section. */
+  .ghost-word {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 700;
+    color: transparent;
+    -webkit-text-stroke: 1px color-mix(in srgb, var(--color-maize) 16%, transparent);
+    line-height: 0.8;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  /* Faint grid, like a spec sheet under the artwork. */
+  .spec-grid {
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--color-maize) 5%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--color-maize) 5%, transparent) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 40%, transparent 100%);
   }
 }
