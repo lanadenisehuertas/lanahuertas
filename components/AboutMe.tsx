@@ -21,6 +21,8 @@ const FLOATERS = [
   { i: 3, size: 64, style: { top: "14%", right: -70 }, dur: "8.5s", delay: "-1s" }, // Ae
   { i: 4, size: 58, style: { top: "46%", right: -64 }, dur: "10s", delay: "-3s" }, // Ca
   { i: 5, size: 54, style: { top: "76%", right: -60 }, dur: "9.5s", delay: "-5s" }, // Fg
+  // Py and Js are named in the list below rather than floated — eight badges
+  // around one portrait is a crowd, and the code tools are not design tools.
 ] as const;
 
 export default function AboutMe() {
@@ -80,15 +82,26 @@ export default function AboutMe() {
           dynamic video edits, I handle the creative heavy lifting so you don&apos;t have to.
         </p>
 
-        {/* Badges are decorative and hidden on small screens, so the tools are
-            named here where a screen reader and a phone will both find them. */}
-        <p className="mt-6 flex flex-wrap gap-x-3 gap-y-1 sm:hidden">
-          {toolkit.map((t) => (
-            <span key={t.id} className="type-pixel text-[10px] text-eminence">
-              {t.name.replace("Adobe ", "")}
-            </span>
-          ))}
-        </p>
+        {/*
+         * The floating badges only carry six tools and are decorative, so the
+         * full set is named here — at every width, not just mobile. Previously
+         * this was sm:hidden, which left Python and JavaScript with nowhere to
+         * appear on desktop.
+         */}
+        <div className="mt-8 border-t-2 border-ink/12 pt-5">
+          <p className="type-pixel text-[10px] text-eminence">tools I work in</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {toolkit.map((t) => (
+              <span
+                key={t.id}
+                className="flex items-center gap-2 rounded-full border-2 border-ink/20 py-1 pr-3.5 pl-1.5 text-xs font-semibold transition-colors duration-200 hover:border-ink"
+              >
+                <ToolBadge tool={t} size={24} className="border" />
+                {t.name.replace("Adobe ", "")}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

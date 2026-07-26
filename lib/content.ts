@@ -82,6 +82,8 @@ export const toolkit = [
   { id: "ae", label: "Ae", name: "Adobe After Effects", bg: "#1F0740", fg: "#9999FF" },
   { id: "ca", label: "Ca", name: "Canva", bg: "#0B0F2B", fg: "#00C4CC" },
   { id: "fg", label: "Fg", name: "Figma", bg: "#12111A", fg: "#F24E1E" },
+  { id: "py", label: "Py", name: "Python", bg: "#0E2233", fg: "#FFD43B" },
+  { id: "js", label: "Js", name: "JavaScript", bg: "#2B2A15", fg: "#F7DF1E" },
 ] as const;
 
 // Most recent first. Bullets kept to two lines each — the detail lives in the

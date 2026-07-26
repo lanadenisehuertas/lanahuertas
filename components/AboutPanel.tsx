@@ -117,17 +117,35 @@ export default function AboutPanel() {
                 What I work with
               </h3>
 
-              <div className="mt-7 space-y-4">
-                {skillGroups.map((g) => (
-                  <div key={g.label}>
-                    <p className="type-pixel text-[10px] text-eminence">
-                      {g.label}
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
+              {/*
+               * Five stacked groups of loose chips read as one long wall. Each
+               * group now sits in its own bordered card in a two-column grid,
+               * with a numbered label and a count, so the eye can find a
+               * discipline instead of scanning every pill.
+               */}
+              <div className="mt-8 grid gap-4 md:grid-cols-2">
+                {skillGroups.map((g, i) => (
+                  <div
+                    key={g.label}
+                    className="rounded-xl border-2 border-ink/15 bg-lavender/8 p-5 transition-colors duration-200 hover:border-ink/40"
+                  >
+                    <div className="flex items-baseline gap-2.5 border-b-2 border-ink/10 pb-3">
+                      <span className="type-pixel text-[10px] text-eminence/50 tabular-nums">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <p className="font-display flex-1 text-[15px] font-black tracking-tight">
+                        {g.label}
+                      </p>
+                      <span className="type-pixel text-[10px] text-ink/35 tabular-nums">
+                        {g.items.length}
+                      </span>
+                    </div>
+
+                    <div className="mt-3.5 flex flex-wrap gap-1.5">
                       {g.items.map((s) => (
                         <span
                           key={s}
-                          className="rounded-full border border-ink/30 px-3 py-1 text-xs font-medium transition-colors duration-200 hover:border-ink hover:bg-fawn/35"
+                          className="rounded-full border border-ink/25 bg-maize px-3 py-1 text-xs font-medium transition-colors duration-200 hover:border-ink hover:bg-fawn/40"
                         >
                           {s}
                         </span>
@@ -135,13 +153,33 @@ export default function AboutPanel() {
                     </div>
                   </div>
                 ))}
-              </div>
 
-              <div className="mt-8">
-                <p className="type-pixel text-[10px] text-eminence">
-                  languages
-                </p>
-                <p className="mt-1 text-sm text-ink/75">{languages.join("  ·  ")}</p>
+                {/* Languages shares the card treatment so the grid closes evenly. */}
+                <div className="rounded-xl border-2 border-ink/15 bg-lavender/8 p-5">
+                  <div className="flex items-baseline gap-2.5 border-b-2 border-ink/10 pb-3">
+                    <span className="type-pixel text-[10px] text-eminence/50 tabular-nums">
+                      {String(skillGroups.length + 1).padStart(2, "0")}
+                    </span>
+                    <p className="font-display flex-1 text-[15px] font-black tracking-tight">
+                      languages
+                    </p>
+                    <span className="type-pixel text-[10px] text-ink/35 tabular-nums">
+                      {languages.length}
+                    </span>
+                  </div>
+
+                  <ul className="mt-3.5 space-y-1.5">
+                    {languages.map((l) => {
+                      const [name, level] = l.replace(")", "").split(" (");
+                      return (
+                        <li key={l} className="flex items-baseline justify-between gap-3 text-sm">
+                          <span className="font-semibold">{name}</span>
+                          <span className="text-xs text-ink/55">{level}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               </div>
             </div>
           )}
