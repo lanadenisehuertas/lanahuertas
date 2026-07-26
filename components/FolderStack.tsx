@@ -29,7 +29,7 @@ export default function FolderStack() {
 
   const tabs: FolderTab[] = [
     ...workTabs.map((t) => ({ id: t.id, label: t.label, accent: t.accent })),
-    { id: CASE_ID, label: "projects", accent: "deep" as const },
+    { id: CASE_ID, label: "ui/ux & code", accent: "deep" as const },
   ];
 
   const tab = workTabs.find((t) => t.id === active);

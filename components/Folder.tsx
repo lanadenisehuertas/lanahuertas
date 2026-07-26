@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 export type FolderTab = {
   id: string;
   label: string;
@@ -50,6 +52,41 @@ export default function Folder({
   // 4 directions, cycled by index: bottom-right, bottom-left, top-right, top-left.
   const direction = activeIndex % 4;
 
+  /*
+   * Keep the folder you just opened in view.
+   *
+   * Holding the scroll position fixed across a switch sounds like the safe
+   * behaviour, and it was the original one — but panels differ enormously in
+   * height (22 posters vs 2 case studies is a 673px drop). Hold the scroll and
+   * the content shrinks out from under the reader instead, landing them in the
+   * *next* section, looking at something they did not ask for.
+   *
+   * So the invariant is the tab strip, not the scrollport: if switching pushes
+   * the strip above the top of the window, pull it back down. Anything still
+   * on screen is left alone, because scrolling a reader who can already see the
+   * panel is its own kind of rude.
+   */
+  const stripRef = useRef<HTMLDivElement>(null);
+  const firstRender = useRef(true);
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return; // never scroll on mount — the page has its own starting position
+    }
+    const strip = stripRef.current;
+    if (!strip) return;
+
+    const top = strip.getBoundingClientRect().top;
+    if (top >= 0) return; // still visible; leave the reader where they are
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({
+      top: window.scrollY + top - 16,
+      behavior: reduced ? "auto" : "smooth",
+    });
+  }, [active]);
+
   return (
     <div className="relative">
       {/*
@@ -59,6 +96,7 @@ export default function Folder({
        * scroll container and clip.
        */}
       <div
+        ref={stripRef}
         className="flex items-end overflow-x-auto pb-[9px] pl-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         role={interactive ? "tablist" : undefined}
       >

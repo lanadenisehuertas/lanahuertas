@@ -39,8 +39,8 @@ export default function Contact() {
               </h3>
 
               <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-ink/75 sm:text-base">
-                Whether you need a brand refresh, event visuals, or just want to chat about
-                design, my inbox is always open.
+                Open to UI/UX and design internships, and to freelance work — brand
+                refreshes, event visuals, product design. My inbox is always open.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">

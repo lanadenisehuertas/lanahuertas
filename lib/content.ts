@@ -44,22 +44,22 @@ export type WorkTab = {
 export const profile = {
   name: "Lana Denise Huertas",
   short: "Lana Huertas",
-  roles: ["Graphic Designer", "Video Editor", "Software Engineer"],
+  roles: ["UI/UX Designer", "Graphic Designer", "Video Editor", "Software Engineer"],
   // Street address deliberately omitted — full address lives on the resume only.
   location: "Manila, Philippines",
   email: "lanadenisehuertas@gmail.com",
   years: "7+ years",
 
   title: "Hi, I'm Lana.",
-  titleRole: "Graphic designer, video editor, and problem solver.",
+  titleRole: "UI/UX designer, graphic designer, video editor, and problem solver.",
   // Hero. Kept to one line and one supporting line — everything else about
   // her is stated properly further down the page.
   heroLead: "I make work that's",
   heroAccent: "hard to scroll past.",
-  heroSub: "Manila-based · 7+ years in Photoshop and Premiere · CS student building what she designs.",
+  heroSub: "UI/UX and visual designer, Manila-based · 7+ years across Figma, Photoshop and Premiere · CS student who ships what she designs.",
 
   welcome:
-    "Welcome to my portfolio. Manila-based, 7+ years deep in Photoshop and Premiere Pro, turning rough ideas into work that holds attention.",
+    "Welcome to my portfolio. Manila-based UI/UX and visual designer, 7+ years deep in Figma, Photoshop and Premiere Pro, turning rough ideas into work that holds attention.",
 
   shortAbout:
     "Brand identities, publicity materials, and video edits that get looked at twice. Fast, detail-obsessed, always on time. Now studying Computer Science at FEU Tech — so I build what I design.",

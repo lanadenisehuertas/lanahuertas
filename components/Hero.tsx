@@ -23,7 +23,7 @@ export default function Hero() {
           items={[
             { label: profile.email, href: `mailto:${profile.email}` },
             { label: "Manila, PH" },
-            { label: "Graphic design · Video · Code" },
+            { label: "UI/UX · Graphic design · Video" },
             { label: "Portfolio Vol. 01" },
           ]}
         />
