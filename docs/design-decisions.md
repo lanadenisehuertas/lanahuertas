@@ -1,6 +1,6 @@
 # Portfolio — design decisions
 
-_2026-07-18_
+_Last reviewed 2026-07-26_
 
 ## What this is
 
@@ -16,16 +16,29 @@ reads existing designs to generate code from them. The only authoring path is a 
 plugin running inside Figma. Rather than generate a Figma file with no live link to the
 site, we build the site directly and iterate in a browser preview.
 
-**Palette: the swatch-card reference.** Dark Ultramarine `#290087` ground, Honeydew
-`#F6FFE9` panels, Vanilla Custard `#F2E0A4` display type, Amethyst `#A230A4` and
-Periwinkle `#CAC5E5` accents.
+**Palette: the lavender-sunset reference.** Deep Purple `#330C4B` ground, Purple Iris
+`#51017C` lifted surface, Eminence `#711E7B` accent, Sunset Lavender `#B9379D`,
+Fawn `#E3A88A`, Maize `#EEDAA5` panels and display type.
 
-One deviation from a literal reading: **Amethyst on Dark Ultramarine measures 2.42:1**,
-below the 3:1 floor for large text. So the hero wordmark uses Vanilla Custard (11.06:1)
-and Amethyst is reserved for accents on light panels, where it has contrast.
+Roles were assigned by measured contrast, not by eye:
+
+| Pairing | Ratio | Role |
+|---|---|---|
+| maize on deep | 11.74:1 | display type, panel fills |
+| fawn on deep | 7.90:1 | secondary text on dark |
+| eminence on maize | 7.00:1 | small labels on light panels |
+| lavender on deep | 3.16:1 | **fails as text — decorative fills only** |
+
+`ink` `#1B0730` is the one derived value. Deep Purple cannot serve as both the page
+ground and the border colour — at 1.27:1 against Purple Iris every border would
+vanish — so it is a deeper shade of the ground.
 
 Two motifs are lifted from the reference image itself: the **aurora gradient wash**
-(radial blooms behind the hero) and the **four-point sparkle**.
+(drifting blooms behind the whole page) and the **four-point sparkle**, which also
+drifts through the background as its own layer.
+
+_An earlier build used an electric-blue palette (Dark Ultramarine / Honeydew /
+Vanilla Custard). It was replaced wholesale; nothing of it remains._
 
 **Layout: reference 1.** Heavy geometric sans (Poppins), hard offset shadows,
 tab-folder cards.
@@ -62,11 +75,12 @@ nodes reach `opacity: 1` on scroll.
 
 ## Page order
 
-1. Title area — name-led (`Hi, I'm Lana. / Designer, video editor, and problem solver.`)
-2. About me, short — one folder, portrait + a paragraph
-3. Projects — five switchable folders
-4. About me, extended — three switchable folders (experience / education / skills)
-5. Contact — one folder
+1. `Hero` — name-led (`Lana / I make work that's hard to scroll past.`)
+2. `FolderStack` — the work, in four switchable folders
+   (graphic design / brand systems / videos / projects)
+3. `AboutPanel` — four switchable folders
+   (about me / experience / education & certs / skills)
+4. `Contact`
 
 Every section is a folder, so the metaphor labels the whole page rather than only the
 work section.
@@ -74,29 +88,40 @@ work section.
 ## The folder drawer
 
 The work section is a stack of manila folders, not browser tabs
-(`components/FolderStack.tsx`).
+(`components/FolderStack.tsx`, with the tab strip in `components/Folder.tsx`).
 
 - **Tab shape** — rounded rectangles (`rounded-t-xl`). An earlier version used an
   angled `clip-path` notch; the rounded form was preferred and the clip-path removed.
 - **Sheet placement** — switching re-keys the panel (`key={activeTab.id}`) so React
-  remounts it and the `paper-drop` keyframes replay. The sheet is released 26px above
-  the stack with a 0.5deg tilt and slight upscale, then settles. The shadow starts wide
-  and soft (in the air) and tightens to the hard offset shadow (landed) — that shadow
-  transition is what sells the depth, more than the movement does. Content inside runs
-  `paper-content` on a 90ms delay so it appears to settle onto the sheet.
+  remounts it and the `place-*` keyframes replay. There are four, one per direction
+  (`place-br`, `place-bl`, `place-tr`, `place-tl`), so a sheet arrives from the side
+  the new tab sits on.
+
+  Each runs in two phases via per-keyframe `animation-timing-function` — the value
+  declared in a keyframe governs the segment that *starts* there. Phase one (0–64%)
+  glides the sheet in off-axis, visibly slanted and slightly oversized. Phase two
+  (64–100%) squares it up, snapping rotation and residual offset to zero on a fast
+  curve. That late correction is the whole effect; without it the sheet just slides
+  and reads like a carousel.
+
+  The shadow travels with it: wide and soft while airborne, tightening to the hard
+  offset shadow on landing. That does more for the sense of depth than the movement
+  does. Content inside runs `paper-content` on a delay so it settles onto the sheet.
 - **The stack** — two decorative sheets sit behind the panel at slight offsets and
   opposing rotations, so there is visibly something for the new sheet to land on.
   `aria-hidden`, purely decorative.
-- **Tight row** — tabs overlap horizontally by `-12px` along a single top edge. An
+- **Tight row** — tabs overlap horizontally along a single top edge. Below 640px the
+  strip becomes `overflow-x: auto` rather than wrapping — four tabs measured 505px in
+  a 375px viewport, and letting them scroll keeps the folder metaphor intact. An
   earlier version stacked each folder vertically with its own visible body strip; that
   left far too much dead vertical space before any content appeared.
-- **Tucking** — the active tab sits at `translateY(0)` with `z-40`; inactive tabs sit
-  at `translateY(7px)` with `z-10+i`, below the folder front (`z-30`), so they read as
-  tucked into the folder rather than floating above it.
+- **Tucking** — the active tab sits at `translateY(0)`; inactive tabs sit lower
+  (`translateY(9px)`, slightly scaled down and dimmed) and below the folder front, so
+  they read as tucked into the folder rather than floating above it.
 - **One panel** — only the active folder has a body. Switching swaps content in place;
   nothing expands or collapses, so there is no layout push.
-- **Colour per folder** — amethyst / custard / periwinkle / honeydew / violet, each
-  paired with a text colour that clears contrast on that fill.
+- **Colour per folder** — each tab takes a fill from the palette, paired with a text
+  colour that clears contrast on that fill.
 
 Opening a folder does not move the page: verified scroll position identical before and
 after a switch (1985 -> 1985). This is the failure the Figma prototype had.
@@ -165,16 +190,62 @@ states, and responsive behaviour have no Figma equivalent and are absent.
 Re-run it after any significant design change, and delete the old frame first
 since it appends rather than replaces.
 
+## Accessibility audit
+
+Run against the live DOM before launch, not by inspection.
+
+**Contrast.** Twenty-seven pieces of text failed WCAG AA — all 10–12px micro-labels
+dimmed with Tailwind opacity modifiers (counts, index numbers, edge-rail marginalia,
+definition-list keys). The worst measured 2.18:1 against a 4.5:1 floor. Each token was
+raised to the minimum alpha that clears the threshold, solved per token in the browser
+rather than guessed, then re-measured across all eight folder tabs. Zero failures.
+
+Two false starts are worth recording, because both produced confident wrong numbers:
+
+- Reading `getComputedStyle().color` with a naive regex breaks on Tailwind opacity
+  modifiers, which render as `oklab(...)`. The oklab components were being read as
+  RGB. Colours must be resolved by painting them to a canvas and reading the pixel.
+- Compositing an element's background from its *parent* upward misses the element's
+  own background, so a maize button with deep text measured against the page ground
+  and reported 1.16:1 on text that actually passes comfortably.
+
+**Mock UI excluded.** `PsyClickVisual` and `DebtLedgerVisual` are `aria-hidden`
+illustrations of other applications, not content, and are left at their original
+values.
+
+**Dialog.** Verified live: `role="dialog"`, `aria-modal`, labelled, focus moves to
+Close on open, focus is trapped and wraps, Escape closes, focus returns to the exact
+card that opened it, background scroll is locked and restored, and scroll position is
+unchanged across open/close.
+
+**Motion.** `prefers-reduced-motion` freezes the aurora drift (the colour stays — it is
+the background) and removes the sparkle layer entirely, rather than freezing it
+mid-twinkle at an arbitrary opacity.
+
+**Overflow.** No horizontal overflow from 320px to 1920px.
+
+## Share metadata
+
+The site had no Open Graph or Twitter tags, so pasting the link anywhere produced a
+blank card — on a page whose entire purpose is being shared with recruiters.
+
+`public/og.png` is generated in the site's own palette and display face. `metadataBase`
+reads `VERCEL_URL` per deployment, because a relative image path resolves against the
+scraper's host rather than the site and comes back empty. Set `NEXT_PUBLIC_SITE_URL`
+once a custom domain is attached.
+
 ## Outstanding
 
-- **Canva scrape produced nothing usable.** Only 7 media assets ever loaded, all
-  background grain textures and gradient washes. The project carousels are
-  interaction-gated and never rendered headlessly. Images must come from Lana directly.
-- Work images. `public/work/` is empty; panels render numbered placeholders.
-  Candidates spotted in `Documents/personal`: `FRONT.png`, `BACK.png`, `MOCKUP.png`,
-  `MAGDA.psd`, `CHRISTMAS.psd`. Not used without explicit say-so — that folder also
-  holds personal documents.
-- Portrait. `components/AboutPanel.tsx` has a placeholder slot.
-  `HUERTAS 1X1.png` is a candidate.
-- Video hosting. Determines embed vs. self-hosted player.
-- Engineering projects and repos, to fill the `engineering` tab.
+- **Socials are thin.** `lib/content.ts` lists only email and the old Canva portfolio.
+  Linking the previous portfolio *from* the new one is circular; it should probably be
+  dropped once this site replaces it. There is no LinkedIn and no GitHub link, and both
+  are expected for design and engineering applications.
+- **`public/work/psyclick.webp` is unused** — `PsyClickVisual` renders in CSS now. Safe
+  to delete.
+- **Résumé and site disagree.** The current résumé (UI/UX targeted) omits social media
+  and VA skills, the CybeRS Robotics Club role, the 2019–2023 school work, and any
+  "7+ years" claim. The site carries all of them. Both are defensible, but a recruiter
+  holding the two together will notice the gap.
+- **Debt Payoff Ledger stack is partly inferred.** Next.js, TypeScript, and Tailwind are
+  visible from the deployed app; Vitest and GitHub Actions were not verified against the
+  repository.
