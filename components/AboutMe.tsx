@@ -2,37 +2,38 @@ import { profile, toolkit } from "@/lib/content";
 import ToolBadge from "./ToolBadge";
 
 /**
- * Layout copied from Lana's own reference sheet: a large plain portrait on the
- * left with four app badges straddling its edges, and a right column of
- * headline, script kicker, and justified body copy.
+ * Layout copied from Lana's own reference sheet: a large portrait on the left
+ * with four big app badges straddling its edges, and a right column of
+ * headline, script kicker, and justified body.
  *
- * The badges sit ON the photo edge here — half on, half off — which is what the
- * reference does. Earlier versions either buried them in the gutter or dumped
- * all six across her face; this is the middle position that actually works.
- *
- * Only four badges float. Six was too many for the frame, and the remaining
- * two are named in the body copy anyway.
+ * Sizing is deliberately generous. Earlier passes had the photo at ~280px and
+ * the badges at ~56px, which read as decoration; in the reference the photo is
+ * the dominant element of the panel and the badges are substantial objects
+ * sitting half on, half off its edges.
  */
 const FLOATERS = [
-  { i: 0, size: 64, style: { top: "18%", right: "-12%" }, dur: "7s", delay: "0s" }, // Ps
-  { i: 2, size: 58, style: { top: "38%", left: "-14%" }, dur: "9s", delay: "-2s" }, // Pr
-  { i: 1, size: 56, style: { top: "62%", left: "-12%" }, dur: "11s", delay: "-4s" }, // Ai
-  { i: 3, size: 60, style: { top: "46%", right: "-14%" }, dur: "8.5s", delay: "-1s" }, // Ae
+  // Ps sits mostly ON the photo, upper right — the one badge that overlaps
+  // rather than straddles, exactly as the reference has it.
+  { i: 0, size: 96, style: { top: "16%", right: "-14%" }, dur: "7s", delay: "0s" },
+  { i: 2, size: 92, style: { top: "36%", left: "-20%" }, dur: "9s", delay: "-2s" }, // Pr
+  { i: 3, size: 92, style: { top: "40%", right: "-20%" }, dur: "8.5s", delay: "-1s" }, // Ae
+  { i: 1, size: 88, style: { top: "60%", left: "-22%" }, dur: "11s", delay: "-4s" }, // Ai
 ] as const;
 
 export default function AboutMe() {
   return (
-    <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.12fr)] lg:gap-16">
+    <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1fr)] lg:gap-20">
       {/* Portrait with badges on its edges */}
-      <div className="mx-auto w-full max-w-[300px] px-8 sm:max-w-[360px] sm:px-10">
+      <div className="mx-auto w-full max-w-[300px] px-0 sm:max-w-[460px] sm:px-[72px]">
         <div className="relative">
+          {/* Hairline mount, as in the reference — a cut edge, not a frame. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/work/lana-portrait.webp"
             alt="Lana Denise Huertas"
             width={1004}
             height={1100}
-            className="block h-auto w-full"
+            className="block h-auto w-full ring-2 ring-maize/70"
           />
 
           <div aria-hidden className="hidden sm:block">
@@ -51,11 +52,11 @@ export default function AboutMe() {
 
       {/* Copy */}
       <div>
-        <h3 className="type-display text-[1.7rem] leading-[1.12] sm:text-[2.15rem]">
+        <h3 className="type-display text-[1.8rem] leading-[1.14] sm:text-[2.3rem]">
           {profile.aboutHeadline}
         </h3>
 
-        <p className="type-script mt-3 text-[2rem] leading-[1] text-eminence sm:text-[2.6rem]">
+        <p className="type-script mt-4 text-[2.1rem] leading-[1] text-eminence sm:text-[2.8rem]">
           {profile.aboutKicker}
         </p>
 
@@ -63,7 +64,7 @@ export default function AboutMe() {
          * Justified, as in the reference. Hyphenation is on because justified
          * text without it opens rivers of white space at this measure.
          */}
-        <p className="mt-6 text-[15px] leading-[1.75] text-ink/85 sm:text-base [text-align:justify] [hyphens:auto]">
+        <p className="mt-7 text-[15px] leading-[1.8] text-ink/85 sm:text-[17px] [text-align:justify] [hyphens:auto]">
           I pride myself on being a highly adaptable creative. I bring a meticulous eye for
           detail and a versatile skill set, backed by{" "}
           <em className="font-semibold text-eminence not-italic">
