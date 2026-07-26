@@ -1,8 +1,10 @@
 import { engineeringProjects } from "@/lib/content";
 import PsyClickVisual from "./PsyClickVisual";
+import DebtLedgerVisual from "./DebtLedgerVisual";
 
 const VISUALS = {
   psyclick: PsyClickVisual,
+  debtledger: DebtLedgerVisual,
 } as const;
 
 /**

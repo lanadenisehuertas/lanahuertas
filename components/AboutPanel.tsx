@@ -78,6 +78,11 @@ export default function AboutPanel() {
                     <p className="text-xs font-semibold text-eminence">{e.period}</p>
                     <p className="type-display mt-1 text-[1.25rem] leading-tight">{e.school}</p>
                     <p className="mt-0.5 text-[15px] font-semibold text-eminence">{e.detail}</p>
+                    {e.coursework && (
+                      <p className="mt-1.5 text-[13px] leading-relaxed text-ink/55">
+                        Coursework: {e.coursework}
+                      </p>
+                    )}
                     {e.honors.length > 0 && (
                       <ul className="mt-2 space-y-1">
                         {e.honors.map((h) => (

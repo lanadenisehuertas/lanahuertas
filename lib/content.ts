@@ -147,6 +147,8 @@ export const education = [
     place: "Manila, PH",
     period: "Aug 2023 — Present",
     detail: "B.S. Computer Science — Software Engineering (Expected July 2027)",
+    coursework:
+      "Digital Image Processing · Discrete Mathematics & Number Theory · Logic & Critical Thinking",
     honors: ["Elite Scholar — FEU Tech", "DOST Scholar — Dept. of Science and Technology"],
   },
   {
@@ -154,6 +156,7 @@ export const education = [
     place: "Zambales, PH",
     period: "Graduated July 2023",
     detail: "Senior High School Diploma — Graduated with High Honors (GWA: 96)",
+    coursework: "",
     honors: [],
   },
 ];
@@ -175,8 +178,22 @@ export const certifications = [
 
 export const skillGroups = [
   {
-    label: "graphic design",
-    items: ["Photoshop", "Illustrator", "Canva", "brand identity", "layout & typography", "print & digital"],
+    label: "design",
+    items: [
+      "UI/UX principles",
+      "design systems",
+      "typography & visual hierarchy",
+      "Figma",
+      "Photoshop",
+      "Illustrator",
+      "Canva",
+      "brand identity",
+      "print & digital",
+    ],
+  },
+  {
+    label: "programming",
+    items: ["Python", "JavaScript/TypeScript", "Java", "PHP", "Kotlin", "Next.js", "Tailwind"],
   },
   {
     label: "video editing",
@@ -191,24 +208,23 @@ export const skillGroups = [
       "X/Twitter",
       "content calendars",
       "organic growth & engagement",
-      "community management",
       "copywriting",
       "brand voice adaptation",
     ],
   },
   {
-    label: "coordination & VA support",
+    label: "ways of working",
     items: [
-      "task delegation",
+      "project management",
+      "cross-functional coordination",
       "remote team coordination",
       "scheduling",
       "digital asset management",
-      "performance reporting",
     ],
   },
   {
-    label: "technical",
-    items: ["Python", "JavaScript", "Kotlin", "Google Workspace", "Microsoft Office"],
+    label: "AI tools",
+    items: ["ChatGPT", "Claude"],
   },
 ];
 
@@ -237,7 +253,7 @@ export type EngineeringProject = {
   href?: string;
   hrefLabel?: string;
   /** Which visual to render beside it. */
-  visual: "psyclick";
+  visual: "psyclick" | "debtledger";
 };
 
 export const engineeringProjects: EngineeringProject[] = [
@@ -247,13 +263,27 @@ export const engineeringProjects: EngineeringProject[] = [
     title: "PsyClick",
     tagline: "Calmer clinical screening",
     description:
-      "A clinician-guided screening companion that combines questionnaires, typing rhythm, and mouse dynamics into clear decision-support reports. It captures keystroke and cursor telemetry during a clinical intake, then shows the psychologist where the client hesitated — so the session can open on what actually registered. It flags; it does not diagnose. In use by a practising clinical psychologist.",
-    role: "Project manager · Full-stack developer",
+      "A clinician-guided screening companion that combines questionnaires, typing rhythm, and mouse dynamics into clear decision-support reports. It captures keystroke and cursor telemetry during a clinical intake, then shows the psychologist where the client hesitated — so the session can open on what actually registered. It flags; it does not diagnose.\n\nI designed the full experience — clinician dashboards, client intake, calibration tasks, and exportable session reports — balancing clinical usability against a calm, accessible visual style, and directed a four-person cross-functional team across design, backend, and research. In use by a practising clinical psychologist.",
+    role: "Lead UI/UX designer · Project manager · Backend developer",
     year: "2025 — 2026",
     stack: ["React", "Vite", "Electron", "Python", "NumPy", "SciPy", "Supabase", "SQLite"],
     href: "https://psyclick-app.vercel.app/",
     hrefLabel: "Visit the live site",
     visual: "psyclick",
+  },
+  {
+    n: "02",
+    id: "debt-ledger",
+    title: "Debt Payoff Ledger",
+    tagline: "Weekly allocator for a student budget",
+    description:
+      "A personal finance app that takes a weekly allowance, keeps back what is needed for food and school, then puts the remainder against whichever debt is due soonest. Entries stay editable until confirmed, and every week is logged.\n\nRebuilt from a single-file prototype into a production Next.js app. Rather than restart the look, I refined the original visual identity into a token-based design system. The data model was redesigned around privacy: hardcoded sample data was replaced with a real onboarding flow, and everything stays local-first by default.",
+    role: "Designer · Full-stack developer",
+    year: "2026",
+    stack: ["Next.js", "TypeScript", "Tailwind", "Vitest", "GitHub Actions"],
+    href: "https://debt-ledger-puce.vercel.app/",
+    hrefLabel: "Visit the live site",
+    visual: "debtledger",
   },
 ];
 

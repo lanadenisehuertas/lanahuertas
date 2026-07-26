@@ -376,6 +376,21 @@ body {
     animation: heat-in 380ms cubic-bezier(0.32, 0.72, 0, 1) both;
   }
 
+  /* Allocation bar grows from nothing, so the split reads as a decision. */
+  @keyframes alloc-in {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .alloc-fill {
+    transform-origin: left center;
+    animation: alloc-in 620ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+
   /* Grid cards stagger in behind the panel as it squares up. */
   @keyframes card-in {
     from {
@@ -434,6 +449,7 @@ body {
   .place-3,
   .tab-in,
   .card-in,
+  .alloc-fill,
   .float-badge,
   .heat-cell,
   .paper-content,
