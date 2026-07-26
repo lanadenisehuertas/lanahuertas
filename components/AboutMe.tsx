@@ -36,8 +36,11 @@ export default function AboutMe() {
               alt="Lana Denise Huertas"
               width={1004}
               height={1100}
-              className="block h-auto w-full"
+              className="cutout block h-auto w-full"
             />
+            <span className="label-badge type-pixel absolute -bottom-4 left-4 z-20 rotate-[-4deg] text-[8px] text-fawn">
+              Manila · 2026
+            </span>
           </div>
 
           {FLOATERS.map((f) => (

@@ -1,10 +1,11 @@
 import { profile, software } from "@/lib/content";
 import Sparkle from "./Sparkle";
 import { CornerLabel, RegMark, GhostWord } from "./Marginalia";
+import SelectionBox from "./SelectionBox";
 
 export default function Hero() {
   return (
-    <section className="spec-grid relative overflow-hidden px-6 py-20 sm:px-10 sm:py-28">
+    <section className="scrim relative overflow-hidden px-6 py-20 sm:px-10 sm:py-28">
       <CornerLabel className="top-5 left-6 sm:left-10">
         Manila, PH
         <br />
@@ -42,9 +43,9 @@ export default function Hero() {
         <p className="type-pixel mb-2 text-[10px] text-fawn sm:text-xs">Hi, I&apos;m</p>
 
         <h1 className="text-maize">
-          <span className="type-display type-fringe block text-[24vw] sm:text-[13rem] sm:leading-[0.8]">
-            Lana
-          </span>
+          <SelectionBox className="type-display type-fringe text-[24vw] sm:text-[13rem] sm:leading-[0.8]">
+            <span className="text-fawn">La</span>na
+          </SelectionBox>
 
           <span className="mt-4 block sm:mt-5">
             <span className="type-display block text-[9vw] leading-[0.95] sm:text-6xl lg:text-7xl">
@@ -56,7 +57,7 @@ export default function Hero() {
           </span>
         </h1>
 
-        <p className="mt-7 max-w-xl text-sm leading-relaxed text-maize/75 sm:text-base">
+        <p className="mt-7 max-w-xl text-sm leading-relaxed text-maize/90 sm:text-base">
           {profile.heroSub}
         </p>
 

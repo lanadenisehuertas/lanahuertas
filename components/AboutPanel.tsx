@@ -33,10 +33,21 @@ export default function AboutPanel() {
                 Where I&apos;ve worked
               </h3>
               <div className="mt-7 space-y-6">
-                {experience.map((e) => (
-                  <div key={`${e.role}-${e.org}`} className="border-l-2 border-eminence pl-4">
-                    <p className="text-xs font-semibold text-eminence">{e.period}</p>
-                    <p className="font-display mt-0.5 text-base font-bold">{e.role}</p>
+                {experience.map((e) => {
+                  const [from, to] = e.period.split("—").map((x) => x.trim());
+                  return (
+                  <div
+                    key={`${e.role}-${e.org}`}
+                    className="grid gap-4"
+                    style={{ gridTemplateColumns: "3.6rem 1fr" }}
+                  >
+                    {/* Year stack — start over end, in colour, as in the reference CVs. */}
+                    <div className="year-stack font-display pt-0.5 text-right text-sm font-black">
+                      <div className="text-eminence">{from}</div>
+                      <div className="text-ink/40">{to}</div>
+                    </div>
+                    <div className="border-l-2 border-eminence/30 pl-4">
+                    <p className="font-display text-base font-bold">{e.role}</p>
                     <p className="text-sm text-ink/65">
                       {e.org} — {e.place}
                     </p>
@@ -47,8 +58,10 @@ export default function AboutPanel() {
                         </li>
                       ))}
                     </ul>
+                    </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

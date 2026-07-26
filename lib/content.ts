@@ -270,10 +270,12 @@ export const workTabs: WorkTab[] = [
         span: 3,
         year: "2025",
         client: "Student Coordinating Council — FEU Tech",
-        role: "Poster and information design",
+        role: "Event branding — full identity",
         tools: ["Photoshop", "Illustrator"],
         description:
-          "Fun-run announcement carrying real logistics — four race distances with pricing, venue, call time, a six-step registration list, and a QR code — without losing the rainbow-track motion of the artwork. The hardest layout in the set, because everything on it had to survive being read at a glance on a phone.\n\nThe race kit that shipped alongside it lives under Brand Systems.",
+          "Full event identity for a charity fun run at the Quirino Grandstand, run under the line \u201ca run for a healthier FEUture\u201d.\n\nThe announcement had to carry real logistics — four race distances priced 499 to 1,499, venue, call time, a six-step registration flow, and a QR code — without losing the rainbow-track motion of the artwork. The hardest layout in the set, because every detail had to survive being read at a glance on a phone.\n\nThe race kit that shipped alongside it lives under Brand Systems.",
+        href: "https://www.facebook.com/share/p/19F1hRVPpk/",
+        hrefLabel: "See the event post",
         images: [{ src: "/work/technorun-poster.webp", w: 1176, h: 1600 }],
       },
       {
@@ -282,11 +284,13 @@ export const workTabs: WorkTab[] = [
         span: 3,
         year: "2024",
         client: "Student Coordinating Council — FEU Tech",
-        role: "Poster design",
+        role: "Event branding — full identity",
         tools: ["Photoshop", "Illustrator"],
         description:
-          "Poster assembled as a print-and-tape collage — halftone amps, cassette decks, and vintage microphones layered under torn-paper title lettering. Deliberately rough where the rest of the campus material was clean.",
+          "Identity for a campus band competition at the FEU Tech Student Plaza, 8 June 2024.\n\nThe poster is assembled as a print-and-tape collage: halftone amps, cassette decks, and vintage microphones layered under torn-paper title lettering. Deliberately rough where the rest of the campus material was clean, to match a brief about guitar battles and stage presence.",
         images: [{ src: "/work/battle-of-the-bands.webp", w: 1200, h: 1600 }],
+        href: "https://www.facebook.com/share/p/1JqSHiJsb7/",
+        hrefLabel: "See the event post",
       },
       {
         id: "rock-of-aces",
@@ -294,10 +298,12 @@ export const workTabs: WorkTab[] = [
         span: 6,
         year: "2025",
         client: "Student Coordinating Council — FEU Tech",
-        role: "Banner design",
+        role: "Event branding — full identity",
         tools: ["Photoshop", "Illustrator"],
         description:
-          "Landscape key art for a music event. Guitars, drums, and a keyboard burst out of a halftone starburst in hot pink and orange, with the title set as stacked, outlined lettering over the collage.",
+          "Identity for Rock of Aces 6.0 — the sixth annual band competition, staged as part of Technoweek 2025 at the FEU Tech gymnasium and open to bands from both FEU Tech and FEU Manila.\n\nGuitars, drums, and a keyboard burst out of a halftone starburst in hot pink and orange, with the title set as stacked, outlined lettering over the collage.",
+        href: "https://www.facebook.com/share/p/1KiZ7sbrdp/",
+        hrefLabel: "See the event post",
         images: [{ src: "/work/rock-of-sales.webp", w: 1600, h: 900 }],
       },
       {
@@ -368,12 +374,14 @@ export const workTabs: WorkTab[] = [
         id: "cs-night",
         title: "CS Night",
         span: 3,
-        year: "2025",
-        client: "FEU Institute of Technology",
+        year: "2026",
+        client: "ACM — FEU Tech Student Chapter",
         role: "Design and compositing",
         tools: ["Photoshop"],
         description:
-          "Masquerade-themed performer lineup. Each act sits in its own gilded frame arranged up a staircase, hosts anchored at the base — a billing hierarchy that reads instantly without a single label.",
+          "Performer lineup for CS Night 2026, the chapter\u2019s 19th anniversary, staged as a masquerade ball.\n\nEight acts and two hosts had to sit on one graphic without any of them getting lost. Each act gets its own gilded frame arranged up a staircase, hosts anchored at the base — a billing hierarchy that reads instantly without a single label.",
+        href: "https://www.facebook.com/share/p/1DqJRPbhVz/",
+        hrefLabel: "See the event post",
         images: [{ src: "/work/cs-night.webp", w: 1280, h: 1600 }],
       },
       {
@@ -409,7 +417,9 @@ export const workTabs: WorkTab[] = [
         role: "Banner design",
         tools: ["Photoshop", "Illustrator"],
         description:
-          "Landscape header for a week-long org fair. An illustrated skyline of oversized objects — chess piece, molecule, telescope, guitar — stands in for the range of organizations, with the title held in a clean centre panel so it survives social-platform cropping.",
+          "Header for an org fair spread across four floors of campus — leadership and recreation, engineering, computing and esports, arts and innovation.\n\nAn illustrated skyline of oversized objects (chess piece, molecule, telescope, guitar) stands in for that range, with the title held in a clean centre panel so it survives social-platform cropping.",
+        href: "https://www.facebook.com/share/p/1Bgn5UtXoW/",
+        hrefLabel: "See the event post",
         images: [{ src: "/work/student-orgs-fair.webp", w: 1600, h: 900 }],
       },
       {
@@ -501,10 +511,12 @@ export const workTabs: WorkTab[] = [
         title: "Project Horizon",
         span: 3,
         year: "2024",
-        role: "Illustration and layout",
+        role: "Visuals and illustration",
         tools: ["Illustrator", "Photoshop"],
         description:
           "Vector illustration of hikers cresting a ridge at sunrise, layered into depth planes with a radiating sky behind the title. Flat-colour work throughout — no photography.",
+        href: "https://www.facebook.com/share/v/1EMNjY5vLf/",
+        hrefLabel: "Watch the reel",
         images: [{ src: "/work/project-horizon.webp", w: 1131, h: 1600 }],
       },
       {
@@ -577,10 +589,12 @@ export const workTabs: WorkTab[] = [
         span: 6,
         year: "2026",
         client: "Tabitayo",
-        role: "Product marketing design",
+        role: "Branding and product marketing",
         tools: ["Photoshop", "Illustrator"],
         description:
-          "Product announcement for an event seat-finding platform, presented as an annotated device mockup. Four callouts point at real interface regions rather than floating as generic bullets, so the feature list and the screenshot explain each other.",
+          "Branding and launch material for an event seat-finding platform.\n\nThe announcement is built as an annotated device mockup: four callouts point at real interface regions rather than floating as generic bullets, so the feature list and the screenshot explain each other.",
+        href: "https://www.facebook.com/tabitayo.ph",
+        hrefLabel: "See Tabitayo",
         images: [{ src: "/work/tabitayo-app.webp", w: 1297, h: 1600 }],
       },
       {

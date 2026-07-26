@@ -67,6 +67,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <AuroraField />
+        <div className="spec-grid pointer-events-none fixed inset-0 -z-10" aria-hidden />
         {children}
         <div className="grain-plate" aria-hidden />
       </body>
