@@ -39,19 +39,19 @@ export default function CaseStudy() {
 
                 <dl className="mt-7 space-y-3">
                   <div>
-                    <dt className="type-pixel text-[9px] text-eminence">
+                    <dt className="type-pixel text-[10px] text-eminence">
                       Role
                     </dt>
                     <dd className="text-sm">{p.role}</dd>
                   </div>
                   <div>
-                    <dt className="type-pixel text-[9px] text-eminence">
+                    <dt className="type-pixel text-[10px] text-eminence">
                       Year
                     </dt>
                     <dd className="text-sm tabular-nums">{p.year}</dd>
                   </div>
                   <div>
-                    <dt className="type-pixel text-[9px] text-eminence">
+                    <dt className="type-pixel text-[10px] text-eminence">
                       Built with
                     </dt>
                     <dd className="mt-1.5 flex flex-wrap gap-1.5">

@@ -29,7 +29,9 @@ export default function ToolBadge({
         height: size,
         background: tool.bg,
         color: tool.fg,
-        fontSize: size * 0.38,
+        // Quantised: three glyph sizes total, so badge boxes of
+        // similar size do not each mint their own font size.
+        fontSize: size >= 56 ? 22 : size >= 40 ? 18 : 11,
         letterSpacing: "-0.02em",
         ...style,
       }}

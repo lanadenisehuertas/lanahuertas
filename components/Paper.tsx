@@ -58,7 +58,7 @@ export function Stamp({
   return (
     <span
       aria-hidden
-      className={`stamp pointer-events-none absolute z-20 text-[9px] ${className}`}
+      className={`stamp pointer-events-none absolute z-20 text-[10px] ${className}`}
       style={{ transform: `rotate(${rotate}deg)` }}
     >
       {children}

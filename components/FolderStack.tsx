@@ -53,12 +53,12 @@ export default function FolderStack() {
                   <h3 className="type-display text-4xl sm:text-6xl">
                     {tab.heading}
                   </h3>
-                  <span className="text-xs font-semibold text-ink/45">
+                  <span className="type-pixel text-[10px] text-ink/40">
                     {tab.projects.length} {tab.projects.length === 1 ? "project" : "projects"}
                   </span>
                 </div>
 
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/75 sm:text-base">
+                <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink/70 sm:text-lg">
                   {tab.blurb}
                 </p>
 
@@ -115,10 +115,10 @@ export default function FolderStack() {
                             )}
 
                             {/* Caption — slides up on hover, always present for screen readers */}
-                            <span className="font-display absolute inset-x-0 bottom-0 translate-y-full bg-ink px-2.5 py-2 text-[11px] leading-tight font-bold text-maize transition-transform duration-300 ease-out group-hover:translate-y-0 group-focus-visible:translate-y-0">
+                            <span className="font-display absolute inset-x-0 bottom-0 translate-y-full bg-ink px-2.5 py-2.5 text-[13px] leading-tight font-bold text-maize transition-transform duration-300 ease-out group-hover:translate-y-0 group-focus-visible:translate-y-0">
                               {p.title}
                               {p.year && (
-                                <span className="ml-1.5 font-normal text-maize/55">{p.year}</span>
+                                <span className="ml-1.5 text-xs font-normal text-maize/55">{p.year}</span>
                               )}
                             </span>
                           </button>

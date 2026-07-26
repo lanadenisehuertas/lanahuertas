@@ -119,7 +119,7 @@ export default function ProjectModal({
         className="sheet-in relative flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-2xl border-2 border-ink bg-maize text-ink shadow-hard"
       >
         <div className="flex shrink-0 items-center justify-between gap-4 border-b-2 border-ink/15 px-5 py-3">
-          <p className="font-display type-pixel text-[9px] text-eminence">
+          <p className="font-display type-pixel text-[10px] text-eminence">
             {categoryLabel}
             {project.images.length > 1 && (
               <span className="ml-2 font-normal text-ink/45">
@@ -218,7 +218,7 @@ export default function ProjectModal({
             <dl className="mt-6 space-y-3">
               {project.client && (
                 <div>
-                  <dt className="type-pixel text-[9px] text-eminence">
+                  <dt className="type-pixel text-[10px] text-eminence">
                     Client
                   </dt>
                   <dd className="text-sm">{project.client}</dd>
@@ -226,7 +226,7 @@ export default function ProjectModal({
               )}
               {project.role && (
                 <div>
-                  <dt className="type-pixel text-[9px] text-eminence">
+                  <dt className="type-pixel text-[10px] text-eminence">
                     Role
                   </dt>
                   <dd className="text-sm">{project.role}</dd>
@@ -234,7 +234,7 @@ export default function ProjectModal({
               )}
               {project.year && (
                 <div>
-                  <dt className="type-pixel text-[9px] text-eminence">
+                  <dt className="type-pixel text-[10px] text-eminence">
                     Year
                   </dt>
                   <dd className="text-sm">{project.year}</dd>
@@ -242,7 +242,7 @@ export default function ProjectModal({
               )}
               {project.duration && (
                 <div>
-                  <dt className="type-pixel text-[9px] text-eminence">
+                  <dt className="type-pixel text-[10px] text-eminence">
                     Runtime
                   </dt>
                   <dd className="text-sm tabular-nums">{project.duration}</dd>
@@ -250,7 +250,7 @@ export default function ProjectModal({
               )}
               {project.tools && project.tools.length > 0 && (
                 <div>
-                  <dt className="type-pixel text-[9px] text-eminence">
+                  <dt className="type-pixel text-[10px] text-eminence">
                     Made with
                   </dt>
                   <dd className="mt-1.5 flex flex-wrap gap-1.5">

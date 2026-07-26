@@ -59,14 +59,14 @@ export default function PsyClickVisual() {
           <div className="min-w-0 flex-1 p-4 sm:p-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="type-pixel text-[8px] text-eminence">
+                <p className="type-pixel text-[10px] text-eminence">
                   Clinical overview
                 </p>
                 <p className="font-display mt-0.5 text-lg font-black tracking-tight text-ink">
                   Session Report
                 </p>
               </div>
-              <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-deep px-2.5 py-1 text-[9px] font-bold text-maize">
+              <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-deep px-2.5 py-1 text-[10px] font-bold text-maize">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#5ee49a]" />
                 GREEN
               </span>
@@ -86,7 +86,7 @@ export default function PsyClickVisual() {
                   }`}
                 >
                   <p
-                    className={`text-[8px] font-bold tracking-wide uppercase ${
+                    className={`text-[10px] font-bold tracking-wide uppercase ${
                       m.flag || m.hot ? "text-maize/70" : "text-ink/45"
                     }`}
                   >
@@ -130,7 +130,7 @@ export default function PsyClickVisual() {
             <p className="font-display text-[10px] leading-tight font-black text-ink">
               Hotelling T²
             </p>
-            <p className="mt-0.5 text-[9px] leading-snug text-ink/60">
+            <p className="mt-0.5 text-[10px] leading-snug text-ink/60">
               Baseline-aware anomaly review
             </p>
           </div>

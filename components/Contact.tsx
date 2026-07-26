@@ -38,8 +38,8 @@ export default function Contact() {
             ))}
           </div>
 
-          <p className="font-display mt-10 text-lg font-black tracking-tight">{profile.name}</p>
-          <p className="text-sm text-ink/70">
+          <p className="type-display mt-10 text-[1.75rem]">{profile.name}</p>
+          <p className="mt-1 text-base text-ink/70">
             {profile.location} · {profile.email}
           </p>
         </Folder>

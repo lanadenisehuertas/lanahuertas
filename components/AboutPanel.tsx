@@ -47,8 +47,8 @@ export default function AboutPanel() {
                       <div className="text-ink/40">{to}</div>
                     </div>
                     <div className="border-l-2 border-eminence/30 pl-4">
-                    <p className="font-display text-base font-bold">{e.role}</p>
-                    <p className="text-sm text-ink/65">
+                    <p className="type-display text-[1.25rem] leading-tight">{e.role}</p>
+                    <p className="mt-0.5 text-[15px] text-ink/60">
                       {e.org} — {e.place}
                     </p>
                     <ul className="mt-2 space-y-1">
@@ -75,7 +75,7 @@ export default function AboutPanel() {
                 {education.map((e) => (
                   <div key={e.school} className="border-l-2 border-eminence pl-4">
                     <p className="text-xs font-semibold text-eminence">{e.period}</p>
-                    <p className="font-display mt-0.5 text-base font-bold">{e.school}</p>
+                    <p className="type-display mt-1 text-[1.25rem] leading-tight">{e.school}</p>
                     <p className="text-sm text-ink/70">{e.detail}</p>
                     {e.honors.length > 0 && (
                       <ul className="mt-2 space-y-1">
@@ -91,7 +91,7 @@ export default function AboutPanel() {
                 ))}
               </div>
 
-              <h4 className="type-pixel mt-10 text-[9px] text-eminence">
+              <h4 className="type-pixel mt-10 text-[10px] text-eminence">
                 Certifications
               </h4>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -100,7 +100,7 @@ export default function AboutPanel() {
                     key={c.name}
                     className="rounded-xl border-2 border-ink/20 bg-lavender/12 p-4 transition-colors duration-200 hover:border-ink/45"
                   >
-                    <p className="font-display text-sm font-black tracking-tight">{c.name}</p>
+                    <p className="type-display text-base leading-snug">{c.name}</p>
                     <p className="mt-1 text-xs font-semibold text-eminence">{c.issuer}</p>
                     <p className="mt-0.5 text-xs text-ink/60">{c.date}</p>
                     <p className="mt-2 text-[11px] text-ink/50">{c.detail}</p>
@@ -119,7 +119,7 @@ export default function AboutPanel() {
               <div className="mt-7 space-y-4">
                 {skillGroups.map((g) => (
                   <div key={g.label}>
-                    <p className="type-pixel text-[9px] text-eminence">
+                    <p className="type-pixel text-[10px] text-eminence">
                       {g.label}
                     </p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
@@ -137,7 +137,7 @@ export default function AboutPanel() {
               </div>
 
               <div className="mt-8">
-                <p className="type-pixel text-[9px] text-eminence">
+                <p className="type-pixel text-[10px] text-eminence">
                   languages
                 </p>
                 <p className="mt-1 text-sm text-ink/75">{languages.join("  ·  ")}</p>
