@@ -28,12 +28,6 @@ export default function Hero() {
           ]}
         />
 
-        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-fawn/40 bg-deep/60 px-4 py-1.5 backdrop-blur-sm">
-          <Sparkle size={11} className="text-maize" />
-          <span className="type-pixel text-[9px] text-maize sm:text-[10px]">
-            available for freelance
-          </span>
-        </div>
 
         {/*
          * Lockup: name set huge, then a statement where the payoff word runs in
