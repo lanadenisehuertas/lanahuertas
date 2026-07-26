@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Yellowtail, Poppins, Silkscreen } from "next/font/google";
 import "./globals.css";
-import { profile } from "@/lib/content";
+import { profile, socials } from "@/lib/content";
 import AuroraField from "@/components/AuroraField";
 import SparkleField from "@/components/SparkleField";
 
@@ -117,6 +117,29 @@ export default function RootLayout({
       className={`${poppins.variable} ${bricolage.variable} ${script.variable} ${silkscreen.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        {/*
+         * Person schema. Search engines treat `sameAs` as the link between a
+         * name and the profiles that belong to it, which is what makes a search
+         * for her name surface this site alongside LinkedIn and GitHub rather
+         * than as an unrelated result.
+         */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: profile.name,
+              jobTitle: profile.roles.join(", "),
+              email: `mailto:${profile.email}`,
+              url: siteUrl,
+              image: `${siteUrl}/og.png`,
+              address: { "@type": "PostalAddress", addressLocality: "Manila", addressCountry: "PH" },
+              alumniOf: { "@type": "CollegeOrUniversity", name: "FEU Institute of Technology" },
+              sameAs: socials.filter((s) => s.href.startsWith("http")).map((s) => s.href),
+            }),
+          }}
+        />
         <AuroraField />
         <SparkleField />
         <div className="spec-grid pointer-events-none fixed inset-0 -z-10" aria-hidden />

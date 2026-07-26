@@ -43,14 +43,20 @@ export default function Contact() {
                 refreshes, event visuals, product design. My inbox is always open.
               </p>
 
-              <div className="mt-8 flex flex-wrap gap-3">
+              {/*
+               * Four pills of differing widths wrapped 2-1-1 on a phone, which
+               * reads as an accident rather than a layout. A two-column grid
+               * below 640px makes the break deliberate and gives every link the
+               * same target; above it they return to sitting on one line.
+               */}
+              <div className="mt-8 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
                 {socials.map((s) => (
                   <a
                     key={s.label}
                     href={s.href}
                     target={s.href.startsWith("http") ? "_blank" : undefined}
                     rel="noopener noreferrer"
-                    className="type-pixel press flex min-h-[50px] cursor-pointer items-center rounded-full border-2 border-ink bg-maize px-7 text-[11px] shadow-hard-sm hover:bg-eminence hover:text-maize"
+                    className="type-pixel press flex min-h-[50px] cursor-pointer items-center justify-center rounded-full border-2 border-ink bg-maize px-5 text-[11px] shadow-hard-sm hover:bg-eminence hover:text-maize sm:justify-start sm:px-7"
                   >
                     {s.label}
                   </a>

@@ -795,7 +795,17 @@ export const workTabs: WorkTab[] = [
   },
 ];
 
+/*
+ * Ordered by what someone hiring reaches for: mail her, check her history,
+ * read her code.
+ *
+ * The Canva site is the previous portfolio and is labelled as such — calling it
+ * "portfolio" on a portfolio site sent readers in a circle. Remove it once this
+ * site has replaced it outright.
+ */
 export const socials = [
   { label: "email", href: "mailto:lanadenisehuertas@gmail.com" },
-  { label: "portfolio", href: "https://lanadenisehuertas.my.canva.site" },
+  { label: "linkedin", href: "https://www.linkedin.com/in/lana-denise-huertas/" },
+  { label: "github", href: "https://github.com/lanadenisehuertas/" },
+  { label: "canva site", href: "https://lanadenisehuertas.my.canva.site" },
 ];
