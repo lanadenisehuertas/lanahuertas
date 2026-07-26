@@ -60,11 +60,7 @@ export default function Contact() {
 
             {/* Sign-off card */}
             <div className="rounded-xl border-2 border-ink/20 bg-lavender/10 p-6">
-              <p className="type-pixel text-[10px] text-eminence">Signed</p>
-              <p className="type-script mt-2 text-[2.4rem] leading-[0.95] text-eminence sm:text-5xl">
-                Lana
-              </p>
-              <p className="type-display mt-3 text-lg">{profile.name}</p>
+              <p className="type-display text-xl">{profile.name}</p>
               <dl className="mt-4 space-y-1.5 text-sm">
                 <div className="flex gap-2">
                   <dt className="type-pixel w-14 shrink-0 pt-0.5 text-[10px] text-ink/40">Based</dt>

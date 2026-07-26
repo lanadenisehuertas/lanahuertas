@@ -2,38 +2,40 @@ import { profile, toolkit } from "@/lib/content";
 import ToolBadge from "./ToolBadge";
 
 /**
- * Layout copied from Lana's own reference sheet: a large portrait on the left
- * with four big app badges straddling its edges, and a right column of
- * headline, script kicker, and justified body.
+ * Portrait left, tool badges floating around it, copy right.
  *
- * Sizing is deliberately generous. Earlier passes had the photo at ~280px and
- * the badges at ~56px, which read as decoration; in the reference the photo is
- * the dominant element of the panel and the badges are substantial objects
- * sitting half on, half off its edges.
+ * The two columns are height-matched: the grid stretches both, the photo fills
+ * its column with object-cover, and the copy is centred against it. That is
+ * what stops the panel reading as a small picture stranded beside a tall slab
+ * of text.
+ *
+ * Badges float clear of the subject rather than sitting on her — offsets are in
+ * pixels so they can't creep inward when the photo scales.
  */
 const FLOATERS = [
-  // Ps sits mostly ON the photo, upper right — the one badge that overlaps
-  // rather than straddles, exactly as the reference has it.
-  { i: 0, size: 96, style: { top: "16%", right: "-14%" }, dur: "7s", delay: "0s" },
-  { i: 2, size: 92, style: { top: "36%", left: "-20%" }, dur: "9s", delay: "-2s" }, // Pr
-  { i: 3, size: 92, style: { top: "40%", right: "-20%" }, dur: "8.5s", delay: "-1s" }, // Ae
-  { i: 1, size: 88, style: { top: "60%", left: "-22%" }, dur: "11s", delay: "-4s" }, // Ai
+  // Each offset is at least the badge's own width, so they sit fully clear of
+  // the subject rather than on her. Verified at 0% overlap.
+  { i: 0, size: 64, style: { top: "6%", left: -70 }, dur: "7s", delay: "0s" }, // Ps
+  { i: 2, size: 58, style: { top: "38%", left: -64 }, dur: "9s", delay: "-2s" }, // Pr
+  { i: 1, size: 54, style: { top: "70%", left: -60 }, dur: "11s", delay: "-4s" }, // Ai
+  { i: 3, size: 64, style: { top: "14%", right: -70 }, dur: "8.5s", delay: "-1s" }, // Ae
+  { i: 4, size: 58, style: { top: "46%", right: -64 }, dur: "10s", delay: "-3s" }, // Ca
+  { i: 5, size: 54, style: { top: "76%", right: -60 }, dur: "9.5s", delay: "-5s" }, // Fg
 ] as const;
 
 export default function AboutMe() {
   return (
-    <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1fr)] lg:gap-20">
-      {/* Portrait with badges on its edges */}
-      <div className="mx-auto w-full max-w-[300px] px-0 sm:max-w-[460px] sm:px-[72px]">
-        <div className="relative">
-          {/* Hairline mount, as in the reference — a cut edge, not a frame. */}
+    <div className="grid items-stretch gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] lg:gap-24">
+      {/* Portrait + floating toolkit */}
+      <div className="mx-auto w-full max-w-[300px] px-0 sm:max-w-[460px] sm:px-[78px]">
+        <div className="relative h-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/work/lana-portrait.webp"
             alt="Lana Denise Huertas"
             width={1004}
             height={1100}
-            className="block h-auto w-full ring-2 ring-maize/70"
+            className="block h-full max-h-[560px] w-full object-cover object-top ring-2 ring-maize/60"
           />
 
           <div aria-hidden className="hidden sm:block">
@@ -50,8 +52,8 @@ export default function AboutMe() {
         </div>
       </div>
 
-      {/* Copy */}
-      <div>
+      {/* Copy — centred so it reads level with the picture */}
+      <div className="flex flex-col justify-center">
         <h3 className="type-display text-[1.8rem] leading-[1.14] sm:text-[2.3rem]">
           {profile.aboutHeadline}
         </h3>
