@@ -1,5 +1,6 @@
 import { profile, toolkit } from "@/lib/content";
 import ToolBadge from "./ToolBadge";
+import { Tape } from "./Paper";
 
 /**
  * Portrait with the toolkit floating around it, mirroring the layout Lana
@@ -24,7 +25,11 @@ export default function AboutMe() {
       {/* Portrait + floating toolkit */}
       <div className="relative mx-auto w-full max-w-[380px] px-10 lg:px-12">
         <div className="relative">
-          <div className="overflow-hidden rounded-2xl border-2 border-ink shadow-hard">
+          {/* Plain rectangle — no radius, no shadow. Taped to the page instead,
+              matching the flat photo treatment in the reference. */}
+          <div className="relative">
+            <Tape className="-top-3 -left-5" rotate={-7} width={86} />
+            <Tape className="-right-5 -bottom-3" rotate={-7} width={86} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/work/lana-portrait.webp"
@@ -55,8 +60,8 @@ export default function AboutMe() {
 
       {/* Copy */}
       <div>
-        <h3 className="type-display-roman text-3xl sm:text-4xl">{profile.aboutHeadline}</h3>
-        <p className="type-display type-fringe mt-3 text-3xl text-eminence sm:text-4xl">
+        <h3 className="type-display text-3xl sm:text-4xl">{profile.aboutHeadline}</h3>
+        <p className="type-script mt-3 text-4xl text-eminence sm:text-5xl">
           {profile.aboutKicker}
         </p>
 

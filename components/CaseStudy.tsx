@@ -24,7 +24,7 @@ export default function CaseStudy() {
                   <span className="type-pixel text-lg text-eminence/50 tabular-nums">
                     {p.n}
                   </span>
-                  <h3 className="type-display-roman text-5xl sm:text-6xl">
+                  <h3 className="type-display text-5xl sm:text-6xl">
                     {p.title}
                   </h3>
                 </div>

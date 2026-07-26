@@ -66,7 +66,7 @@ export default function Folder({
           const isActive = t.id === active;
           const c = folderColor[t.accent];
           const shared =
-            "type-pixel relative flex min-h-[44px] shrink-0 items-center rounded-t-xl border-2 border-b-0 border-ink px-5 text-[9px] whitespace-nowrap sm:text-[10px]";
+            "type-pixel paper relative flex min-h-[44px] shrink-0 items-center rounded-t-xl border-2 border-b-0 border-ink px-5 text-[9px] whitespace-nowrap sm:text-[10px]";
 
           const style = {
             marginLeft: i === 0 ? 0 : "-10px",
@@ -125,9 +125,9 @@ export default function Folder({
           id={`panel-${activeTab.id}`}
           role={interactive ? "tabpanel" : undefined}
           aria-labelledby={labelledBy}
-          className={`place-${direction} relative z-30 rounded-2xl rounded-tl-none border-2 border-ink p-4 shadow-hard sm:p-5 ${body.bg}`}
+          className={`place-${direction} paper relative z-30 rounded-2xl rounded-tl-none border-2 border-ink p-4 shadow-hard sm:p-5 ${body.bg}`}
         >
-          <div className="paper-content rounded-xl border-2 border-ink bg-maize p-6 text-ink sm:p-9">
+          <div className="paper-content paper relative rounded-xl border-2 border-ink bg-maize p-6 text-ink sm:p-9">
             {children}
           </div>
         </div>

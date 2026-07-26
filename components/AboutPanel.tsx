@@ -5,6 +5,7 @@ import { experience, education, skillGroups, certifications, languages } from "@
 import Folder, { type FolderTab } from "./Folder";
 import AboutMe from "./AboutMe";
 import Sparkle from "./Sparkle";
+import { PaperClip } from "./Paper";
 
 const tabs: FolderTab[] = [
   { id: "about", label: "about me", accent: "eminence" },
@@ -18,7 +19,8 @@ export default function AboutPanel() {
 
   return (
     <section id="about" className="px-4 pb-20 sm:px-8">
-      <div className="mx-auto max-w-6xl">
+      <div className="relative mx-auto max-w-6xl">
+        <PaperClip className="-top-3 right-10 sm:right-16" />
         <h2
           id="about-heading"
           className="type-pixel mb-6 pl-2 text-[10px] text-fawn"
@@ -31,7 +33,7 @@ export default function AboutPanel() {
 
           {active === "experience" && (
             <div>
-              <h3 className="type-display-roman text-4xl sm:text-5xl">
+              <h3 className="type-display text-4xl sm:text-5xl">
                 Where I&apos;ve worked
               </h3>
               <div className="mt-7 space-y-6">
@@ -57,7 +59,7 @@ export default function AboutPanel() {
 
           {active === "education" && (
             <div>
-              <h3 className="type-display-roman text-4xl sm:text-5xl">
+              <h3 className="type-display text-4xl sm:text-5xl">
                 Where I studied
               </h3>
               <div className="mt-7 space-y-6">
@@ -101,7 +103,7 @@ export default function AboutPanel() {
 
           {active === "skills" && (
             <div>
-              <h3 className="type-display-roman text-4xl sm:text-5xl">
+              <h3 className="type-display text-4xl sm:text-5xl">
                 What I work with
               </h3>
 

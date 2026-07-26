@@ -6,6 +6,7 @@ import Folder, { type FolderTab } from "./Folder";
 import ProjectModal from "./ProjectModal";
 import MasonryGrid from "./MasonryGrid";
 import CaseStudy from "./CaseStudy";
+import { Stamp } from "./Paper";
 
 const CASE_ID = "projects";
 
@@ -35,7 +36,10 @@ export default function FolderStack() {
 
   return (
     <section id="work" className="px-4 pb-20 sm:px-8">
-      <div className="mx-auto max-w-6xl">
+      <div className="relative mx-auto max-w-6xl">
+        <Stamp className="-top-1 right-4 text-fawn sm:right-10" rotate={-9}>
+          Portfolio 2026
+        </Stamp>
         <h2
           id="work-heading"
           className="type-pixel mb-6 pl-2 text-[10px] text-fawn"
@@ -50,7 +54,7 @@ export default function FolderStack() {
             tab && (
               <>
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <h3 className="type-display-roman text-4xl sm:text-6xl">
+                  <h3 className="type-display text-4xl sm:text-6xl">
                     {tab.heading}
                   </h3>
                   <span className="text-xs font-semibold text-ink/45">

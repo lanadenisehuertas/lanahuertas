@@ -1,25 +1,21 @@
 import type { Metadata } from "next";
-import { Poppins, Bodoni_Moda, Silkscreen } from "next/font/google";
+import { Poppins, Style_Script, Silkscreen } from "next/font/google";
 import "./globals.css";
 import { profile } from "@/lib/content";
 import AuroraField from "@/components/AuroraField";
 
 /*
- * Three voices, deliberately paired.
+ * Three voices — the heavy / script / mono formula the reference sheets run on.
  *
- *  Bodoni Moda  — high-contrast Didone. Its italic carries the swash-serif
- *                 elegance of the reference. Used large, never small: at body
- *                 size the hairlines disappear on a dark ground.
- *  Silkscreen   — pixel face. Used ONLY for tracked-out uppercase micro-type,
- *                 which is the size it was drawn for. It supplies the
- *                 mechanical counter-voice, and doubles as a nod to the
- *                 engineering half of the portfolio.
- *  Poppins      — geometric sans doing all the reading work. Neither display
- *                 face is legible in a paragraph, so body text stays neutral.
+ *  Poppins      — the workhorse. Black weight set LARGE for display, regular
+ *                 for body. Carries the whole page; nothing competes with it.
+ *  Style Script — one bold connected script, used for a single accent word per
+ *                 lockup. It only works because it is rationed.
+ *  Silkscreen   — pixel face for tracked-out uppercase marginalia: dates,
+ *                 TM marks, corner labels, tab labels. Never above 13px.
  *
- * The pairing works because the two display faces disagree on every axis —
- * contrast, resolution, era, warmth — while agreeing on being uppercase-ish and
- * geometric in the small sizes. Poppins sits between them without competing.
+ * Bodoni was tried here and pulled: it read as editorial-elegant rather than
+ * scrapbook, and its hairlines disappeared against the panel textures.
  */
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -28,11 +24,10 @@ const poppins = Poppins({
   display: "swap",
 });
 
-const bodoni = Bodoni_Moda({
-  variable: "--font-serif",
+const script = Style_Script({
+  variable: "--font-script",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
+  weight: ["400"],
   display: "swap",
 });
 
@@ -56,7 +51,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${bodoni.variable} ${silkscreen.variable} h-full antialiased`}
+      className={`${poppins.variable} ${script.variable} ${silkscreen.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <AuroraField />

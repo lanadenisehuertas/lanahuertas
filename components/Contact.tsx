@@ -19,7 +19,7 @@ export default function Contact() {
           active="contact"
           labelledBy="contact-heading"
         >
-          <h3 className="type-display-roman text-4xl sm:text-6xl">
+          <h3 className="type-display text-4xl sm:text-6xl">
             Let&apos;s make something cool together.
           </h3>
 
