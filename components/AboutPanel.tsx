@@ -6,6 +6,7 @@ import Folder, { type FolderTab } from "./Folder";
 import AboutMe from "./AboutMe";
 import Sparkle from "./Sparkle";
 import { PaperClip } from "./Paper";
+import SectionTitle from "./SectionTitle";
 
 const tabs: FolderTab[] = [
   { id: "about", label: "about me", accent: "eminence" },
@@ -21,12 +22,7 @@ export default function AboutPanel() {
     <section id="about" className="px-4 pb-20 sm:px-8">
       <div className="relative mx-auto max-w-6xl">
         <PaperClip className="-top-3 right-10 sm:right-16" />
-        <h2
-          id="about-heading"
-          className="type-pixel mb-6 pl-2 text-[10px] text-fawn"
-        >
-          about me
-        </h2>
+        <SectionTitle id="about-heading" lead="about" accent="me" />
 
         <Folder tabs={tabs} active={active} onSelect={setActive} labelledBy="about-heading">
           {active === "about" && <AboutMe />}

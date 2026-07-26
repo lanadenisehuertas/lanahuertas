@@ -2,17 +2,13 @@
 
 import { profile, socials } from "@/lib/content";
 import Folder from "./Folder";
+import SectionTitle from "./SectionTitle";
 
 export default function Contact() {
   return (
     <section id="contact" className="px-4 pb-28 sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <h2
-          id="contact-heading"
-          className="type-pixel mb-6 pl-2 text-[10px] text-fawn"
-        >
-          contact
-        </h2>
+        <SectionTitle id="contact-heading" lead="get in" accent="touch" />
 
         <Folder
           tabs={[{ id: "contact", label: "get in touch", accent: "fawn" }]}

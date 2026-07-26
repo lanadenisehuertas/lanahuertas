@@ -7,6 +7,7 @@ import ProjectModal from "./ProjectModal";
 import MasonryGrid from "./MasonryGrid";
 import CaseStudy from "./CaseStudy";
 import { Stamp } from "./Paper";
+import SectionTitle from "./SectionTitle";
 
 const CASE_ID = "projects";
 
@@ -40,12 +41,7 @@ export default function FolderStack() {
         <Stamp className="-top-1 right-4 text-fawn sm:right-10" rotate={-9}>
           Portfolio 2026
         </Stamp>
-        <h2
-          id="work-heading"
-          className="type-pixel mb-6 pl-2 text-[10px] text-fawn"
-        >
-          selected work
-        </h2>
+        <SectionTitle id="work-heading" lead="selected" accent="work" />
 
         <Folder tabs={tabs} active={active} onSelect={setActive} labelledBy="work-heading">
           {isCase ? (
@@ -78,7 +74,7 @@ export default function FolderStack() {
                             onClick={() => setSelected(p)}
                             aria-label={`View ${p.title}${extra > 0 ? ` — ${p.images.length} pieces` : ""}`}
                             style={{ animationDelay: `${Math.min(i * 28, 340)}ms` }}
-                            className="group card-in relative block w-full cursor-pointer overflow-hidden rounded-md border border-ink/60 bg-lavender/20 text-left transition-[transform,border-color] duration-300 ease-out hover:z-10 hover:-translate-y-1 hover:border-ink"
+                            className={`group card-in paper relative block w-full cursor-pointer overflow-hidden rounded-[3px] border-2 border-ink bg-lavender/20 text-left transition-[transform,border-color] duration-300 ease-out hover:z-10 hover:!rotate-0 hover:-translate-y-1.5 ${["askew-1","askew-2","askew-3",""][i % 4]}`}
                           >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
@@ -119,7 +115,7 @@ export default function FolderStack() {
                             )}
 
                             {/* Caption — slides up on hover, always present for screen readers */}
-                            <span className="absolute inset-x-0 bottom-0 translate-y-full bg-gradient-to-t from-ink via-ink/95 to-transparent px-2.5 pt-5 pb-2 text-[11px] leading-tight font-semibold text-maize transition-transform duration-300 ease-out group-hover:translate-y-0 group-focus-visible:translate-y-0">
+                            <span className="font-display absolute inset-x-0 bottom-0 translate-y-full bg-ink px-2.5 py-2 text-[11px] leading-tight font-bold text-maize transition-transform duration-300 ease-out group-hover:translate-y-0 group-focus-visible:translate-y-0">
                               {p.title}
                               {p.year && (
                                 <span className="ml-1.5 font-normal text-maize/55">{p.year}</span>

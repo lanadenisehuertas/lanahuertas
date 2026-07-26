@@ -66,7 +66,7 @@ export default function Folder({
           const isActive = t.id === active;
           const c = folderColor[t.accent];
           const shared =
-            "type-pixel paper relative flex min-h-[44px] shrink-0 items-center rounded-t-xl border-2 border-b-0 border-ink px-5 text-[9px] whitespace-nowrap sm:text-[10px]";
+            "font-display paper relative flex min-h-[46px] shrink-0 items-center rounded-t-xl border-2 border-b-0 border-ink px-5 text-[12px] font-black tracking-[-0.01em] whitespace-nowrap lowercase sm:text-sm";
 
           const style = {
             marginLeft: i === 0 ? 0 : "-10px",

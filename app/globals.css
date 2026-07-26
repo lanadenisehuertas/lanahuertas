@@ -572,9 +572,9 @@ body {
     pointer-events: none;
     border-radius: inherit;
     /* Fibre grain. baseFrequency tuned so the speckle reads as tooth, not TV static. */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.62'/%3E%3C/svg%3E");
     mix-blend-mode: multiply;
-    opacity: 0.16;
+    opacity: 0.4;
   }
 
   /* Uneven light across the sheet + a cut-edge highlight along the top. */
@@ -676,5 +676,58 @@ body {
     64% { opacity: 1; transform: translate3d(-2px, -3px, 0) rotate(0.55deg) scale(1.003);
           animation-timing-function: cubic-bezier(0.7, 0, 0.24, 1); }
     100% { opacity: 1; transform: none; box-shadow: 8px 8px 0 0 var(--color-ink); }
+  }
+}
+
+@layer utilities {
+  /* --- Global grain -----------------------------------------------------
+   * A single fixed film-grain plate over the whole page. This is what makes
+   * the difference between "flat screen" and "printed thing" — the panel
+   * textures alone were too local to register.
+   */
+  .grain-plate {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* --- Sticker ----------------------------------------------------------
+   * A cut-out label with a white keyline, like a die-cut sticker pressed
+   * onto the page. Used for category chips and callouts.
+   */
+  .sticker {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.3em 0.9em;
+    box-shadow:
+      0 0 0 3px var(--color-maize),
+      2px 3px 0 3px var(--color-ink);
+  }
+
+  /* Slight, varied rotations so nothing sits perfectly square. */
+  .askew-1 { transform: rotate(-1.4deg); }
+  .askew-2 { transform: rotate(1.1deg); }
+  .askew-3 { transform: rotate(-0.7deg); }
+
+  /* Torn bottom edge for panels. */
+  .torn-bottom {
+    -webkit-mask-image:
+      linear-gradient(#000 0 0),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='12' preserveAspectRatio='none'%3E%3Cpath d='M0 0 L0 7 Q10 12 20 7 T40 7 T60 8 T80 6 T100 8 T120 7 L120 0 Z' fill='%23000'/%3E%3C/svg%3E");
+    -webkit-mask-size: 100% calc(100% - 11px), 120px 12px;
+    -webkit-mask-position: top left, bottom left;
+    -webkit-mask-repeat: no-repeat, repeat-x;
+    mask-image:
+      linear-gradient(#000 0 0),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='12' preserveAspectRatio='none'%3E%3Cpath d='M0 0 L0 7 Q10 12 20 7 T40 7 T60 8 T80 6 T100 8 T120 7 L120 0 Z' fill='%23000'/%3E%3C/svg%3E");
+    mask-size: 100% calc(100% - 11px), 120px 12px;
+    mask-position: top left, bottom left;
+    mask-repeat: no-repeat, repeat-x;
   }
 }
