@@ -27,17 +27,19 @@ const FLOATERS = [
 
 export default function AboutMe() {
   return (
-    <div className="grid items-stretch gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] lg:gap-24">
+    <div className="grid items-stretch gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16">
       {/* Portrait + floating toolkit */}
-      <div className="mx-auto w-full max-w-[300px] px-0 sm:max-w-[460px] sm:px-[78px]">
+      {/* Gutters are sized to the widest badge offset (70px), so the floating
+          toolkit straddles the photo edge without pushing the page wider. */}
+      <div className="mx-auto w-full max-w-[300px] px-0 sm:max-w-[520px] sm:px-[70px]">
         <div className="relative h-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/work/lana-portrait.webp"
             alt="Lana Denise Huertas"
-            width={1004}
-            height={1100}
-            className="block h-full max-h-[560px] w-full object-cover object-top ring-2 ring-maize/60"
+            width={1000}
+            height={1500}
+            className="block h-full w-full object-cover object-top ring-2 ring-maize/60"
           />
 
           <div aria-hidden className="hidden sm:block">
