@@ -80,8 +80,15 @@ export const toolkit = [
   { id: "ai", label: "Ai", name: "Adobe Illustrator", bg: "#330000", fg: "#FF9A00" },
   { id: "pr", label: "Pr", name: "Adobe Premiere Pro", bg: "#2A0634", fg: "#EA77FF" },
   { id: "ae", label: "Ae", name: "Adobe After Effects", bg: "#1F0740", fg: "#9999FF" },
-  { id: "ca", label: "Ca", name: "Canva", bg: "#0B0F2B", fg: "#00C4CC" },
-  { id: "fg", label: "Fg", name: "Figma", bg: "#12111A", fg: "#F24E1E" },
+  // Canva's tile is the gradient itself, with the wordmark reversed out of it.
+  {
+    id: "ca",
+    label: "Ca",
+    name: "Canva",
+    bg: "linear-gradient(135deg, #00E7C4 0%, #00C4CC 18%, #1E7FE0 52%, #7D2AE8 100%)",
+    fg: "#FFFFFF",
+  },
+  { id: "fg", label: "Fg", name: "Figma", bg: "#000000", fg: "#F24E1E" },
   { id: "py", label: "Py", name: "Python", bg: "#0E2233", fg: "#FFD43B" },
   { id: "js", label: "Js", name: "JavaScript", bg: "#2B2A15", fg: "#F7DF1E" },
 ] as const;
@@ -228,7 +235,11 @@ export const skillGroups = [
   },
 ];
 
-export const software = ["Ps", "Ai", "Pr", "Ae", "Ca", "Py", "Js"];
+/*
+ * Hero tile row. Figma leads, matching the sub-line — it was missing from this
+ * list entirely, which read oddly on a page positioned around UI/UX work.
+ */
+export const software = ["Fg", "Ps", "Ai", "Pr", "Ae", "Ca", "Py", "Js"];
 
 export const languages = ["Filipino (Native)", "English (Advanced)"];
 

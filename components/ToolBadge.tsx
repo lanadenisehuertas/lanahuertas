@@ -1,11 +1,16 @@
 import { toolkit } from "@/lib/content";
+import ToolMark, { HAS_MARK } from "./ToolMark";
 
 type Tool = (typeof toolkit)[number];
 
 /**
- * App-icon style badge: rounded square, product's own dark ground, two-letter
- * mark in its accent colour. A nominative reference to the tool, not a copy of
- * anyone's logo artwork.
+ * App-icon style badge: rounded square, the product's own dark ground, and its
+ * mark on top.
+ *
+ * The Adobe apps brand themselves as two-letter glyphs, so for those the glyph
+ * *is* the logo. Canva and Figma do not, so they render their real marks (see
+ * `ToolMark`). The dark tile stays either way — eight badges float around one
+ * portrait, and letting two of them go full-bleed colour would break the set.
  */
 export default function ToolBadge({
   tool,
@@ -36,7 +41,7 @@ export default function ToolBadge({
         ...style,
       }}
     >
-      {tool.label}
+      {HAS_MARK.has(tool.id) ? <ToolMark id={tool.id} size={size} /> : tool.label}
     </span>
   );
 }
