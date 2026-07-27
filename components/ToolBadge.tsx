@@ -8,9 +8,10 @@ type Tool = (typeof toolkit)[number];
  * mark on top.
  *
  * The Adobe apps brand themselves as two-letter glyphs, so for those the glyph
- * *is* the logo. Canva and Figma do not, so they render their real marks (see
- * `ToolMark`). The dark tile stays either way — eight badges float around one
- * portrait, and letting two of them go full-bleed colour would break the set.
+ * *is* the logo. Canva and Figma do not, so those two use the real artwork (see
+ * `ToolMark`), filling the tile edge to edge with the badge's own rounding
+ * clipping it — which is what makes them sit in the same set as the rest
+ * rather than looking like stickers.
  */
 export default function ToolBadge({
   tool,
@@ -23,15 +24,19 @@ export default function ToolBadge({
   className?: string;
   style?: React.CSSProperties;
 }) {
+  const hasMark = HAS_MARK.has(tool.id);
+
   return (
     <span
       role="img"
       aria-label={tool.name}
       title={tool.name}
-      className={`font-display inline-flex items-center justify-center rounded-[22%] border-2 border-ink/70 font-black select-none ${className}`}
+      className={`font-display inline-flex items-center justify-center overflow-hidden rounded-[22%] border-2 border-ink/70 font-black select-none ${className}`}
       style={{
         width: size,
         height: size,
+        // Artwork covers this for the two marked tools; it stays as the ground
+        // underneath so a failed image leaves the right colour, not a hole.
         background: tool.bg,
         color: tool.fg,
         // Quantised: three glyph sizes total, so badge boxes of
@@ -41,7 +46,7 @@ export default function ToolBadge({
         ...style,
       }}
     >
-      {HAS_MARK.has(tool.id) ? <ToolMark id={tool.id} size={size} /> : tool.label}
+      {hasMark ? <ToolMark id={tool.id} size={size} /> : tool.label}
     </span>
   );
 }
