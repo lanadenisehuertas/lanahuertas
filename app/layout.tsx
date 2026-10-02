@@ -1,53 +1,74 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Yellowtail, Poppins, Silkscreen } from "next/font/google";
+import { Archivo, DM_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { profile, socials } from "@/lib/content";
-import AuroraField from "@/components/AuroraField";
-import SparkleField from "@/components/SparkleField";
+import Nav from "@/components/Nav";
 
 /*
- * Display / script / body — the formula the reference sheets run on.
- *
- *  Bricolage Grotesque — display. A grotesque with deliberately irregular
- *      curves and tight joins, so headings have character of their own rather
- *      than reading as neutral geometry.
- *  Yellowtail — the overlapping accent word. A brush script with real stroke
- *      weight, so it holds its ground against a heavy sans instead of
- *      thinning out beside it.
- *  Poppins — body copy only. Neutral on purpose; nothing in a paragraph
- *      should compete with the lockups.
- *  Silkscreen — marginalia only. Corner labels and stamps, never above 13px.
- *
- * Two earlier attempts and why they were pulled: Bodoni read
- * editorial-elegant rather than scrapbook and its hairlines vanished against
- * the grain; Style Script was too thin and too formal to pair with a heavy
- * sans — the two never fused into one mark.
+ * Archivo — one grotesk family for everything set in words. Its width axis
+ *     gives two voices from one file: tight at 100% for flim-style
+ *     headlines, and fully extended at 125% for the Y2K-tech name.
+ * DM Mono — small uppercase labels, readouts, and buttons.
+ * Redaction (OFL, MCKL) — the morph target. Its cuts degrade the same
+ *     letterforms step by step and share metrics, so the hero name can decay
+ *     through them on hover.
  */
-const poppins = Poppins({
-  variable: "--font-poppins",
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  axes: ["wdth"],
   display: "swap",
 });
 
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+const redaction = localFont({
+  variable: "--font-redaction",
   display: "swap",
+  src: [
+    { path: "./fonts/redaction/Redaction-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/redaction/Redaction-Italic.woff2", weight: "400", style: "italic" },
+    { path: "./fonts/redaction/Redaction-Bold.woff2", weight: "700", style: "normal" },
+  ],
 });
 
-const script = Yellowtail({
-  variable: "--font-script",
-  subsets: ["latin"],
-  weight: ["400"],
+const r10 = localFont({
+  variable: "--font-r10",
   display: "swap",
+  src: [
+    { path: "./fonts/redaction/Redaction10-Regular.woff2", style: "normal" },
+    { path: "./fonts/redaction/Redaction10-Italic.woff2", style: "italic" },
+  ],
 });
 
-const silkscreen = Silkscreen({
+const r35 = localFont({
+  variable: "--font-r35",
+  display: "swap",
+  src: [
+    { path: "./fonts/redaction/Redaction35-Regular.woff2", style: "normal" },
+    { path: "./fonts/redaction/Redaction35-Italic.woff2", style: "italic" },
+  ],
+});
+
+const r70 = localFont({
+  variable: "--font-r70",
+  display: "swap",
+  src: [
+    { path: "./fonts/redaction/Redaction70-Regular.woff2", style: "normal" },
+    { path: "./fonts/redaction/Redaction70-Italic.woff2", style: "italic" },
+  ],
+});
+
+// No italic exists at 100 — italic letters stop at the 70 cut.
+const r100 = localFont({
+  variable: "--font-r100",
+  display: "swap",
+  src: "./fonts/redaction/Redaction100-Regular.woff2",
+});
+
+const mono = DM_Mono({
   variable: "--font-pixel",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500"],
   display: "swap",
 });
 
@@ -114,7 +135,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${bricolage.variable} ${script.variable} ${silkscreen.variable} h-full antialiased`}
+      className={`${archivo.variable} ${mono.variable} ${redaction.variable} ${r10.variable} ${r35.variable} ${r70.variable} ${r100.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {/*
@@ -140,9 +161,8 @@ export default function RootLayout({
             }),
           }}
         />
-        <AuroraField />
-        <SparkleField />
-        <div className="spec-grid pointer-events-none fixed inset-0 -z-10" aria-hidden />
+        <div className="graph-ground" aria-hidden />
+        <Nav />
         {children}
         <div className="grain-plate" aria-hidden />
       </body>

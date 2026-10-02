@@ -4,8 +4,6 @@ import { useState } from "react";
 import { experience, education, skillGroups, certifications, languages } from "@/lib/content";
 import Folder, { type FolderTab } from "./Folder";
 import AboutMe from "./AboutMe";
-import Sparkle from "./Sparkle";
-import { PaperClip } from "./Paper";
 import SectionTitle from "./SectionTitle";
 
 const tabs: FolderTab[] = [
@@ -21,8 +19,7 @@ export default function AboutPanel() {
   return (
     <section id="about" className="px-4 pb-20 sm:px-8">
       <div className="relative mx-auto max-w-6xl">
-        <PaperClip className="-top-3 right-10 sm:right-16" />
-        <SectionTitle id="about-heading" lead="about" accent="me" />
+        <SectionTitle id="about-heading" index="02" lead="About" accent="me" note="CV — 2026" />
 
         <Folder tabs={tabs} active={active} onSelect={setActive} labelledBy="about-heading">
           {active === "about" && <AboutMe />}
@@ -33,20 +30,21 @@ export default function AboutPanel() {
                 Where I&apos;ve worked
               </h3>
               <div className="mt-7 space-y-6">
-                {experience.map((e) => {
+                {experience.map((e, idx) => {
                   const [from, to] = e.period.split("—").map((x) => x.trim());
                   return (
                   <div
+                    data-rv
                     key={`${e.role}-${e.org}`}
                     className="grid gap-4"
-                    style={{ gridTemplateColumns: "3.6rem 1fr" }}
+                    style={{ gridTemplateColumns: "3.6rem 1fr", "--d": `${idx * 70}ms` } as React.CSSProperties}
                   >
                     {/* Year stack — start over end, in colour, as in the reference CVs. */}
-                    <div className="year-stack font-display pt-0.5 text-right text-sm font-black">
+                    <div className="year-stack font-display pt-0.5 text-right text-sm font-semibold">
                       <div className="text-eminence">{from}</div>
                       <div className="text-ink/65">{to}</div>
                     </div>
-                    <div className="border-l-2 border-eminence/30 pl-4">
+                    <div className="border-l border-eminence/30 pl-4">
                     <p className="type-display text-[1.25rem] leading-tight">{e.role}</p>
                     <p className="mt-1 text-[15px] font-semibold text-eminence">
                       {e.org}
@@ -73,8 +71,8 @@ export default function AboutPanel() {
                 Where I studied
               </h3>
               <div className="mt-7 space-y-6">
-                {education.map((e) => (
-                  <div key={e.school} className="border-l-2 border-eminence pl-4">
+                {education.map((e, idx) => (
+                  <div data-rv style={{ "--d": `${idx * 70}ms` } as React.CSSProperties} key={e.school} className="border-l border-eminence/50 pl-4">
                     <p className="text-xs font-semibold text-eminence">{e.period}</p>
                     <p className="type-display mt-1 text-[1.25rem] leading-tight">{e.school}</p>
                     <p className="mt-0.5 text-[15px] font-semibold text-eminence">{e.detail}</p>
@@ -87,7 +85,7 @@ export default function AboutPanel() {
                       <ul className="mt-2 space-y-1">
                         {e.honors.map((h) => (
                           <li key={h} className="flex items-center gap-1.5 text-sm text-ink/70">
-                            <Sparkle size={11} className="shrink-0 text-eminence" />
+                            <span aria-hidden className="orb orb-lav" />
                             {h}
                           </li>
                         ))}
@@ -101,10 +99,12 @@ export default function AboutPanel() {
                 Certifications
               </h4>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                {certifications.map((c) => (
+                {certifications.map((c, idx) => (
                   <div
+                    data-rv
+                    style={{ "--d": `${idx * 70}ms` } as React.CSSProperties}
                     key={c.name}
-                    className="rounded-xl border-2 border-ink/20 bg-lavender/12 p-4 transition-colors duration-200 hover:border-ink/45"
+                    className="glass-soft rounded-[4px] p-4"
                   >
                     <p className="type-display text-base leading-snug">{c.name}</p>
                     <p className="mt-1 text-xs font-semibold text-eminence">{c.issuer}</p>
@@ -131,14 +131,16 @@ export default function AboutPanel() {
               <div className="mt-8 grid gap-4 md:grid-cols-2">
                 {skillGroups.map((g, i) => (
                   <div
+                    data-rv
+                    style={{ "--d": `${i * 70}ms` } as React.CSSProperties}
                     key={g.label}
-                    className="rounded-xl border-2 border-ink/15 bg-lavender/8 p-5 transition-colors duration-200 hover:border-ink/40"
+                    className="glass-soft rounded-[4px] p-5"
                   >
-                    <div className="flex items-baseline gap-2.5 border-b-2 border-ink/10 pb-3">
+                    <div className="flex items-baseline gap-2.5 border-b border-ink/10 pb-3">
                       <span className="type-pixel text-[10px] text-eminence/85 tabular-nums">
                         {String(i + 1).padStart(2, "0")}
                       </span>
-                      <p className="font-display flex-1 text-[15px] font-black tracking-tight">
+                      <p className="font-display flex-1 text-[17px] font-semibold">
                         {g.label}
                       </p>
                       <span className="type-pixel text-[10px] text-ink/65 tabular-nums">
@@ -150,7 +152,7 @@ export default function AboutPanel() {
                       {g.items.map((s) => (
                         <span
                           key={s}
-                          className="rounded-full border border-ink/25 bg-maize px-3 py-1 text-xs font-medium transition-colors duration-200 hover:border-ink hover:bg-fawn/40"
+                          className="rounded-[4px] bg-white/40 px-3 py-1 text-xs font-medium ring-1 ring-ink/10 transition-colors duration-200 hover:bg-fawn/45"
                         >
                           {s}
                         </span>
@@ -160,12 +162,12 @@ export default function AboutPanel() {
                 ))}
 
                 {/* Languages shares the card treatment so the grid closes evenly. */}
-                <div className="rounded-xl border-2 border-ink/15 bg-lavender/8 p-5">
-                  <div className="flex items-baseline gap-2.5 border-b-2 border-ink/10 pb-3">
+                <div className="glass-soft rounded-[4px] p-5">
+                  <div className="flex items-baseline gap-2.5 border-b border-ink/10 pb-3">
                     <span className="type-pixel text-[10px] text-eminence/85 tabular-nums">
                       {String(skillGroups.length + 1).padStart(2, "0")}
                     </span>
-                    <p className="font-display flex-1 text-[15px] font-black tracking-tight">
+                    <p className="font-display flex-1 text-[17px] font-semibold">
                       languages
                     </p>
                     <span className="type-pixel text-[10px] text-ink/65 tabular-nums">

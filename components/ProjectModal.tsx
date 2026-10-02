@@ -118,14 +118,14 @@ export default function ProjectModal({
         type="button"
         aria-label="Close project details"
         onClick={onClose}
-        className="scrim-in absolute inset-0 cursor-pointer bg-ink/80 backdrop-blur-sm"
+        className="scrim-in absolute inset-0 bg-deep/70 backdrop-blur-md"
       />
 
       <div
         ref={panelRef}
-        className="sheet-in relative flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-2xl border-2 border-ink bg-maize text-ink shadow-hard"
+        className="sheet-in relative flex max-h-full w-full max-w-5xl flex-col overflow-hidden glass rounded-[6px] text-ink"
       >
-        <div className="flex shrink-0 items-center justify-between gap-4 border-b-2 border-ink/15 px-5 py-3">
+        <div className="flex shrink-0 items-center justify-between gap-4 border-b border-ink/10 px-5 py-3">
           <p className="font-display type-pixel text-[10px] text-eminence">
             {categoryLabel}
             {project.images.length > 1 && (
@@ -138,7 +138,7 @@ export default function ProjectModal({
             ref={closeRef}
             type="button"
             onClick={onClose}
-            className="font-display press-sm flex min-h-[44px] cursor-pointer items-center rounded-full border-2 border-ink px-5 text-xs font-bold hover:bg-eminence hover:text-maize"
+            className="type-pixel press flex min-h-[44px] items-center rounded-[4px] bg-white/40 px-5 text-[11px] ring-1 ring-ink/15 hover:bg-eminence hover:text-maize"
           >
             Close
           </button>
@@ -146,7 +146,7 @@ export default function ProjectModal({
 
         <div className="grid overflow-y-auto md:grid-cols-[1.3fr_1fr]">
           {/* Media */}
-          <div className="flex flex-col gap-3 bg-lavender/25 p-4 sm:p-6">
+          <div className="flex flex-col gap-3 bg-white/20 p-4 sm:p-6">
             {embed ? (
               <div className="w-full" style={{ aspectRatio: "16 / 9" }}>
                 <iframe
@@ -154,7 +154,7 @@ export default function ProjectModal({
                   title={project.title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  className="h-full w-full rounded-xl border-2 border-ink"
+                  className="h-full w-full rounded-[4px] shadow-hard-sm"
                 />
               </div>
             ) : (
@@ -166,7 +166,7 @@ export default function ProjectModal({
                   alt={shown.caption ?? project.title}
                   width={shown.w}
                   height={shown.h}
-                  className="paper-content mx-auto block max-h-[62vh] w-auto max-w-full rounded-xl border-2 border-ink object-contain"
+                  className="card-in mx-auto block max-h-[62vh] w-auto max-w-full rounded-[4px] object-contain shadow-hard-sm"
                 />
                 <figcaption className="mt-2.5 text-center text-xs text-ink/65">
                   {shown.caption ??
@@ -192,10 +192,10 @@ export default function ProjectModal({
                     aria-selected={i === idx}
                     aria-label={im.caption ?? `Piece ${i + 1}`}
                     onClick={() => setIdx(i)}
-                    className={`h-14 w-14 shrink-0 cursor-pointer overflow-hidden rounded-md border-2 transition duration-200 ${
+                    className={`h-14 w-14 shrink-0 overflow-hidden rounded-[4px] border-2 transition duration-200 ${
                       i === idx
                         ? "border-eminence ring-2 ring-eminence/35"
-                        : "border-ink/30 opacity-65 hover:opacity-100"
+                        : "border-transparent opacity-65 hover:opacity-100"
                     }`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -208,7 +208,7 @@ export default function ProjectModal({
 
           {/* Details */}
           <div className="p-6 sm:p-8">
-            <h2 id={titleId} className="font-display text-3xl font-black tracking-tight">
+            <h2 id={titleId} className="type-display text-4xl">
               {project.title}
             </h2>
 
@@ -264,7 +264,7 @@ export default function ProjectModal({
                     {project.tools.map((t) => (
                       <span
                         key={t}
-                        className="rounded-full border border-ink/30 px-3 py-1 text-xs font-medium"
+                        className="rounded-[4px] bg-white/40 px-3 py-1 text-xs font-medium ring-1 ring-ink/10"
                       >
                         {t}
                       </span>
@@ -279,7 +279,7 @@ export default function ProjectModal({
                 href={project.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-display press mt-8 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border-2 border-ink bg-fawn px-6 text-sm font-bold shadow-hard-sm hover:bg-eminence hover:text-maize"
+                className="gel type-pixel mt-8 inline-flex min-h-[48px] items-center px-7 text-[11px]"
               >
                 {project.hrefLabel ?? "View project"}
               </a>

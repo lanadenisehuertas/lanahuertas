@@ -41,7 +41,7 @@ export default function AboutMe() {
             alt="Lana Denise Huertas"
             width={1136}
             height={1200}
-            className="block h-full w-full object-cover object-top ring-2 ring-maize/60"
+            className="block h-full w-full rounded-[4px] object-cover object-top shadow-hard"
           />
 
           <div aria-hidden className="hidden sm:block">
@@ -64,7 +64,7 @@ export default function AboutMe() {
           {profile.aboutHeadline}
         </h3>
 
-        <p className="type-script mt-4 text-[2.1rem] leading-[1] text-eminence sm:text-[2.8rem]">
+        <p className="mt-4 text-xl font-semibold tracking-[-0.02em] text-eminence sm:text-2xl">
           {profile.aboutKicker}
         </p>
 
@@ -92,13 +92,13 @@ export default function AboutMe() {
          * this was sm:hidden, which left Python and JavaScript with nowhere to
          * appear on desktop.
          */}
-        <div className="mt-8 border-t-2 border-ink/12 pt-5">
+        <div className="mt-8 border-t border-ink/12 pt-5">
           <p className="type-pixel text-[10px] text-eminence">tools I work in</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {toolkit.map((t) => (
               <span
                 key={t.id}
-                className="flex items-center gap-2 rounded-full border-2 border-ink/20 py-1 pr-3.5 pl-1.5 text-xs font-semibold transition-colors duration-200 hover:border-ink"
+                className="flex items-center gap-2 rounded-[4px] bg-white/40 py-1 pr-3.5 pl-1.5 text-xs font-semibold ring-1 ring-ink/10 transition-colors duration-200 hover:bg-white/80"
               >
                 <ToolBadge tool={t} size={24} className="border" />
                 {t.name.replace("Adobe ", "")}

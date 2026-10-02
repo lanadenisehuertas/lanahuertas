@@ -3,9 +3,7 @@
 import { profile, socials } from "@/lib/content";
 import Folder from "./Folder";
 import SectionTitle from "./SectionTitle";
-import Sparkle from "./Sparkle";
 import EdgeRail from "./EdgeRail";
-import { RegMark, GhostWord } from "./Marginalia";
 
 /**
  * The page opened with a drafting grid, a ghost word, registration marks and an
@@ -16,16 +14,9 @@ import { RegMark, GhostWord } from "./Marginalia";
 export default function Contact() {
   return (
     <section id="contact" className="relative overflow-hidden px-4 pb-24 sm:px-8">
-      <GhostWord className="-bottom-10 -left-8 text-[30vw] sm:-left-12 sm:text-[17vw]">
-        thanks
-      </GhostWord>
-      <RegMark className="top-[12%] right-[5%]" />
-      <RegMark className="bottom-[22%] left-[7%]" />
-      <Sparkle size={34} className="absolute top-[8%] left-[10%] text-fawn/70 sm:size-10" />
-      <Sparkle size={20} className="absolute right-[12%] bottom-[30%] text-maize/60 sm:size-7" />
 
       <div className="relative mx-auto max-w-6xl">
-        <SectionTitle id="contact-heading" lead="get in" accent="touch" />
+        <SectionTitle id="contact-heading" index="03" lead="Get in" accent="touch" note="Manila, PH" />
 
         <Folder
           tabs={[{ id: "contact", label: "get in touch", accent: "fawn" }]}
@@ -34,7 +25,7 @@ export default function Contact() {
         >
           <div className="grid gap-10 lg:grid-cols-[1.25fr_1fr] lg:items-end">
             <div>
-              <h3 className="type-display text-4xl sm:text-6xl">
+              <h3 data-rv="mask" className="type-display text-4xl sm:text-6xl">
                 Let&apos;s make something cool together.
               </h3>
 
@@ -50,13 +41,15 @@ export default function Contact() {
                * same target; above it they return to sitting on one line.
                */}
               <div className="mt-8 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
-                {socials.map((s) => (
+                {socials.map((s, idx) => (
                   <a
+                    data-rv
+                    style={{ "--d": `${idx * 70}ms` } as React.CSSProperties}
                     key={s.label}
                     href={s.href}
                     target={s.href.startsWith("http") ? "_blank" : undefined}
                     rel="noopener noreferrer"
-                    className="type-pixel press flex min-h-[50px] cursor-pointer items-center justify-center rounded-full border-2 border-ink bg-maize px-5 text-[11px] shadow-hard-sm hover:bg-eminence hover:text-maize sm:justify-start sm:px-7"
+                    className="gel type-pixel flex min-h-[48px] items-center justify-center gap-2 px-5 text-[11px] sm:justify-start sm:px-6"
                   >
                     {s.label}
                   </a>
@@ -65,7 +58,7 @@ export default function Contact() {
             </div>
 
             {/* Sign-off card */}
-            <div className="rounded-xl border-2 border-ink/20 bg-lavender/10 p-6">
+            <div className="glass-soft rounded-[4px] p-6">
               <p className="type-display text-xl">{profile.name}</p>
               <dl className="mt-4 space-y-1.5 text-sm">
                 <div className="flex gap-2">

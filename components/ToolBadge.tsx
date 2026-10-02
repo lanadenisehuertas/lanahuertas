@@ -31,7 +31,7 @@ export default function ToolBadge({
       role="img"
       aria-label={tool.name}
       title={tool.name}
-      className={`font-display inline-flex items-center justify-center overflow-hidden rounded-[22%] border-2 border-ink/70 font-black select-none ${className}`}
+      className={`font-display inline-flex items-center justify-center overflow-hidden rounded-[28%] border border-white/25 font-semibold select-none ${className}`}
       style={{
         width: size,
         height: size,

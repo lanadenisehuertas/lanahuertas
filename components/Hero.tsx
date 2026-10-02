@@ -1,99 +1,130 @@
+import type { CSSProperties } from "react";
 import { profile, software } from "@/lib/content";
-import Sparkle from "./Sparkle";
-import { RegMark, GhostWord } from "./Marginalia";
 import EdgeRail from "./EdgeRail";
-import SelectionBox from "./SelectionBox";
+import MorphName from "./MorphName";
 
+const TICKER = [
+  "UI/UX design",
+  "Graphic design",
+  "Brand systems",
+  "Video editing",
+  "Motion graphics",
+  "Software engineering",
+  "Figma prototypes",
+  "Design systems",
+];
+
+const d = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
+
+/**
+ * Flim-style opener: a readout strip, the name on one line at full measure,
+ * then a two-column footer — the pitch on the left, actions on the right —
+ * and a slow ticker closing the fold.
+ */
 export default function Hero() {
   return (
-    <section className="scrim relative overflow-hidden px-6 py-20 sm:px-10 sm:py-28">
-      <RegMark className="top-1/3 left-[4%]" />
-      <RegMark className="right-[6%] bottom-1/4" />
-
-      <GhostWord className="-top-6 -right-8 text-[30vw] sm:-right-12 sm:text-[20vw]">
-        design
-      </GhostWord>
-
-      <Sparkle size={40} className="absolute top-[20%] right-[16%] text-maize/60 sm:size-12" />
-      <Sparkle size={22} className="absolute bottom-[20%] left-[6%] text-fawn/70 sm:size-7" />
-
-      <div className="relative mx-auto max-w-5xl">
-        <EdgeRail
-          className="mb-12 border-b pb-3"
-          items={[
-            { label: profile.email, href: `mailto:${profile.email}` },
-            { label: "Manila, PH" },
-            { label: "UI/UX · Graphic design · Video" },
-            { label: "Portfolio Vol. 01" },
-          ]}
-        />
-
+    <section className="relative pt-24 sm:pt-28">
+      <div className="mx-auto max-w-6xl px-4 sm:px-8">
+        <div data-rv style={d(0)}>
+          <EdgeRail
+            className="border-b pb-3"
+            items={[
+              { label: "Portfolio — Vol. 01" },
+              { label: `Now: ${profile.now}` },
+              { label: "Manila, PH" },
+              { label: "Est. 2019" },
+            ]}
+          />
+        </div>
 
         {/*
-         * Lockup: name set huge, then a statement where the payoff word runs in
-         * script and overlaps the line above it — the move from the reference
-         * sheets. Poppins Black does the shouting; the script is rationed to
-         * exactly one phrase.
+         * One line, one size, in Redaction Regular — the clean cut of the
+         * family the letters decay into on hover, so the glitch lands exactly
+         * on the letterforms.
          */}
-        <p className="type-pixel mb-2 text-[10px] text-fawn sm:text-xs">Hi, I&apos;m</p>
+        <div data-rv style={d(120)} className="relative mt-10 sm:mt-14">
+          <MorphName
+            label={profile.name}
+            words={[
+              {
+                text: "LANA DENISE",
+                italic: false,
+                className: "type-name text-[14.6vw] whitespace-nowrap text-maize xl:text-[11.4rem]",
+              },
+            ]}
+          />
 
-        <h1
-          className="text-maize"
-          aria-label={`${profile.name} — ${profile.heroLead} ${profile.heroAccent}`}
-        >
-          <SelectionBox className="type-display type-fringe text-[24vw] sm:text-[13rem] sm:leading-[0.8]">
-            Lana
-          </SelectionBox>
-
-          <span className="mt-4 block sm:mt-5">
-            <span className="type-display block text-[9vw] leading-[0.95] sm:text-6xl lg:text-7xl">
-              {profile.heroLead}
-            </span>
-            <span className="type-script -mt-1 block text-[13vw] leading-[0.9] text-fawn sm:-mt-2 sm:text-8xl lg:text-9xl">
-              {profile.heroAccent}
-            </span>
+          {/* Hover hint — a flat Mac tooltip, desktop only */}
+          <span
+            aria-hidden
+            className="type-pixel pointer-events-none absolute -top-7 right-2 hidden items-center gap-1.5 rounded-[2px] border border-ink bg-maize px-1.5 py-0.5 text-[10px] text-ink md:flex"
+          >
+            <svg viewBox="0 0 16 24" className="h-3.5 w-2.5" shapeRendering="crispEdges">
+              <path d="M1 1v17l4-4 3 7 3-1-3-7h6z" fill="#1b0730" />
+            </svg>
+            hover the name
           </span>
-        </h1>
+        </div>
 
-        <p className="mt-8 max-w-xl text-base leading-relaxed text-maize/90 sm:text-lg">
-          {profile.heroSub}
-        </p>
+        <div className="mt-10 grid gap-8 pt-6 sm:mt-12 md:grid-cols-12">
+          <span data-rv="rule" style={d(260)} className="col-span-full -mt-6 block h-px bg-maize/20" />
 
-        <div className="mt-8 flex flex-wrap items-center gap-2">
-          {software.map((s) => (
-            <span
-              key={s}
-              className="font-display flex h-10 w-10 items-center justify-center rounded-lg border border-maize/20 bg-ink text-xs font-black text-maize transition-transform duration-200 hover:-translate-y-1 hover:rotate-[-4deg]"
-            >
-              {s}
+          <p
+            data-rv
+            style={d(320)}
+            className="text-xl leading-snug font-medium tracking-[-0.015em] text-maize md:col-span-6 sm:text-[1.65rem]"
+          >
+            {profile.heroShort}
+            <span aria-hidden className="caret ml-1 inline-block h-[0.9em] w-[0.5em] translate-y-[0.12em] bg-fawn" />
+          </p>
+
+          <div data-rv style={d(420)} className="flex flex-col gap-5 md:col-span-5 md:col-start-8">
+            <div className="flex flex-wrap gap-3">
+              <a href="#work" className="gel type-pixel flex min-h-[46px] items-center gap-2 px-5 text-[12px]">
+                See the work <span aria-hidden>↓</span>
+              </a>
+              <a
+                href="#contact"
+                className="gel-ghost type-pixel flex min-h-[46px] items-center gap-2 px-5 text-[12px]"
+              >
+                Contact <span aria-hidden>↗</span>
+              </a>
+            </div>
+
+            <div className="type-pixel flex flex-wrap items-center gap-x-1.5 gap-y-2 text-[11px] text-maize/60">
+              <span className="mr-1">Tools</span>
+              {software.map((s) => (
+                <span
+                  key={s}
+                  className="flex h-7 min-w-7 items-center justify-center rounded-[2px] border border-maize/25 px-1.5 text-maize transition-colors duration-100 hover:bg-maize hover:text-ink"
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Ticker */}
+      <div
+        data-rv
+        style={d(520)}
+        className="ticker-wrap mt-16 overflow-hidden border-y border-maize/15 py-2.5"
+        aria-hidden
+      >
+        <div className="ticker type-pixel text-[12px] text-maize/70">
+          {[0, 1].map((k) => (
+            <span key={k} className="flex shrink-0">
+              {TICKER.map((t) => (
+                <span key={t} className="flex items-center gap-6 pr-6">
+                  {t}
+                  <span className="text-fawn">↗</span>
+                </span>
+              ))}
             </span>
           ))}
         </div>
-
-        <div className="mt-9 flex flex-wrap items-center gap-3">
-          <a
-            href="#work"
-            className="type-pixel press flex min-h-[54px] cursor-pointer items-center rounded-full border-2 border-ink bg-fawn px-9 text-xs text-ink shadow-hard-sm hover:bg-maize"
-          >
-            See the work →
-          </a>
-          <a
-            href="#contact"
-            className="type-pixel press flex min-h-[54px] cursor-pointer items-center rounded-full border-2 border-maize/40 px-9 text-xs text-maize hover:border-maize"
-          >
-            Contact me
-          </a>
-        </div>
-
-        <EdgeRail
-          className="mt-14 border-t pt-3"
-          items={[
-            { label: "Graphic design" },
-            { label: "Video editing" },
-            { label: "Software engineering" },
-            { label: "Est. 2019" },
-          ]}
-        />
       </div>
     </section>
   );

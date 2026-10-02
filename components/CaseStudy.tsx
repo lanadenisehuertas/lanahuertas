@@ -18,7 +18,7 @@ export default function CaseStudy() {
       {engineeringProjects.map((p, i) => {
         const Visual = VISUALS[p.visual];
         return (
-          <article key={p.id} className={i > 0 ? "border-t-2 border-ink/12 pt-16" : undefined}>
+          <article key={p.id} data-rv className={i > 0 ? "border-t border-ink/12 pt-16" : undefined}>
             <div className="grid gap-10 lg:grid-cols-[1fr_1.05fr] lg:items-center lg:gap-14">
               {/* Copy */}
               <div>
@@ -35,9 +35,11 @@ export default function CaseStudy() {
                   {p.tagline}
                 </p>
 
-                <p className="mt-5 max-w-xl text-sm leading-relaxed text-ink/80 sm:text-base">
-                  {p.description}
-                </p>
+                <div className="mt-5 max-w-xl space-y-3 text-sm leading-relaxed text-ink/80 sm:text-base">
+                  {p.description.split("\n\n").map((para) => (
+                    <p key={para.slice(0, 24)}>{para}</p>
+                  ))}
+                </div>
 
                 <dl className="mt-7 space-y-3">
                   <div>
@@ -60,7 +62,7 @@ export default function CaseStudy() {
                       {p.stack.map((s) => (
                         <span
                           key={s}
-                          className="rounded-full border border-ink/30 px-3 py-1 text-xs font-medium transition-colors duration-200 hover:border-ink hover:bg-fawn/35"
+                          className="rounded-[4px] bg-white/40 px-3 py-1 text-xs font-medium ring-1 ring-ink/10 transition-colors duration-200 hover:bg-fawn/45"
                         >
                           {s}
                         </span>
@@ -74,7 +76,7 @@ export default function CaseStudy() {
                     href={p.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-display press mt-7 inline-flex min-h-[44px] cursor-pointer items-center rounded-full border-2 border-ink bg-fawn px-6 text-sm font-bold shadow-hard-sm hover:bg-eminence hover:text-maize"
+                    className="gel type-pixel mt-7 inline-flex min-h-[48px] items-center px-7 text-[11px]"
                   >
                     {p.hrefLabel ?? "View project"}
                   </a>

@@ -1,35 +1,45 @@
-import Sparkle from "./Sparkle";
+import type { CSSProperties } from "react";
 
 /**
- * The lockup every reference uses: a heavy sans word with a script word
- * overlapping it from below-right ("post"+"folio", "design"+"de posts").
- *
- * The overlap is the whole point — set as two lines they read as a subtitle;
- * overlapped they read as one drawn mark.
+ * Section header, after flim.ai: a mono index row on a hairline that draws in
+ * as it scrolls into view, then one large tight headline wiping up from a mask.
  */
 export default function SectionTitle({
   lead,
   accent,
+  index,
+  note,
   id,
   className = "",
 }: {
   lead: string;
   accent: string;
+  index: string;
+  note?: string;
   id?: string;
   className?: string;
 }) {
   return (
-    <h2 id={id} className={`relative mb-8 pl-1 ${className}`}>
-      <span className="relative inline-block">
-        <span className="type-display block text-5xl text-maize sm:text-7xl">{lead}</span>
-        <span className="type-script type-fringe absolute -right-4 -bottom-5 text-5xl whitespace-nowrap text-fawn sm:-right-10 sm:-bottom-8 sm:text-7xl">
-          {accent}
+    <header className={`mb-8 sm:mb-10 ${className}`}>
+      <span data-rv="rule" className="block h-px bg-maize/25" />
+      <div
+        data-rv
+        style={{ "--d": "120ms" } as CSSProperties}
+        className="type-pixel flex items-center justify-between gap-4 pt-3 text-[11px] text-maize/60"
+      >
+        <span className="flex items-center gap-2">
+          <span aria-hidden className="text-fawn">▸</span>({index}) {lead} {accent}
         </span>
-        <Sparkle
-          size={16}
-          className="absolute -top-2 -right-6 text-fawn/70 sm:-right-12 sm:size-6"
-        />
-      </span>
-    </h2>
+        {note && <span>{note}</span>}
+      </div>
+      <h2
+        id={id}
+        data-rv="mask"
+        style={{ "--d": "180ms" } as CSSProperties}
+        className="type-display mt-6 text-[13vw] text-maize sm:text-8xl"
+      >
+        {lead} <span className="text-fawn">{accent}</span>
+      </h2>
+    </header>
   );
 }
