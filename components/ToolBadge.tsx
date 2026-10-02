@@ -31,7 +31,7 @@ export default function ToolBadge({
       role="img"
       aria-label={tool.name}
       title={tool.name}
-      className={`font-display inline-flex items-center justify-center overflow-hidden rounded-[28%] border border-white/25 font-semibold select-none ${className}`}
+      className={`inline-flex items-center justify-center overflow-hidden rounded-[22%] font-bold select-none ${className}`}
       style={{
         width: size,
         height: size,
@@ -42,11 +42,21 @@ export default function ToolBadge({
         // Quantised: three glyph sizes total, so badge boxes of
         // similar size do not each mint their own font size.
         fontSize: size >= 56 ? 22 : size >= 40 ? 18 : 11,
-        letterSpacing: "-0.02em",
+        letterSpacing: "-0.03em",
+        // Adobe's tiles set the glyph in a heavy geometric sans and rim the
+        // square in the glyph colour; the serif display face read as fake.
+        fontFamily: "var(--font-grotesk)",
+        boxShadow: hasMark || tool.id === "js" ? "0 0 0 1px rgb(0 0 0 / 0.12) inset" : `0 0 0 ${Math.max(2, Math.round(size / 26))}px ${tool.fg} inset`,
         ...style,
       }}
     >
-      {hasMark ? <ToolMark id={tool.id} size={size} /> : tool.label}
+      {hasMark ? (
+        <ToolMark id={tool.id} size={size} />
+      ) : tool.id === "js" ? (
+        <span className="self-end justify-self-end pr-[12%] pb-[6%] ml-auto">{tool.label}</span>
+      ) : (
+        tool.label
+      )}
     </span>
   );
 }

@@ -4,8 +4,12 @@ import { useEffect } from "react";
 
 /**
  * One observer for every `[data-rv]` element on the page. When an element
- * scrolls into view it gets `.in`, and the CSS variant does the rest (see
+ * scrolls into view it gets `data-in`, and the CSS variant does the rest (see
  * "Scroll reveal" in globals.css).
+ *
+ * An attribute, not a class: React owns `className` and rewrites it on any
+ * re-render that touches it, which silently stripped a `.in` class and left
+ * the element invisible. React never touches attributes it did not set.
  *
  * A MutationObserver picks up elements mounted later — switching a tab
  * renders new tiles, and they should animate in too.
@@ -13,7 +17,7 @@ import { useEffect } from "react";
 export default function ScrollFX() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      document.querySelectorAll("[data-rv]").forEach((el) => el.classList.add("in"));
+      document.querySelectorAll<HTMLElement>("[data-rv]").forEach((el) => (el.dataset.in = ""));
       return;
     }
 
@@ -21,7 +25,7 @@ export default function ScrollFX() {
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            e.target.classList.add("in");
+            (e.target as HTMLElement).dataset.in = "";
             io.unobserve(e.target);
           }
         });
@@ -30,7 +34,7 @@ export default function ScrollFX() {
     );
 
     const watch = (root: ParentNode) =>
-      root.querySelectorAll("[data-rv]:not(.in)").forEach((el) => io.observe(el));
+      root.querySelectorAll("[data-rv]:not([data-in])").forEach((el) => io.observe(el));
 
     watch(document);
 
@@ -38,7 +42,7 @@ export default function ScrollFX() {
       records.forEach((r) =>
         r.addedNodes.forEach((n) => {
           if (!(n instanceof Element)) return;
-          if (n.matches("[data-rv]:not(.in)")) io.observe(n);
+          if (n.matches("[data-rv]:not([data-in])")) io.observe(n);
           watch(n);
         })
       );

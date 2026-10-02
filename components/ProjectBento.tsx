@@ -1,6 +1,7 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import type { CSSProperties, PointerEvent } from "react";
+import { Lotus, Sparkle4 } from "./Botanicals";
 import type { Project } from "@/lib/content";
 
 /** Desktop-window file name for the title bar — the tool decides the extension. */
@@ -14,6 +15,24 @@ function fileName(p: Project) {
         ? "psd"
         : "png";
   return `${p.id.replace(/-/g, "_")}.${ext}`;
+}
+
+/** Tilt toward the pointer and steer the gloss band. Mouse only. */
+function tilt(e: PointerEvent<HTMLElement>) {
+  if (e.pointerType !== "mouse") return;
+  const el = e.currentTarget;
+  const r = el.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width;
+  const y = (e.clientY - r.top) / r.height;
+  el.style.setProperty("--ry", `${((x - 0.5) * 9).toFixed(2)}deg`);
+  el.style.setProperty("--rx", `${((0.5 - y) * 9).toFixed(2)}deg`);
+  el.style.setProperty("--mx", (x * 140 - 20).toFixed(1));
+}
+
+function untilt(e: PointerEvent<HTMLElement>) {
+  const el = e.currentTarget;
+  el.style.setProperty("--rx", "0deg");
+  el.style.setProperty("--ry", "0deg");
 }
 
 /**
@@ -46,7 +65,7 @@ export default function ProjectBento({
       <div
         data-rv
         style={{ "--ar": 0.82 } as CSSProperties}
-        className="flex min-h-[150px] flex-col overflow-hidden rounded-[3px] border border-ink bg-ink text-maize"
+        className="relative flex min-h-[150px] flex-col overflow-hidden rounded-[4px] border border-ink bg-iris text-paper"
       >
         <span className="titlebar type-pixel flex h-[22px] shrink-0 items-center gap-2 px-2 text-[9px]">
           <span aria-hidden className="closebox" />
@@ -55,15 +74,14 @@ export default function ProjectBento({
           </span>
         </span>
         <div className="flex flex-1 flex-col justify-between p-3.5">
-          <p className="type-pixel text-[10px] leading-relaxed text-maize/60">
-            {projects.length} items
-            {range && <><br />{range}</>}
+          <p className="type-pixel text-[10px] leading-relaxed text-paper/70">
+            {range}
           </p>
           <div>
-            <p className="type-display text-6xl tabular-nums text-fawn">
+            <p className="type-display text-7xl tracking-[-0.04em] text-blush italic">
               {String(projects.length).padStart(2, "0")}
             </p>
-            <p className="mt-2 line-clamp-4 hidden text-[12px] leading-snug text-maize/70 sm:block">
+            <p className="mt-2 line-clamp-4 hidden text-[12px] leading-snug text-paper/80 sm:block">
               {blurb}
             </p>
           </div>
@@ -78,11 +96,12 @@ export default function ProjectBento({
           <button
             key={p.id}
             type="button"
-            data-rv
             onClick={() => onOpen(p)}
+            onPointerMove={tilt}
+            onPointerLeave={untilt}
             aria-label={`Open ${p.title}${p.year ? `, ${p.year}` : ""}`}
             style={{ "--ar": ar, "--d": `${(i % 6) * 60}ms` } as CSSProperties}
-            className="group relative flex flex-col overflow-hidden rounded-[3px] border border-ink bg-ink text-left outline-offset-2 transition-[outline-color] duration-150 hover:outline-2 hover:outline-lavender"
+            className="tile sl-rise group relative flex flex-col overflow-hidden rounded-[4px] border border-ink bg-ink text-left"
           >
             {/* Window chrome */}
             <span className="titlebar type-pixel flex h-[22px] shrink-0 items-center gap-2 px-2 text-[9px]">
@@ -118,7 +137,7 @@ export default function ProjectBento({
               )}
 
               {/* Caption bar — slides up on hover/focus */}
-              <span className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-between gap-3 border-t border-ink bg-maize px-2.5 py-2 text-ink transition-transform duration-200 ease-out group-hover:translate-y-0 group-focus-visible:translate-y-0">
+              <span className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-between gap-3 border-t border-ink bg-paper px-2.5 py-2 text-ink transition-transform duration-200 ease-out group-hover:translate-y-0 group-focus-visible:translate-y-0">
                 <span className="truncate text-[13px] leading-tight font-semibold tracking-[-0.01em]">
                   {p.title}
                 </span>
@@ -128,6 +147,28 @@ export default function ProjectBento({
           </button>
         );
       })}
+
+      {/*
+       * End tile. It grows to soak up whatever the last row leaves, so the
+       * gallery always closes square — no gap at the bottom right. Hover it
+       * and the lotus opens.
+       */}
+      <div
+        aria-hidden
+        className="bento-end relative flex min-h-[120px] items-end justify-between overflow-hidden rounded-[4px] border border-ink/25 p-3"
+        style={{
+          background: "linear-gradient(160deg, #a9b6f0 0%, #f2b8cf 60%, #f6d3c3 100%)",
+        }}
+      >
+        <div className="band-grain absolute inset-0" />
+        <p className="type-pixel relative text-[10px] leading-relaxed text-ink/70">
+          end of folder
+          <br />
+          more on request ✿
+        </p>
+        <Sparkle4 className="spin-slow absolute top-3 right-3 h-5 w-5 text-white" />
+        <Lotus className="sway relative -mb-2 h-[85%] max-h-40 w-auto" deep />
+      </div>
     </div>
   );
 }

@@ -25,7 +25,7 @@ export default function FolderStack() {
   return (
     <section id="work" className="px-4 pb-20 sm:px-8">
       <div className="relative mx-auto max-w-6xl">
-        <SectionTitle id="work-heading" index="01" lead="Selected" accent="work" note="2019 — 2026" />
+        <SectionTitle id="work-heading" index="01" lead="Selected" accent="work" />
 
         <Folder tabs={tabs} active={active} onSelect={setActive} labelledBy="work-heading">
           {isCase ? (
@@ -33,7 +33,6 @@ export default function FolderStack() {
           ) : (
             tab && (
               <>
-                <h3 className="type-display mb-5 text-3xl sm:text-5xl">{tab.heading}</h3>
                 {/* Keyed by tab so tiles replay their entrance on switch */}
                 <ProjectBento
                   key={tab.id}

@@ -3,6 +3,7 @@ import FolderStack from "@/components/FolderStack";
 import AboutPanel from "@/components/AboutPanel";
 import Contact from "@/components/Contact";
 import ScrollFX from "@/components/ScrollFX";
+import ScrollVine from "@/components/ScrollVine";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <AboutPanel />
       <Contact />
       <ScrollFX />
+      <ScrollVine />
     </main>
   );
 }

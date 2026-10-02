@@ -1,10 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { experience, education, skillGroups, certifications, languages } from "@/lib/content";
 import Folder, { type FolderTab } from "./Folder";
 import AboutMe from "./AboutMe";
 import SectionTitle from "./SectionTitle";
+import { Lotus, Orb, Sparkle4 } from "./Botanicals";
+
+/* The hero's printed sheet, reused as header strips so every tab matches. */
+const SHEET =
+  "radial-gradient(70% 90% at 30% 20%, #fff6ea 0%, transparent 70%), linear-gradient(120deg, #a9b6f0 0%, #c9b9ec 38%, #f2b8cf 72%, #f6d3c3 100%)";
+
+function PanelHead({ lead, accent }: { lead: string; accent: string }) {
+  return (
+    <div>
+      <h3 className="type-display text-4xl text-iris sm:text-6xl">
+        {lead} <span className="text-lavender italic">{accent}</span>
+      </h3>
+    </div>
+  );
+}
 
 const tabs: FolderTab[] = [
   { id: "about", label: "about me", accent: "eminence" },
@@ -19,97 +34,122 @@ export default function AboutPanel() {
   return (
     <section id="about" className="px-4 pb-20 sm:px-8">
       <div className="relative mx-auto max-w-6xl">
-        <SectionTitle id="about-heading" index="02" lead="About" accent="me" note="CV — 2026" />
+        <SectionTitle id="about-heading" index="02" lead="About" accent="me" />
 
         <Folder tabs={tabs} active={active} onSelect={setActive} labelledBy="about-heading">
           {active === "about" && <AboutMe />}
 
           {active === "experience" && (
             <div>
-              <h3 className="type-display text-4xl sm:text-5xl">
-                Where I&apos;ve worked
-              </h3>
-              <div className="mt-7 space-y-6">
+              <PanelHead lead="Where I've" accent="worked" />
+
+              {/* Vine timeline: a stem down the left, a bead per role. */}
+              <ol className="relative mt-10 space-y-5 pl-9 sm:pl-12">
+                <span aria-hidden className="absolute top-2 bottom-2 left-[13px] w-[3px] rounded-full bg-leaf/70 sm:left-[19px]" />
                 {experience.map((e, idx) => {
-                  const [from, to] = e.period.split("—").map((x) => x.trim());
+                  const now = /present/i.test(e.period);
                   return (
-                  <div
-                    data-rv
-                    key={`${e.role}-${e.org}`}
-                    className="grid gap-4"
-                    style={{ gridTemplateColumns: "3.6rem 1fr", "--d": `${idx * 70}ms` } as React.CSSProperties}
-                  >
-                    {/* Year stack — start over end, in colour, as in the reference CVs. */}
-                    <div className="year-stack font-display pt-0.5 text-right text-sm font-semibold">
-                      <div className="text-eminence">{from}</div>
-                      <div className="text-ink/65">{to}</div>
-                    </div>
-                    <div className="border-l border-eminence/30 pl-4">
-                    <p className="type-display text-[1.25rem] leading-tight">{e.role}</p>
-                    <p className="mt-1 text-[15px] font-semibold text-eminence">
-                      {e.org}
-                      <span className="font-normal text-ink/65"> — {e.place}</span>
-                    </p>
-                    <ul className="mt-2 space-y-1">
-                      {e.points.map((pt) => (
-                        <li key={pt} className="text-sm leading-relaxed text-ink/75">
-                          {pt}
-                        </li>
-                      ))}
-                    </ul>
-                    </div>
-                  </div>
+                    <li
+                      key={`${e.role}-${e.org}`}
+                      data-rv
+                      style={{ "--d": `${idx * 70}ms` } as CSSProperties}
+                      className="group relative"
+                    >
+                      <Orb
+                        className={`absolute top-5 -left-9 h-7 w-7 transition-transform duration-300 group-hover:scale-125 sm:-left-12 ${now ? "float-badge" : ""}`}
+                      />
+                      <div className="rounded-[6px] border border-ink/12 bg-white/45 p-5 transition-[box-shadow,transform,background-color] duration-200 group-hover:-translate-y-0.5 group-hover:bg-white/75 group-hover:shadow-[5px_5px_0_var(--color-blush)] sm:p-6">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="type-pixel rounded-full bg-iris px-2.5 py-0.5 text-[10px] text-paper">
+                            {e.period}
+                          </span>
+                          {now && (
+                            <span className="type-pixel rounded-full border border-lavender px-2 py-0.5 text-[10px] text-lavender">
+                              ✦ now
+                            </span>
+                          )}
+                          <span className="type-pixel ml-auto text-[10px] text-ink/50">{e.place}</span>
+                        </div>
+                        <h4 className="type-display mt-3 text-2xl leading-tight text-iris sm:text-[1.9rem]">{e.role}</h4>
+                        <p className="type-display text-lg text-lavender italic">{e.org}</p>
+                        <ul className="mt-3 space-y-1.5">
+                          {e.points.map((pt) => (
+                            <li key={pt} className="flex gap-2 text-[14px] leading-relaxed text-ink/80">
+                              <span aria-hidden className="mt-[0.35em] text-[10px] text-sky">✦</span>
+                              {pt}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </li>
                   );
                 })}
-              </div>
+              </ol>
             </div>
           )}
 
           {active === "education" && (
             <div>
-              <h3 className="type-display text-4xl sm:text-5xl">
-                Where I studied
-              </h3>
-              <div className="mt-7 space-y-6">
+              <PanelHead lead="Where I" accent="studied" />
+
+              <div className="mt-10 grid gap-5 md:grid-cols-2">
                 {education.map((e, idx) => (
-                  <div data-rv style={{ "--d": `${idx * 70}ms` } as React.CSSProperties} key={e.school} className="border-l border-eminence/50 pl-4">
-                    <p className="text-xs font-semibold text-eminence">{e.period}</p>
-                    <p className="type-display mt-1 text-[1.25rem] leading-tight">{e.school}</p>
-                    <p className="mt-0.5 text-[15px] font-semibold text-eminence">{e.detail}</p>
-                    {e.coursework && (
-                      <p className="mt-1.5 text-[13px] leading-relaxed text-ink/65">
-                        Coursework: {e.coursework}
-                      </p>
-                    )}
-                    {e.honors.length > 0 && (
-                      <ul className="mt-2 space-y-1">
-                        {e.honors.map((h) => (
-                          <li key={h} className="flex items-center gap-1.5 text-sm text-ink/70">
-                            <span aria-hidden className="orb orb-lav" />
-                            {h}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
+                  <article
+                    key={e.school}
+                    data-rv
+                    style={{ "--d": `${idx * 80}ms` } as CSSProperties}
+                    className="group relative overflow-hidden rounded-[6px] border border-ink/15 bg-white/50 transition-shadow duration-200 hover:shadow-[5px_5px_0_var(--color-sky)]"
+                  >
+                    <div className="relative h-24 overflow-hidden" style={{ background: SHEET }}>
+                      <div className="band-grain absolute inset-0" />
+                      <p className="type-display absolute bottom-2 left-5 text-3xl text-iris italic">{e.period}</p>
+                      <Lotus className="sway absolute -right-2 -bottom-4 w-20 transition-transform duration-500 group-hover:scale-110" deep={idx === 1} />
+                    </div>
+                    <div className="p-5 sm:p-6">
+                      <h4 className="type-display text-2xl leading-tight text-iris">{e.school}</h4>
+                      <p className="mt-1 text-[14px] text-ink/80">{e.detail}</p>
+                      {e.coursework && (
+                        <p className="mt-3 text-[13px] leading-relaxed text-ink/60">
+                          <span className="type-pixel text-[10px] text-ink/50">Coursework </span>
+                          {e.coursework}
+                        </p>
+                      )}
+                      {e.honors.length > 0 && (
+                        <ul className="mt-4 flex flex-wrap gap-2">
+                          {e.honors.map((h) => (
+                            <li key={h} className="flex items-center gap-1.5 rounded-full bg-blush/45 px-3 py-1 text-[12px] text-ink">
+                              <Sparkle4 className="h-3 w-3 text-lavender" />
+                              {h}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </article>
                 ))}
               </div>
 
-              <h4 className="type-pixel mt-10 text-[10px] text-eminence">
-                Certifications
-              </h4>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <p className="type-pixel mt-12 text-[11px] text-ink/55">✦ Certifications</p>
+              {/* Tickets: a gradient stub, a perforated tear, the details. */}
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {certifications.map((c, idx) => (
                   <div
-                    data-rv
-                    style={{ "--d": `${idx * 70}ms` } as React.CSSProperties}
                     key={c.name}
-                    className="glass-soft rounded-[4px] p-4"
+                    data-rv
+                    style={{ "--d": `${idx * 70}ms` } as CSSProperties}
+                    className="group flex overflow-hidden rounded-[6px] border border-ink/15 bg-white/60 transition-transform duration-200 hover:-rotate-1"
                   >
-                    <p className="type-display text-base leading-snug">{c.name}</p>
-                    <p className="mt-1 text-xs font-semibold text-eminence">{c.issuer}</p>
-                    <p className="mt-0.5 text-xs text-ink/65">{c.date}</p>
-                    <p className="mt-2 text-[11px] text-ink/65">{c.detail}</p>
+                    <div className="relative flex w-14 shrink-0 items-center justify-center" style={{ background: SHEET }}>
+                      <div className="band-grain absolute inset-0" />
+                      <Sparkle4 className="relative h-6 w-6 text-white transition-transform duration-500 group-hover:rotate-180" />
+                    </div>
+                    <div className="border-l-2 border-dashed border-ink/20 p-4">
+                      <p className="type-display text-lg leading-snug text-iris">{c.name}</p>
+                      <p className="mt-1 text-[12px] text-ink/70">{c.issuer}</p>
+                      <p className="type-pixel mt-2 text-[10px] text-ink/50">
+                        {c.date} · {c.detail}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -118,75 +158,33 @@ export default function AboutPanel() {
 
           {active === "skills" && (
             <div>
-              <h3 className="type-display text-4xl sm:text-5xl">
-                What I work with
-              </h3>
+              <PanelHead lead="What I" accent="work with" />
 
-              {/*
-               * Five stacked groups of loose chips read as one long wall. Each
-               * group now sits in its own bordered card in a two-column grid,
-               * with a numbered label and a count, so the eye can find a
-               * discipline instead of scanning every pill.
-               */}
-              <div className="mt-8 grid gap-4 md:grid-cols-2">
-                {skillGroups.map((g, i) => (
+              <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {[...skillGroups, { label: "languages", items: languages }].map((g, i) => (
                   <div
-                    data-rv
-                    style={{ "--d": `${i * 70}ms` } as React.CSSProperties}
                     key={g.label}
-                    className="glass-soft rounded-[4px] p-5"
+                    data-rv
+                    style={{ "--d": `${(i % 3) * 70}ms` } as CSSProperties}
+                    className="group overflow-hidden rounded-[6px] border border-ink/15 bg-white/50 transition-shadow duration-200 hover:shadow-[5px_5px_0_var(--color-blush)]"
                   >
-                    <div className="flex items-baseline gap-2.5 border-b border-ink/10 pb-3">
-                      <span className="type-pixel text-[10px] text-eminence/85 tabular-nums">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <p className="font-display flex-1 text-[17px] font-semibold">
-                        {g.label}
-                      </p>
-                      <span className="type-pixel text-[10px] text-ink/65 tabular-nums">
-                        {g.items.length}
-                      </span>
+                    <div className="relative flex items-end justify-between overflow-hidden px-4 pt-6 pb-2" style={{ background: SHEET }}>
+                      <div className="band-grain absolute inset-0" />
+                      <p className="type-display relative text-2xl text-iris capitalize">{g.label}</p>
+                      <p className="type-display relative text-3xl text-white italic">{String(i + 1).padStart(2, "0")}</p>
                     </div>
-
-                    <div className="mt-3.5 flex flex-wrap gap-1.5">
+                    <ul className="flex flex-wrap gap-1.5 p-4">
                       {g.items.map((s) => (
-                        <span
+                        <li
                           key={s}
-                          className="rounded-[4px] bg-white/40 px-3 py-1 text-xs font-medium ring-1 ring-ink/10 transition-colors duration-200 hover:bg-fawn/45"
+                          className="rounded-full border border-ink/15 bg-white/70 px-3 py-1 text-[12px] transition-colors duration-150 hover:border-iris hover:bg-iris hover:text-paper"
                         >
                           {s}
-                        </span>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 ))}
-
-                {/* Languages shares the card treatment so the grid closes evenly. */}
-                <div className="glass-soft rounded-[4px] p-5">
-                  <div className="flex items-baseline gap-2.5 border-b border-ink/10 pb-3">
-                    <span className="type-pixel text-[10px] text-eminence/85 tabular-nums">
-                      {String(skillGroups.length + 1).padStart(2, "0")}
-                    </span>
-                    <p className="font-display flex-1 text-[17px] font-semibold">
-                      languages
-                    </p>
-                    <span className="type-pixel text-[10px] text-ink/65 tabular-nums">
-                      {languages.length}
-                    </span>
-                  </div>
-
-                  <ul className="mt-3.5 space-y-1.5">
-                    {languages.map((l) => {
-                      const [name, level] = l.replace(")", "").split(" (");
-                      return (
-                        <li key={l} className="flex items-baseline justify-between gap-3 text-sm">
-                          <span className="font-semibold">{name}</span>
-                          <span className="text-xs text-ink/65">{level}</span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
               </div>
             </div>
           )}

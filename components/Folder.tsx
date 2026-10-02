@@ -106,7 +106,7 @@ export default function Folder({
         id={`panel-${activeTab.id}`}
         role={interactive ? "tabpanel" : undefined}
         aria-labelledby={labelledBy}
-        className="glass sheet-in relative rounded-[6px] p-5 text-ink sm:p-8"
+        className="glass sheet-in sl-curtain relative rounded-[6px] p-5 text-ink sm:p-8"
       >
         {children}
       </div>

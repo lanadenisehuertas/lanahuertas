@@ -1,90 +1,106 @@
+import type { CSSProperties } from "react";
 import { engineeringProjects } from "@/lib/content";
-import PsyClickVisual from "./PsyClickVisual";
-import DebtLedgerVisual from "./DebtLedgerVisual";
+import SiteMockup from "./SiteMockup";
+import { Lotus, Leaf } from "./Botanicals";
 
-const VISUALS = {
-  psyclick: PsyClickVisual,
-  debtledger: DebtLedgerVisual,
-} as const;
+/*
+ * Each project shows its real, live site as a device mockup. Add a project by
+ * appending to `engineeringProjects` and giving it an entry here.
+ */
+const MOCKS = {
+  psyclick: {
+    kind: "browser" as const,
+    src: "/work/shot-psyclick.webp",
+    url: "psyclick-app.vercel.app",
+  },
+  debtledger: {
+    kind: "phone" as const,
+    src: "/work/shot-debtledger.webp",
+    url: "debt-ledger-puce.vercel.app",
+  },
+};
 
 /**
- * Software engineering work, as a numbered list. Each entry gets its own
- * product visual — adding a project means appending to `engineeringProjects`
- * and registering its visual above.
+ * Software work. Copy on one side, the live product on the other, sides
+ * alternating down the list.
  */
 export default function CaseStudy() {
   return (
-    <div className="space-y-16">
+    <div className="space-y-14 sm:space-y-20">
       {engineeringProjects.map((p, i) => {
-        const Visual = VISUALS[p.visual];
+        const m = MOCKS[p.visual];
+        const flip = i % 2 === 1;
         return (
-          <article key={p.id} data-rv className={i > 0 ? "border-t border-ink/12 pt-16" : undefined}>
-            <div className="grid gap-10 lg:grid-cols-[1fr_1.05fr] lg:items-center lg:gap-14">
-              {/* Copy */}
-              <div>
-                <div className="flex items-baseline gap-3">
-                  <span className="type-pixel text-lg text-eminence/85 tabular-nums">
-                    {p.n}
-                  </span>
-                  <h3 className="type-display text-5xl sm:text-6xl">
-                    {p.title}
-                  </h3>
-                </div>
+          <article
+            key={p.id}
+            data-rv
+            className={`grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-14 ${i > 0 ? "border-t border-ink/12 pt-14 sm:pt-20" : ""}`}
+          >
+            <div className={flip ? "lg:order-2" : undefined}>
+              <p className="type-pixel text-[11px] text-ink/55">
+                {p.n} · {p.year}
+              </p>
+              <h3 className="type-display mt-2 text-5xl text-iris sm:text-6xl">{p.title}</h3>
+              <p className="type-display mt-1 text-2xl text-lavender italic sm:text-3xl">{p.tagline}</p>
 
-                <p className="type-display mt-2 pl-[2.6rem] text-2xl text-eminence sm:text-3xl">
-                  {p.tagline}
-                </p>
+              <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-ink/80">{p.description}</p>
 
-                <div className="mt-5 max-w-xl space-y-3 text-sm leading-relaxed text-ink/80 sm:text-base">
-                  {p.description.split("\n\n").map((para) => (
-                    <p key={para.slice(0, 24)}>{para}</p>
-                  ))}
-                </div>
+              <p className="mt-5 text-[13px] text-ink/60">
+                <span className="type-pixel text-[10px] text-ink/50">Role </span>
+                {p.role.split(" — ")[0]}
+              </p>
 
-                <dl className="mt-7 space-y-3">
-                  <div>
-                    <dt className="type-pixel text-[10px] text-eminence">
-                      Role
-                    </dt>
-                    <dd className="text-sm">{p.role}</dd>
-                  </div>
-                  <div>
-                    <dt className="type-pixel text-[10px] text-eminence">
-                      Year
-                    </dt>
-                    <dd className="text-sm tabular-nums">{p.year}</dd>
-                  </div>
-                  <div>
-                    <dt className="type-pixel text-[10px] text-eminence">
-                      Built with
-                    </dt>
-                    <dd className="mt-1.5 flex flex-wrap gap-1.5">
-                      {p.stack.map((s) => (
-                        <span
-                          key={s}
-                          className="rounded-[4px] bg-white/40 px-3 py-1 text-xs font-medium ring-1 ring-ink/10 transition-colors duration-200 hover:bg-fawn/45"
-                        >
-                          {s}
-                        </span>
-                      ))}
-                    </dd>
-                  </div>
-                </dl>
-
-                {p.href && (
-                  <a
-                    href={p.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="gel type-pixel mt-7 inline-flex min-h-[48px] items-center px-7 text-[11px]"
+              <ul className="mt-3 flex flex-wrap gap-1.5">
+                {p.stack.slice(0, 5).map((s, k) => (
+                  <li
+                    key={s}
+                    data-rv
+                    style={{ "--d": `${k * 40}ms` } as CSSProperties}
+                    className="rounded-[3px] border border-ink/20 bg-white/50 px-2.5 py-1 text-xs transition-colors duration-150 hover:border-iris hover:bg-iris hover:text-paper"
                   >
-                    {p.hrefLabel ?? "View project"}
-                  </a>
+                    {s}
+                  </li>
+                ))}
+                {p.stack.length > 5 && (
+                  <li className="rounded-[3px] px-1.5 py-1 text-xs text-ink/50">+{p.stack.length - 5}</li>
                 )}
-              </div>
+              </ul>
 
-              {/* Product visual */}
-              <div className="px-4 sm:px-8 lg:px-0">{Visual && <Visual />}</div>
+              {p.href && (
+                <a
+                  href={p.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="gel mt-7 inline-flex min-h-[46px] items-center gap-2 px-6"
+                >
+                  {p.hrefLabel ?? "View project"} <span aria-hidden>↗</span>
+                </a>
+              )}
+            </div>
+
+            {/* The product, laid on a garden sheet like the hero */}
+            <div className={`relative ${flip ? "lg:order-1" : ""}`}>
+              <div
+                aria-hidden
+                className="absolute inset-x-2 inset-y-6 overflow-hidden rounded-[6px] border border-ink/12"
+                style={{
+                  background:
+                    "radial-gradient(60% 70% at 50% 50%, #fff6ea 0%, transparent 70%), linear-gradient(160deg, #a9b6f0 0%, #c9b9ec 40%, #f2b8cf 75%, #f6d3c3 100%)",
+                }}
+              >
+                <div className="band-grain absolute inset-0" />
+              </div>
+              <div aria-hidden className="sl-sprout pointer-events-none absolute -bottom-2 left-0 z-10 w-20 sm:w-24">
+                <Lotus className="sway w-full" deep={i % 2 === 0} />
+              </div>
+              <Leaf className="pointer-events-none absolute top-2 right-0 z-10 w-20 rotate-[200deg]" />
+              <SiteMockup
+                kind={m.kind}
+                src={m.src}
+                url={m.url}
+                href={p.href}
+                alt={`${p.title} — live site`}
+              />
             </div>
           </article>
         );

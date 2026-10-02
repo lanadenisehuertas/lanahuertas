@@ -94,7 +94,7 @@ export const toolkit = [
   },
   { id: "fg", label: "Fg", name: "Figma", bg: "#000000", fg: "#F24E1E" },
   { id: "py", label: "Py", name: "Python", bg: "#0E2233", fg: "#FFD43B" },
-  { id: "js", label: "Js", name: "JavaScript", bg: "#2B2A15", fg: "#F7DF1E" },
+  { id: "js", label: "JS", name: "JavaScript", bg: "#F7DF1E", fg: "#1b1b1b" },
 ] as const;
 
 // Most recent first. Bullets kept to two lines each — the detail lives in the
@@ -308,7 +308,7 @@ export const engineeringProjects: EngineeringProject[] = [
     title: "PsyClick",
     tagline: "Calmer clinical screening",
     description:
-      "A Windows desktop app (Electron + Python) that reads keystroke and mouse dynamics in real time to support clinician-guided psychomotor and mental health screening. An 8-feature extraction pipeline — keystroke flight and dwell time, mouse velocity, jerk, path entropy — feeds a Hotelling's T² anomaly engine measured against an EWMA-adaptive personal baseline. Supabase handles cloud storage alongside a parallel offline data layer, and the Python backend ships as a standalone executable. It flags; it does not diagnose.\n\nI designed the full experience — clinician dashboards, client intake, calibration tasks, and exportable session reports — and directed a four-person team across design, backend, and research through thesis defense.",
+      "A desktop app that reads typing rhythm and mouse movement in real time to support clinician-guided mental health screening. It flags; it does not diagnose. I designed the whole experience, from clinician dashboards and intake to calibration tasks and session reports, and led a four-person team through thesis defense.",
     role: "Project manager · Backend developer · Lead UI/UX designer — undergraduate thesis",
     year: "2025 — 2026",
     stack: ["Electron", "Python", "NumPy", "SciPy", "React", "Vite", "Supabase", "SQLite", "PyInstaller"],
@@ -322,7 +322,7 @@ export const engineeringProjects: EngineeringProject[] = [
     title: "Debt Payoff Ledger",
     tagline: "Weekly allocator for a student budget",
     description:
-      "A personal finance app that takes a weekly allowance, keeps back what is needed for food and school, then puts the remainder against whichever debt is due soonest. Entries stay editable until confirmed, and every week is logged.\n\nRebuilt from a single-file HTML prototype into a typed, tested Next.js app. The allocation algorithm lives in a pure, framework-independent module covered by 18 Vitest unit tests; state persists through useSyncExternalStore over localStorage, with opt-in Supabase cloud sync behind environment variables.\n\nRather than restart the look, I refined the original visual identity into a token-based design system. The data model was redesigned around privacy: hardcoded sample data was replaced with a real onboarding flow, and everything stays local-first by default.",
+      "A student budget app: it sets aside food and school money from a weekly allowance, then puts the rest toward whichever debt is due soonest. Rebuilt from a one-file prototype into a tested Next.js app, with the original look refined into a token-based design system. Local-first and private by default.",
     role: "Designer · Full-stack developer — personal project",
     year: "2026",
     stack: ["Next.js", "TypeScript", "Tailwind", "Vitest", "GitHub Actions"],

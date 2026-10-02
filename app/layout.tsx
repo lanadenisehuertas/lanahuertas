@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, DM_Mono } from "next/font/google";
+import { Archivo, Cormorant_Garamond, DM_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { profile, socials } from "@/lib/content";
 import Nav from "@/components/Nav";
+import PointerFX from "@/components/PointerFX";
+import { BotanicalDefs } from "@/components/Botanicals";
 
 /*
  * Archivo — one grotesk family for everything set in words. Its width axis
@@ -18,6 +20,14 @@ const archivo = Archivo({
   variable: "--font-archivo",
   subsets: ["latin"],
   axes: ["wdth"],
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -124,7 +134,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#330c4b",
+  themeColor: "#f5eee2",
 };
 
 export default function RootLayout({
@@ -135,7 +145,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${mono.variable} ${redaction.variable} ${r10.variable} ${r35.variable} ${r70.variable} ${r100.variable} h-full antialiased`}
+      className={`${archivo.variable} ${cormorant.variable} ${mono.variable} ${redaction.variable} ${r10.variable} ${r35.variable} ${r70.variable} ${r100.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {/*
@@ -162,6 +172,8 @@ export default function RootLayout({
           }}
         />
         <div className="graph-ground" aria-hidden />
+        <BotanicalDefs />
+        <PointerFX />
         <Nav />
         {children}
         <div className="grain-plate" aria-hidden />

@@ -25,14 +25,14 @@ export default function Nav() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-200 ${
-        scrolled ? "border-maize/15 bg-deep/92" : "border-transparent"
+        scrolled ? "border-ink/10 bg-paper/88 backdrop-blur-md" : "border-transparent"
       }`}
     >
       <nav
         aria-label="Main"
         className="type-pixel mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2.5 text-[11px] sm:px-8"
       >
-        <a href="#top" className="flex min-h-[40px] items-center gap-2 text-maize">
+        <a href="#top" className="flex min-h-[40px] items-center gap-2 text-ink">
           <span aria-hidden className="orb orb-live" />
           Lana Denise Huertas
         </a>
@@ -42,7 +42,7 @@ export default function Nav() {
             <li key={l.href}>
               <a
                 href={l.href}
-                className="flex min-h-[40px] items-center text-maize/70 transition-colors hover:text-maize"
+                className="flex min-h-[40px] items-center text-ink/65 transition-colors hover:text-iris"
               >
                 {l.label}
               </a>
@@ -50,7 +50,7 @@ export default function Nav() {
           ))}
         </ul>
 
-        <a href="#contact" className="gel flex min-h-[34px] items-center px-3.5 text-[11px]">
+        <a href="#contact" className="gel flex min-h-[34px] items-center px-3.5">
           Hire me
         </a>
       </nav>

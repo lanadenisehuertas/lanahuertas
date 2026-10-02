@@ -23,7 +23,16 @@ type Word = { text: string; italic: boolean; className: string };
  * Everything runs on data attributes, not React state, so a sweep of the
  * mouse costs no re-renders.
  */
-export default function MorphName({ words, label }: { words: Word[]; label: string }) {
+export default function MorphName({
+  words,
+  label,
+  as: Tag = "h1",
+}: {
+  words: Word[];
+  label: string;
+  /** The hero name is the page's h1; anywhere else, pass "p". */
+  as?: "h1" | "p";
+}) {
   const letters = useRef<(HTMLSpanElement | null)[]>([]);
   const busy = useRef<Set<number>>(new Set());
   const timers = useRef<number[]>([]);
@@ -66,11 +75,59 @@ export default function MorphName({ words, label }: { words: Word[]; label: stri
     letters.current.forEach((_, i) => later(() => run(i), i * RIPPLE_MS));
   }, [run]);
 
+  /*
+   * Click: scramble. Random letters hold a random rough cut for a beat, then
+   * the whole name washes clean with a wave.
+   */
+  const scramble = useCallback(() => {
+    if (reduced.current) return;
+    const cuts = ["r35", "r70", "r100"];
+    letters.current.forEach((el, i) => {
+      if (!el || busy.current.has(i) || Math.random() < 0.35) return;
+      busy.current.add(i);
+      el.dataset.on = "1";
+      el.dataset.cut = cuts[(Math.random() * cuts.length) | 0];
+      later(() => {
+        delete el.dataset.on;
+        delete el.dataset.cut;
+        busy.current.delete(i);
+      }, 500 + Math.random() * 500);
+    });
+    later(wave, 1100);
+  }, [wave]);
+
+  /*
+   * Magnetic lift: letters near the cursor rise and swell a little, falling
+   * off with horizontal distance. One rAF per frame, transforms only.
+   */
+  const frame = useRef(0);
+  const onMove = useCallback((e: React.PointerEvent) => {
+    if (reduced.current || e.pointerType !== "mouse") return;
+    const px = e.clientX;
+    cancelAnimationFrame(frame.current);
+    frame.current = requestAnimationFrame(() => {
+      letters.current.forEach((el) => {
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const d = Math.abs(px - (r.left + r.width / 2));
+        const k = Math.max(0, 1 - d / (r.width * 2.6));
+        el.style.setProperty("--lift", k.toFixed(3));
+      });
+    });
+  }, []);
+
+  const onLeave = useCallback(() => {
+    cancelAnimationFrame(frame.current);
+    letters.current.forEach((el) => el?.style.setProperty("--lift", "0"));
+  }, []);
+
   useEffect(() => {
     reduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const t = timers.current;
     const start = window.setTimeout(wave, 450);
+    const raf = frame;
     return () => {
+      cancelAnimationFrame(raf.current);
       window.clearTimeout(start);
       t.forEach(window.clearTimeout);
     };
@@ -78,7 +135,13 @@ export default function MorphName({ words, label }: { words: Word[]; label: stri
 
   let n = 0;
   return (
-    <h1 aria-label={label} onClick={wave} className="morph-name select-none">
+    <Tag
+      aria-label={label}
+      onClick={scramble}
+      onPointerMove={onMove}
+      onPointerLeave={onLeave}
+      className="morph-name select-none"
+    >
       {words.map((w) => (
         <span key={w.text} aria-hidden className={`block ${w.className}`}>
           {Array.from(w.text).map((ch, k) => {
@@ -101,6 +164,6 @@ export default function MorphName({ words, label }: { words: Word[]; label: stri
           })}
         </span>
       ))}
-    </h1>
+    </Tag>
   );
 }
