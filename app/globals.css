@@ -95,8 +95,6 @@ body {
    *
    * .glass       Cream paper panel. Name kept from the previous theme so
    *              every section picks the new look up unchanged.
-   * .glass-soft  Card inside a panel: hairline, faint tint, no shadow.
-   * .glass-dark  Dark chip over imagery or the ground.
    */
   /* Paper sheet laid on the paper ground: a lighter, slightly frosted card
      with a hairline and a printed offset shadow in purple. */
@@ -108,24 +106,9 @@ body {
     box-shadow: 5px 5px 0 color-mix(in srgb, var(--color-sky) 70%, transparent);
   }
 
-  .glass-soft {
-    background-color: color-mix(in srgb, var(--color-ink) 4%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
-  }
 
-  .glass-dark {
-    background-color: color-mix(in srgb, var(--color-ink) 72%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-maize) 20%, transparent);
-    color: var(--color-maize);
-  }
 
-  .shadow-hard {
-    box-shadow: 4px 4px 0 color-mix(in srgb, var(--color-ink) 70%, transparent);
-  }
 
-  .shadow-hard-sm {
-    box-shadow: 2px 2px 0 color-mix(in srgb, var(--color-ink) 70%, transparent);
-  }
 
   /* --- Flat Mac system ------------------------------------------------------
    *
@@ -220,9 +203,6 @@ body {
       0 1px 0 color-mix(in srgb, var(--color-sky) 85%, transparent);
   }
 
-  .gel-maize {
-    background-color: var(--color-maize);
-  }
 
   /* Secondary gel: frosted clear glass with a violet label. */
   .gel-ghost {
@@ -246,8 +226,6 @@ body {
     background-color: var(--orb);
   }
 
-  .orb-lav { --orb: var(--color-lavender); }
-  .orb-maize { --orb: var(--color-maize); }
 
   .orb-live {
     animation: orb-blink 1.6s steps(1) infinite;
@@ -346,18 +324,8 @@ body {
     background-color: var(--color-iris);
   }
 
-  .pill-cta {
-    border-radius: 3px;
-  }
 
-  .press {
-    transition: transform 80ms ease-out;
-  }
 
-  .press:active,
-  .press-sm:active {
-    transform: translateY(1px);
-  }
 
   /* --- Cursors ----------------------------------------------------------------
    * Classic 1-bit arrow and pointing hand, drawn as SVG so they stay crisp.
@@ -412,19 +380,8 @@ body {
   }
 
   /* --- Ticker ------------------------------------------------------------------- */
-  @keyframes ticker {
-    to { transform: translateX(-50%); }
-  }
 
-  .ticker {
-    display: flex;
-    width: max-content;
-    animation: ticker 38s linear infinite;
-  }
 
-  .ticker-wrap:hover .ticker {
-    animation-play-state: paused;
-  }
 
   /* --- Scroll reveal ---------------------------------------------------------------
    * ScrollFX sets data-in when an element enters the viewport. Variants:
@@ -509,24 +466,9 @@ body {
     will-change: transform;
   }
 
-  @keyframes heat-in {
-    from { opacity: 0; transform: scale(0.6); }
-    to { opacity: 1; transform: none; }
-  }
 
-  .heat-cell {
-    animation: heat-in 380ms cubic-bezier(0.32, 0.72, 0, 1) both;
-  }
 
-  @keyframes alloc-in {
-    from { transform: scaleX(0); }
-    to { transform: scaleX(1); }
-  }
 
-  .alloc-fill {
-    transform-origin: left center;
-    animation: alloc-in 620ms cubic-bezier(0.32, 0.72, 0, 1) both;
-  }
 
   @keyframes scrim-in {
     from { opacity: 0; }
@@ -550,9 +492,6 @@ body {
     50% { opacity: 0; }
   }
 
-  .caret {
-    animation: blink 1.05s steps(1) infinite;
-  }
 
   /* --- Botanicals ------------------------------------------------------------
    * Shapes from Botanicals.tsx. Petals fan open on hover (.bloom on any
@@ -576,7 +515,11 @@ body {
     50% { rotate: 3deg; }
   }
 
+  /* will-change promotes these to their own layer, so the speckle filter is
+     rasterised once and the loop runs on the compositor instead of
+     re-filtering the SVG every frame. */
   .sway {
+    will-change: rotate;
     transform-origin: 50% 100%;
     animation: sway var(--sway, 7s) ease-in-out infinite;
   }
@@ -586,6 +529,7 @@ body {
   }
 
   .spin-slow {
+    will-change: rotate;
     animation: spin-slow 24s linear infinite;
   }
 
@@ -692,7 +636,6 @@ body {
    *
    *   .sl-rise     tiles: rise, un-blur and settle as they enter
    *   .sl-curtain  panels: a curtain lifts off them bottom-up
-   *   .sl-grow     bands: widen from a strip to full measure
    */
   @supports (animation-timeline: view()) {
     @keyframes sl-curtain {
@@ -702,10 +645,6 @@ body {
       to { clip-path: inset(-90px -60px -40px -60px); }
     }
 
-    @keyframes sl-grow {
-      from { clip-path: inset(0 22% 0 22% round 4px); }
-      to { clip-path: inset(0 0 0 0 round 4px); }
-    }
 
 
     .sl-curtain {
@@ -714,11 +653,6 @@ body {
       animation-range: entry 0% cover 25%;
     }
 
-    .sl-grow {
-      animation: sl-grow linear both;
-      animation-timeline: view();
-      animation-range: entry 10% cover 45%;
-    }
   }
 
   /* Scroll vine (ScrollVine): drawn to the reader's progress down the page,
@@ -916,6 +850,32 @@ body {
     --hov: 1;
   }
 
+  /* AppShowcase: the active tab fills while its screen is on. */
+  @keyframes showcase-progress {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  .showcase-progress {
+    transform-origin: left center;
+    animation: showcase-progress linear forwards;
+  }
+
+  /* SiteMockup with several frames: they cross-fade on a loop. */
+  @keyframes mock-frame {
+    0%, 42% { opacity: 1; }
+    50%, 92% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  .mock-frame {
+    animation: mock-frame 10s ease-in-out infinite;
+  }
+
+  .group:hover .mock-frame {
+    animation-play-state: paused;
+  }
+
   /* Heavier riso grain for printed colour fields. */
   .band-grain {
     opacity: 0.5;
@@ -1016,15 +976,7 @@ body {
   .morph-letter[data-cut="r70"] .morph-overlay { font-family: var(--font-r70); }
   .morph-letter[data-cut="r100"] .morph-overlay { font-family: var(--font-r100); }
 
-  .font-redaction {
-    font-family: var(--font-redaction), var(--font-display);
-  }
 
-  .year-stack {
-    font-variant-numeric: tabular-nums;
-    line-height: 1.02;
-    letter-spacing: -0.02em;
-  }
 
   .paper {
     position: relative;
@@ -1048,9 +1000,6 @@ body {
   .sl-badge,
   .sl-drift,
   .sl-curtain,
-  .sl-grow {
-    animation: none !important;
-  }
 
   .reveal,
   [data-rv],

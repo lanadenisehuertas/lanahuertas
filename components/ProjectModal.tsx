@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Project } from "@/lib/content";
 import { Lotus, Sparkle4 } from "./Botanicals";
+import { small } from "./ProjectBento";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])';
 
@@ -241,7 +242,7 @@ export default function ProjectModal({
                     }`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={im.src} alt="" className="h-full w-full object-cover" />
+                    <img src={small(im.src)} alt="" loading="lazy" className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>

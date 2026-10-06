@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { engineeringProjects } from "@/lib/content";
 import SiteMockup from "./SiteMockup";
+import AppShowcase from "./AppShowcase";
 import { Lotus, Leaf } from "./Botanicals";
 
 /*
@@ -10,13 +11,19 @@ import { Lotus, Leaf } from "./Botanicals";
 const MOCKS = {
   psyclick: {
     kind: "browser" as const,
-    src: "/work/shot-psyclick.webp",
+    // The live site opens on an animated intro, then lands on the hero. The
+    // hero is the top frame, so it is what shows when motion is reduced.
+    src: "/work/psyclick/landing-hero-sm.webp",
+    src2: "/work/psyclick/landing-intro-sm.webp",
     url: "psyclick-app.vercel.app",
+    app: true,
   },
   debtledger: {
     kind: "phone" as const,
     src: "/work/shot-debtledger.webp",
+    src2: undefined,
     url: "debt-ledger-puce.vercel.app",
+    app: false,
   },
 };
 
@@ -97,11 +104,21 @@ export default function CaseStudy() {
               <SiteMockup
                 kind={m.kind}
                 src={m.src}
+                src2={m.src2}
+                alt2={`${p.title} — website intro`}
                 url={m.url}
                 href={p.href}
                 alt={`${p.title} — live site`}
               />
             </div>
+
+            {/* The product itself — real app screens, full width */}
+            {m.app && (
+              <div className="lg:col-span-2" data-rv>
+                <p className="type-pixel mb-4 text-center text-[11px] text-ink/55">✦ Inside the app</p>
+                <AppShowcase />
+              </div>
+            )}
           </article>
         );
       })}

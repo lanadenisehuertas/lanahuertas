@@ -17,6 +17,9 @@ function fileName(p: Project) {
   return `${p.id.replace(/-/g, "_")}.${ext}`;
 }
 
+/** 720px-wide copy of a poster, made for the grid tiles (public/work/sm). */
+export const small = (src: string) => src.replace("/work/", "/work/sm/");
+
 /** Tilt toward the pointer and steer the gloss band. Mouse only. */
 function tilt(e: PointerEvent<HTMLElement>) {
   if (e.pointerType !== "mouse") return;
@@ -116,7 +119,9 @@ export default function ProjectBento({
             <span className="relative block w-full" style={{ paddingBottom: `${100 / ar}%` }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={cover.src}
+                src={small(cover.src)}
+                srcSet={`${small(cover.src)} 720w, ${cover.src} ${cover.w}w`}
+                sizes="(min-width: 1024px) 34vw, (min-width: 640px) 45vw, 60vw"
                 alt=""
                 width={cover.w}
                 height={cover.h}

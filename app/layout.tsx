@@ -44,6 +44,8 @@ const redaction = localFont({
 const r10 = localFont({
   variable: "--font-r10",
   display: "swap",
+  // Hover-only cut: fetched on first use, not preloaded with the page.
+  preload: false,
   src: [
     { path: "./fonts/redaction/Redaction10-Regular.woff2", style: "normal" },
     { path: "./fonts/redaction/Redaction10-Italic.woff2", style: "italic" },
@@ -53,6 +55,8 @@ const r10 = localFont({
 const r35 = localFont({
   variable: "--font-r35",
   display: "swap",
+  // Hover-only cut: fetched on first use, not preloaded with the page.
+  preload: false,
   src: [
     { path: "./fonts/redaction/Redaction35-Regular.woff2", style: "normal" },
     { path: "./fonts/redaction/Redaction35-Italic.woff2", style: "italic" },
@@ -62,6 +66,8 @@ const r35 = localFont({
 const r70 = localFont({
   variable: "--font-r70",
   display: "swap",
+  // Hover-only cut: fetched on first use, not preloaded with the page.
+  preload: false,
   src: [
     { path: "./fonts/redaction/Redaction70-Regular.woff2", style: "normal" },
     { path: "./fonts/redaction/Redaction70-Italic.woff2", style: "italic" },
@@ -72,6 +78,8 @@ const r70 = localFont({
 const r100 = localFont({
   variable: "--font-r100",
   display: "swap",
+  // Hover-only cut: fetched on first use, not preloaded with the page.
+  preload: false,
   src: "./fonts/redaction/Redaction100-Regular.woff2",
 });
 

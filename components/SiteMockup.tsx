@@ -17,6 +17,8 @@ type Chip = { label: string; value: string; style: CSSProperties };
 export default function SiteMockup({
   kind,
   src,
+  src2,
+  alt2,
   url,
   href,
   alt,
@@ -24,6 +26,9 @@ export default function SiteMockup({
 }: {
   kind: "browser" | "phone";
   src: string;
+  /** Browser only: a second frame to cross-fade with (e.g. an intro, then the hero). */
+  alt2?: string;
+  src2?: string;
   url: string;
   href?: string;
   alt: string;
@@ -40,9 +45,18 @@ export default function SiteMockup({
             {url}
           </span>
         </span>
-        <span className="relative block aspect-[4/3] overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt={alt} loading="lazy" className="mock-pan absolute inset-0 h-full w-full object-cover" />
+        <span className={`relative block overflow-hidden ${src2 ? "aspect-[36/25]" : "aspect-[4/3]"}`}>
+          {src2 ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src2} alt={alt2 ?? alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-top" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={alt} loading="lazy" decoding="async" className="mock-frame absolute inset-0 h-full w-full object-cover object-top" />
+            </>
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={src} alt={alt} loading="lazy" className="mock-pan absolute inset-0 h-full w-full object-cover" />
+          )}
           {/* Fake cursor */}
           <svg aria-hidden viewBox="0 0 16 24" className="mock-cursor absolute h-6 w-4" shapeRendering="crispEdges">
             <path d="M1 1v17l4-4 3 7 3-1-3-7h6z" fill="#fff" stroke="#1b0730" strokeWidth="1.2" />
