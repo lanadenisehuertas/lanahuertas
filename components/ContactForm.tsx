@@ -206,7 +206,7 @@ export default function ContactForm() {
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <a
           href={`mailto:${profile.email}`}
-          className="text-[13px] text-ink/65 underline decoration-ink/25 underline-offset-4 transition-colors hover:text-lavender"
+          className="inline-flex min-h-[44px] items-center text-[13px] text-ink/65 underline decoration-ink/25 underline-offset-4 transition-colors hover:text-lavender"
         >
           or email {profile.email}
         </a>

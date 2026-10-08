@@ -124,7 +124,7 @@ export const metadata: Metadata = {
     locale: "en_PH",
     images: [
       {
-        url: "/og.png",
+        url: "/og.jpg",
         width: 1200,
         height: 630,
         alt: `${profile.name} — portfolio. ${profile.heroLead} ${profile.heroAccent}`,
@@ -135,7 +135,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${profile.name} — Graphic Designer, Video Editor, Software Engineer`,
     description: seoDescription,
-    images: ["/og.png"],
+    images: ["/og.jpg"],
   },
   robots: { index: true, follow: true },
 };
@@ -198,7 +198,7 @@ export default function RootLayout({
               jobTitle: profile.roles.join(", "),
               email: `mailto:${profile.email}`,
               url: siteUrl,
-              image: `${siteUrl}/og.png`,
+              image: `${siteUrl}/og.jpg`,
               address: { "@type": "PostalAddress", addressLocality: "Manila", addressCountry: "PH" },
               alumniOf: { "@type": "CollegeOrUniversity", name: "FEU Institute of Technology" },
               sameAs: socials.filter((s) => s.href.startsWith("http")).map((s) => s.href),

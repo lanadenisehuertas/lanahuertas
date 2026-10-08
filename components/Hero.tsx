@@ -42,8 +42,8 @@ export default function Hero() {
           dissolves into the page on every side, so the garden grows out of
           the hero instead of sitting on it in a box. The end card closes the
           page on the same sky at dusk. */}
-      <div data-rv style={d(260)} className="relative mx-auto mt-2 max-w-6xl px-4 sm:px-8">
-        <div className="bloom-zone relative h-[50vw] max-h-[460px] min-h-[260px]">
+      <div data-rv style={d(260)} className="relative mx-auto mt-2 max-w-6xl px-0 sm:px-8">
+        <div className="bloom-zone relative h-[80vw] max-h-[460px] min-h-[290px] sm:h-[50vw]">
           {/* The sky: full-bleed, edges dissolved */}
           <div
             aria-hidden

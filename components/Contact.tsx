@@ -113,7 +113,7 @@ export default function Contact() {
             </span>
             <a
               href="#top"
-              className="rounded-full border border-ink/40 bg-white/40 px-3 py-1 transition-colors hover:bg-iris hover:text-paper"
+              className="inline-flex min-h-[44px] items-center rounded-full border border-ink/40 bg-white/40 px-4 transition-colors hover:bg-iris hover:text-paper sm:min-h-[34px] sm:px-3"
             >
               Back to top ↑
             </a>
@@ -140,7 +140,7 @@ export default function Contact() {
               />
             </div>
 
-            <p className="mx-auto mt-4 max-w-md text-[15px] text-ink/75">
+            <p className="mx-auto mt-4 max-w-md text-base text-ink/75 sm:text-[15px]">
               Open to UI/UX and design roles, and to freelance brand, event and product work.
             </p>
 

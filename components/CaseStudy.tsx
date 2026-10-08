@@ -56,7 +56,7 @@ export default function CaseStudy() {
               <h3 className="type-display mt-3 text-4xl leading-none text-iris sm:text-5xl">{p.title}</h3>
               <p className="type-display mt-2 text-xl text-lavender italic sm:text-2xl">{p.tagline}</p>
 
-              <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink/80">{p.description}</p>
+              <p className="mt-5 max-w-md text-base leading-relaxed text-ink/80 sm:text-[15px]">{p.description}</p>
 
               <p className="mt-5 text-[13px] text-ink/65">
                 <span className="type-pixel text-[10px] text-ink/50">Role </span>

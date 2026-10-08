@@ -124,7 +124,7 @@ export default function AboutMe() {
         </h3>
         <p className="type-display mt-2 text-3xl text-lavender italic sm:text-4xl">{profile.aboutKicker}</p>
 
-        <p className="mt-6 max-w-xl text-[15px] leading-[1.75] text-ink/80">
+        <p className="mt-6 max-w-xl text-base leading-[1.75] text-ink/80 sm:text-[15px]">
           Publicity art, scalable templates and paced video edits for student organizations and clients, and,
           as a Computer Science student, the interfaces I design I can also build. Detail-obsessed and always on
           time.

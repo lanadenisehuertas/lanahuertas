@@ -229,10 +229,12 @@ mid-twinkle at an arbitrary opacity.
 The site had no Open Graph or Twitter tags, so pasting the link anywhere produced a
 blank card — on a page whose entire purpose is being shared with recruiters.
 
-`public/og.png` is generated in the site's own palette and display face. `metadataBase`
-reads `VERCEL_URL` per deployment, because a relative image path resolves against the
-scraper's host rather than the site and comes back empty. Set `NEXT_PUBLIC_SITE_URL`
-once a custom domain is attached.
+`public/og.jpg` is a capture of the real hero (name, garden, tagline) at 1200×630 with
+poster corner labels, so the preview always matches the live site; re-capture it when the
+hero changes. JPEG keeps it near 70 KB. `metadataBase` reads `VERCEL_PROJECT_PRODUCTION_URL`
+(see `lib/site.ts`), because a relative image path resolves against the scraper's host
+rather than the site and comes back empty. Set `NEXT_PUBLIC_SITE_URL` once a custom
+domain is attached.
 
 ## Outstanding
 

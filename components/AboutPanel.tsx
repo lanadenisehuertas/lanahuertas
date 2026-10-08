@@ -79,7 +79,7 @@ export default function AboutPanel() {
                         </div>
                         <ul className="space-y-2 px-5 py-4 sm:px-6">
                           {e.points.map((pt) => (
-                            <li key={pt} className="flex gap-2.5 text-[14px] leading-relaxed text-ink/85">
+                            <li key={pt} className="flex gap-2.5 text-[15px] leading-relaxed text-ink/85 sm:text-[14px]">
                               <PixelFlower className="mt-[0.45em] h-2.5 w-2.5 shrink-0" fill="#a9b6f0" />
                               {pt}
                             </li>
