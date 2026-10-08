@@ -3,6 +3,7 @@ import { Archivo, Cormorant_Garamond, DM_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { profile, socials } from "@/lib/content";
+import { siteUrl } from "@/lib/site";
 import Nav from "@/components/Nav";
 import PointerFX from "@/components/PointerFX";
 import { BotanicalDefs } from "@/components/Botanicals";
@@ -90,24 +91,20 @@ const mono = DM_Mono({
   display: "swap",
 });
 
-/*
- * Absolute URLs are required for share previews — a relative /og.png resolves
- * against the scraper's own host, not this site, and the preview comes back
- * blank. Vercel injects VERCEL_URL per deployment; set NEXT_PUBLIC_SITE_URL
- * once a custom domain is attached so previews point at the real address.
- */
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+// Leads with both forms of her name, so a search for either matches the snippet.
+const seoDescription = `${profile.short} (${profile.name}) — Manila-based UI/UX designer, graphic designer and video editor. 7+ years in Figma, Photoshop and Premiere Pro, and a Computer Science student at FEU Tech who builds what she designs.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "lana denise huertas",
-  description: profile.welcome,
+  title: `${profile.name} — UI/UX Designer & Graphic Designer`,
+  description: seoDescription,
+  alternates: { canonical: "/" },
   applicationName: "Lana Denise Huertas — Portfolio",
   authors: [{ name: profile.name }],
   creator: profile.name,
   keywords: [
+    profile.name,
+    profile.short,
     "graphic design",
     "video editing",
     "UI/UX design",
@@ -120,7 +117,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: profile.name,
     title: `${profile.name} — Graphic Designer, Video Editor, Software Engineer`,
-    description: profile.welcome,
+    description: seoDescription,
     url: siteUrl,
     locale: "en_PH",
     images: [
@@ -135,7 +132,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: `${profile.name} — Graphic Designer, Video Editor, Software Engineer`,
-    description: profile.welcome,
+    description: seoDescription,
     images: ["/og.png"],
   },
   robots: { index: true, follow: true },
@@ -169,6 +166,9 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Person",
               name: profile.name,
+              alternateName: profile.short,
+              givenName: "Lana Denise",
+              familyName: "Huertas",
               jobTitle: profile.roles.join(", "),
               email: `mailto:${profile.email}`,
               url: siteUrl,

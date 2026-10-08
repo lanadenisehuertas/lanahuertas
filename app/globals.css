@@ -963,6 +963,9 @@ body {
     color: var(--color-lavender);
   }
 
+  /* Drawn from the attribute so the duplicate letter is not page text. */
+  .morph-overlay::before { content: attr(data-ch); }
+
   .morph-letter[data-on] .morph-base { opacity: 0; }
   .morph-letter[data-on] .morph-overlay { opacity: 1; }
 

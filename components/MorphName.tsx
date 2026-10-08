@@ -136,12 +136,14 @@ export default function MorphName({
   let n = 0;
   return (
     <Tag
-      aria-label={label}
       onClick={scramble}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
       className="morph-name select-none"
     >
+      {/* The real heading text. The letters below are drawn twice for the
+          morph, so they are hidden; otherwise crawlers read "LLaannaa". */}
+      <span className="sr-only">{label}</span>
       {words.map((w) => (
         <span key={w.text} aria-hidden className={`block ${w.className}`}>
           {Array.from(w.text).map((ch, k) => {
@@ -158,7 +160,7 @@ export default function MorphName({
                 className="morph-letter"
               >
                 <span className="morph-base">{ch}</span>
-                <span className="morph-overlay">{ch}</span>
+                <span className="morph-overlay" data-ch={ch} />
               </span>
             );
           })}
