@@ -25,6 +25,13 @@ const MOCKS = {
     url: "debt-ledger-puce.vercel.app",
     app: false,
   },
+  algebrawl: {
+    kind: "browser" as const,
+    src: "/work/algebrawl-title.webp",
+    src2: undefined,
+    url: "algebrawl.vercel.app",
+    app: false,
+  },
 };
 
 /**

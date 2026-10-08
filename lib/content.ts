@@ -298,7 +298,7 @@ export type EngineeringProject = {
   href?: string;
   hrefLabel?: string;
   /** Which visual to render beside it. */
-  visual: "psyclick" | "debtledger";
+  visual: "psyclick" | "debtledger" | "algebrawl";
 };
 
 export const engineeringProjects: EngineeringProject[] = [
@@ -329,6 +329,20 @@ export const engineeringProjects: EngineeringProject[] = [
     href: "https://debt-ledger-puce.vercel.app/",
     hrefLabel: "Visit the live site",
     visual: "debtledger",
+  },
+  {
+    n: "03",
+    id: "algebrawl",
+    title: "Algebrawl",
+    tagline: "A pixel-art math battle arena",
+    description:
+      "An arcade-style, turn-based math game where you duel Gauss, Newton and Fibonacci; right answers land hits, wrong ones cost lives. Built as a four-person college project in Java, later ported to the web. I designed the entire UI and hand-drew every sprite: the title screen, menus, buttons, boss animations and battle backgrounds.",
+    role: "UI designer · Pixel artist — college course project",
+    year: "2026",
+    stack: ["Pixel art", "Java Swing", "React", "TypeScript", "Vite", "Tailwind", "KaTeX"],
+    href: "https://algebrawl.vercel.app",
+    hrefLabel: "Play the game",
+    visual: "algebrawl",
   },
 ];
 
