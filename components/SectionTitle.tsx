@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { Sparkle4 } from "./Botanicals";
+import { Sparkle4, Blossom } from "./Botanicals";
+import { Star5, Orbit, PixelArt, type PixelArtName } from "./Ethereal";
 
 /**
  * Section header, after flim.ai: a mono index row on a hairline that draws in
@@ -12,6 +13,7 @@ export default function SectionTitle({
   note,
   id,
   className = "",
+  ornament = "ornament",
 }: {
   lead: string;
   accent: string;
@@ -19,9 +21,17 @@ export default function SectionTitle({
   note?: string;
   id?: string;
   className?: string;
+  /** The dot-matrix ornament set in the right margin. */
+  ornament?: PixelArtName;
 }) {
   return (
-    <header className={`mb-8 sm:mb-10 ${className}`}>
+    <header className={`relative mb-8 sm:mb-10 ${className}`}>
+      <PixelArt
+        name={ornament}
+        className={`absolute right-0 hidden w-auto opacity-50 md:block ${
+          ornament === "flourish" ? "top-16 h-8 lg:h-10" : ornament === "dotButterfly" ? "top-8 h-24 lg:h-28" : "top-2 h-36 lg:h-44"
+        }`}
+      />
       <div
         data-rv
         style={{ "--d": "120ms" } as CSSProperties}
@@ -43,6 +53,12 @@ export default function SectionTitle({
           <Chars text={accent} offset={lead.length + 1} />
         </span>
         <Sparkle4 className="absolute -top-2 -right-9 h-7 w-7 text-sky transition-transform duration-700 ease-out group-hover:rotate-[180deg] group-hover:scale-125 sm:-right-12 sm:h-10 sm:w-10" />
+        {/* A small constellation off the accent word: orbit, star, bud */}
+        <span aria-hidden className="pointer-events-none absolute -top-6 -right-28 hidden w-36 sm:block lg:-right-36 lg:w-44">
+          <Orbit className="w-full -rotate-[12deg] opacity-70" stroke="#a9b6f0" dur="18s" />
+        </span>
+        <Star5 className="twinkle absolute top-[38%] -right-16 hidden h-3 w-3 text-blush sm:block lg:-right-20" />
+        <Blossom className="spin-slow absolute -bottom-1 -right-6 hidden h-6 w-6 sm:block sm:-right-8" />
       </h2>
     </header>
   );

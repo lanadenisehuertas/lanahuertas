@@ -11,8 +11,8 @@ type Chip = { label: string; value: string; style: CSSProperties };
  *            cursor glides in and clicks, and UI chips bob beside it.
  *  phone   — the screen scrolls the full app on a loop; hover pauses it.
  *
- * The whole device is a link to the live site and tilts with the pointer
- * (the same .tile behaviour as the work grid).
+ * The whole device is a link to the live site, with the same quiet .tile
+ * hover as the work grid.
  */
 export default function SiteMockup({
   kind,
@@ -36,7 +36,7 @@ export default function SiteMockup({
 }) {
   const body =
     kind === "browser" ? (
-      <span className="tile relative block overflow-hidden rounded-[6px] border border-ink bg-paper shadow-[6px_6px_0_var(--color-sky)]">
+      <span className="tile relative block overflow-hidden rounded-[6px] border border-ink/30 bg-paper shadow-[0_20px_44px_-28px_rgb(81_1_124/0.4)]">
         <span className="titlebar type-pixel flex h-7 items-center gap-1.5 px-2.5 text-[10px]">
           <span className="closebox" />
           <span className="closebox" style={{ filter: "hue-rotate(60deg)" }} />
@@ -65,7 +65,7 @@ export default function SiteMockup({
         </span>
       </span>
     ) : (
-      <span className="tile relative mx-auto block w-[62%] max-w-[260px] rounded-[26px] border border-ink bg-ink p-2 shadow-[6px_6px_0_var(--color-blush)]">
+      <span className="tile relative mx-auto block w-[62%] max-w-[260px] rounded-[26px] border border-ink bg-ink p-2">
         <span className="absolute top-3.5 left-1/2 z-10 h-1.5 w-12 -translate-x-1/2 rounded-full bg-ink" />
         <span className="mock-screen relative block aspect-[9/17] overflow-hidden rounded-[19px] bg-paper">
           {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -121,21 +121,62 @@ export default function MorphName({
     letters.current.forEach((el) => el?.style.setProperty("--lift", "0"));
   }, []);
 
+  /*
+   * The tell that this is not static text: while the name is on screen and
+   * nobody has touched it yet, a sparkle glints across it every few seconds
+   * and the letters it passes shimmer. The first hover or tap retires it.
+   */
+  const root = useRef<HTMLElement>(null);
+  const played = useRef(false);
+  const markPlayed = useCallback(() => {
+    played.current = true;
+  }, []);
+
   useEffect(() => {
     reduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const t = timers.current;
-    const start = window.setTimeout(wave, 450);
+    // The first wave plays as the opening screen lifts, not underneath it.
+    let start = 0;
+    const begin = () => (start = window.setTimeout(wave, 350));
+    const w = window as Window & { __gardenReady?: boolean };
+    if (w.__gardenReady) begin();
+    else window.addEventListener("garden:ready", begin, { once: true });
     const raf = frame;
+
+    const el = root.current;
+    let visible = false;
+    let idle = 0;
+    const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting), { threshold: 0.4 });
+    if (el) io.observe(el);
+
+    const glint = () => {
+      if (el && visible && !played.current && !reduced.current && document.visibilityState === "visible") {
+        el.dataset.glint = "";
+        const count = letters.current.length;
+        // Shimmer the letters under the sparkle as it passes.
+        [0.3, 0.62].forEach((f) => later(() => trigger(Math.floor(count * f)), 1600 * f));
+        later(() => delete el.dataset.glint, 1700);
+      }
+      idle = window.setTimeout(glint, 6500 + Math.random() * 3000);
+    };
+    idle = window.setTimeout(glint, 4200);
+
     return () => {
       cancelAnimationFrame(raf.current);
       window.clearTimeout(start);
+      window.removeEventListener("garden:ready", begin);
+      window.clearTimeout(idle);
+      io.disconnect();
       t.forEach(window.clearTimeout);
     };
-  }, [wave]);
+  }, [wave, trigger]);
 
   let n = 0;
   return (
     <Tag
+      ref={root as React.Ref<HTMLHeadingElement>}
+      onPointerEnter={markPlayed}
+      onPointerDown={markPlayed}
       onClick={scramble}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
@@ -144,6 +185,13 @@ export default function MorphName({
       {/* The real heading text. The letters below are drawn twice for the
           morph, so they are hidden; otherwise crawlers read "LLaannaa". */}
       <span className="sr-only">{label}</span>
+      <span aria-hidden className="name-glint">
+        <span>
+          <svg viewBox="0 0 24 24" className="h-full w-full" fill="currentColor">
+            <path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z" />
+          </svg>
+        </span>
+      </span>
       {words.map((w) => (
         <span key={w.text} aria-hidden className={`block ${w.className}`}>
           {Array.from(w.text).map((ch, k) => {

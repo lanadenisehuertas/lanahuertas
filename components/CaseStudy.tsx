@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { engineeringProjects } from "@/lib/content";
 import SiteMockup from "./SiteMockup";
 import AppShowcase from "./AppShowcase";
-import { Lotus, Leaf } from "./Botanicals";
+import { PixelFlower } from "./Ethereal";
 
 /*
  * Each project shows its real, live site as a device mockup. Add a project by
@@ -35,49 +35,41 @@ const MOCKS = {
 };
 
 /**
- * Software work. Copy on one side, the live product on the other, sides
- * alternating down the list.
+ * Software work, as one calm reading line: copy on the left, the live product
+ * on the right, the same for every project so the eye never has to re-find
+ * its place. Each product sits on a quiet pearl field that dissolves at the
+ * bottom in the site's pixel dither. PsyClick's app screens wait behind a
+ * disclosure rather than all arriving at once.
  */
 export default function CaseStudy() {
   return (
-    <div className="space-y-14 sm:space-y-20">
-      {engineeringProjects.map((p, i) => {
+    <div className="divide-y divide-ink/10">
+      {engineeringProjects.map((p) => {
         const m = MOCKS[p.visual];
-        const flip = i % 2 === 1;
         return (
-          <article
-            key={p.id}
-            data-rv
-            className={`grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-14 ${i > 0 ? "border-t border-ink/12 pt-14 sm:pt-20" : ""}`}
-          >
-            <div className={flip ? "lg:order-2" : undefined}>
-              <p className="type-pixel text-[11px] text-ink/55">
+          <article key={p.id} className="grid gap-8 py-12 first:pt-2 last:pb-2 lg:grid-cols-12 lg:items-center lg:gap-12 sm:py-16">
+            <div data-rv className="focus-rv lg:col-span-5">
+              <p className="type-pixel flex items-center gap-2 text-[11px] text-ink/55">
+                <PixelFlower className="h-2.5 w-2.5" fill="var(--color-lavender)" />
                 {p.n} · {p.year}
               </p>
-              <h3 className="type-display mt-2 text-5xl text-iris sm:text-6xl">{p.title}</h3>
-              <p className="type-display mt-1 text-2xl text-lavender italic sm:text-3xl">{p.tagline}</p>
+              <h3 className="type-display mt-3 text-4xl leading-none text-iris sm:text-5xl">{p.title}</h3>
+              <p className="type-display mt-2 text-xl text-lavender italic sm:text-2xl">{p.tagline}</p>
 
-              <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-ink/80">{p.description}</p>
+              <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink/80">{p.description}</p>
 
-              <p className="mt-5 text-[13px] text-ink/60">
+              <p className="mt-5 text-[13px] text-ink/65">
                 <span className="type-pixel text-[10px] text-ink/50">Role </span>
                 {p.role.split(" — ")[0]}
               </p>
 
               <ul className="mt-3 flex flex-wrap gap-1.5">
-                {p.stack.slice(0, 5).map((s, k) => (
-                  <li
-                    key={s}
-                    data-rv
-                    style={{ "--d": `${k * 40}ms` } as CSSProperties}
-                    className="rounded-[3px] border border-ink/20 bg-white/50 px-2.5 py-1 text-xs transition-colors duration-150 hover:border-iris hover:bg-iris hover:text-paper"
-                  >
+                {p.stack.slice(0, 4).map((s) => (
+                  <li key={s} className="rounded-full border border-ink/15 bg-white/50 px-2.5 py-0.5 text-xs text-ink/75">
                     {s}
                   </li>
                 ))}
-                {p.stack.length > 5 && (
-                  <li className="rounded-[3px] px-1.5 py-1 text-xs text-ink/50">+{p.stack.length - 5}</li>
-                )}
+                {p.stack.length > 4 && <li className="px-1.5 py-0.5 text-xs text-ink/50">+{p.stack.length - 4}</li>}
               </ul>
 
               {p.href && (
@@ -85,46 +77,50 @@ export default function CaseStudy() {
                   href={p.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="gel mt-7 inline-flex min-h-[46px] items-center gap-2 px-6"
+                  className="hire mt-7 inline-flex min-h-[44px] items-center gap-2 rounded-full px-5 text-[18px] italic"
                 >
-                  {p.hrefLabel ?? "View project"} <span aria-hidden>↗</span>
+                  {p.hrefLabel ?? "View project"} <span aria-hidden className="text-[13px] not-italic">↗</span>
                 </a>
               )}
             </div>
 
-            {/* The product, laid on a garden sheet like the hero */}
-            <div className={`relative ${flip ? "lg:order-1" : ""}`}>
+            {/* The product on a quiet field */}
+            <div data-rv style={{ "--d": "140ms" } as CSSProperties} className="focus-rv relative lg:col-span-7">
               <div
                 aria-hidden
-                className="absolute inset-x-2 inset-y-6 overflow-hidden rounded-[6px] border border-ink/12"
+                className="absolute inset-x-0 inset-y-4 overflow-hidden rounded-[10px]"
                 style={{
                   background:
-                    "radial-gradient(60% 70% at 50% 50%, #fff6ea 0%, transparent 70%), linear-gradient(160deg, #a9b6f0 0%, #c9b9ec 40%, #f2b8cf 75%, #f6d3c3 100%)",
+                    "radial-gradient(60% 70% at 50% 40%, #ffffff 0%, transparent 70%), linear-gradient(170deg, #dfe5fa 0%, #e6dcf6 55%, #f4dbe7 100%)",
                 }}
               >
-                <div className="band-grain absolute inset-0" />
+                <div className="dither absolute inset-x-0 bottom-0 h-1/2 opacity-80" />
               </div>
-              <div aria-hidden className="sl-sprout pointer-events-none absolute -bottom-2 left-0 z-10 w-20 sm:w-24">
-                <Lotus className="sway w-full" deep={i % 2 === 0} />
+              <div className="relative px-6 py-10 sm:px-10">
+                <SiteMockup
+                  kind={m.kind}
+                  src={m.src}
+                  src2={m.src2}
+                  alt2={`${p.title} — website intro`}
+                  url={m.url}
+                  href={p.href}
+                  alt={`${p.title} — live site`}
+                />
               </div>
-              <Leaf className="pointer-events-none absolute top-2 right-0 z-10 w-20 rotate-[200deg]" />
-              <SiteMockup
-                kind={m.kind}
-                src={m.src}
-                src2={m.src2}
-                alt2={`${p.title} — website intro`}
-                url={m.url}
-                href={p.href}
-                alt={`${p.title} — live site`}
-              />
             </div>
 
-            {/* The product itself — real app screens, full width */}
+            {/* The app itself, on request */}
             {m.app && (
-              <div className="lg:col-span-2" data-rv>
-                <p className="type-pixel mb-4 text-center text-[11px] text-ink/55">✦ Inside the app</p>
-                <AppShowcase />
-              </div>
+              <details className="app-peek group lg:col-span-12">
+                <summary className="type-pixel mx-auto flex min-h-[44px] w-fit cursor-pointer list-none items-center gap-2 rounded-full border border-ink/15 bg-white/50 px-4 text-[11px] text-ink/70 transition-colors hover:border-lavender hover:text-iris">
+                  <span aria-hidden className="transition-transform duration-300 group-open:rotate-45">+</span>
+                  <span className="group-open:hidden">See inside the app</span>
+                  <span className="hidden group-open:inline">Hide the app screens</span>
+                </summary>
+                <div className="mt-8">
+                  <AppShowcase />
+                </div>
+              </details>
             )}
           </article>
         );

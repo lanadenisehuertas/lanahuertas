@@ -7,6 +7,8 @@ import { siteUrl } from "@/lib/site";
 import Nav from "@/components/Nav";
 import PointerFX from "@/components/PointerFX";
 import { BotanicalDefs } from "@/components/Botanicals";
+import { Starfield } from "@/components/Ethereal";
+import GardenLoader from "@/components/GardenLoader";
 
 /*
  * Archivo — one grotesk family for everything set in words. Its width axis
@@ -139,7 +141,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f5eee2",
+  themeColor: "#e6ebfb",
 };
 
 export default function RootLayout({
@@ -149,10 +151,34 @@ export default function RootLayout({
 }>) {
   return (
     <html
+      suppressHydrationWarning
       lang="en"
       className={`${archivo.variable} ${cormorant.variable} ${mono.variable} ${redaction.variable} ${r10.variable} ${r35.variable} ${r70.variable} ${r100.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        {/*
+         * Lite mode, decided before first paint: few cores, little memory or
+         * Save-Data get the same garden without blur and grain filters.
+         */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var n=navigator,c=n.hardwareConcurrency||8,m=n.deviceMemory||8,s=n.connection&&n.connection.saveData;if(c<=4||m<=4||s)document.documentElement.setAttribute('data-lite','')}catch(e){}",
+          }}
+        />
+        <GardenLoader />
+        {/*
+         * Lift the opening screen when the page has loaded — never before
+         * ~0.7s so it doesn't flash, never after 3.5s — then tell the page
+         * (MorphName waits for this before its first wave). Seen once per
+         * session; later loads skip straight in.
+         */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}try{if(sessionStorage.getItem('garden-seen')){go();return}}catch(e){}var t0=performance.now();function later(){setTimeout(go,Math.max(0,700-(performance.now()-t0)))}if(document.readyState==='complete')later();else window.addEventListener('load',later);setTimeout(go,3500)})();",
+          }}
+        />
         {/*
          * Person schema. Search engines treat `sameAs` as the link between a
          * name and the profiles that belong to it, which is what makes a search
@@ -180,11 +206,11 @@ export default function RootLayout({
           }}
         />
         <div className="graph-ground" aria-hidden />
+        <Starfield />
         <BotanicalDefs />
         <PointerFX />
         <Nav />
         {children}
-        <div className="grain-plate" aria-hidden />
       </body>
     </html>
   );

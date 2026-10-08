@@ -25,7 +25,7 @@ export default function FolderStack() {
   return (
     <section id="work" className="px-4 pb-20 sm:px-8">
       <div className="relative mx-auto max-w-6xl">
-        <SectionTitle id="work-heading" index="01" lead="Selected" accent="work" />
+        <SectionTitle id="work-heading" index="01" lead="Selected" accent="work" ornament="dotButterfly" />
 
         <Folder tabs={tabs} active={active} onSelect={setActive} labelledBy="work-heading">
           {isCase ? (

@@ -1,7 +1,8 @@
 "use client";
 
-import type { CSSProperties, PointerEvent } from "react";
-import { Lotus, Sparkle4 } from "./Botanicals";
+import type { CSSProperties } from "react";
+import { Lotus, Sparkle4, Blossom, Bellflower } from "./Botanicals";
+import { Cloud, Star5, PixelFlower, PixelArt } from "./Ethereal";
 import type { Project } from "@/lib/content";
 
 /** Desktop-window file name for the title bar — the tool decides the extension. */
@@ -19,24 +20,6 @@ function fileName(p: Project) {
 
 /** 720px-wide copy of a poster, made for the grid tiles (public/work/sm). */
 export const small = (src: string) => src.replace("/work/", "/work/sm/");
-
-/** Tilt toward the pointer and steer the gloss band. Mouse only. */
-function tilt(e: PointerEvent<HTMLElement>) {
-  if (e.pointerType !== "mouse") return;
-  const el = e.currentTarget;
-  const r = el.getBoundingClientRect();
-  const x = (e.clientX - r.left) / r.width;
-  const y = (e.clientY - r.top) / r.height;
-  el.style.setProperty("--ry", `${((x - 0.5) * 9).toFixed(2)}deg`);
-  el.style.setProperty("--rx", `${((0.5 - y) * 9).toFixed(2)}deg`);
-  el.style.setProperty("--mx", (x * 140 - 20).toFixed(1));
-}
-
-function untilt(e: PointerEvent<HTMLElement>) {
-  const el = e.currentTarget;
-  el.style.setProperty("--rx", "0deg");
-  el.style.setProperty("--ry", "0deg");
-}
 
 /**
  * Justified gallery. Each tile is sized by its cover's aspect ratio, so every
@@ -68,7 +51,7 @@ export default function ProjectBento({
       <div
         data-rv
         style={{ "--ar": 0.82 } as CSSProperties}
-        className="relative flex min-h-[150px] flex-col overflow-hidden rounded-[4px] border border-ink bg-iris text-paper"
+        className="bento-info sheet-band relative flex min-h-[150px] flex-col overflow-hidden rounded-[4px] border border-ink text-ink"
       >
         <span className="titlebar type-pixel flex h-[22px] shrink-0 items-center gap-2 px-2 text-[9px]">
           <span aria-hidden className="closebox" />
@@ -77,14 +60,14 @@ export default function ProjectBento({
           </span>
         </span>
         <div className="flex flex-1 flex-col justify-between p-3.5">
-          <p className="type-pixel text-[10px] leading-relaxed text-paper/70">
+          <p className="type-pixel text-[10px] leading-relaxed text-ink/60">
             {range}
           </p>
           <div>
-            <p className="type-display text-7xl tracking-[-0.04em] text-blush italic">
+            <p className="type-display text-7xl tracking-[-0.04em] text-iris italic">
               {String(projects.length).padStart(2, "0")}
             </p>
-            <p className="mt-2 line-clamp-4 hidden text-[12px] leading-snug text-paper/80 sm:block">
+            <p className="mt-2 line-clamp-4 hidden text-[12px] leading-snug text-ink/75 sm:block">
               {blurb}
             </p>
           </div>
@@ -100,11 +83,10 @@ export default function ProjectBento({
             key={p.id}
             type="button"
             onClick={() => onOpen(p)}
-            onPointerMove={tilt}
-            onPointerLeave={untilt}
             aria-label={`Open ${p.title}${p.year ? `, ${p.year}` : ""}`}
             style={{ "--ar": ar, "--d": `${(i % 6) * 60}ms` } as CSSProperties}
-            className="tile sl-rise group relative flex flex-col overflow-hidden rounded-[4px] border border-ink bg-ink text-left"
+            data-rv
+            className="tile group relative flex flex-col overflow-hidden rounded-[4px] border border-ink bg-ink text-left"
           >
             {/* Window chrome */}
             <span className="titlebar type-pixel flex h-[22px] shrink-0 items-center gap-2 px-2 text-[9px]">
@@ -127,7 +109,7 @@ export default function ProjectBento({
                 height={cover.h}
                 loading={i < 8 ? "eager" : "lazy"}
                 decoding="async"
-                className="absolute inset-0 h-full w-full object-cover"
+                className="tile-img absolute inset-0 h-full w-full object-cover"
               />
 
               {p.isVideo && (
@@ -141,8 +123,8 @@ export default function ProjectBento({
                 </span>
               )}
 
-              {/* Caption bar — slides up on hover/focus */}
-              <span className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-between gap-3 border-t border-ink bg-paper px-2.5 py-2 text-ink transition-transform duration-200 ease-out group-hover:translate-y-0 group-focus-visible:translate-y-0">
+              {/* Caption — fades in on hover/focus */}
+              <span className="tile-cap absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 border-t border-ink bg-paper/95 px-2.5 py-2 text-ink">
                 <span className="truncate text-[13px] leading-tight font-semibold tracking-[-0.01em]">
                   {p.title}
                 </span>
@@ -165,7 +147,16 @@ export default function ProjectBento({
           background: "linear-gradient(160deg, #a9b6f0 0%, #f2b8cf 60%, #f6d3c3 100%)",
         }}
       >
+        <Cloud className="drift-x absolute -bottom-[18%] -left-[16%] w-[100%] opacity-90" />
+        <div className="dither absolute inset-x-0 bottom-0 h-1/2 opacity-45" />
         <div className="band-grain absolute inset-0" />
+        <Star5 className="twinkle absolute top-[30%] left-[18%] h-3 w-3 text-white" />
+        <Star5 className="twinkle absolute top-[14%] left-[46%] h-2 w-2 text-white/90 [animation-delay:-1.4s]" />
+        <Blossom className="spin-slow absolute top-[14%] right-[42%] h-7 w-7" />
+        <PixelFlower className="absolute top-[12%] left-[30%] h-5 w-5" />
+        <PixelArt name="sparkle" className="twinkle absolute top-[10%] left-[52%] w-8" />
+        <PixelArt name="heart" className="absolute top-[34%] left-[18%] w-3" />
+        <Bellflower className="sway absolute right-[30%] bottom-0 h-[58%] w-auto" deep />
         <p className="type-pixel relative text-[10px] leading-relaxed text-ink/70">
           end of folder
           <br />

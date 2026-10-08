@@ -49,9 +49,22 @@ export default function ScrollFX() {
     });
     mo.observe(document.body, { childList: true, subtree: true });
 
+    // Sections well off screen pause their ambient loops (see [data-idle]).
+    const idle = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          const el = e.target as HTMLElement;
+          if (e.isIntersecting) delete el.dataset.idle;
+          else el.dataset.idle = "";
+        }),
+      { rootMargin: "200px 0px" }
+    );
+    document.querySelectorAll("main > section").forEach((s) => idle.observe(s));
+
     return () => {
       io.disconnect();
       mo.disconnect();
+      idle.disconnect();
     };
   }, []);
 

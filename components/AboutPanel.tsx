@@ -5,11 +5,10 @@ import { experience, education, skillGroups, certifications, languages } from "@
 import Folder, { type FolderTab } from "./Folder";
 import AboutMe from "./AboutMe";
 import SectionTitle from "./SectionTitle";
-import { Lotus, Orb, Sparkle4 } from "./Botanicals";
+import { Lotus, Sparkle4, Blossom } from "./Botanicals";
+import { PixelFlower } from "./Ethereal";
 
 /* The hero's printed sheet, reused as header strips so every tab matches. */
-const SHEET =
-  "radial-gradient(70% 90% at 30% 20%, #fff6ea 0%, transparent 70%), linear-gradient(120deg, #a9b6f0 0%, #c9b9ec 38%, #f2b8cf 72%, #f6d3c3 100%)";
 
 function PanelHead({ lead, accent }: { lead: string; accent: string }) {
   return (
@@ -43,39 +42,45 @@ export default function AboutPanel() {
             <div>
               <PanelHead lead="Where I've" accent="worked" />
 
-              {/* Vine timeline: a stem down the left, a bead per role. */}
-              <ol className="relative mt-10 space-y-5 pl-9 sm:pl-12">
-                <span aria-hidden className="absolute top-2 bottom-2 left-[13px] w-[3px] rounded-full bg-leaf/70 sm:left-[19px]" />
+              {/* Vine timeline: a living stem down the left with a blossom at
+                  each role (a pulsing bud for the current one). Each role is a
+                  layered sheet: a sky band carrying the dates that dissolves in
+                  pixel dither into a near-white page for the reading. */}
+              <ol className="relative mt-10 space-y-6 pl-10 sm:pl-14">
+                <span
+                  aria-hidden
+                  className="absolute top-3 bottom-3 left-[15px] w-[3px] rounded-full sm:left-[23px]"
+                  style={{ background: "linear-gradient(180deg, #4f9a78, #b9e4cf 50%, #4f9a78)" }}
+                />
                 {experience.map((e, idx) => {
                   const now = /present/i.test(e.period);
                   return (
-                    <li
-                      key={`${e.role}-${e.org}`}
-                      data-rv
-                      style={{ "--d": `${idx * 70}ms` } as CSSProperties}
-                      className="group relative"
-                    >
-                      <Orb
-                        className={`absolute top-5 -left-9 h-7 w-7 transition-transform duration-300 group-hover:scale-125 sm:-left-12 ${now ? "float-badge" : ""}`}
-                      />
-                      <div className="rounded-[6px] border border-ink/12 bg-white/45 p-5 transition-[box-shadow,transform,background-color] duration-200 group-hover:-translate-y-0.5 group-hover:bg-white/75 group-hover:shadow-[5px_5px_0_var(--color-blush)] sm:p-6">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="type-pixel rounded-full bg-iris px-2.5 py-0.5 text-[10px] text-paper">
-                            {e.period}
-                          </span>
-                          {now && (
-                            <span className="type-pixel rounded-full border border-lavender px-2 py-0.5 text-[10px] text-lavender">
-                              ✦ now
-                            </span>
-                          )}
-                          <span className="type-pixel ml-auto text-[10px] text-ink/50">{e.place}</span>
+                    <li key={`${e.role}-${e.org}`} data-rv style={{ "--d": `${idx * 70}ms` } as CSSProperties} className="group relative">
+                      <span aria-hidden className="absolute top-4 -left-10 block h-8 w-8 sm:-left-14 sm:h-9 sm:w-9">
+                        {now ? (
+                          <Lotus className="bud-now h-full w-full" deep />
+                        ) : (
+                          <Blossom className="h-full w-full transition-transform duration-700 group-hover:rotate-[72deg]" deep={idx % 2 === 1} />
+                        )}
+                      </span>
+                      <div className="sheet-card">
+                        <div className="sheet-band px-5 pt-4 pb-6 sm:px-6">
+                          <div className="relative flex flex-wrap items-center gap-2">
+                            <span className="type-pixel rounded-full bg-iris px-2.5 py-0.5 text-[10px] text-paper">{e.period}</span>
+                            {now && (
+                              <span className="type-pixel rounded-full border border-lavender bg-white/60 px-2 py-0.5 text-[10px] text-lavender">
+                                ✦ now
+                              </span>
+                            )}
+                            <span className="type-pixel ml-auto text-[10px] text-ink/60">{e.place}</span>
+                          </div>
+                          <h4 className="type-display relative mt-3 text-2xl leading-tight text-iris sm:text-[1.9rem]">{e.role}</h4>
+                          <p className="type-display relative text-lg text-lavender italic">{e.org}</p>
                         </div>
-                        <h4 className="type-display mt-3 text-2xl leading-tight text-iris sm:text-[1.9rem]">{e.role}</h4>
-                        <p className="type-display text-lg text-lavender italic">{e.org}</p>
-                        <ul className="mt-3 space-y-1.5">
+                        <ul className="space-y-2 px-5 py-4 sm:px-6">
                           {e.points.map((pt) => (
-                            <li key={pt} className="flex gap-2 text-[14px] leading-relaxed text-ink/80">
-                              <span aria-hidden className="mt-[0.35em] text-[10px] text-sky">✦</span>
+                            <li key={pt} className="flex gap-2.5 text-[14px] leading-relaxed text-ink/85">
+                              <PixelFlower className="mt-[0.45em] h-2.5 w-2.5 shrink-0" fill="#a9b6f0" />
                               {pt}
                             </li>
                           ))}
@@ -98,10 +103,9 @@ export default function AboutPanel() {
                     key={e.school}
                     data-rv
                     style={{ "--d": `${idx * 80}ms` } as CSSProperties}
-                    className="group relative overflow-hidden rounded-[6px] border border-ink/15 bg-white/50 transition-shadow duration-200 hover:shadow-[5px_5px_0_var(--color-sky)]"
+                    className="sheet-card group relative"
                   >
-                    <div className="relative h-24 overflow-hidden" style={{ background: SHEET }}>
-                      <div className="band-grain absolute inset-0" />
+                    <div className="sheet-band relative h-24 overflow-hidden">
                       <p className="type-display absolute bottom-2 left-5 text-3xl text-iris italic">{e.period}</p>
                       <Lotus className="sway absolute -right-2 -bottom-4 w-20 transition-transform duration-500 group-hover:scale-110" deep={idx === 1} />
                     </div>
@@ -137,13 +141,12 @@ export default function AboutPanel() {
                     key={c.name}
                     data-rv
                     style={{ "--d": `${idx * 70}ms` } as CSSProperties}
-                    className="group flex overflow-hidden rounded-[6px] border border-ink/15 bg-white/60 transition-transform duration-200 hover:-rotate-1"
+                    className="sheet-card group flex"
                   >
-                    <div className="relative flex w-14 shrink-0 items-center justify-center" style={{ background: SHEET }}>
-                      <div className="band-grain absolute inset-0" />
+                    <div className="sheet-band flex w-14 shrink-0 items-center justify-center">
                       <Sparkle4 className="relative h-6 w-6 text-white transition-transform duration-500 group-hover:rotate-180" />
                     </div>
-                    <div className="border-l-2 border-dashed border-ink/20 p-4">
+                    <div className="border-l border-dashed border-ink/20 p-4">
                       <p className="type-display text-lg leading-snug text-iris">{c.name}</p>
                       <p className="mt-1 text-[12px] text-ink/70">{c.issuer}</p>
                       <p className="type-pixel mt-2 text-[10px] text-ink/50">
@@ -166,10 +169,9 @@ export default function AboutPanel() {
                     key={g.label}
                     data-rv
                     style={{ "--d": `${(i % 3) * 70}ms` } as CSSProperties}
-                    className="group overflow-hidden rounded-[6px] border border-ink/15 bg-white/50 transition-shadow duration-200 hover:shadow-[5px_5px_0_var(--color-blush)]"
+                    className="sheet-card group"
                   >
-                    <div className="relative flex items-end justify-between overflow-hidden px-4 pt-6 pb-2" style={{ background: SHEET }}>
-                      <div className="band-grain absolute inset-0" />
+                    <div className="sheet-band flex items-end justify-between px-4 pt-6 pb-2">
                       <p className="type-display relative text-2xl text-iris capitalize">{g.label}</p>
                       <p className="type-display relative text-3xl text-white italic">{String(i + 1).padStart(2, "0")}</p>
                     </div>

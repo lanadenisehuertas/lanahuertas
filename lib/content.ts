@@ -48,34 +48,16 @@ export const profile = {
   // Street address deliberately omitted — full address lives on the resume only.
   location: "Manila, Philippines",
   email: "lanadenisehuertas@gmail.com",
-  years: "7+ years",
 
-  title: "Hi, I'm Lana.",
-  titleRole: "UI/UX designer, graphic designer, video editor, and problem solver.",
-  // Hero. Kept to one line and one supporting line — everything else about
-  // her is stated properly further down the page.
+  // The line printed on the share image (og.png alt text).
   heroLead: "I make work that's",
   heroAccent: "hard to scroll past.",
   // One-line subheading under the morphing name.
   heroShort: "UI/UX & visual designer in Manila, making work that's hard to scroll past.",
-  // Current role, shown in the hero readout.
-  now: "UI/UX Design Intern @ Eden Holdings",
-  heroSub: "UI/UX and visual designer, Manila-based · 7+ years across Figma, Photoshop and Premiere · CS student who ships what she designs.",
 
-  welcome:
-    "Welcome to my portfolio. Manila-based UI/UX and visual designer, 7+ years deep in Figma, Photoshop and Premiere Pro, turning rough ideas into work that holds attention.",
-
-  shortAbout:
-    "Brand identities, publicity materials, and video edits that get looked at twice. Fast, detail-obsessed, always on time. Now studying Computer Science at FEU Tech — so I build what I design.",
-
-  // Long-form about, shown in the About Me folder tab.
+  // About Me tab: headline and kicker.
   aboutHeadline: "I build high-quality visual content and adaptable designs for brands that want to stand out.",
   aboutKicker: "And I can do it for you, too.",
-  aboutBody:
-    "I pride myself on being a highly adaptable creative. I bring a meticulous eye for detail and a versatile skill set, backed by 7+ years in Photoshop, 6 years in Premiere Pro, and a sharp command of Illustrator. From crafting high-impact publicity materials and scalable templates to pacing dynamic video edits, I handle the creative heavy lifting so you don't have to.",
-
-  summary:
-    "Creative professional with 7+ years in graphic design, video editing, and social media content, dating back to 2019 through freelance, school, and organizational work. Advanced in Photoshop, Illustrator, Premiere Pro, After Effects, and Canva, producing branded graphics, promotional videos, and multi-platform social content aligned to client brand voice. Experienced managing content calendars and coordinating remote creative teams across Facebook, Instagram, TikTok, and X. Currently completing a B.S. in Computer Science — Software Engineering.",
 };
 
 /** Tool badges shown floating around the portrait. */

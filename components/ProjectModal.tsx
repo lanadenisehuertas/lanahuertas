@@ -143,7 +143,7 @@ export default function ProjectModal({
       {/* The window */}
       <div
         ref={panelRef}
-        className="sheet-in relative flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-[8px] border border-ink/50 bg-paper text-ink shadow-[8px_8px_0_var(--color-sky),0_30px_60px_-20px_rgb(81_1_124/0.45)]"
+        className="sheet-in relative flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-[8px] border border-ink/50 bg-paper text-ink shadow-[0_30px_60px_-28px_rgb(81_1_124/0.45)]"
       >
         {/* Aero title bar — the pink bead closes it */}
         <div className="titlebar type-pixel flex h-10 shrink-0 items-center gap-3 px-3 text-[11px]">
@@ -182,7 +182,7 @@ export default function ProjectModal({
                   title={project.title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  className="h-full w-full rounded-[4px] border border-ink/40 shadow-[5px_5px_0_var(--color-blush)]"
+                  className="h-full w-full rounded-[4px] border border-ink/40"
                 />
               </div>
             ) : (
@@ -194,7 +194,7 @@ export default function ProjectModal({
                   alt={shown.caption ?? project.title}
                   width={shown.w}
                   height={shown.h}
-                  className="card-in mx-auto block max-h-[60vh] w-auto max-w-full rounded-[4px] border border-ink/40 object-contain shadow-[5px_5px_0_var(--color-blush)]"
+                  className="card-in mx-auto block max-h-[60vh] w-auto max-w-full rounded-[4px] border border-ink/40 object-contain"
                 />
                 {count > 1 && (
                   <>
@@ -237,7 +237,7 @@ export default function ProjectModal({
                     onClick={() => setIdx(i)}
                     className={`h-14 w-14 shrink-0 overflow-hidden rounded-[4px] border transition duration-200 ${
                       i === idx
-                        ? "-translate-y-0.5 border-ink shadow-[3px_3px_0_var(--color-iris)]"
+                        ? "-translate-y-0.5 border-ink"
                         : "border-ink/30 opacity-70 hover:opacity-100"
                     }`}
                   >

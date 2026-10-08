@@ -83,7 +83,7 @@ export default function AppShowcase() {
       className="relative"
     >
       {/* The window */}
-      <div className="tile relative overflow-hidden rounded-[8px] border border-ink/60 bg-paper shadow-[8px_8px_0_var(--color-sky),0_30px_60px_-24px_rgb(81_1_124/0.45)]">
+      <div className="tile relative overflow-hidden rounded-[8px] border border-ink/60 bg-paper shadow-[0_24px_50px_-28px_rgb(81_1_124/0.4)]">
         <div className="titlebar type-pixel flex h-8 items-center gap-1.5 px-3 text-[10px]">
           <span className="closebox" />
           <span className="closebox" style={{ filter: "hue-rotate(60deg)" }} />

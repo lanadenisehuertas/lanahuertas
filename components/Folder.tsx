@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { Leaf, Blossom, Bellflower, Fern } from "./Botanicals";
+import { PixelFlower, PixelArt } from "./Ethereal";
 
 export type FolderTab = {
   id: string;
@@ -106,9 +108,39 @@ export default function Folder({
         id={`panel-${activeTab.id}`}
         role={interactive ? "tabpanel" : undefined}
         aria-labelledby={labelledBy}
-        className="glass sheet-in sl-curtain relative rounded-[6px] p-5 text-ink sm:p-8"
+        className="glass sheet-in sl-curtain relative isolate rounded-[6px] p-5 text-ink sm:p-8"
       >
+        <PixelArt name="lotus" className="absolute right-4 bottom-4 -z-10 w-28 opacity-[0.13] sm:w-36" />
         {children}
+      </div>
+
+      {/* Corner sprigs: outside the keyed panel so they stay put across tabs */}
+      <div aria-hidden className="pointer-events-none">
+        <div className="absolute -top-7 right-6 hidden w-24 sm:block" data-react="leaf">
+          <span className="react block">
+            <Leaf className="sway w-full -rotate-[160deg]" />
+          </span>
+        </div>
+        <div className="absolute -top-5 right-24 hidden w-9 sm:block" data-react="blossom">
+          <span className="react block">
+            <Blossom className="w-full" deep />
+          </span>
+        </div>
+        <div className="absolute -top-9 right-36 hidden w-5 sm:block" data-react="pixel">
+          <span className="react block">
+            <PixelFlower className="w-full" fill="#a9b6f0" />
+          </span>
+        </div>
+        <div className="absolute -bottom-6 -left-4 w-10 sm:-left-7 sm:w-12" data-react="leaf">
+          <span className="react block">
+            <Fern className="sway w-full -rotate-[8deg]" />
+          </span>
+        </div>
+        <div className="absolute -bottom-4 left-4 w-9 sm:left-3 sm:w-11" data-react="bell">
+          <span className="react block">
+            <Bellflower className="sway w-full rotate-[6deg]" />
+          </span>
+        </div>
       </div>
     </div>
   );

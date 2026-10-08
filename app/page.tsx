@@ -4,6 +4,7 @@ import AboutPanel from "@/components/AboutPanel";
 import Contact from "@/components/Contact";
 import ScrollFX from "@/components/ScrollFX";
 import ScrollVine from "@/components/ScrollVine";
+import GardenFX from "@/components/GardenFX";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
       <Contact />
       <ScrollFX />
       <ScrollVine />
+      <GardenFX />
     </main>
   );
 }
