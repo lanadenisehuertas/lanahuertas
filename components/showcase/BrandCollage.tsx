@@ -101,7 +101,7 @@ function Cover({ brand, eager }: { brand: Brand; eager: boolean }) {
         <PhoneFrame key={img.src} img={img} handle={brand.handle} className="hidden sm:block" style={place({ l: "38%", b: "-8%", w: "16%", rot: -6, z: 3 }, 1)} />
       ))}
       {brand.collage.print?.slice(0, 1).map((img) => (
-        <PrintFrame key={img.src} img={img} className="hidden lg:block" style={place({ l: "2%", t: "-2%", w: "20%", rot: -6, z: 0 }, 2)} />
+        <PrintFrame key={img.src} img={img} className="hidden lg:block" style={place({ l: "2%", t: "4%", w: "20%", rot: -6, z: 0 }, 2)} />
       ))}
     </div>
   );

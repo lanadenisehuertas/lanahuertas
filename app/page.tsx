@@ -1,5 +1,6 @@
 import Hero from "@/components/Hero";
 import FolderStack from "@/components/FolderStack";
+import BrandShowcase from "@/components/showcase/BrandShowcase";
 import AboutPanel from "@/components/AboutPanel";
 import Contact from "@/components/Contact";
 import ScrollFX from "@/components/ScrollFX";
@@ -11,6 +12,7 @@ export default function Home() {
     <main id="top">
       {/* intro -> the work -> about -> contact */}
       <Hero />
+      <BrandShowcase />
       <FolderStack />
       <AboutPanel />
       <Contact />

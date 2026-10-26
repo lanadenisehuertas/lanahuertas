@@ -13,7 +13,7 @@ const SHELL: Record<BrandLayout, { art: string; card: string }> = {
   wall: { art: "lg:col-span-7 lg:col-start-6 lg:row-start-1", card: "lg:col-span-5 lg:col-start-1 lg:row-start-1" },
   mirror: { art: "lg:col-span-7 lg:col-start-1 lg:row-start-1", card: "lg:col-span-5 lg:col-start-8 lg:row-start-1" },
   fan: { art: "lg:col-span-7 lg:col-start-1 lg:row-start-1", card: "lg:col-span-5 lg:col-start-8 lg:row-start-1" },
-  cover: { art: "lg:col-span-12 lg:col-start-1 lg:row-start-1", card: "lg:col-span-5 lg:col-start-1 lg:row-start-1 lg:self-end lg:z-10" },
+  cover: { art: "lg:col-span-12 lg:col-start-1 lg:row-start-1", card: "lg:col-span-5 lg:col-start-1 lg:row-start-1 lg:mb-10 lg:self-end lg:z-10" },
   stickers: { art: "lg:col-span-12 lg:col-start-1 lg:row-start-1", card: "lg:col-span-4 lg:col-start-5 lg:row-start-1 lg:self-center lg:z-10" },
 };
 
