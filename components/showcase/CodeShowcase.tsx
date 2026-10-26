@@ -13,7 +13,7 @@ export default function CodeShowcase() {
         <CodeSlide key={p.id} p={p} n={i + 1} total={total} />
       ))}
       <div className="mt-10 text-center">
-        <a href="/ui-ux" className="gel inline-flex min-h-[48px] items-center gap-2 px-6">
+        <a href="/ui-ux" className="btn inline-flex min-h-[48px] items-center gap-2 px-6">
           All case studies <span aria-hidden>→</span>
         </a>
       </div>

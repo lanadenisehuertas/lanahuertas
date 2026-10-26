@@ -38,10 +38,10 @@ export default function Hero() {
         }}
       >
         <div className="px absolute top-[8%] right-[6%] w-[26%]" style={depth(-3)}>
-          <Cloud className="drift-x dof-far w-full opacity-70" style={{ "--dur": "26s" } as CSSProperties} />
+          <Cloud priority className="drift-x dof-far w-full opacity-70" style={{ "--dur": "26s" } as CSSProperties} />
         </div>
         <div className="px absolute top-[30%] -left-[12%] w-[46%]" style={depth(-4)}>
-          <Cloud className="drift-x dof-mid w-full -scale-x-100 opacity-85" style={{ "--dur": "22s", "--td": "-8s" } as CSSProperties} />
+          <Cloud priority className="drift-x dof-mid w-full -scale-x-100 opacity-85" style={{ "--dur": "22s", "--td": "-8s" } as CSSProperties} />
         </div>
         <div className="px absolute -right-[14%] bottom-[18%] w-[70%]" style={depth(-6)}>
           <Cloud className="drift-x w-full" style={{ "--dur": "30s", "--drift": "-36px" } as CSSProperties} />
@@ -205,7 +205,7 @@ export default function Hero() {
             {profile.heroShort}
           </p>
           <div data-rv style={d(480)} className="mt-6 flex justify-center">
-            <a href="#branding" className="gel flex min-h-[46px] items-center gap-2 px-5">
+            <a href="#branding" className="btn flex min-h-[46px] items-center gap-2 px-5">
               See the work <span aria-hidden>↓</span>
             </a>
           </div>

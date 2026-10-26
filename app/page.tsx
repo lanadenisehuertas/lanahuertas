@@ -5,6 +5,7 @@ import CodeShowcase from "@/components/showcase/CodeShowcase";
 import AboutPanel from "@/components/AboutPanel";
 import Contact from "@/components/Contact";
 import ScrollFX from "@/components/ScrollFX";
+import { brandOrgs } from "@/lib/brands";
 import ScrollVine from "@/components/ScrollVine";
 import GardenFX from "@/components/GardenFX";
 
@@ -16,7 +17,7 @@ export default function Home() {
       <BrandShowcase />
       <VideoShowcase />
       <CodeShowcase />
-      <AboutPanel />
+      <AboutPanel orgs={brandOrgs()} />
       <Contact />
       <ScrollFX />
       <ScrollVine />

@@ -12,12 +12,16 @@ const LINKS = [
   { id: "contact", label: "contact", n: "05" },
 ];
 
+/** The section each sub-page belongs to, so the nav can mark it. */
+const PAGE_SECTION: Record<string, string> = { "/design": "branding", "/videos": "videos", "/ui-ux": "code" };
+
 const MANILA = new Intl.DateTimeFormat("en-PH", { timeZone: "Asia/Manila", hour: "numeric", minute: "2-digit" });
 
 /**
  * Masthead, set like the top of a printed poster: a pixel-flower mark and
- * the name in italic serif; the sections as a lowercase index with a sparkle
- * that follows where you are; Manila time and a thin "hire me" at the end.
+ * the name in italic serif; the sections as a printed index, the current one
+ * underlined (the section in view on the homepage, the page itself on a
+ * sub-page); Manila time and the "hire me" button at the end.
  *
  * Clear over the hero. Once the page scrolls it becomes a pearl band whose
  * lower edge fades out instead of ending on a rule.
@@ -44,8 +48,9 @@ export default function Nav() {
       const el = document.getElementById(l.id);
       if (el) spy.observe(el);
     });
+    // On the homepage, the hero clears the mark; sub-pages have no hero.
     const top = new IntersectionObserver(([e]) => e.isIntersecting && setActive(null), { rootMargin: "0px 0px -60% 0px" });
-    const hero = document.querySelector("main > section");
+    const hero = home ? document.querySelector("main > section") : null;
     if (hero) top.observe(hero);
 
     // Rendered after mount so server and client never disagree on the minute.
@@ -59,7 +64,9 @@ export default function Nav() {
       top.disconnect();
       window.clearInterval(clock);
     };
-  }, []);
+  }, [home]);
+
+  const page = PAGE_SECTION[pathname];
 
   return (
     <header className={`masthead fixed inset-x-0 top-0 z-50 ${scrolled ? "is-scrolled" : ""}`}>
@@ -69,26 +76,14 @@ export default function Nav() {
           <span className="type-display text-[19px] leading-none italic">Lana Denise Huertas</span>
         </a>
 
-        <ul className="hidden items-center gap-8 md:flex">
+        <ul className="hidden items-center gap-6 md:flex">
           {LINKS.map((l) => {
-            const on = active === l.id;
+            const current = page === l.id ? "page" : active === l.id ? "location" : undefined;
             return (
               <li key={l.id}>
-                <a
-                  href={href(l.id)}
-                  aria-current={on ? "location" : undefined}
-                  className={`nav-link relative flex min-h-[44px] items-center gap-1.5 text-[14px] transition-colors ${
-                    on ? "text-iris" : "text-ink/70 hover:text-iris"
-                  }`}
-                >
-                  <span className="type-pixel text-[9px] text-ink/40">{l.n}</span>
+                <a href={href(l.id)} aria-current={current} className="nav-link">
+                  <span className="opacity-50">{l.n}</span>
                   {l.label}
-                  <svg aria-hidden viewBox="0 0 24 24" className="nav-spark absolute -bottom-0.5 left-1/2 h-2.5 w-2.5 text-lavender">
-                    <path
-                      d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"
-                      fill="currentColor"
-                    />
-                  </svg>
                 </a>
               </li>
             );
@@ -100,7 +95,7 @@ export default function Nav() {
             <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-leaf" />
             manila {time || " "}
           </span>
-          <a href="#contact" className="hire flex min-h-[40px] items-center gap-1.5 rounded-full px-4 text-[17px] italic">
+          <a href="#contact" className="btn inline-flex min-h-[40px] items-center gap-1.5 px-4 text-[16px]">
             Hire me <span aria-hidden className="text-[13px] not-italic">↗</span>
           </a>
         </div>

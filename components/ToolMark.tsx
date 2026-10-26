@@ -33,6 +33,8 @@ export default function ToolMark({ id, size }: { id: string; size: number }) {
       alt=""
       width={mark.w}
       height={mark.h}
+      loading="lazy"
+      decoding="async"
       // The badge is already role="img" with a label, so this must not be
       // announced a second time.
       aria-hidden

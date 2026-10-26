@@ -6,11 +6,11 @@ import ProjectBento from "../ProjectBento";
 import ProjectModal from "../ProjectModal";
 
 /** The justified gallery and its lightbox, for one list of pieces. */
-export default function SetGallery({ items, heading, blurb }: { items: Project[]; heading: string; blurb: string }) {
+export default function SetGallery({ items, heading, blurb, eager = false }: { items: Project[]; heading: string; blurb: string; eager?: boolean }) {
   const [sel, setSel] = useState<Project | null>(null);
   return (
     <>
-      <ProjectBento projects={items} heading={heading} blurb={blurb} onOpen={setSel} />
+      <ProjectBento projects={items} heading={heading} blurb={blurb} onOpen={setSel} eager={eager} />
       <ProjectModal project={sel} categoryLabel={heading} onClose={() => setSel(null)} />
     </>
   );

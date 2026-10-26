@@ -16,7 +16,7 @@ export default function VideoEmbed({ p }: { p: Project }) {
       ) : (
         <button type="button" onClick={() => setOn(true)} disabled={!src} aria-label={`Play ${p.title}`} className="group absolute inset-0 cursor-pointer">
           <Pic img={p.images[0]} sizes="(min-width: 1024px) 60vw, 92vw" className="h-full w-full object-cover" />
-          <span aria-hidden className="gel !absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center !p-0 after:hidden">
+          <span aria-hidden className="btn !absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center !p-0 after:hidden">
             <svg viewBox="0 0 24 24" className="ml-1 h-6 w-6 fill-white">
               <path d="M8 5v14l11-7z" />
             </svg>

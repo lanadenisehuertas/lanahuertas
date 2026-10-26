@@ -15,7 +15,7 @@ export default function VideosPage() {
   return (
     <main id="top">
       <div className="mx-auto max-w-6xl px-4 pt-32 sm:px-8">
-        <SectionTitle id="videos-heading" index="02" lead="Moving" accent="pictures" note={`${videos.length} edits`} />
+        <SectionTitle as="h1" id="videos-heading" index="02" lead="Moving" accent="pictures" note={`${videos.length} edits`} />
       </div>
       <div className="mx-auto max-w-6xl divide-y divide-ink/10 px-4 sm:px-8">
         {videos.map((p) => (

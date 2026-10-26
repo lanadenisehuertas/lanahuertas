@@ -65,7 +65,7 @@ export default function CaseStudy() {
 
               <ul className="mt-3 flex flex-wrap gap-1.5">
                 {p.stack.slice(0, 4).map((s) => (
-                  <li key={s} className="rounded-full border border-ink/15 bg-white/50 px-2.5 py-0.5 text-xs text-ink/75">
+                  <li key={s} className="chip">
                     {s}
                   </li>
                 ))}
@@ -77,7 +77,7 @@ export default function CaseStudy() {
                   href={p.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hire mt-7 inline-flex min-h-[44px] items-center gap-2 rounded-full px-5 text-[18px] italic"
+                  className="btn-ghost mt-7 inline-flex min-h-[44px] items-center gap-2 px-5"
                 >
                   {p.hrefLabel ?? "View project"} <span aria-hidden className="text-[13px] not-italic">↗</span>
                 </a>
@@ -112,7 +112,7 @@ export default function CaseStudy() {
             {/* The app itself, on request */}
             {m.app && (
               <details className="app-peek group lg:col-span-12">
-                <summary className="type-pixel mx-auto flex min-h-[44px] w-fit cursor-pointer list-none items-center gap-2 rounded-full border border-ink/15 bg-white/50 px-4 text-[11px] text-ink/70 transition-colors hover:border-lavender hover:text-iris">
+                <summary className="btn-ghost mx-auto flex min-h-[44px] w-fit cursor-pointer list-none items-center gap-2 px-5">
                   <span aria-hidden className="transition-transform duration-300 group-open:rotate-45">+</span>
                   <span className="group-open:hidden">See inside the app</span>
                   <span className="hidden group-open:inline">Hide the app screens</span>

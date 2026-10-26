@@ -24,7 +24,7 @@ export default function EndSlide({ title, accent, note, href, label }: { title: 
         <p className="type-display mt-4 text-6xl text-iris sm:text-8xl">
           {title} <span className="text-lavender italic">{accent}</span>
         </p>
-        <a href={href} className="gel mx-auto mt-8 inline-flex min-h-[48px] items-center gap-2 px-6">
+        <a href={href} className="btn mx-auto mt-8 inline-flex min-h-[48px] items-center gap-2 px-6">
           {label} <span aria-hidden>→</span>
         </a>
         <Sparkle4 className="spin-slow absolute -top-6 right-2 h-8 w-8 text-white" />

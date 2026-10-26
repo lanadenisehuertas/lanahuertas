@@ -3,8 +3,8 @@ import { Sparkle4, Blossom } from "./Botanicals";
 import { Star5, Orbit, PixelArt, type PixelArtName } from "./Ethereal";
 
 /**
- * Section header, after flim.ai: a mono index row on a hairline that draws in
- * as it scrolls into view, then one large tight headline wiping up from a mask.
+ * Section opener: the index, then one large headline rising letter by
+ * letter. Sub-pages render it as their h1.
  */
 export default function SectionTitle({
   lead,
@@ -14,6 +14,7 @@ export default function SectionTitle({
   id,
   className = "",
   ornament = "ornament",
+  as: Heading = "h2",
 }: {
   lead: string;
   accent: string;
@@ -23,9 +24,13 @@ export default function SectionTitle({
   className?: string;
   /** The dot-matrix ornament set in the right margin. */
   ornament?: PixelArtName;
+  /** h1 on a page whose opener this is. */
+  as?: "h1" | "h2";
 }) {
   return (
-    <header className={`relative mb-8 sm:mb-10 ${className}`}>
+    <header className={`relative isolate mb-8 sm:mb-10 ${className}`}>
+      {/* A dot screen fading out behind the title, like light through a print. */}
+      <span aria-hidden className="halftone pointer-events-none absolute -top-10 -left-16 -z-10 h-[150%] w-[min(760px,90vw)] opacity-[0.22]" />
       <PixelArt
         name={ornament}
         className={`absolute right-0 hidden w-auto opacity-50 md:block ${
@@ -35,21 +40,18 @@ export default function SectionTitle({
       <div
         data-rv
         style={{ "--d": "120ms" } as CSSProperties}
-        className="type-pixel flex items-center justify-between gap-4 text-[11px] text-ink/55"
+        className="flex items-end justify-between gap-4"
       >
-        <span className="flex items-center gap-2">
-          <span aria-hidden className="text-lavender">✦</span>
-          {index}
-        </span>
-        {note && <span>{note}</span>}
+        <span className="idx">{index}</span>
+        {note && <span className="hand text-[1.35rem]">{note}</span>}
       </div>
-      <h2
+      <Heading
         id={id}
         aria-label={`${lead} ${accent}`}
         className="group type-display relative mt-6 inline-block text-[15vw] text-iris sm:text-8xl lg:text-9xl"
       >
         <Chars text={lead} />{" "}
-        <span className="text-lavender italic">
+        <span className="glow text-lavender italic">
           <Chars text={accent} offset={lead.length + 1} />
         </span>
         <Sparkle4 className="absolute -top-2 -right-9 h-7 w-7 text-sky transition-transform duration-700 ease-out group-hover:rotate-[180deg] group-hover:scale-125 sm:-right-12 sm:h-10 sm:w-10" />
@@ -59,7 +61,7 @@ export default function SectionTitle({
         </span>
         <Star5 className="twinkle absolute top-[38%] -right-16 hidden h-3 w-3 text-blush sm:block lg:-right-20" />
         <Blossom className="spin-slow absolute -bottom-1 -right-6 hidden h-6 w-6 sm:block sm:-right-8" />
-      </h2>
+      </Heading>
     </header>
   );
 }

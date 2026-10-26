@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Project } from "@/lib/content";
 import { Lotus, Sparkle4 } from "./Botanicals";
+import { InkArrow } from "./Ink";
 import { small } from "./ProjectBento";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])';
@@ -202,17 +203,17 @@ export default function ProjectModal({
                       type="button"
                       aria-label="Previous piece"
                       onClick={() => setIdx((idx - 1 + count) % count)}
-                      className="bloom-orb absolute top-1/2 left-1 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full"
+                      className="btn-ghost btn-icon !absolute top-1/2 left-1 -translate-y-1/2 rounded-full bg-[#fffdf8]/90"
                     >
-                      <span aria-hidden className="relative">←</span>
+                      <InkArrow dir="left" className="h-5 w-8" />
                     </button>
                     <button
                       type="button"
                       aria-label="Next piece"
                       onClick={() => setIdx((idx + 1) % count)}
-                      className="bloom-orb absolute top-1/2 right-1 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full"
+                      className="btn-ghost btn-icon !absolute top-1/2 right-1 -translate-y-1/2 rounded-full bg-[#fffdf8]/90"
                     >
-                      <span aria-hidden className="relative">→</span>
+                      <InkArrow className="h-5 w-8" />
                     </button>
                   </>
                 )}
@@ -285,7 +286,7 @@ export default function ProjectModal({
             {project.tools && project.tools.length > 0 && (
               <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Made with">
                 {project.tools.map((t) => (
-                  <li key={t} className="rounded-full border border-ink/15 bg-white/70 px-3 py-1 text-[12px]">
+                  <li key={t} className="chip">
                     {t}
                   </li>
                 ))}
@@ -297,7 +298,7 @@ export default function ProjectModal({
                 href={project.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="gel mt-8 inline-flex min-h-[48px] items-center px-7"
+                className="btn mt-8 inline-flex min-h-[48px] items-center px-7"
               >
                 {project.hrefLabel ?? "View project"} ↗
               </a>

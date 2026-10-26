@@ -78,7 +78,7 @@ export default function Folder({
       {interactive && (
         <div
           ref={stripRef}
-          className="-mx-1 mb-3 flex gap-1.5 overflow-x-auto px-1 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="seg mb-4 max-w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           role="tablist"
         >
           {tabs.map((t, i) => {
@@ -91,11 +91,9 @@ export default function Folder({
                 aria-selected={isActive}
                 aria-controls={`panel-${t.id}`}
                 onClick={() => onSelect(t.id)}
-                className={`pill type-pixel flex min-h-[40px] shrink-0 items-center gap-2 px-3.5 text-[11px] whitespace-nowrap ${
-                  isActive ? "pill-active" : ""
-                }`}
+                className="seg-btn shrink-0"
               >
-                <span className="tabular-nums opacity-60">{String(i + 1).padStart(2, "0")}</span>
+                <span className="seg-n">{String(i + 1).padStart(2, "0")}</span>
                 {t.label}
               </button>
             );
@@ -108,7 +106,7 @@ export default function Folder({
         id={`panel-${activeTab.id}`}
         role={interactive ? "tabpanel" : undefined}
         aria-labelledby={labelledBy}
-        className="glass sheet-in sl-curtain relative isolate rounded-[6px] p-5 text-ink sm:p-8"
+        className="sheet-in relative isolate pt-6 text-ink sm:pt-8"
       >
         <PixelArt name="lotus" className="absolute right-4 bottom-4 -z-10 w-28 opacity-[0.13] sm:w-36" />
         {children}

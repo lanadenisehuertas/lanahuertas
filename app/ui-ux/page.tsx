@@ -14,7 +14,7 @@ export default function UiUxPage() {
   return (
     <main id="top">
       <div className="mx-auto max-w-6xl px-4 pt-32 pb-16 sm:px-8">
-        <SectionTitle id="code-heading" index="03" lead="UI/UX &" accent="code" note="designed, then built" ornament="flourish" />
+        <SectionTitle as="h1" id="code-heading" index="03" lead="UI/UX &" accent="code" note="designed, then built" ornament="flourish" />
         <CaseStudy />
       </div>
       <Contact />

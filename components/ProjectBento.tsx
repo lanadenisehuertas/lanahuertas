@@ -35,11 +35,14 @@ export default function ProjectBento({
   heading,
   blurb,
   onOpen,
+  eager = false,
 }: {
   projects: Project[];
   heading: string;
   blurb: string;
   onOpen: (p: Project) => void;
+  /** Load the first covers up front — only for a gallery that opens in view. */
+  eager?: boolean;
 }) {
   const years = projects.map((p) => p.year).filter(Boolean).sort() as string[];
   const range =
@@ -107,7 +110,7 @@ export default function ProjectBento({
                 alt=""
                 width={cover.w}
                 height={cover.h}
-                loading={i < 8 ? "eager" : "lazy"}
+                loading={eager && i < 8 ? "eager" : "lazy"}
                 decoding="async"
                 className="tile-img absolute inset-0 h-full w-full object-cover"
               />

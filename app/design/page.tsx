@@ -18,14 +18,14 @@ export default function DesignPage() {
   return (
     <main id="top">
       <header className="mx-auto max-w-6xl px-4 pt-32 pb-6 sm:px-8">
-        <SectionTitle id="design-heading" index="01" lead="Branding &" accent="pubmats" note={`${total} brands · every piece`} ornament="dotButterfly" />
-        <nav aria-label="Brands" className="flex flex-wrap gap-2">
+        <SectionTitle as="h1" id="design-heading" index="01" lead="Branding &" accent="pubmats" note={`${total} brands · every piece`} ornament="dotButterfly" />
+        <nav aria-label="Brands" className="seg flex-wrap !rounded-[24px]">
           {brands.map((b) => (
-            <a key={b.slug} href={`#${b.slug}`} className="rounded-full border border-ink/15 bg-white/60 px-3 py-1.5 text-sm text-ink/80 transition-colors hover:border-lavender hover:text-iris">
+            <a key={b.slug} href={`#${b.slug}`} className="seg-btn">
               {b.name}
             </a>
           ))}
-          <a href="#more" className="rounded-full border border-ink/15 bg-white/60 px-3 py-1.5 text-sm text-ink/80 transition-colors hover:border-lavender hover:text-iris">
+          <a href="#more" className="seg-btn">
             More posters
           </a>
         </nav>
@@ -35,7 +35,7 @@ export default function DesignPage() {
         <section key={b.slug} id={b.slug} aria-label={b.name} className="scroll-mt-16">
           <BrandSlide brand={b} n={i + 1} total={total} eager={i === 0} link={false} />
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-8">
-            <SetGallery items={brandPieces(b)} heading={b.name} blurb={b.brief} />
+            <SetGallery items={brandPieces(b)} heading={b.name} blurb={b.brief} eager={i === 0} />
           </div>
         </section>
       ))}

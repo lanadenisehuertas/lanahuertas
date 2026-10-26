@@ -74,14 +74,15 @@ export function Butterfly({ className = "", style }: { className?: string; style
 }
 
 /** Flat cloud bank with stretched wisps underneath (Codex, site palette). */
-export function Cloud({ className = "", style }: { className?: string; style?: CSSProperties }) {
+export function Cloud({ className = "", style, priority = false }: { className?: string; style?: CSSProperties; priority?: boolean }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src="/art/cloud.webp"
       alt=""
       aria-hidden
-      loading="lazy"
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : undefined}
       decoding="async"
       draggable={false}
       width={900}

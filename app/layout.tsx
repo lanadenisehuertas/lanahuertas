@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Cormorant_Garamond, DM_Mono } from "next/font/google";
+import { Archivo, Cormorant_Garamond, DM_Mono, Nanum_Pen_Script } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { profile, socials } from "@/lib/content";
@@ -14,7 +14,8 @@ import GardenLoader from "@/components/GardenLoader";
  * Archivo — one grotesk family for everything set in words. Its width axis
  *     gives two voices from one file: tight at 100% for flim-style
  *     headlines, and fully extended at 125% for the Y2K-tech name.
- * DM Mono — small uppercase labels, readouts, and buttons.
+ * DM Mono — small uppercase labels and readouts.
+ * Nanum Pen Script — the sketchbook hand: margin notes and annotations only.
  * Redaction (OFL, MCKL) — the morph target. Its cuts degrade the same
  *     letterforms step by step and share metrics, so the hero name can decay
  *     through them on hover.
@@ -93,6 +94,13 @@ const mono = DM_Mono({
   display: "swap",
 });
 
+const hand = Nanum_Pen_Script({
+  variable: "--font-hand",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
 // Leads with both forms of her name, so a search for either matches the snippet.
 const seoDescription = `${profile.short} (${profile.name}) — Manila-based UI/UX designer, graphic designer and video editor. 7+ years in Figma, Photoshop and Premiere Pro, and a Computer Science student at FEU Tech who builds what she designs.`;
 
@@ -153,22 +161,22 @@ export default function RootLayout({
     <html
       suppressHydrationWarning
       lang="en"
-      className={`${archivo.variable} ${cormorant.variable} ${mono.variable} ${redaction.variable} ${r10.variable} ${r35.variable} ${r70.variable} ${r100.variable} h-full antialiased`}
+      className={`${archivo.variable} ${cormorant.variable} ${mono.variable} ${hand.variable} ${redaction.variable} ${r10.variable} ${r35.variable} ${r70.variable} ${r100.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {/*
-         * Lite mode, decided before first paint: few cores, little memory or
-         * Save-Data get the same garden without blur and grain filters.
+         * Lite mode, decided before first paint: few cores, little memory,
+         * Save-Data or a touch-first device get the same garden held still.
          */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var n=navigator,c=n.hardwareConcurrency||8,m=n.deviceMemory||8,s=n.connection&&n.connection.saveData;if(c<=4||m<=4||s)document.documentElement.setAttribute('data-lite','')}catch(e){}",
+              "try{var n=navigator,c=n.hardwareConcurrency||8,m=n.deviceMemory||8,s=n.connection&&n.connection.saveData;if(c<=4||m<=4||s||matchMedia('(pointer: coarse)').matches)document.documentElement.setAttribute('data-lite','')}catch(e){}",
           }}
         />
         <GardenLoader />
         {/*
-         * Lift the opening screen when the page has loaded — never before
+         * Lift the opening screen once the document is parsed — never before
          * ~0.7s so it doesn't flash, never after 3.5s — then tell the page
          * (MorphName waits for this before its first wave). Seen once per
          * session; later loads skip straight in.
@@ -176,7 +184,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}try{if(sessionStorage.getItem('garden-seen')){go();return}}catch(e){}var t0=performance.now();function later(){setTimeout(go,Math.max(0,700-(performance.now()-t0)))}if(document.readyState==='complete')later();else window.addEventListener('load',later);setTimeout(go,3500)})();",
+              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}try{if(sessionStorage.getItem('garden-seen')){go();return}}catch(e){}var t0=performance.now();function later(){setTimeout(go,Math.max(0,700-(performance.now()-t0)))}if(document.readyState!=='loading')later();else document.addEventListener('DOMContentLoaded',later);setTimeout(go,3500)})();",
           }}
         />
         {/*

@@ -32,6 +32,7 @@
   --font-body: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-pixel: var(--font-pixel), ui-monospace, "Courier New", monospace;
+  --font-hand: var(--font-hand), "Segoe Print", cursive;
 }
 
 html {
@@ -82,123 +83,29 @@ body {
       linear-gradient(180deg, #e6ebfb 0%, #dce3fa 34%, #e7e4f7 68%, #f3e9f0 100%);
   }
 
-  /* --- Surfaces ------------------------------------------------------------
-   *
-   * .glass       Cream paper panel. Name kept from the previous theme so
-   *              every section picks the new look up unchanged.
-   */
-  /* Paper sheet laid on the paper ground: a lighter, slightly frosted card
-     with a hairline and a printed offset shadow in purple. */
-  .glass {
-    background-color: color-mix(in srgb, #fffaf0 72%, transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
-  }
-
-
-
-
-
-  /* --- Flat Mac system ------------------------------------------------------
-   *
-   * Palette roles, in order of weight:
-   *   deep      the desktop — page ground
-   *   maize     windows — panels, primary type on the ground
-   *   ink       1px lines and type on windows
-   *   fawn      ACTION + SELECTION — buttons, active tab, highlights, caret
-   *   lavender  focus/hover outline and the decay glitch — never behind text
-   *   eminence  small labels on windows
-   *
-   * No gloss, no gradients, no soft shadows. Boxes are 1px, corners 2–4px,
-   * and state changes invert rather than glow — the classic Mac way.
-   */
-
-  /* --- Buttons: Frutiger-Aero gel -------------------------------------------
-   * A glossy pill: violet body, a hard white gloss across the top half, a
-   * soft inner glow at the base, and the label set in italic Cormorant with
-   * a sparkle that turns on hover. Pressing sinks it a pixel.
-   */
-  .gel,
-  .gel-ghost {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    border-radius: 999px;
-    font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 500;
-    font-size: 1.12rem;
-    letter-spacing: 0.005em;
-    line-height: 1;
-    text-transform: none;
-    white-space: nowrap;
-    transition: transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 220ms ease-out, filter 220ms ease-out;
-  }
-
-  .gel {
-    color: #fff;
-    background: linear-gradient(180deg, #9b6ce0 0%, #6a1fa8 48%, #51017c 52%, #7a3cc4 100%);
-    border: 1px solid color-mix(in srgb, var(--color-ink) 70%, transparent);
-    box-shadow:
-      inset 0 -3px 8px rgb(242 184 207 / 0.55),
-      inset 0 1px 0 rgb(255 255 255 / 0.6),
-      0 8px 18px -12px rgb(81 1 124 / 0.5);
-    text-shadow: 0 1px 0 rgb(27 7 48 / 0.45);
-  }
-
-  /* The gloss: a white lens over the top half. */
-  .gel::before,
-  .gel-ghost::before {
+  /* Print texture on the sky, painted once (fixed, static, no blending): a
+     dot screen rising from the bottom like dusk light, and film grain over all. */
+  .graph-ground::before,
+  .graph-ground::after {
     content: "";
     position: absolute;
-    inset: 2px 10px 52% 10px;
-    z-index: -1;
-    border-radius: 999px;
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.08));
-    pointer-events: none;
+    inset: 0;
   }
-
-  /* Sparkle that rides in front of the label and turns on hover. */
-  .gel::after,
-  .gel-ghost::after {
-    content: "";
-    order: -1;
-    width: 0.8em;
-    height: 0.8em;
-    flex-shrink: 0;
-    margin-right: 0.15em;
-    background: currentColor;
-    clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
-    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  .graph-ground::before {
+    top: auto;
+    height: 55vh;
+    background-image: radial-gradient(circle, rgb(185 55 157 / 0.5) 0.9px, transparent 1.4px);
+    background-size: 8px 8px;
+    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 100%);
+    mask-image: linear-gradient(to top, #000 0%, transparent 100%);
+    opacity: 0.32;
   }
-
-  .gel:hover,
-  .gel-ghost:hover {
-    transform: translateY(-2px);
-    filter: saturate(1.15) brightness(1.05);
+  .graph-ground::after {
+    background-image: url("/art/grain-soft.webp");
+    background-size: 160px 160px;
+    opacity: 0.4;
   }
-
-  .gel:hover::after,
-  .gel-ghost:hover::after {
-    transform: rotate(180deg) scale(1.25);
-  }
-
-  .gel:active,
-  .gel-ghost:active {
-    transform: translateY(2px);
-    box-shadow: inset 0 2px 8px rgb(27 7 48 / 0.3);
-  }
-
-
-  /* Secondary gel: frosted clear glass with a violet label. */
-  .gel-ghost {
-    color: var(--color-iris);
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.85), rgb(233 236 253 / 0.65));
-    border: 1px solid color-mix(in srgb, var(--color-iris) 45%, transparent);
-    box-shadow:
-      inset 0 -3px 8px rgb(169 182 240 / 0.45);
-  }
+  html[data-lite] .graph-ground::after { display: none; }
 
   /* Status dot — flat. Set --orb. */
   .orb {
@@ -230,32 +137,25 @@ body {
     background-color: var(--tb-bg, var(--color-ink));
   }
 
-  /* Title bar, Frutiger-Aero: a glossy periwinkle gel with the hard
-     highlight line across the middle, ink label on a cut-out block. */
+  /* Title bar: a plain paper strip with a filename, and a pen-drawn circle
+     where a window would keep its close box. */
   .titlebar {
     --tb-bg: transparent;
     color: var(--color-ink);
-    background-image: linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #e4e8fd 48%,
-      #c3cdf7 52%,
-      #dfe4fc 100%
-    );
-    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 30%, transparent);
+    background: #fbf9ff;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 16%, transparent);
   }
 
   .titlebar > .tb-label {
     padding: 0 6px;
   }
 
-  /* Close box becomes a glossy pink bead. */
   .titlebar .closebox {
-    width: 10px;
-    height: 10px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
-    border: 1px solid color-mix(in srgb, var(--color-ink) 40%, transparent);
-    background: radial-gradient(circle at 35% 30%, #fff 0 18%, #f2b8cf 45%, #b9379d 100%);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 45%, transparent);
+    background: transparent;
   }
 
   /* Work tile. A quiet hover: the cover leans in 3% inside its frame, the
@@ -290,29 +190,6 @@ body {
   @media (hover: none) {
     .tile-cap { opacity: 1; transform: none; }
   }
-
-  /* Tab / filter chip. */
-  .pill {
-    border-radius: 3px;
-    color: var(--color-ink);
-    background-color: color-mix(in srgb, #fffaf0 55%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-ink) 25%, transparent);
-    transition: background-color 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out;
-  }
-
-  .pill:hover {
-    border-color: var(--color-ink);
-  }
-
-  .pill-active,
-  .pill-active:hover {
-    color: var(--color-paper);
-    border-color: var(--color-iris);
-    background-color: var(--color-iris);
-  }
-
-
-
 
   /* --- Cursors ----------------------------------------------------------------
    * Classic 1-bit arrow and pointing hand, drawn as SVG so they stay crisp.
@@ -456,7 +333,6 @@ body {
     animation-name: float-badge;
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
-    will-change: transform;
   }
 
 
@@ -503,11 +379,7 @@ body {
     50% { transform: rotate(3deg); }
   }
 
-  /* will-change promotes these to their own layer, so the speckle filter is
-     rasterised once and the loop runs on the compositor instead of
-     re-filtering the SVG every frame. */
   .sway {
-    will-change: transform;
     transform-origin: 50% 100%;
     animation: sway var(--sway, 7s) ease-in-out infinite;
   }
@@ -521,7 +393,6 @@ body {
   }
 
   .spin-slow {
-    will-change: transform;
     animation: spin-slow 24s linear infinite;
   }
 
@@ -542,7 +413,6 @@ body {
   .px {
     /* 0.4px per depth unit: layers part gently, never slide. */
     translate: calc(var(--px, 0) * var(--depth, 10) * 0.4px) calc(var(--py, 0) * var(--depth, 10) * 0.4px);
-    transition: translate 600ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   /* Sparkle burst on the copy button: five stars fly out on a fan. */
@@ -669,53 +539,6 @@ body {
 
   .scroll-vine .bud.open .petal {
     transform: rotate(calc(var(--r) * 1.2));
-  }
-
-  /* --- End card bloom buttons (Contact) ------------------------------------
-   * A glossy orb per link. Hover: the orb swells and six petals burst out
-   * of it on a spring, then fold back in.
-   */
-  .bloom-orb {
-    color: var(--color-iris);
-    background: radial-gradient(circle at 34% 28%, #fff 0 10%, #fbe3ee 26%, #f2b8cf 52%, #a9b6f0 82%, #7a3cc4 100%);
-    border: 1px solid color-mix(in srgb, var(--color-ink) 45%, transparent);
-    box-shadow:
-      inset 0 -6px 12px rgb(122 60 196 / 0.35),
-      0 10px 20px -14px rgb(81 1 124 / 0.45);
-    transition: transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .bloom-orb::before {
-    content: "";
-    position: absolute;
-    inset: 6% 18% 52% 18%;
-    border-radius: 999px;
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0));
-  }
-
-  .bloom-petal {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 22px;
-    height: 34px;
-    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
-    background: linear-gradient(180deg, #b9379d, #f2b8cf 60%, #f6d3c3);
-    transform-origin: 50% 100%;
-    transform: translate(-50%, -100%) rotate(var(--r)) translateY(0) scale(0.2);
-    opacity: 0;
-    transition: transform 520ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 200ms ease-out;
-  }
-
-  .bloom-btn:hover .bloom-petal,
-  .bloom-btn:focus-visible .bloom-petal {
-    opacity: 1;
-    transform: translate(-50%, -100%) rotate(var(--r)) translateY(-22px) scale(1);
-  }
-
-  .bloom-btn:hover .bloom-orb,
-  .bloom-btn:focus-visible .bloom-orb {
-    transform: scale(1.1) rotate(-8deg);
   }
 
   /* --- Scroll choreography ---------------------------------------------------
@@ -1089,9 +912,10 @@ body {
   }
 
   /* Depth of field. */
-  .dof-far { filter: blur(3px); opacity: 0.75; }
-  .dof-mid { filter: blur(1.2px); }
-  .dof-near { filter: blur(6px); opacity: 0.9; }
+  /* Depth of field by fading only: a blur filter on drifting art re-rasterises
+     every frame. */
+  .dof-far { opacity: 0.72; }
+  .dof-near { opacity: 0.6; }
 
   @keyframes drift-x {
     from { transform: translateX(calc(var(--drift, 24px) * -1)); }
@@ -1099,7 +923,6 @@ body {
   }
 
   .drift-x {
-    will-change: transform;
     animation: drift-x var(--dur, 18s) ease-in-out var(--td, 0s) infinite alternate;
   }
 
@@ -1109,7 +932,6 @@ body {
   }
 
   .drift-y {
-    will-change: transform;
     animation: drift-y var(--dur, 12s) ease-in-out var(--td, 0s) infinite alternate;
   }
 
@@ -1134,7 +956,6 @@ body {
   }
 
   .flutter {
-    will-change: transform;
     animation: flutter var(--dur, 7s) ease-in-out var(--td, 0s) infinite;
   }
 
@@ -1144,7 +965,6 @@ body {
   }
 
   .orbit-spin {
-    will-change: transform;
     animation: orbit-spin var(--dur, 16s) linear infinite;
   }
 
@@ -1172,11 +992,9 @@ body {
   .focus-rv[data-rv] {
     opacity: 0;
     transform: translateY(26px) scale(0.97);
-    filter: blur(8px);
     transition:
       opacity 700ms var(--ease-mist) var(--d, 0ms),
       transform 900ms var(--ease-mist) var(--d, 0ms),
-      filter 700ms var(--ease-mist) var(--d, 0ms),
       border-color 200ms ease-out;
   }
 
@@ -1184,7 +1002,6 @@ body {
   .focus-rv[data-rv][data-in] {
     opacity: 1;
     transform: none;
-    filter: none;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -1247,33 +1064,40 @@ body {
   /* --- Contact form ---------------------------------------------------------
    * Visible labels, 48px fields, a lavender focus ring, errors under the field.
    */
+  /* Form fields as lines on note paper: write on the rule, no box. */
   .field {
     width: 100%;
-    min-height: 48px;
-    border-radius: 6px;
-    border: 1px solid color-mix(in srgb, var(--color-ink) 28%, transparent);
-    background: color-mix(in srgb, #fffaf3 90%, transparent);
-    padding: 12px 14px;
+    min-height: 44px;
+    border: 0;
+    border-bottom: 1.5px solid color-mix(in srgb, var(--color-ink) 35%, transparent);
+    border-radius: 0;
+    background: transparent;
+    padding: 8px 2px;
     font-size: 16px;
     line-height: 1.5;
     color: var(--color-ink);
-    transition: border-color 160ms ease-out, box-shadow 160ms ease-out, background-color 160ms ease-out;
+    transition: border-color 160ms ease-out, background-color 160ms ease-out;
   }
 
-  .field::placeholder { color: color-mix(in srgb, var(--color-ink) 45%, transparent); }
+  .field::placeholder { color: color-mix(in srgb, var(--color-ink) 42%, transparent); font-style: italic; }
 
-  .field:hover { border-color: color-mix(in srgb, var(--color-ink) 45%, transparent); }
+  .field:hover { border-bottom-color: color-mix(in srgb, var(--color-ink) 55%, transparent); }
 
   .field:focus-visible {
     outline: none;
-    border-color: var(--color-lavender);
-    background: #fffdf8;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-lavender) 28%, transparent);
+    border-bottom-color: var(--color-lavender);
+    background: color-mix(in srgb, var(--color-blush) 18%, transparent);
   }
 
-  .field[aria-invalid="true"] {
-    border-color: #b42318;
-    box-shadow: 0 0 0 3px rgb(180 35 24 / 0.14);
+  .field[aria-invalid="true"] { border-bottom-color: #b42318; }
+
+  /* Note paper: cream, faint rules, a blush margin line, lifted off the page. */
+  .notepaper {
+    background-color: #fffdf8;
+    background-image:
+      linear-gradient(90deg, transparent 38px, color-mix(in srgb, var(--color-blush) 70%, transparent) 38px 39.5px, transparent 39.5px),
+      repeating-linear-gradient(180deg, transparent 0 31px, color-mix(in srgb, var(--color-sky) 38%, transparent) 31px 32px);
+    box-shadow: 0 30px 50px -30px rgb(27 7 48 / 0.55), 0 2px 6px rgb(27 7 48 / 0.12);
   }
 
   /* Off screen: pause every loop in the section. */
@@ -1294,7 +1118,6 @@ html[data-lite] .tile[data-rv] {
 }
 
 html[data-lite] g[filter] { filter: none; }
-html[data-lite] .glass { backdrop-filter: none; -webkit-backdrop-filter: none; }
 html[data-lite] .sky-extra,
 html[data-lite] .shoot,
 html[data-lite] .lite-hide { display: none; }
@@ -1339,29 +1162,31 @@ html[data-lite] .lite-hide { display: none; }
 
   .masthead.is-scrolled::after { opacity: 1; }
 
-  .nav-spark {
-    opacity: 0;
-    transform: translateX(-50%) scale(0.3);
-    transition: opacity 250ms ease-out, transform 450ms var(--ease-petal);
-  }
-
-  .nav-link:hover .nav-spark { opacity: 0.55; transform: translateX(-50%) scale(0.8); }
-  .nav-link[aria-current] .nav-spark { opacity: 1; transform: translateX(-50%) scale(1) rotate(90deg); }
-
-  /* Thin outlined call to action in the display face, filling on hover. */
-  .hire {
+  /* Section links: italic words; the current one is underlined in pen. */
+  .nav-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 44px;
     font-family: var(--font-display);
-    color: var(--color-iris);
-    border: 1px solid color-mix(in srgb, var(--color-iris) 55%, transparent);
-    background: color-mix(in srgb, #ffffff 40%, transparent);
-    transition: background-color 220ms ease-out, color 220ms ease-out, border-color 220ms ease-out;
+    font-style: italic;
+    font-size: 1.12rem;
+    color: color-mix(in srgb, var(--color-ink) 68%, transparent);
+    transition: color 160ms ease-out;
+  }
+  .nav-link:hover,
+  .nav-link[aria-current] { color: var(--color-iris); }
+  .nav-link[aria-current]::after {
+    content: "";
+    position: absolute;
+    inset: auto -2px 7px -2px;
+    height: 8px;
+    background: var(--color-lavender);
+    -webkit-mask: var(--ink-underline) center / 100% 100% no-repeat;
+    mask: var(--ink-underline) center / 100% 100% no-repeat;
   }
 
-  .hire:hover {
-    color: var(--color-paper);
-    background: var(--color-iris);
-    border-color: var(--color-iris);
-  }
 }
 
 html[data-lite] .masthead.is-scrolled {
@@ -1501,19 +1326,8 @@ html[data-lite] .masthead.is-scrolled {
  * band that dissolves in the site's pixel dither. Hairline border, no shadow;
  * on hover the hairline turns orchid and the card lifts 2px.
  */
-.sheet-card {
-  overflow: hidden;
-  border-radius: 10px;
-  border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
-  background: #ffffff;
-  transition: border-color 200ms ease-out, transform 300ms var(--ease-mist);
-}
 
 @media (hover: hover) and (pointer: fine) {
-  .sheet-card:hover {
-    border-color: color-mix(in srgb, var(--color-lavender) 45%, transparent);
-    transform: translateY(-2px);
-  }
 }
 
 .sheet-band {
@@ -1554,10 +1368,6 @@ html[data-lite] .art-wing {
 }
 
 @media (max-width: 640px) {
-  .dof-far,
-  .dof-mid,
-  .dof-near { filter: none; }
-  .dof-near { opacity: 0.55; }
   .sky-extra,
   .shoot { display: none; }
 }
@@ -1649,23 +1459,6 @@ html.garden-ready #garden-loader * {
  * Slides, mockup frames and the carousel. See components/showcase/.
  */
 
-.bs-card {
-  background-color: color-mix(in srgb, #fffaf0 90%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
-  box-shadow: 0 30px 60px -36px rgb(27 7 48 / 0.55);
-}
-/* Brand-coloured hairline across the card's top edge — decoration only. */
-.bs-card::before {
-  content: "";
-  position: absolute;
-  inset: 0 24px auto;
-  height: 3px;
-  border-radius: 0 0 3px 3px;
-  background: var(--accent, var(--color-lavender));
-}
-
 /* Collage pieces: placed by inline style, rotated by --r. */
 .bs-piece {
   position: absolute;
@@ -1674,14 +1467,14 @@ html.garden-ready #garden-loader * {
 }
 .bs-piece:hover { transform: rotate(var(--r, 0deg)) translateY(-6px) scale(1.02); z-index: 30; }
 
-/* Inside the carousel, the backdrop fades in and pieces drop into place as
-   their slide arrives; the first slide is marked active on the server. */
-.carousel-slide .bs-backdrop > img { opacity: 0; transform: scale(1.04); transition: opacity 800ms ease, transform 1400ms ease; }
-.carousel-slide[data-active] .bs-backdrop > img { opacity: 1; transform: none; }
-.carousel-slide .bs-piece { opacity: 0; translate: 0 22px; transition: opacity 600ms ease, translate 700ms cubic-bezier(0.22, 1, 0.36, 1), transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1); transition-delay: calc(var(--i, 0) * 90ms + 150ms); }
-.carousel-slide[data-active] .bs-piece { opacity: 1; translate: 0 0; }
+/* Pieces drop into place as their slide arrives. Only once the carousel has
+   mounted (data-ready): before that every slide shows as it is. */
+.carousel-slide .bs-piece { transition: opacity 600ms ease, translate 700ms cubic-bezier(0.22, 1, 0.36, 1), transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1); transition-delay: calc(var(--i, 0) * 90ms + 150ms); }
+.carousel-track[data-ready] .carousel-slide:not([data-active]) .bs-piece { opacity: 0; translate: 0 22px; }
 
 .carousel-track { scrollbar-width: none; }
+/* Slides off screen are not rendered at all until scrolled near. */
+.carousel-slide { content-visibility: auto; contain-intrinsic-size: auto 1440px auto 900px; }
 .carousel-track::-webkit-scrollbar { display: none; }
 
 /* Phone: a feed post inside a handset. */
@@ -1744,14 +1537,295 @@ html.garden-ready #garden-loader * {
 .wall-frame { background: #fffaf0; padding: 4%; box-shadow: 0 0 0 3px #1b0730, 0 26px 40px -26px rgb(27 7 48 / 0.7); }
 .wall-frame::before { content: ""; position: absolute; left: 50%; bottom: 100%; width: 40%; height: 18px; translate: -50% 0; border: 1px solid color-mix(in srgb, var(--color-ink) 45%, transparent); border-bottom: 0; clip-path: polygon(0 100%, 50% 0, 100% 100%); }
 
-html[data-lite] .bs-card { backdrop-filter: none; -webkit-backdrop-filter: none; }
 html[data-lite] .sticker { filter: drop-shadow(0 8px 10px rgb(27 7 48 / 0.3)); }
-html[data-lite] .bs-blur { filter: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .bs-piece,
-  .carousel-slide .bs-piece,
-  .carousel-slide .bs-backdrop > img { transition: none; }
-  .carousel-slide .bs-piece { opacity: 1; translate: 0 0; }
-  .carousel-slide .bs-backdrop > img { opacity: 1; transform: none; }
+  .carousel-slide .bs-piece { transition: none; }
+  .carousel-track[data-ready] .carousel-slide:not([data-active]) .bs-piece { opacity: 1; translate: 0 0; }
+}
+
+/* --- Sketchbook ink ----------------------------------------------------------
+ * The interface is drawn into the garden like notes in a sketchbook, not
+ * built from boxes. Every mark is an SVG mask on a pseudo-element, coloured
+ * by CSS, so one drawing serves light and dark slides and costs no markup.
+ *
+ *   .btn        primary action: italic label over a brush swash
+ *   .btn-ghost  secondary action: italic label, pen underline drawn on hover
+ *   .btn-icon   a pen-drawn ring around an icon (add to .btn-ghost)
+ *   .seg-btn    tab / choice; the current one is circled in ink
+ *   .nav-link   masthead link; the current one is underlined
+ *   .chip       a pen-written tag
+ *   .idx        an index or counter in italic numerals
+ *   .note       a paper slip (mockup stats)
+ *   .halftone   a dot screen that fades out from its centre
+ *   .glow       a soft lavender glow on display type
+ */
+@layer components {
+  :root {
+    --ink-circle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 48' preserveAspectRatio='none'%3E%3Cpath d='M14 31C9 15 43 5 70 6c28 1 46 9 43 20-3 12-33 18-59 17-26-1-45-7-43-19 2-9 20-15 37-16' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+    --ink-underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8c18-4 36 1 56-2s38 2 60-2' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+    --ink-ring: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M25 4c12 0 19 8 19 20s-9 20-21 20S4 35 4 23 13 5 27 5' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    --ink-brush: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 44' preserveAspectRatio='none'%3E%3Cpath d='M7 25C3 13 18 8 42 7c40-2 88-4 128-1 22 2 28 9 25 18-3 10-19 13-45 13-40 1-88 3-118 0C15 36 9 32 7 25Z'/%3E%3Cpath d='M20 9c50-4 110-6 165-2M14 37c60 3 120 1 170-3' fill='none' stroke='%23000' stroke-width='2' opacity='.5'/%3E%3C/svg%3E");
+  }
+
+  .btn,
+  .btn-ghost,
+  .seg-btn {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45em;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    transition: color 200ms ease-out;
+  }
+
+  /* Primary: ink over a blush brush swash that stretches on hover. */
+  .btn {
+    padding: 0 22px;
+    font-size: 1.25rem;
+    color: var(--color-ink);
+  }
+  .btn::before {
+    content: "";
+    position: absolute;
+    inset: 4px -2px 2px;
+    z-index: -1;
+    background: var(--btn-brush, #f2b8cf);
+    -webkit-mask: var(--ink-brush) center / 100% 100% no-repeat;
+    mask: var(--ink-brush) center / 100% 100% no-repeat;
+    transform-origin: left center;
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), background-color 200ms ease-out;
+  }
+
+  /* Secondary: an italic label; the pen underline draws in on hover. */
+  .btn-ghost {
+    padding: 0 4px;
+    font-size: 1.2rem;
+    color: var(--t-title, var(--color-iris));
+  }
+  .btn-ghost::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 6px;
+    height: 9px;
+    background: var(--color-lavender);
+    -webkit-mask: var(--ink-underline) center / 100% 100% no-repeat;
+    mask: var(--ink-underline) center / 100% 100% no-repeat;
+    transform: scaleX(0.35);
+    transform-origin: left center;
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover::before { transform: scaleX(1.06); background-color: #f6c9da; }
+    .btn-ghost:hover::after { transform: scaleX(1); }
+    .seg-btn:hover { color: var(--color-iris); }
+  }
+  .btn:focus-visible,
+  .btn-ghost:focus-visible,
+  .seg-btn:focus-visible { outline: 2px dashed var(--color-lavender); outline-offset: 4px; border-radius: 4px; }
+
+  /* Icon action: a pen ring around the glyph, no underline. */
+  .btn-icon {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    flex-shrink: 0;
+    color: var(--color-iris);
+  }
+  .btn-icon::after { display: none; }
+  .btn-icon::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    -webkit-mask: var(--ink-ring) center / 100% 100% no-repeat;
+    mask: var(--ink-ring) center / 100% 100% no-repeat;
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-icon:hover::before { transform: rotate(-12deg) scale(1.06); }
+  }
+
+  /* Tabs: words in a row; the current one is circled. */
+  .seg { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; }
+  .seg-btn {
+    padding: 0 10px;
+    font-size: 1.2rem;
+    color: color-mix(in srgb, var(--color-ink) 62%, transparent);
+  }
+  .seg-btn::after {
+    content: "";
+    position: absolute;
+    inset: 2px -8px 0;
+    background: var(--color-lavender);
+    -webkit-mask: var(--ink-circle) center / 100% 100% no-repeat;
+    mask: var(--ink-circle) center / 100% 100% no-repeat;
+    opacity: 0;
+    transform: scale(0.9) rotate(-3deg);
+    transition: opacity 200ms ease-out, transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .seg-btn[aria-current="page"],
+  .seg-btn[aria-current="true"],
+  .seg-btn[aria-pressed="true"],
+  .seg-btn[aria-selected="true"] { color: var(--color-iris); }
+  .seg-btn[aria-current="page"]::after,
+  .seg-btn[aria-current="true"]::after,
+  .seg-btn[aria-pressed="true"]::after,
+  .seg-btn[aria-selected="true"]::after { opacity: 1; transform: none; }
+  .seg-btn .seg-n { font-size: 0.75em; opacity: 0.55; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 14px;
+    font-family: var(--font-hand);
+    font-size: 1.3rem;
+    line-height: 1.15;
+    color: color-mix(in srgb, var(--color-ink) 78%, transparent);
+  }
+
+  .link {
+    color: var(--color-iris);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-lavender) 55%, transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 5px;
+    transition: text-decoration-color 160ms ease-out;
+  }
+  .link:hover { text-decoration-color: currentColor; }
+
+  .idx {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--color-lavender);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .note {
+    background: #fffaf0;
+    box-shadow: 0 14px 24px -16px rgb(27 7 48 / 0.45), 0 1px 2px rgb(27 7 48 / 0.12);
+  }
+
+  .halftone {
+    background-image: radial-gradient(circle, var(--dot, #b9379d) 0.9px, transparent 1.4px);
+    background-size: 7px 7px;
+    -webkit-mask-image: radial-gradient(closest-side, #000 0%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 0%, transparent 100%);
+  }
+
+  .hand {
+    font-family: var(--font-hand);
+    font-size: 1.5rem;
+    line-height: 1.05;
+    color: var(--color-lavender);
+  }
+
+  /* A strip of washi tape, a little translucent, its ends torn. */
+  .tape {
+    position: absolute;
+    z-index: 2;
+    width: 92px;
+    height: 24px;
+    background: color-mix(in srgb, #f2b8cf 55%, #fffaf0);
+    opacity: 0.85;
+    box-shadow: 0 1px 2px rgb(27 7 48 / 0.15);
+    clip-path: polygon(3% 0, 97% 4%, 100% 30%, 96% 55%, 100% 80%, 97% 100%, 2% 96%, 0 70%, 4% 45%, 0 20%);
+  }
+
+  /* A pen doodle from public/art/ink, inked in currentColor. Set --doodle. */
+  .doodle {
+    display: block;
+    aspect-ratio: 1;
+    background: currentColor;
+    -webkit-mask: var(--doodle) center / contain no-repeat;
+    mask: var(--doodle) center / contain no-repeat;
+  }
+
+  .glow { text-shadow: 0 0 22px rgb(185 55 157 / 0.32), 0 0 2px rgb(255 255 255 / 0.6); }
+
+  .window-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 28px;
+    padding: 0 12px;
+    color: var(--color-ink);
+    background: #fbf9ff;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 16%, transparent);
+    font-family: var(--font-pixel);
+    font-size: 10px;
+  }
+  .window-beads { display: flex; gap: 5px; flex-shrink: 0; }
+  .window-beads > i { width: 9px; height: 9px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--color-ink) 45%, transparent); }
+}
+
+/* Mockups as drawn objects: a paper handset with an ink outline. Unlayered,
+   after the originals, so they replace them. */
+.phone {
+  background: #fffdf8;
+  box-shadow: 0 26px 40px -28px rgb(27 7 48 / 0.55), inset 0 0 0 1.5px var(--color-ink);
+}
+.phone-screen::before { background: var(--color-ink); }
+.wall-frame {
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 14%, transparent), 0 26px 40px -28px rgb(27 7 48 / 0.55);
+}
+
+/* --- Slides: full-bleed backdrop, type set straight on it ---------------------
+ * No card. The text side gets a soft wash in the backdrop's own tone so the
+ * type reads; .on-dark / .on-light switch the type colours to match. On
+ * phones the text sits under the art, so the wash rises from the bottom.
+ */
+@layer components {
+  .on-dark {
+    --t-title: #fff7ea;
+    --t-accent: #f2b8cf;
+    --t-body: rgb(255 255 255 / 0.88);
+    --t-muted: rgb(255 255 255 / 0.68);
+    --t-line: rgb(255 255 255 / 0.35);
+    text-shadow: 0 1px 14px rgb(10 4 20 / 0.6);
+  }
+  .on-light {
+    --t-title: var(--color-iris);
+    --t-accent: var(--color-eminence);
+    --t-body: rgb(27 7 48 / 0.84);
+    --t-muted: rgb(27 7 48 / 0.62);
+    --t-line: rgb(27 7 48 / 0.3);
+    text-shadow: 0 1px 12px rgb(255 255 255 / 0.7);
+  }
+
+  .slide-wash {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    --wash: rgb(250 248 255);
+    background: linear-gradient(to top, color-mix(in srgb, var(--wash) 88%, transparent) 0%, color-mix(in srgb, var(--wash) 66%, transparent) 40%, transparent 72%);
+  }
+  .slide-wash.wash-dark { --wash: rgb(12 4 24); }
+  @media (min-width: 1024px) {
+    .slide-wash { background: linear-gradient(var(--wash-dir, to right), color-mix(in srgb, var(--wash) 84%, transparent) 0%, color-mix(in srgb, var(--wash) 66%, transparent) 30%, color-mix(in srgb, var(--wash) 30%, transparent) 46%, transparent 62%); }
+    .slide-wash.wash-right { --wash-dir: to left; }
+  }
+
+
+  .swatch-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--sw);
+    box-shadow: 0 0 0 1.5px var(--t-line, rgb(27 7 48 / 0.3)), inset 0 4px 4px -2px rgb(255 255 255 / 0.6);
+  }
 }

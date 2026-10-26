@@ -4,6 +4,7 @@
 // scripts/pubmats.json + scripts/backdrops.json + COPY below.
 import { brandAssets, moreAssets, type CollageRole } from "./brand-assets";
 import { workTabs, type Project, type ProjectImage } from "./content";
+import { small } from "./img";
 
 export type BrandLayout = "spread" | "mirror" | "cover" | "fan" | "stickers" | "kit" | "wall";
 
@@ -249,6 +250,18 @@ export const brands: Brand[] = COPY.map((c) => {
 });
 
 export const backdropSrc = (slug: string) => `/art/backdrops/${slug}.webp`;
+
+/** The organisations the brands were made for, in showcase order, each shown by its first brand's key visual. */
+export function brandOrgs(): { name: string; src: string }[] {
+  const seen = new Map<string, string>();
+  for (const b of brands) {
+    const name = b.org === "Client" ? b.name : b.org.replace(/ \d{4}$/, "");
+    if (seen.has(name)) continue;
+    const img = (b.collage.key ?? b.collage.print ?? b.set)[0];
+    seen.set(name, img.w > 720 ? small(img.src) : img.src);
+  }
+  return [...seen].map(([name, src]) => ({ name, src }));
+}
 
 /** A brand's full set as one lightbox entry per piece, for /design. */
 export function brandPieces(b: Brand): Project[] {

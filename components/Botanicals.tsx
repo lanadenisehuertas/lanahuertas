@@ -120,7 +120,7 @@ export function Lotus({ className = "", deep = false }: { className?: string; de
   const outer = [-58, -30, 30, 58];
   return (
     <svg viewBox="0 0 200 200" aria-hidden className={`lotus ${className}`}>
-      <g filter="url(#speckle)">
+      <g>
         {/* stem */}
         <path d="M100 196 C98 170 102 150 100 128" stroke="#4f9a78" strokeWidth="6" fill="none" strokeLinecap="round" />
         {/* sepals */}
@@ -144,7 +144,7 @@ export function Lotus({ className = "", deep = false }: { className?: string; de
 export function Leaf({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 120 60" aria-hidden className={className}>
-      <g filter="url(#speckle)">
+      <g>
         <path d="M4 30 C30 2 86 0 116 30 C86 58 30 58 4 30Z" fill="url(#g-leaf)" />
         <path d="M8 30 C40 26 80 26 112 30" stroke="#fff6dc" strokeWidth="2" fill="none" opacity="0.6" />
       </g>
@@ -170,7 +170,7 @@ export function Spiral({ className = "", stroke = "#4f9a78" }: { className?: str
 export function Orb({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 40 40" aria-hidden className={className}>
-      <g filter="url(#speckle)">
+      <g>
         <circle cx="20" cy="20" r="19" fill="url(#g-orb)" />
         <ellipse cx="14" cy="12" rx="6" ry="3.5" fill="#fff" opacity="0.6" transform="rotate(-30 14 12)" />
       </g>
@@ -185,7 +185,7 @@ export function Orb({ className = "" }: { className?: string }) {
 export function Bellflower({ className = "", deep = false }: { className?: string; deep?: boolean }) {
   return (
     <svg viewBox="0 0 120 200" aria-hidden className={className}>
-      <g filter="url(#speckle)">
+      <g>
         <path d="M60 198 C56 170 68 140 60 96" stroke="#4f9a78" strokeWidth="5" fill="none" strokeLinecap="round" />
         <path d="M61 160 C80 150 98 156 106 140 C88 134 70 140 61 160Z" fill="url(#g-leaf)" />
         <path
@@ -207,7 +207,7 @@ export function Blossom({ className = "", deep = false }: { className?: string; 
   const fill = deep ? "url(#g-blossom-deep)" : "url(#g-blossom)";
   return (
     <svg viewBox="0 0 100 100" aria-hidden className={`blossom ${className}`}>
-      <g filter="url(#speckle)">
+      <g>
         <g className="blossom-petals">
           {[0, 72, 144, 216, 288].map((a) => (
             <circle
@@ -236,7 +236,7 @@ export function Fern({ className = "" }: { className?: string }) {
   });
   return (
     <svg viewBox="0 0 80 220" aria-hidden className={className}>
-      <g filter="url(#speckle)">
+      <g>
         <path d="M40 218 C40 160 52 90 38 4" stroke="url(#g-fern)" strokeWidth="3.5" fill="none" strokeLinecap="round" />
         {leaflets.map(({ x, y, len }, i) => (
           <g key={i} opacity="0.92">
@@ -286,7 +286,7 @@ export function LongVine({ className = "", flip = false }: { className?: string;
         strokeLinecap="round"
         style={{ "--d": "900ms" } as React.CSSProperties}
       />
-      <g filter="url(#speckle)">
+      <g>
         {LONG_LEAVES.map((l, i) => (
           <g key={i} transform={`translate(${l.x} ${l.y}) rotate(${l.r}) scale(${l.s})`}>
             <g className="vine-sprout" style={{ "--d": `${900 + i * 140}ms` } as React.CSSProperties}>

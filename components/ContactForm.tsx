@@ -94,7 +94,8 @@ export default function ContactForm() {
 
   if (status === "sent") {
     return (
-      <div role="status" className="glass relative mx-auto max-w-xl rounded-[8px] px-6 py-10 text-center">
+      <div role="status" className="notepaper relative mx-auto max-w-xl -rotate-[0.6deg] px-6 py-10 pl-14 text-center">
+        <span aria-hidden className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-2" />
         <span aria-hidden className="relative mx-auto block h-10 w-10">
           {[0, 1, 2, 3, 4].map((k) => (
             <Sparkle4 key={k} className="burst absolute h-3 w-3 text-lavender" />
@@ -112,7 +113,7 @@ export default function ContactForm() {
             setFields({ name: "", email: "", message: "" });
             setStatus("idle");
           }}
-          className="gel-ghost mt-6 inline-flex min-h-[46px] items-center px-5"
+          className="btn-ghost mt-6 inline-flex min-h-[46px] items-center px-5"
         >
           Send another message
         </button>
@@ -128,8 +129,9 @@ export default function ContactForm() {
       onSubmit={submit}
       noValidate
       aria-labelledby="form-heading"
-      className="glass relative mx-auto max-w-xl rounded-[8px] p-5 text-left sm:p-7"
+      className="notepaper relative mx-auto max-w-xl -rotate-[0.6deg] p-6 pl-14 text-left sm:p-8 sm:pl-16"
     >
+      <span aria-hidden className="tape -top-3 left-1/2 -translate-x-1/2 rotate-2" />
       <h3 id="form-heading" className="type-display text-3xl text-iris italic">
         Send a message
       </h3>
@@ -193,7 +195,7 @@ export default function ContactForm() {
       <input ref={honey} type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
 
       {status === "failed" && (
-        <p role="alert" className="mt-4 rounded-[6px] border border-[#b42318]/40 bg-[#fdecea] px-3.5 py-2.5 text-[14px] text-[#7a1a12]">
+        <p role="alert" className="mt-4 border-l-2 border-[#b42318] bg-[#fdecea]/70 px-3.5 py-2.5 text-[14px] text-[#7a1a12]">
           Your message didn&apos;t send — the connection dropped or the mail service didn&apos;t answer. Everything you typed
           is still here: try again, or email{" "}
           <a href={`mailto:${profile.email}`} className="font-semibold underline underline-offset-2">
@@ -214,7 +216,7 @@ export default function ContactForm() {
           type="submit"
           disabled={sending}
           aria-busy={sending}
-          className="gel inline-flex min-h-[48px] items-center gap-2 px-6 disabled:cursor-wait disabled:opacity-70"
+          className="btn inline-flex min-h-[48px] items-center gap-2 px-6 disabled:cursor-wait disabled:opacity-70"
         >
           {sending ? (
             <>
@@ -234,7 +236,7 @@ export default function ContactForm() {
 function Field({ id, label, error, children }: { id: string; label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label htmlFor={id} className="type-pixel mb-1.5 block text-[11px] text-ink/70">
+      <label htmlFor={id} className="hand block text-[1.35rem] text-ink/70">
         {label}
       </label>
       {children}

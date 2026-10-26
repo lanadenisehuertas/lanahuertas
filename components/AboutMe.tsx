@@ -1,27 +1,34 @@
 import type { CSSProperties } from "react";
 import { profile, toolkit, workTabs, engineeringProjects } from "@/lib/content";
 import ToolBadge from "./ToolBadge";
-import { Lotus, Leaf, Sparkle4, Orb, Spiral, Bellflower } from "./Botanicals";
-import { Butterfly, PixelFlower, Star5, PixelArt } from "./Ethereal";
+import { Lotus, Leaf } from "./Botanicals";
+
+/** An organisation the work was made for, shown by its first brand's key visual. */
+export type Org = { name: string; src: string };
 
 /*
- * App icons orbiting the portrait. Nothing to drag — they move on their own:
- *   - drift with the pointer (--depth),
- *   - glide up/down as the section scrolls past (--dy),
- *   - spring outward and tilt when you hover the portrait (--hx/--hy).
- * Each one also spins in on its own slice of the scroll (--i).
+ * App icons orbiting the snapshot. They drift with the pointer (--depth),
+ * glide as the section scrolls (--dy) and spring outward when you hover the
+ * photo (--hx/--hy); each spins in on its own slice of the scroll (--i).
  */
 const ORBIT = [
-  { i: 0, size: 64, pos: { top: "4%", left: -40 }, depth: 18, dy: 40, hx: -26, hy: -14 }, // Ps
-  { i: 2, size: 56, pos: { top: "38%", left: -38 }, depth: 26, dy: -30, hx: -30, hy: 0 }, // Pr
-  { i: 1, size: 52, pos: { top: "72%", left: -30 }, depth: 14, dy: 50, hx: -24, hy: 16 }, // Ai
-  { i: 3, size: 64, pos: { top: "10%", right: -40 }, depth: 22, dy: -40, hx: 26, hy: -14 }, // Ae
-  { i: 4, size: 56, pos: { top: "44%", right: -38 }, depth: 30, dy: 34, hx: 30, hy: 0 }, // Ca
-  { i: 5, size: 52, pos: { top: "76%", right: -30 }, depth: 16, dy: -46, hx: 24, hy: 16 }, // Fg
+  { i: 0, size: 60, pos: { top: "6%", left: -44 }, depth: 18, dy: 40, hx: -26, hy: -14 }, // Ps
+  { i: 2, size: 52, pos: { top: "40%", left: -42 }, depth: 26, dy: -30, hx: -30, hy: 0 }, // Pr
+  { i: 1, size: 48, pos: { top: "72%", left: -34 }, depth: 14, dy: 50, hx: -24, hy: 16 }, // Ai
+  { i: 3, size: 60, pos: { top: "12%", right: -44 }, depth: 22, dy: -40, hx: 26, hy: -14 }, // Ae
+  { i: 4, size: 52, pos: { top: "46%", right: -42 }, depth: 30, dy: 34, hx: 30, hy: 0 }, // Ca
+  { i: 5, size: 48, pos: { top: "78%", right: -34 }, depth: 16, dy: -46, hx: 24, hy: 16 }, // Fg
 ] as const;
 
-const PIECES =
-  workTabs.reduce((n, t) => n + t.projects.length, 0) + engineeringProjects.length;
+/* Pen doodles (scripts/gen-stickers.py) drawn around the snapshot. */
+const DOODLES = [
+  { name: "moon", className: "-top-12 -left-10 w-20 text-iris sm:w-24" },
+  { name: "stars", className: "-top-10 right-0 w-16 text-lavender sm:w-20" },
+  { name: "butterfly", className: "-right-12 bottom-24 w-16 -rotate-12 text-iris sm:w-20" },
+  { name: "swirl", className: "-bottom-4 left-[38%] w-16 text-lavender" },
+];
+
+const PIECES = workTabs.reduce((n, t) => n + t.projects.length, 0) + engineeringProjects.length;
 
 const STATS = [
   { n: "7+", label: "years in Photoshop" },
@@ -29,126 +36,98 @@ const STATS = [
   { n: String(PIECES), label: "pieces in this folio" },
 ];
 
-export default function AboutMe() {
+/** The photo, taped into the sketchbook with a pen caption, the apps and doodles around it. */
+function Snapshot() {
   return (
-    <div className="grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16">
-      {/* Portrait — hover it and the icons spring out */}
-      <div className="portrait-zone mx-auto w-full max-w-[300px] sm:max-w-[420px]">
-        <div className="relative">
-          <div
-            aria-hidden
-            className="absolute -inset-4 -rotate-[3deg] overflow-hidden rounded-[6px] border border-ink/15 transition-transform duration-700 ease-out sm:-inset-6 [.portrait-zone:hover_&]:-rotate-[5deg]"
-            style={{
-              background:
-                "radial-gradient(60% 60% at 50% 40%, #fff6ea 0%, transparent 70%), linear-gradient(180deg, #a9b6f0 0%, #c9b9ec 36%, #f2b8cf 70%, #f6d3c3 100%)",
-            }}
+    <div className="portrait-zone relative mx-auto w-full max-w-[290px] pt-6 sm:max-w-[350px]">
+      <span aria-hidden className="halftone pointer-events-none absolute -inset-16 -z-10 opacity-30" />
+
+      <figure className="relative -rotate-[3deg] bg-[#fffdf8] p-3 pb-16 shadow-[0_30px_50px_-30px_rgb(27_7_48/0.6),0_2px_6px_rgb(27_7_48/0.15)] transition-transform duration-700 ease-out [.portrait-zone:hover_&]:-rotate-[5deg]">
+        <span aria-hidden className="tape -top-3 left-1/2 -translate-x-1/2 -rotate-3" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/work/lana-portrait.webp"
+          alt="Lana Denise Huertas"
+          width={1136}
+          height={1200}
+          loading="lazy"
+          decoding="async"
+          className="block aspect-[1136/1200] w-full object-cover object-top"
+        />
+        <figcaption className="hand absolute right-4 bottom-4 left-4 text-[1.55rem] text-ink/75">me, probably redesigning something</figcaption>
+      </figure>
+
+      {/* App icons */}
+      <div aria-hidden className="hidden sm:block">
+        {ORBIT.map((o, k) => (
+          <span
+            key={toolkit[o.i].id}
+            className="orbit absolute z-20"
+            style={{ ...o.pos, "--depth": o.depth, "--hx": `${o.hx}px`, "--hy": `${o.hy}px` } as unknown as CSSProperties}
           >
-            <span className="bokeh absolute top-[6%] right-[8%] h-24 w-24 opacity-60" style={{ "--bk": "#ffffff" } as CSSProperties} />
-            <div className="dither absolute inset-x-0 bottom-0 h-[46%] opacity-70" />
-            <div className="band-grain absolute inset-0" />
-          </div>
-
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/work/lana-portrait.webp"
-            alt="Lana Denise Huertas"
-            width={1136}
-            height={1200}
-            className="relative block aspect-[1136/1200] w-full rounded-[4px] border border-ink/40 object-cover object-top"
-          />
-
-          <span className="type-pixel absolute -bottom-3 left-4 rounded-[3px] border border-ink/30 bg-paper px-2 py-0.5 text-[10px] text-ink/70">
-            lana_huertas.jpg
-          </span>
-
-          <div aria-hidden className="hidden sm:block">
-            {ORBIT.map((o, k) => (
-              <span
-                key={toolkit[o.i].id}
-                className="orbit absolute z-20"
-                style={
-                  {
-                    ...o.pos,
-                    "--depth": o.depth,
-                    "--hx": `${o.hx}px`,
-                    "--hy": `${o.hy}px`,
-                  } as unknown as CSSProperties
-                }
-              >
-                <span className="sl-badge sl-drift block" style={{ "--i": k, "--dy": `${o.dy}px` } as CSSProperties}>
-                  <ToolBadge
-                    tool={toolkit[o.i]}
-                    size={o.size}
-                    className="float-badge"
-                    style={{ animationDuration: `${7 + k * 0.9}s`, animationDelay: `${-k * 1.1}s` }}
-                  />
-                </span>
-              </span>
-            ))}
-          </div>
-
-          <div aria-hidden className="pointer-events-none">
-            <div className="sl-sprout absolute -bottom-10 -left-12 z-10 w-28 sm:w-36" style={{ "--i": 1 } as CSSProperties} data-react="lotus">
-              <span className="react block"><Lotus className="sway w-full" deep /></span>
-            </div>
-            <div className="sl-sprout absolute -right-10 -bottom-8 z-10 w-24 sm:w-32" style={{ "--i": 2 } as CSSProperties} data-react="leaf">
-              <span className="react block"><Leaf className="sway w-full -rotate-[35deg]" /></span>
-            </div>
-            <Spiral className="spin-slow absolute -top-10 left-[18%] z-10 w-10" stroke="#b9379d" />
-            <Sparkle4 className="spin-slow absolute -top-6 right-[10%] z-10 h-8 w-8 text-white" />
-            <Orb className="float-badge absolute top-[56%] -right-3 z-10 h-5 w-5" />
-            <div className="sl-sprout absolute -bottom-6 left-[22%] z-10 w-12 sm:w-16" style={{ "--i": 2 } as CSSProperties} data-react="bell">
-              <span className="react block"><Bellflower className="sway w-full" /></span>
-            </div>
-            <PixelFlower className="absolute -top-4 left-[44%] z-10 h-6 w-6" />
-            <PixelArt name="swirl" className="absolute -bottom-8 right-[18%] z-10 w-24 opacity-90" />
-            <PixelArt name="heart" className="absolute top-[10%] left-[10%] z-10 w-5" />
-            <PixelArt name="daisy" className="absolute -top-5 right-[30%] z-10 w-7" />
-            <Star5 className="twinkle absolute top-[34%] -left-4 z-10 h-3 w-3 text-white" />
-            <span className="absolute -top-12 -right-6 z-30 w-16 sm:-right-10 sm:w-20" data-react="butterfly">
-              <span className="react block">
-                <span className="flutter block" style={{ "--dur": "9s" } as CSSProperties}>
-                  <Butterfly className="w-full -rotate-[12deg]" style={{ "--flap": "1.25s" } as CSSProperties} />
-                </span>
-              </span>
+            <span className="sl-badge sl-drift block" style={{ "--i": k, "--dy": `${o.dy}px` } as CSSProperties}>
+              <ToolBadge tool={toolkit[o.i]} size={o.size} />
             </span>
-          </div>
-        </div>
+          </span>
+        ))}
       </div>
 
-      {/* Copy */}
-      <div>
-        <p className="type-pixel text-[11px] text-ink/55">✦ Hello, I&apos;m Lana</p>
-        <h3 className="type-display mt-3 text-[2rem] leading-[1.06] text-iris sm:text-[2.7rem]">
-          {profile.aboutHeadline}
-        </h3>
-        <p className="type-display mt-2 text-3xl text-lavender italic sm:text-4xl">{profile.aboutKicker}</p>
+      {/* Doodles and two pieces of the garden */}
+      <div aria-hidden className="pointer-events-none">
+        {DOODLES.map((d) => (
+          <span key={d.name} className={`doodle absolute z-30 ${d.className}`} style={{ "--doodle": `url(/art/ink/${d.name}.webp)` } as CSSProperties} />
+        ))}
+        <Lotus className="absolute -bottom-10 -left-14 z-10 w-28 sm:w-32" deep />
+        <Leaf className="absolute -right-10 -bottom-6 z-10 w-24 -rotate-[35deg] sm:w-28" />
+      </div>
+    </div>
+  );
+}
 
+/**
+ * About me, as a sketchbook page on the sky: the snapshot taped in with the
+ * apps and doodles around it, then the words, the numbers on ruled lines
+ * and the organisations the work was made for.
+ */
+export default function AboutMe({ orgs }: { orgs: Org[] }) {
+  return (
+    <div className="grid items-center gap-20 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
+      <Snapshot />
+
+      <div>
+        <p className="hand">hello, I&apos;m Lana —</p>
+        <h3 className="type-display mt-4 text-[2rem] leading-[1.06] text-iris sm:text-[2.7rem]">{profile.aboutHeadline}</h3>
+        <p className="type-display mt-2 text-3xl text-lavender italic sm:text-4xl">{profile.aboutKicker}</p>
         <p className="mt-6 max-w-xl text-base leading-[1.75] text-ink/80 sm:text-[15px]">
-          Publicity art, scalable templates and paced video edits for student organizations and clients, and,
-          as a Computer Science student, the interfaces I design I can also build. Detail-obsessed and always on
-          time.
+          Publicity art, scalable templates and paced video edits for student organizations and clients, and, as a Computer Science
+          student, the interfaces I design I can also build. Detail-obsessed and always on time.
         </p>
 
-        {/* Stats — printed tiles, the number in italic on the sheet */}
-        <ul className="mt-7 grid grid-cols-3 gap-3">
-          {STATS.map((s, k) => (
-            <li
-              key={s.label}
-              className="sl-pop sheet-card group relative"
-              style={{ "--i": k * 0.6 } as CSSProperties}
-            >
-              <div className="sheet-band relative h-14 overflow-hidden sm:h-16">
-                <p className="type-display absolute bottom-0 left-3 text-4xl text-iris italic transition-transform duration-500 group-hover:-translate-y-1 sm:text-5xl">
-                  {s.n}
-                </p>
-                <Sparkle4 className="absolute top-2 right-2 h-3 w-3 text-white transition-transform duration-500 group-hover:rotate-180" />
-              </div>
-              <p className="px-3 py-2 text-[12px] leading-snug text-ink/75">{s.label}</p>
+        <dl className="mt-9 grid grid-cols-3 divide-x divide-ink/15 border-y border-ink/15">
+          {STATS.map((s) => (
+            <div key={s.label} className="flex flex-col px-4 py-4 first:pl-0">
+              <dt className="type-pixel order-2 mt-1 text-[10px] text-ink/60">{s.label}</dt>
+              <dd className="type-display -order-1 text-5xl text-iris italic">{s.n}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <p className="hand mt-9">made for —</p>
+        <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-5">
+          {orgs.map((o) => (
+            <li key={o.name} className="flex w-[76px] flex-col items-center gap-2 text-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={o.src}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="h-16 w-16 rounded-full border border-ink object-cover shadow-[2px_2px_0_var(--color-ink)]"
+              />
+              <span className="type-pixel text-[9px] leading-tight text-ink/70">{o.name}</span>
             </li>
           ))}
         </ul>
-
       </div>
     </div>
   );

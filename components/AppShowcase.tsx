@@ -123,8 +123,8 @@ export default function AppShowcase() {
       {/* Tabs, grouped by who sees the screen */}
       <div className="mt-4 flex flex-col items-center gap-3">
         {GROUPS.map((g) => (
-          <div key={g.who} className="flex flex-wrap items-center justify-center gap-1.5">
-            <span className="type-pixel mr-1 text-[10px] text-ink/50">{g.who}</span>
+          <div key={g.who} className="seg flex-wrap justify-center !rounded-[22px]">
+            <span className="type-pixel px-2 text-[10px] text-ink/50">{g.who}</span>
             {g.screens.map((s) => {
               const k = ALL.indexOf(s);
               const on = k === i;
@@ -134,9 +134,7 @@ export default function AppShowcase() {
                   type="button"
                   aria-pressed={on}
                   onClick={() => go(k)}
-                  className={`relative overflow-hidden rounded-full border px-3 py-1.5 text-[12px] transition-colors duration-150 ${
-                    on ? "border-iris bg-iris text-paper" : "border-ink/20 bg-white/60 text-ink hover:border-iris"
-                  }`}
+                  className="seg-btn"
                 >
                   {s.label}
                   {on && running && (

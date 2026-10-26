@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { profile, socials } from "@/lib/content";
 import { Lotus, Leaf, Spiral, Sparkle4, Orb, Bellflower, Blossom, Fern, LongVine } from "./Botanicals";
 import { Cloud, Butterfly, Orbit, ShootingStar, GlowSparkle, Star5, StarBurst, PixelFlower, Staff, Note, PixelArt } from "./Ethereal";
+import { InkArrow } from "./Ink";
 import SectionTitle from "./SectionTitle";
 import MorphName from "./MorphName";
 import ContactForm from "./ContactForm";
@@ -21,7 +22,6 @@ const GLYPH: Record<string, React.ReactNode> = {
   "canva site": <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M3 12h18 M12 3c3 3.5 3 14.5 0 18 M12 3c-3 3.5-3 14.5 0 18" />,
 };
 
-const PETALS = [0, 60, 120, 180, 240, 300];
 
 const dp = (depth: number, extra: Record<string, string | number> = {}) => ({ "--depth": depth, ...extra }) as CSSProperties;
 
@@ -39,7 +39,7 @@ export default function Contact() {
   return (
     <section id="contact" className="relative px-4 pb-24 sm:px-8 sm:pb-28">
       <div className="relative mx-auto max-w-6xl">
-        <SectionTitle id="contact-heading" index="05" lead="Thank" accent="you!" note="let's make something" ornament="flourish" />
+        <SectionTitle id="contact-heading" index="05" lead="Let's" accent="talk" note="let's make something" ornament="flourish" />
 
         <footer aria-labelledby="contact-heading" className="end-card bloom-zone relative overflow-visible">
           {/* The dusk sky: full-bleed, fading in from the page above and
@@ -113,9 +113,10 @@ export default function Contact() {
             </span>
             <a
               href="#top"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-ink/40 bg-white/40 px-4 transition-colors hover:bg-iris hover:text-paper sm:min-h-[34px] sm:px-3"
+              aria-label="Back to top"
+              className="btn-ghost btn-icon"
             >
-              Back to top ↑
+              <InkArrow dir="up" className="h-5 w-8" />
             </a>
           </div>
 
@@ -144,38 +145,19 @@ export default function Contact() {
               Open to UI/UX and design roles, and to freelance brand, event and product work.
             </p>
 
-            {/* Bloom buttons */}
-            <ul className="mx-auto mt-10 flex max-w-2xl flex-wrap items-start justify-center gap-x-6 gap-y-8 sm:gap-x-10">
-              {socials.filter((s) => s.label !== "email").map((s, i) => (
-                <li key={s.label} className="sl-pop" style={{ "--i": i } as CSSProperties}>
+            <ul className="mx-auto mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-4">
+              {socials.filter((s) => s.label !== "email").map((s) => (
+                <li key={s.label}>
                   <a
                     href={s.href}
                     target={s.href.startsWith("http") ? "_blank" : undefined}
                     rel="noopener noreferrer"
-                    className="bloom-btn group flex flex-col items-center gap-2"
+                    className="btn-ghost"
                   >
-                    <span className="relative flex h-[72px] w-[72px] items-center justify-center">
-                      {PETALS.map((r) => (
-                        <span key={r} aria-hidden className="bloom-petal" style={{ "--r": `${r}deg` } as CSSProperties} />
-                      ))}
-                      <span className="bloom-orb relative flex h-full w-full items-center justify-center rounded-full">
-                        <svg
-                          viewBox="0 0 24 24"
-                          aria-hidden
-                          className="relative h-7 w-7"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          {GLYPH[s.label]}
-                        </svg>
-                      </span>
-                    </span>
-                    <span className="type-display text-xl text-ink italic capitalize transition-colors group-hover:text-lavender">
-                      {s.label}
-                    </span>
+                    <svg viewBox="0 0 24 24" aria-hidden className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      {GLYPH[s.label]}
+                    </svg>
+                    {s.label} <span aria-hidden>↗</span>
                   </a>
                 </li>
               ))}

@@ -9,8 +9,10 @@ const COLORS = ["#b9379d", "#e3a88a", "#a9b6f0", "#4f9a78", "#711e7b"];
 /**
  * One pointer listener for the whole page:
  *
- *  - writes --px / --py (-1…1 from the viewport centre) on <html>, which
- *    `.px` elements read with their own --depth to drift in parallax;
+ *  - writes --px / --py (-1…1 from the viewport centre) on the parallax
+ *    elements (`.px`, `.orbit`) that are on screen, which read them with
+ *    their own --depth to drift. Writing on <html> instead restyles the
+ *    whole page every frame; on-screen elements only cost a few ms;
  *  - drops a short trail of four-point sparkles behind a mouse cursor.
  *
  * Both are skipped for touch input and for reduced motion.
@@ -19,7 +21,14 @@ export default function PointerFX() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const root = document.documentElement;
+    // Parallax elements currently on screen.
+    const visible = new Set<HTMLElement>();
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => (e.isIntersecting ? visible.add(e.target as HTMLElement) : visible.delete(e.target as HTMLElement))),
+      { rootMargin: "100px" }
+    );
+    document.querySelectorAll<HTMLElement>(".px, .orbit").forEach((el) => io.observe(el));
+
     let raf = 0;
     let x = 0;
     let y = 0;
@@ -52,8 +61,12 @@ export default function PointerFX() {
       if (!raf) {
         raf = requestAnimationFrame(() => {
           raf = 0;
-          root.style.setProperty("--px", ((x / window.innerWidth) * 2 - 1).toFixed(3));
-          root.style.setProperty("--py", ((y / window.innerHeight) * 2 - 1).toFixed(3));
+          const px = ((x / window.innerWidth) * 2 - 1).toFixed(3);
+          const py = ((y / window.innerHeight) * 2 - 1).toFixed(3);
+          visible.forEach((el) => {
+            el.style.setProperty("--px", px);
+            el.style.setProperty("--py", py);
+          });
         });
       }
       const now = performance.now();
@@ -70,6 +83,7 @@ export default function PointerFX() {
     return () => {
       window.removeEventListener("pointermove", onMove);
       cancelAnimationFrame(raf);
+      io.disconnect();
     };
   }, []);
 
