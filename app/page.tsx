@@ -1,5 +1,4 @@
 import Hero from "@/components/Hero";
-import FolderStack from "@/components/FolderStack";
 import BrandShowcase from "@/components/showcase/BrandShowcase";
 import VideoShowcase from "@/components/showcase/VideoShowcase";
 import CodeShowcase from "@/components/showcase/CodeShowcase";
@@ -12,12 +11,11 @@ import GardenFX from "@/components/GardenFX";
 export default function Home() {
   return (
     <main id="top">
-      {/* intro -> the work -> about -> contact */}
+      {/* intro -> branding -> videos -> ui/ux & code -> about -> thank you */}
       <Hero />
       <BrandShowcase />
       <VideoShowcase />
       <CodeShowcase />
-      <FolderStack />
       <AboutPanel />
       <Contact />
       <ScrollFX />
