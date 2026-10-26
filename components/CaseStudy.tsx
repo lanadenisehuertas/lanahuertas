@@ -47,7 +47,7 @@ export default function CaseStudy() {
       {engineeringProjects.map((p) => {
         const m = MOCKS[p.visual];
         return (
-          <article key={p.id} className="grid gap-8 py-12 first:pt-2 last:pb-2 lg:grid-cols-12 lg:items-center lg:gap-12 sm:py-16">
+          <article key={p.id} id={p.id} className="grid scroll-mt-20 gap-8 py-12 first:pt-2 last:pb-2 lg:grid-cols-12 lg:items-center lg:gap-12 sm:py-16">
             <div data-rv className="focus-rv lg:col-span-5">
               <p className="type-pixel flex items-center gap-2 text-[11px] text-ink/55">
                 <PixelFlower className="h-2.5 w-2.5" fill="var(--color-lavender)" />
