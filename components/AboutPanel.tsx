@@ -33,7 +33,7 @@ export default function AboutPanel() {
   return (
     <section id="about" className="px-4 pb-20 sm:px-8">
       <div className="relative mx-auto max-w-6xl">
-        <SectionTitle id="about-heading" index="02" lead="About" accent="me" />
+        <SectionTitle id="about-heading" index="04" lead="About" accent="me" />
 
         <Folder tabs={tabs} active={active} onSelect={setActive} labelledBy="about-heading">
           {active === "about" && <AboutMe />}

@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { PixelFlower } from "./Ethereal";
 
 const LINKS = [
-  { href: "#work", id: "work", label: "work", n: "01" },
-  { href: "#about", id: "about", label: "about", n: "02" },
-  { href: "#contact", id: "contact", label: "contact", n: "03" },
+  { id: "branding", label: "branding", n: "01" },
+  { id: "videos", label: "videos", n: "02" },
+  { id: "code", label: "ui/ux", n: "03" },
+  { id: "about", label: "about", n: "04" },
+  { id: "contact", label: "contact", n: "05" },
 ];
 
 const MANILA = new Intl.DateTimeFormat("en-PH", { timeZone: "Asia/Manila", hour: "numeric", minute: "2-digit" });
@@ -20,6 +23,9 @@ const MANILA = new Intl.DateTimeFormat("en-PH", { timeZone: "Asia/Manila", hour:
  * lower edge fades out instead of ending on a rule.
  */
 export default function Nav() {
+  const pathname = usePathname();
+  const home = pathname === "/";
+  const href = (id: string) => (home ? `#${id}` : `/#${id}`);
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const [time, setTime] = useState("");
@@ -58,7 +64,7 @@ export default function Nav() {
   return (
     <header className={`masthead fixed inset-x-0 top-0 z-50 ${scrolled ? "is-scrolled" : ""}`}>
       <nav aria-label="Main" className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2 sm:px-8">
-        <a href="#top" className="group flex min-h-[44px] items-center gap-2.5 text-iris">
+        <a href={home ? "#top" : "/"} className="group flex min-h-[44px] items-center gap-2.5 text-iris">
           <PixelFlower className="h-4 w-4 transition-transform duration-500 group-hover:rotate-90" fill="currentColor" />
           <span className="type-display text-[19px] leading-none italic">Lana Denise Huertas</span>
         </a>
@@ -67,9 +73,9 @@ export default function Nav() {
           {LINKS.map((l) => {
             const on = active === l.id;
             return (
-              <li key={l.href}>
+              <li key={l.id}>
                 <a
-                  href={l.href}
+                  href={href(l.id)}
                   aria-current={on ? "location" : undefined}
                   className={`nav-link relative flex min-h-[44px] items-center gap-1.5 text-[14px] transition-colors ${
                     on ? "text-iris" : "text-ink/70 hover:text-iris"

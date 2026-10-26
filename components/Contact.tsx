@@ -39,7 +39,7 @@ export default function Contact() {
   return (
     <section id="contact" className="relative px-4 pb-24 sm:px-8 sm:pb-28">
       <div className="relative mx-auto max-w-6xl">
-        <SectionTitle id="contact-heading" index="03" lead="Get in" accent="touch" ornament="flourish" />
+        <SectionTitle id="contact-heading" index="05" lead="Thank" accent="you!" note="let's make something" ornament="flourish" />
 
         <footer aria-labelledby="contact-heading" className="end-card bloom-zone relative overflow-visible">
           {/* The dusk sky: full-bleed, fading in from the page above and
