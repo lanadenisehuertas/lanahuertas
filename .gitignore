@@ -44,3 +44,7 @@ next-env.d.ts
 CLAUDE.md
 AGENTS.md
 .claude/
+
+# Codex image generation and screenshot scratch
+.codex-scratch/
+__pycache__/
