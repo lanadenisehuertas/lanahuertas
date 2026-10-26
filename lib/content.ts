@@ -524,9 +524,8 @@ export const workTabs: WorkTab[] = [
         role: "Concept, copy, and design",
         tools: ["Photoshop", "Illustrator"],
         description:
-          "An ongoing series for the campus library, where the brief was almost always the same: make an administrative notice worth stopping for.\n\nThe database announcement became a what-this-means-for-you list. The Halloween reading activity became a detective corkboard, its game mechanics doubling as the layout. Finals-week opening hours arrived disguised as a multiple-choice question — the schedule only turns up after the joke has landed.",
+          "An ongoing series for the campus library, where the brief was almost always the same: make an administrative notice worth stopping for.\n\nThe database announcement became a what-this-means-for-you list. Finals-week opening hours arrived disguised as a multiple-choice question — the schedule only turns up after the joke has landed.",
         images: [
-          { src: "/work/biblioboo.webp", w: 1600, h: 1600, caption: "Biblioboo's Haunted Book Nook" },
           { src: "/work/finals-motivation.webp", w: 1600, h: 1600, caption: "You Can Do It, iTamaraw — finals hours" },
           { src: "/work/ebsco-office365.webp", w: 1080, h: 1080, caption: "EBSCO in Office 365" },
         ],

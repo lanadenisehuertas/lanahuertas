@@ -40,22 +40,12 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1600
       },
       {
-        "src": "/work/brands/revival-x/2025-01-15-facebook-01.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
         "src": "/work/brands/revival-x/2025-01-15-facebook-02.webp",
         "w": 1600,
         "h": 1600
       },
       {
         "src": "/work/brands/revival-x/481149552-976832484554048-769970505119435199-n.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/revival-x/481956456-976832327887397-3253310767882497422-n.webp",
         "w": 1600,
         "h": 1600
       }
@@ -121,11 +111,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "src": "/work/brands/into-the-code/481297602-943447034632905-1925747471807246309-n.webp",
         "w": 1600,
         "h": 1600
-      },
-      {
-        "src": "/work/brands/into-the-code/481464852-943446994632909-7706815380810392034-n.webp",
-        "w": 1600,
-        "h": 1600
       }
     ]
   },
@@ -187,16 +172,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1500
       },
       {
-        "src": "/work/brands/neostalgia/artboard-1.webp",
-        "w": 1358,
-        "h": 1358
-      },
-      {
-        "src": "/work/brands/neostalgia/teaser.webp",
-        "w": 1538,
-        "h": 1600
-      },
-      {
         "src": "/work/brands/neostalgia/teaser-2.webp",
         "w": 1538,
         "h": 1600
@@ -247,56 +222,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1600
       },
       {
-        "src": "/work/brands/neostalgia/2.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/3.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/4.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/byteme-1.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/ck.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/code-prits-1.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/elevate-1.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/hotfix-1.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/stochastic-1.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/dp-blast-2.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
         "src": "/work/brands/neostalgia/dp-blast-3.webp",
         "w": 1594,
         "h": 1600
@@ -312,22 +237,7 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1600
       },
       {
-        "src": "/work/brands/neostalgia/10-james.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/13-csypres.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
         "src": "/work/brands/neostalgia/14-shy.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/6-marianne.webp",
         "w": 1594,
         "h": 1600
       },
@@ -363,16 +273,6 @@ export const brandAssets: Record<string, BrandAssets> = {
       },
       {
         "src": "/work/brands/neostalgia/jacket-teal.webp",
-        "w": 1600,
-        "h": 766
-      },
-      {
-        "src": "/work/brands/neostalgia/jacket-navy.webp",
-        "w": 1600,
-        "h": 766
-      },
-      {
-        "src": "/work/brands/neostalgia/jacket-black.webp",
         "w": 1600,
         "h": 766
       }
@@ -422,11 +322,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1600
       },
       {
-        "src": "/work/brands/tabitayo/fb-3d.webp",
-        "w": 1297,
-        "h": 1600
-      },
-      {
         "src": "/work/brands/tabitayo/fb-3e.webp",
         "w": 1297,
         "h": 1600
@@ -435,11 +330,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "src": "/work/brands/tabitayo/post2.webp",
         "w": 1297,
         "h": 1600
-      },
-      {
-        "src": "/work/brands/tabitayo/post1.webp",
-        "w": 1080,
-        "h": 1350
       },
       {
         "src": "/work/brands/tabitayo/layer-2.webp",
@@ -507,11 +397,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1600
       },
       {
-        "src": "/work/brands/rock-of-aces/485728706-1038197318333018-546074348015722220-n.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
         "src": "/work/brands/rock-of-aces/486288255-1039087391577344-4766816782571373435-n.webp",
         "w": 1080,
         "h": 1080
@@ -567,26 +452,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1436
       },
       {
-        "src": "/work/brands/battle-of-the-bands/2024-05-12-facebook-02.webp",
-        "w": 1435,
-        "h": 1436
-      },
-      {
-        "src": "/work/brands/battle-of-the-bands/2024-05-12-facebook-03.webp",
-        "w": 1435,
-        "h": 1436
-      },
-      {
-        "src": "/work/brands/battle-of-the-bands/2024-05-12-facebook-04.webp",
-        "w": 1435,
-        "h": 1436
-      },
-      {
-        "src": "/work/brands/battle-of-the-bands/2024-05-12-facebook-05.webp",
-        "w": 1435,
-        "h": 1436
-      },
-      {
         "src": "/work/brands/battle-of-the-bands/2024-05-25-facebook-last-01.webp",
         "w": 526,
         "h": 526
@@ -598,16 +463,6 @@ export const brandAssets: Record<string, BrandAssets> = {
       },
       {
         "src": "/work/brands/battle-of-the-bands/2024-06-07-facebook-meet-02.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/battle-of-the-bands/2024-06-07-facebook-meet-03.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/battle-of-the-bands/2024-06-07-facebook-meet-04.webp",
         "w": 1600,
         "h": 1600
       },
@@ -632,16 +487,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1440
       },
       {
-        "src": "/work/brands/battle-of-the-bands/2024-06-08-facebook-champion-02.webp",
-        "w": 1440,
-        "h": 1440
-      },
-      {
-        "src": "/work/brands/battle-of-the-bands/2024-06-08-facebook-champion-03.webp",
-        "w": 1440,
-        "h": 1440
-      },
-      {
         "src": "/work/brands/battle-of-the-bands/2024-06-10-facebook-band-01.webp",
         "w": 834,
         "h": 540
@@ -650,98 +495,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "src": "/work/brands/battle-of-the-bands/2024-06-10-facebook-thank-01.webp",
         "w": 834,
         "h": 540
-      }
-    ]
-  },
-  "biblioboo": {
-    "collage": {
-      "print": [
-        {
-          "src": "/work/brands/biblioboo/poster.webp",
-          "w": 1200,
-          "h": 1600
-        },
-        {
-          "src": "/work/brands/biblioboo/part-2.webp",
-          "w": 1600,
-          "h": 1600
-        }
-      ],
-      "phone": [
-        {
-          "src": "/work/brands/biblioboo/movie-1.webp",
-          "w": 1046,
-          "h": 1600
-        }
-      ],
-      "sticker": [
-        {
-          "src": "/work/brands/biblioboo/biblioboo-scared.webp",
-          "w": 1600,
-          "h": 1515
-        },
-        {
-          "src": "/work/brands/biblioboo/5a865d55-38d1-4f51-a8fe-c9b9e0a1bf7d.webp",
-          "w": 1024,
-          "h": 1536
-        }
-      ]
-    },
-    "set": [
-      {
-        "src": "/work/brands/biblioboo/poster.webp",
-        "w": 1200,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/biblioboo/5a865d55-38d1-4f51-a8fe-c9b9e0a1bf7d.webp",
-        "w": 1024,
-        "h": 1536
-      },
-      {
-        "src": "/work/brands/biblioboo/biblioboo-scared.webp",
-        "w": 1600,
-        "h": 1515
-      },
-      {
-        "src": "/work/brands/biblioboo/artboard-1.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/biblioboo/part-2.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/biblioboo/halloween-long.webp",
-        "w": 1046,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/biblioboo/library-2.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/biblioboo/movie-1.webp",
-        "w": 1046,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/biblioboo/movie-2.webp",
-        "w": 1046,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/biblioboo/movie-3.webp",
-        "w": 1046,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/biblioboo/movie-4.webp",
-        "w": 1046,
-        "h": 1600
       }
     ]
   },
@@ -763,7 +516,7 @@ export const brandAssets: Record<string, BrandAssets> = {
       ],
       "print": [
         {
-          "src": "/work/brands/dystopia/2024-07-03-facebook-8155-02.webp",
+          "src": "/work/brands/dystopia/2024-07-03-facebook-8155-01.webp",
           "w": 1600,
           "h": 1600
         }
@@ -781,17 +534,7 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1600
       },
       {
-        "src": "/work/brands/dystopia/2024-07-03-facebook-1783-02.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
         "src": "/work/brands/dystopia/2024-07-03-facebook-8155-01.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/dystopia/2024-07-03-facebook-8155-02.webp",
         "w": 1600,
         "h": 1600
       }
@@ -813,39 +556,19 @@ export const brandAssets: Record<string, BrandAssets> = {
           "h": 1545
         },
         {
-          "src": "/work/brands/technorun/5k.webp",
-          "w": 1600,
-          "h": 1545
-        },
-        {
-          "src": "/work/brands/technorun/10k.webp",
-          "w": 1600,
-          "h": 1545
-        },
-        {
-          "src": "/work/brands/technorun/21k.webp",
-          "w": 1600,
-          "h": 1545
-        },
-        {
           "src": "/work/brands/technorun/485004285-987718973215459-1496984069015702086-n.webp",
           "w": 1053,
           "h": 790
         },
         {
-          "src": "/work/brands/technorun/485124671-2082693738884781-7476618700085019870-n.webp",
-          "w": 1053,
-          "h": 790
+          "src": "/work/brands/technorun/1.webp",
+          "w": 1500,
+          "h": 1500
         },
         {
-          "src": "/work/brands/technorun/486166051-1310848763478920-3251119603958408455-n.webp",
-          "w": 1053,
-          "h": 790
-        },
-        {
-          "src": "/work/brands/technorun/486722766-1877324576140011-2043964807489557612-n.webp",
-          "w": 1053,
-          "h": 790
+          "src": "/work/brands/technorun/2.webp",
+          "w": 1500,
+          "h": 1500
         }
       ]
     },
@@ -876,37 +599,7 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1545
       },
       {
-        "src": "/work/brands/technorun/5k.webp",
-        "w": 1600,
-        "h": 1545
-      },
-      {
-        "src": "/work/brands/technorun/10k.webp",
-        "w": 1600,
-        "h": 1545
-      },
-      {
-        "src": "/work/brands/technorun/21k.webp",
-        "w": 1600,
-        "h": 1545
-      },
-      {
         "src": "/work/brands/technorun/485004285-987718973215459-1496984069015702086-n.webp",
-        "w": 1053,
-        "h": 790
-      },
-      {
-        "src": "/work/brands/technorun/485124671-2082693738884781-7476618700085019870-n.webp",
-        "w": 1053,
-        "h": 790
-      },
-      {
-        "src": "/work/brands/technorun/486166051-1310848763478920-3251119603958408455-n.webp",
-        "w": 1053,
-        "h": 790
-      },
-      {
-        "src": "/work/brands/technorun/486722766-1877324576140011-2043964807489557612-n.webp",
         "w": 1053,
         "h": 790
       }
@@ -948,37 +641,12 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 900
       },
       {
-        "src": "/work/brands/pacsa/speaker.webp",
-        "w": 1600,
-        "h": 900
-      },
-      {
-        "src": "/work/brands/pacsa/dp-frame.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
         "src": "/work/brands/pacsa/dp-frame-2-1.webp",
         "w": 1600,
         "h": 1600
       },
       {
-        "src": "/work/brands/pacsa/3.webp",
-        "w": 1500,
-        "h": 1500
-      },
-      {
-        "src": "/work/brands/pacsa/announcement.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
         "src": "/work/brands/pacsa/btc-house-rules.webp",
-        "w": 1000,
-        "h": 1000
-      },
-      {
-        "src": "/work/brands/pacsa/1.webp",
         "w": 1000,
         "h": 1000
       },
@@ -1038,16 +706,6 @@ export const brandAssets: Record<string, BrandAssets> = {
       ],
       "item": [
         {
-          "src": "/work/brands/elysium/2024-08-31-facebook-03.webp",
-          "w": 1524,
-          "h": 1524
-        },
-        {
-          "src": "/work/brands/elysium/2024-08-31-facebook-04.webp",
-          "w": 1524,
-          "h": 1524
-        },
-        {
           "src": "/work/brands/elysium/2024-09-19-facebook-01.webp",
           "w": 526,
           "h": 526
@@ -1071,6 +729,21 @@ export const brandAssets: Record<string, BrandAssets> = {
           "src": "/work/brands/elysium/2025-04-21-facebook-01.webp",
           "w": 1600,
           "h": 1600
+        },
+        {
+          "src": "/work/brands/elysium/2024-12-27-facebook-01.webp",
+          "w": 1600,
+          "h": 1061
+        },
+        {
+          "src": "/work/brands/elysium/2025-07-24-facebook-01.webp",
+          "w": 526,
+          "h": 529
+        },
+        {
+          "src": "/work/brands/elysium/2024-11-04-facebook-01.webp",
+          "w": 1000,
+          "h": 1000
         }
       ]
     },
@@ -1086,27 +759,12 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1524
       },
       {
-        "src": "/work/brands/elysium/2024-08-31-facebook-03.webp",
-        "w": 1524,
-        "h": 1524
-      },
-      {
-        "src": "/work/brands/elysium/2024-08-31-facebook-04.webp",
-        "w": 1524,
-        "h": 1524
-      },
-      {
         "src": "/work/brands/elysium/2024-09-19-facebook-01.webp",
         "w": 526,
         "h": 526
       },
       {
         "src": "/work/brands/elysium/2024-11-04-facebook-01.webp",
-        "w": 1000,
-        "h": 1000
-      },
-      {
-        "src": "/work/brands/elysium/2024-11-04-facebook-02.webp",
         "w": 1000,
         "h": 1000
       },
@@ -1121,29 +779,9 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1061
       },
       {
-        "src": "/work/brands/elysium/2024-12-27-facebook-02.webp",
-        "w": 1070,
-        "h": 1075
-      },
-      {
-        "src": "/work/brands/elysium/2024-12-27-facebook-03.webp",
-        "w": 1070,
-        "h": 1075
-      },
-      {
-        "src": "/work/brands/elysium/2024-12-27-facebook-04.webp",
-        "w": 1070,
-        "h": 1075
-      },
-      {
         "src": "/work/brands/elysium/2025-03-06-facebook-01.webp",
         "w": 510,
         "h": 565
-      },
-      {
-        "src": "/work/brands/elysium/2025-03-19-facebook-01.webp",
-        "w": 526,
-        "h": 526
       },
       {
         "src": "/work/brands/elysium/2025-04-21-facebook-01.webp",
@@ -1152,16 +790,6 @@ export const brandAssets: Record<string, BrandAssets> = {
       },
       {
         "src": "/work/brands/elysium/2025-04-21-facebook-02.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/elysium/2025-04-21-facebook-03.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/elysium/2025-04-21-facebook-04.webp",
         "w": 1600,
         "h": 1600
       },
@@ -1179,11 +807,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "src": "/work/brands/elysium/feutech-acm-2.webp",
         "w": 1600,
         "h": 1599
-      },
-      {
-        "src": "/work/brands/elysium/feutech-acm-7.webp",
-        "w": 1600,
-        "h": 1600
       }
     ]
   },
@@ -1241,11 +864,6 @@ export const brandAssets: Record<string, BrandAssets> = {
       {
         "src": "/work/brands/techno-week/3-1.webp",
         "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/techno-week/476071158-575837482109744-8873126769850518653-n.webp",
-        "w": 1208,
         "h": 1600
       }
     ]

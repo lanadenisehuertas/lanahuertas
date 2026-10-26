@@ -1,4 +1,4 @@
-// The branding showcase: 14 brands in showcase order, strongest first.
+// The branding showcase: 13 brands in showcase order, strongest first.
 // Copy lives here; images come from the generated lib/brand-assets.ts
 // (scripts/import-pubmats.py). Adding a brand = an entry in
 // scripts/pubmats.json + scripts/backdrops.json + COPY below.
@@ -129,21 +129,6 @@ const COPY: BrandCopy[] = [
     layout: "mirror",
     accent: "#a3243b",
     href: "https://www.facebook.com/share/p/1JqSHiJsb7/",
-  },
-  {
-    slug: "biblioboo",
-    name: "BiblioBOO",
-    org: "FEU Tech Library",
-    handle: "feutechlibrary",
-    date: "Oct 2025",
-    year: "2025",
-    tagline: "A haunted book nook and The Isolation Room.",
-    brief:
-      "Halloween at the library: a ghost mascot, a detective corkboard whose game rules double as the layout, and a four-film screening series for The Isolation Room.",
-    roles: ["Mascot", "Campaign", "Social media"],
-    tools: ["Photoshop", "Illustrator"],
-    layout: "stickers",
-    accent: "#c7924a",
   },
   {
     slug: "dystopia",
@@ -303,14 +288,7 @@ const existing = workTabs.flatMap((t) => t.projects);
 const kept: Project[] = KEEP.map((id) => {
   const p = existing.find((x) => x.id === id);
   if (!p) throw new Error(`morePosters: no project "${id}" in content.ts`);
-  if (id !== "feu-library") return p;
-  // BiblioBOO is its own brand now; the library entry keeps the rest.
-  return {
-    ...p,
-    images: p.images.filter((i) => !i.src.includes("biblioboo")),
-    description:
-      "An ongoing series for the campus library, where the brief was almost always the same: make an administrative notice worth stopping for.\n\nThe database announcement became a what-this-means-for-you list. Finals-week opening hours arrived disguised as a multiple-choice question — the schedule only turns up after the joke has landed.",
-  };
+  return p;
 });
 
 const added: Project[] = [
