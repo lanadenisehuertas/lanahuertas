@@ -22,7 +22,7 @@ the existing ethereal-garden site.
 ### Homepage `/`
 
 1. **Hero** — same elements, re-composed (see _Hero_).
-2. **Branding** — chapter card, then a carousel of all 15 brands (one per
+2. **Branding** — chapter card, then a carousel of all 14 brands (one per
    screen), ending on a "see every pubmat →" card linking to `/design`.
 3. **Videos** — chapter card, then a carousel of the 7 videos, ending on a card
    linking to `/videos`. Each slide links to `/videos#<id>`.
@@ -37,7 +37,7 @@ the existing ethereal-garden site.
 
 ### New pages
 
-- **`/design`** — all 15 brands in order. Each: the same intro block as its
+- **`/design`** — all 14 brands in order. Each: the same intro block as its
   carousel slide, then every pubmat of that set in a masonry grid with the
   existing lightbox (`ProjectModal`). After the brands, a **More posters** grid
   of one-offs. Brand sections are anchored (`/design#neostalgia`).
@@ -83,18 +83,24 @@ is its own brand even within the same org.
 | 1 | `revival-x` | ACM Revival X | ACM · Jan 2025 | Cover | chrome-violet nebula, liquid-metal ribbons |
 | 2 | `into-the-code` | Into the Code F++ 5.0 | ACM · Mar 2024 | Speaker wall | deep navy grid tunnel, neon violet wireframe portal |
 | 3 | `neostalgia` | NEOSTALGIA | CS Expo · 2026 | Spread | retro-futurist teal sky, ringed orange planet, cream clouds, rocket trail |
-| 4 | `rock-of-aces` | Rock of Aces | SCC · 2025 | Phone fan | hot-pink/orange torn xerox paper, starbursts |
-| 5 | `battle-of-the-bands` | Battle of the Bands | SCC · 2024 | Mirror | maroon sunburst stage, kraft paper, vintage mic |
-| 6 | `biblioboo` | BiblioBOO & The Isolation Room | Library · Oct 2025 | Sticker sheet | moonlit haunted library shelves, cork board |
-| 7 | `dystopia` | Dystopia | ACM · Jun 2024 | Cover | chrome cyber skyline at magenta-violet dusk |
-| 8 | `tammy` | Tammy & KnowsMore | Library · 2026 | Sticker sheet | warm wooden shelves, green and gold light |
+| 4 | `tabitayo` | Tabitayo | Client · 2026 | Mirror | wine-and-cream table setting, linen, candlelight |
+| 5 | `rock-of-aces` | Rock of Aces | SCC · 2025 | Phone fan | hot-pink/orange torn xerox paper, starbursts |
+| 6 | `battle-of-the-bands` | Battle of the Bands | SCC · 2024 | Mirror | maroon sunburst stage, kraft paper, vintage mic |
+| 7 | `biblioboo` | BiblioBOO & The Isolation Room | Library · Oct 2025 | Sticker sheet | moonlit haunted library shelves, cork board |
+| 8 | `dystopia` | Dystopia | ACM · Jun 2024 | Cover | chrome cyber skyline at magenta-violet dusk |
 | 9 | `technorun` | TechnoRun | SCC · 2025 | Kit flat-lay | bright running-track lanes at sunrise |
 | 10 | `pacsa` | Kulay PACSA | PACSA · 2025 | Spread | Filipino woven-pattern border, Baguio pine hills, golden clouds |
 | 11 | `heartwired` | HeartWired | ACM · Feb 2025 | Phone fan | pink grid paper, hearts, ribbon, tape |
-| 12 | `tabitayo` | Tabitayo | Client · 2026 | Mirror | wine-and-cream table setting, linen, candlelight |
-| 13 | `elysium` | ACM Elysium 2024–25 | ACM · 2024–25 | Kit flat-lay | lavender aurora heavens, soft glow |
-| 14 | `cs-night` | CS Night | ACM · 2026 | Speaker wall | art-deco gold on midnight, marquee lights |
-| 15 | `techno-week` | Techno Week | SCC · 2025 | Spread | pastel Memphis shapes and confetti |
+| 12 | `elysium` | ACM Elysium 2024–25 | ACM · 2024–25 | Kit flat-lay | lavender aurora heavens, soft glow |
+| 13 | `cs-night` | CS Night | ACM · 2026 | Speaker wall | art-deco gold on midnight, marquee lights |
+| 14 | `techno-week` | Techno Week | SCC · 2025 | Spread | pastel Memphis shapes and confetti |
+
+Tabitayo sits at #4 because it is real client work; its slide labels the org
+as "Client".
+
+**Excluded entirely** (not on the homepage, not on `/design`): Tammy mascot &
+sticker set and the Student Journey 2 / KnowsMore booth set, and ACM X
+(Nov 2023).
 
 **More posters** (on `/design` only): ACM Ignition, Handog Ngiti 2023, SCC
 general (certified org, birthdays, Never Again, Spooktechular, Holy Week,
@@ -106,15 +112,15 @@ work.
 Source folders map 1:1 from `D:\WORK\PORTFOLIO\PUBMATS` (e.g. `revival-x` ←
 `02 FEU Tech ACM/03 ACM Revival (Jan 2025)`; `elysium` ←
 `02 FEU Tech ACM/00 ACM Overall Theme 2024-2025` minus pieces belonging to
-other brands; `tammy` ← `04 FEU Tech Library/12 Student Journey 2…` +
-`13 Tammy mascot & sticker set`).
+other brands; `tabitayo` ← `06 Freelance & clients/01 Tabitayo (seat-finder
+app)`).
 
 ### Slide anatomy (shared)
 
 - Full-screen slide; generated backdrop fills it (crossfades in as the slide
   arrives), site grain + a few pixel sparkles over it so it belongs to the
   garden.
-- **Copy card** — pearl glass card: `NN / 15 · Org · Date` (pixel type),
+- **Copy card** — pearl glass card: `NN / 14 · Org · Date` (pixel type),
   brand name (Cormorant display), one-line tagline (italic), two-line brief,
   role chips, tools chips, "View the full set →" (`/design#slug`). Text is
   always on the card, never directly on a backdrop, so contrast holds on every
@@ -123,6 +129,26 @@ other brands; `tammy` ← `04 FEU Tech Library/12 Student Journey 2…` +
   printed-poster (tilted, soft shadow), phone frame (CSS device), die-cut
   stickers (no frame, drop shadow), product shots.
 - Carousel chrome: prev/next arrows, numbered pips, swipe/trackpad, ←/→ keys.
+
+### Mockups
+
+Pubmats are shown in context, not as flat squares, wherever a mockup reads
+better. All mockups are built in code (CSS/SVG frames with the real pubmat
+placed inside, perspective via CSS transforms), so the designs stay pixel-true:
+
+- **Phone** — social posts in an iPhone-style frame (feed or story crop).
+- **Print** — poster pinned/taped to a surface, slight paper curl shadow.
+- **Lanyard ID** — DP frames and nameplates (NEOSTALGIA, PACSA) as event IDs.
+- **Tablet / laptop** — Tabitayo's app screens and PsyClick (existing
+  `SiteMockup`).
+- **Billboard / standee** — one key visual per Cover slide where it helps
+  (e.g. Revival X, NEOSTALGIA main poster).
+- Existing product shots (jackets, singlets, Tabitayo hand-held phones) are
+  used as they are.
+
+If a code-built mockup looks flat for a particular brand, Codex may generate an
+**empty** mockup scene (blank poster on a wall, blank billboard) with the
+pubmat composited onto it in CSS — Codex never draws the pubmat itself.
 
 ### Layout variants
 
@@ -162,7 +188,7 @@ the existing `SiteMockup` / device mocks, on generated backdrops:
 
 ## Backdrops (Codex)
 
-18 images (15 brands + 3 UI/UX), generated with the Codex CLI
+17 images (14 brands + 3 UI/UX), generated with the Codex CLI
 (`C:\Users\Lana\AppData\Local\OpenAI\Codex\bin\a96ca4c1eee0cf35\codex.exe exec`).
 Prompt base: flat 2D poster illustration, light grain, soft dreamy light,
 **no text, no logos, no people**, quiet negative space where the copy card and
@@ -213,7 +239,7 @@ curated to ~12 for `/design`.
 
 - `Carousel` — generic: scroll-snap track, arrows, pips, keys, active-index
   callback, `aria-roledescription="carousel"`, each slide
-  `role="group" aria-label="3 of 15"`.
+  `role="group" aria-label="3 of 14"`.
 - `ChapterCard` — the ref-1 divider ("Branding", "Videos", "UI/UX & code").
 - `BrandSlide` — copy card + `BrandCollage` + backdrop for one brand.
 - `BrandCollage` — renders a layout variant from `brand.collage`.
@@ -248,4 +274,4 @@ No test framework in the repo; verification is:
 
 - Per-brand case-study pages (`/design/<slug>`).
 - Editing or regenerating any pubmat itself.
-- ACM X (Nov 2023) — its images are no longer in PUBMATS.
+- ACM X (Nov 2023), Tammy mascot set, Student Journey 2 / KnowsMore set.
