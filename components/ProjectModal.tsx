@@ -8,7 +8,7 @@ import { small } from "./ProjectBento";
 const FOCUSABLE = 'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])';
 
 /** Turn a YouTube / Vimeo / Google Drive URL into its embeddable form. */
-function toEmbed(url: string): string | null {
+export function toEmbed(url: string): string | null {
   const yt = url.match(
     /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/
   );

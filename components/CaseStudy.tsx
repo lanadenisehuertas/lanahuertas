@@ -8,7 +8,7 @@ import { PixelFlower } from "./Ethereal";
  * Each project shows its real, live site as a device mockup. Add a project by
  * appending to `engineeringProjects` and giving it an entry here.
  */
-const MOCKS = {
+export const MOCKS = {
   psyclick: {
     kind: "browser" as const,
     // The live site opens on an animated intro, then lands on the hero. The
