@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import { Lotus, Sparkle4, Blossom, Bellflower } from "./Botanicals";
 import { Cloud, Star5, PixelFlower, PixelArt } from "./Ethereal";
 import type { Project } from "@/lib/content";
+import { small } from "@/lib/img";
 
 /** Desktop-window file name for the title bar — the tool decides the extension. */
 function fileName(p: Project) {
@@ -18,8 +19,7 @@ function fileName(p: Project) {
   return `${p.id.replace(/-/g, "_")}.${ext}`;
 }
 
-/** 720px-wide copy of a poster, made for the grid tiles (public/work/sm). */
-export const small = (src: string) => src.replace("/work/", "/work/sm/");
+export { small };
 
 /**
  * Justified gallery. Each tile is sized by its cover's aspect ratio, so every

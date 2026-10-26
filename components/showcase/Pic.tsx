@@ -1,5 +1,5 @@
 import type { ProjectImage } from "@/lib/content";
-import { small } from "../ProjectBento";
+import { small } from "@/lib/img";
 
 /**
  * A pubmat at its intrinsic ratio: the 720px copy for small slots, the full
