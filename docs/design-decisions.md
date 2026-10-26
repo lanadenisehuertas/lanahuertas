@@ -75,15 +75,23 @@ nodes reach `opacity: 1` on scroll.
 
 ## Page order
 
-1. `Hero` — name-led (`Lana / I make work that's hard to scroll past.`)
-2. `FolderStack` — the work, in four switchable folders
-   (graphic design / brand systems / videos / projects)
-3. `AboutPanel` — four switchable folders
+1. `Hero` — one garden scene with the name grown into it
+2. `BrandShowcase` — 01 Branding & pubmats, a one-brand-per-screen carousel
+3. `VideoShowcase` — 02 Moving pictures, a carousel of edits
+4. `CodeShowcase` — 03 UI/UX & code, one stacked screen per project
+5. `AboutPanel` — 04, four switchable folders
    (about me / experience / education & certs / skills)
-4. `Contact`
+6. `Contact` — 05 Thank you!
 
-Every section is a folder, so the metaphor labels the whole page rather than only the
-work section.
+Each showcase ends in a link to its full page: `/design`, `/videos`, `/ui-ux`.
+
+## Brand showcase
+
+The work is presented as branded screens rather than a gallery: each brand gets
+a generated backdrop, its real pubmats arranged in one of seven mockup layouts
+(spread, mirror, cover, fan, stickers, kit, wall), and a copy card. The full
+reasoning is in `docs/superpowers/specs/2026-10-26-brand-showcase-design.md`;
+the build steps are in `docs/superpowers/plans/2026-10-26-brand-showcase.md`.
 
 ## The folder drawer
 

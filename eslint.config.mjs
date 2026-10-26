@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Screenshot/Codex scratch and agent worktrees.
+    ".codex-scratch/**",
+    ".claude/**",
   ]),
 ]);
 

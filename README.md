@@ -43,7 +43,16 @@ only. `lavender` in particular is never used behind text.
 
 ## Adding a project
 
-Add an entry to the relevant tab's `projects` array in `lib/content.ts`:
+Brands are added in three places: curate the brand's pubmats in
+`scripts/pubmats.json`, give it a backdrop prompt in `scripts/backdrops.json`,
+and write its copy in `COPY` in `lib/brands.ts`. Then run
+`python -I scripts/import-pubmats.py` (converts the images and regenerates
+`lib/brand-assets.ts`) and `python -I scripts/gen-backdrops.py` (generates any
+missing backdrop with the Codex CLI). `node scripts/check-brands.mjs` confirms
+every asset exists.
+
+Other work — videos, UI/UX case studies, one-off posters — is an entry in
+`lib/content.ts`:
 
 ```ts
 {
