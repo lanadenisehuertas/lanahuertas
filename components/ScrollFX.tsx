@@ -61,10 +61,27 @@ export default function ScrollFX() {
     );
     document.querySelectorAll("main > section").forEach((s) => idle.observe(s));
 
+    // While scrolling, the garden's loops hold still (see html[data-scrolling]):
+    // one attribute write when a scroll starts and one 150ms after it ends.
+    const root = document.documentElement;
+    let settle = 0;
+    const onScroll = () => {
+      if (!settle) root.dataset.scrolling = "";
+      window.clearTimeout(settle);
+      settle = window.setTimeout(() => {
+        settle = 0;
+        delete root.dataset.scrolling;
+      }, 150);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+
     return () => {
       io.disconnect();
       mo.disconnect();
       idle.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(settle);
+      delete root.dataset.scrolling;
     };
   }, []);
 

@@ -1134,6 +1134,13 @@ html[data-lite] .lite-hide { display: none; }
   }
 }
 
+/* While the page scrolls (ScrollFX sets data-scrolling, clearing it 150ms
+   after the last scroll event) the garden's loops hold still: the browser
+   then only moves pixels, instead of also animating everything under them. */
+html[data-scrolling] :is(.twinkle, .sway, .drift-x, .drift-y, .flutter, .spin-slow, .orbit-spin, .float-badge, .art-wing, .bud-now) {
+  animation-play-state: paused;
+}
+
 /* --- Masthead (Nav) ---------------------------------------------------------
  * Clear over the hero; a pearl band once scrolled, its lower edge fading out
  * rather than ending on a rule. The current section wears a sparkle.
@@ -1155,9 +1162,7 @@ html[data-lite] .lite-hide { display: none; }
   }
 
   .masthead.is-scrolled {
-    background-color: color-mix(in srgb, var(--color-paper) 82%, transparent);
-    backdrop-filter: blur(12px) saturate(1.1);
-    -webkit-backdrop-filter: blur(12px) saturate(1.1);
+    background-color: color-mix(in srgb, var(--color-paper) 94%, transparent);
   }
 
   .masthead.is-scrolled::after { opacity: 1; }
