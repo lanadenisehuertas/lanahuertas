@@ -1,6 +1,6 @@
 # Portfolio — design decisions
 
-_Last reviewed 2026-07-26_
+_Last reviewed 2026-10-27_
 
 ## What this is
 
@@ -40,16 +40,26 @@ drifts through the background as its own layer.
 _An earlier build used an electric-blue palette (Dark Ultramarine / Honeydew /
 Vanilla Custard). It was replaced wholesale; nothing of it remains._
 
-**Layout: reference 1.** Heavy geometric sans (Poppins), hard offset shadows,
-tab-folder cards.
-Reference 2's dense poster-grid *composition* is used inside the work panels, but
-rendered in this palette — its cream-and-serif editorial treatment was dropped because
-the two systems use opposite navigation metaphors (click-to-switch vs. scroll-through).
+**Look: a night-garden sketchbook.** The garden sky, botanicals and pixel art,
+under a dusk of halftone, dither and grain, with the interface drawn on in ink:
+actions are italic words on a brush swash, the current tab is circled, the
+current nav item underlined, and margin notes are in a pen face (Nanum Pen
+Script). No boxes, capsules or gel. Type: Cormorant Garamond for display and
+the name, Archivo for text, DM Mono for labels, Redaction for the name's hover
+decay. Full reasoning: `docs/superpowers/specs/2026-10-26-night-garden-sketchbook-design.md`.
+
+_The first build was neo-brutalist (Poppins, hard offset shadows, tab-folder
+cards); it was replaced by the garden, and the garden's Y2K layer (gel, chrome,
+LCD cells, running ribbons) by the sketchbook. The palette tokens above
+survived both._
 
 **Content is data.** Everything lives in `lib/content.ts`. Work categories are an array;
 adding one — including the engineering showcase — is a data change, not a rewrite.
 
-## Design validation (ui-ux-pro-max)
+## Design validation (ui-ux-pro-max, first build)
+
+_The style findings below belong to the neo-brutalist build. The touch-target and
+focus-ring fixes still apply._
 
 Ran the design skill against the build. It independently recommended **Neo Brutalism**
 for a creative portfolio — thick borders, hard offset shadows, colour blocking,
@@ -79,7 +89,7 @@ nodes reach `opacity: 1` on scroll.
 2. `BrandShowcase` — 01 Branding & pubmats, a one-brand-per-screen carousel
 3. `VideoShowcase` — 02 Moving pictures, a carousel of edits
 4. `CodeShowcase` — 03 UI/UX & code, one stacked screen per project
-5. `AboutPanel` — 04, four switchable folders
+5. `AboutPanel` — 04, four tabs circled in ink when current
    (about me / experience / education & certs / skills)
 6. `Contact` — 05 Thank you!
 
@@ -93,10 +103,14 @@ a generated backdrop, its real pubmats arranged in one of seven mockup layouts
 reasoning is in `docs/superpowers/specs/2026-10-26-brand-showcase-design.md`;
 the build steps are in `docs/superpowers/plans/2026-10-26-brand-showcase.md`.
 
-## The folder drawer
+## The folder drawer (retired)
 
-The work section is a stack of manila folders, not browser tabs
-(`components/FolderStack.tsx`, with the tab strip in `components/Folder.tsx`).
+_History. The homepage work section was a stack of manila folders until the
+showcase carousels replaced it; `FolderStack.tsx` is gone. `components/Folder.tsx`
+survives only as the About tabs, drawn as circled words, and its colour accents
+are no longer rendered. The notes below record what the drawer did._
+
+The work section was a stack of manila folders, not browser tabs.
 
 - **Tab shape** — rounded rectangles (`rounded-t-xl`). An earlier version used an
   angled `clip-path` notch; the rounded form was preferred and the clip-path removed.
@@ -187,7 +201,10 @@ or descriptions stand in for real work.
 
 ## Figma plugin
 
-`figma-plugin/` was regenerated on 2026-07-26 against the current design —
+_Out of date: the snapshot predates the garden and the sketchbook. Re-run it
+before relying on it._
+
+`figma-plugin/` was regenerated on 2026-07-26 against the design of the time —
 lavender-sunset palette, Bricolage/Yellowtail/Silkscreen/Poppins, folder tabs,
 edge rails, and the section-title lockups.
 
@@ -199,6 +216,12 @@ Re-run it after any significant design change, and delete the old frame first
 since it appends rather than replaces.
 
 ## Accessibility audit
+
+_Run on the first build. Still to redo for the redesign: on the brand slides the
+type sits on each artboard behind a tone wash, light or dark per side
+(`lib/palettes.ts`, measured by `scripts/extract-palettes.py`), and those pairs
+have not been through the audit below. Overflow was re-checked on 2026-10-27:
+none on any page from 320px to 1920px (`node scripts/check-overflow.mjs`)._
 
 Run against the live DOM before launch, not by inspection.
 
@@ -232,6 +255,25 @@ mid-twinkle at an arbitrary opacity.
 
 **Overflow.** No horizontal overflow from 320px to 1920px.
 
+## Performance
+
+Measured on a production build in headless Chrome, which renders in software:
+read the numbers as relative, not as what a phone shows.
+
+- **Every looping element costs a style update per frame**, composited or not
+  (a trace showed each loop invalidating style about 60 times a second). So the
+  count of running loops matters more than what they animate. Sections out of
+  view pause theirs (`[data-idle]`, from `ScrollFX`); the fixed starfield never
+  leaves view, so only half its stars twinkle. Loops running at the top of the
+  page: 66 -> 50.
+- **`overflow: hidden` breaks `view()` timelines.** A hidden box is a scroll
+  container, so a scroll-driven animation inside it binds to that box, which
+  never scrolls, and runs on the main thread. The hero uses `overflow-clip`
+  (clips, but is not a scroll container); its 25 parallax layers now run on the
+  compositor. Use `clip` around any `animation-timeline: view()` element.
+- **While the page scrolls, ambient loops hold still** (`html[data-scrolling]`),
+  so the browser only moves pixels.
+
 ## Share metadata
 
 The site had no Open Graph or Twitter tags, so pasting the link anywhere produced a
@@ -246,12 +288,11 @@ domain is attached.
 
 ## Outstanding
 
-- **Socials are thin.** `lib/content.ts` lists only email and the old Canva portfolio.
-  Linking the previous portfolio *from* the new one is circular; it should probably be
-  dropped once this site replaces it. There is no LinkedIn and no GitHub link, and both
-  are expected for design and engineering applications.
-- **`public/work/psyclick.webp` is unused** — `PsyClickVisual` renders in CSS now. Safe
-  to delete.
+- **The old Canva site is still linked.** LinkedIn and GitHub are in now; linking the
+  previous portfolio *from* the new one is circular and should probably go once this
+  site replaces it.
+- **The `/design` gallery still wears the old window chrome** (title bars, close boxes,
+  `.psd` file names, "end of folder"): the one piece not yet moved to the sketchbook.
 - **Résumé and site disagree.** The current résumé (UI/UX targeted) omits social media
   and VA skills, the CybeRS Robotics Club role, the 2019–2023 school work, and any
   "7+ years" claim. The site carries all of them. Both are defensible, but a recruiter
