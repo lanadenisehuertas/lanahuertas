@@ -26,12 +26,14 @@ const VINE_FRONT: CSSProperties = {
  * garden drifts with the pointer and reacts when it comes near.
  */
 export default function Hero() {
+  // overflow-clip, not -hidden: a hidden box is a scroll container, and the
+  // .sl-par layers' view() timeline would bind to it instead of the page.
   return (
-    <section className="bloom-zone relative isolate flex min-h-[100svh] flex-col overflow-hidden pt-20">
+    <section className="bloom-zone relative isolate flex min-h-[100svh] flex-col overflow-clip pt-20">
       {/* The sky, edge to edge, fading into the page at the bottom */}
       <div
         aria-hidden
-        className="sheet-fade absolute inset-0 -z-10 overflow-hidden"
+        className="sheet-fade absolute inset-0 -z-10 overflow-clip"
         style={{
           background:
             "radial-gradient(46% 40% at 50% 34%, #fff6ea 0%, transparent 72%), linear-gradient(180deg, #dfe4fb 0%, #c8d0f6 22%, #c9b9ec 46%, #f2b8cf 70%, #f6d3c3 86%, #f3dccf 100%)",
@@ -61,7 +63,7 @@ export default function Hero() {
         <div className="light-leak absolute inset-0" />
         <span className="bokeh drift-y absolute top-[8%] left-[6%] h-24 w-24 opacity-60" style={{ "--bk": "#ffffff", "--dur": "14s" } as CSSProperties} />
         <span className="bokeh drift-y absolute top-[44%] right-[3%] h-32 w-32 opacity-50" style={{ "--bk": "#f2b8cf", "--dur": "17s", "--td": "-5s" } as CSSProperties} />
-        <span className="bokeh-ring drift-y absolute top-[14%] left-[34%] h-10 w-10" style={{ "--dur": "11s" } as CSSProperties} />
+        <span className="bokeh-ring absolute top-[14%] left-[34%] h-10 w-10" />
         <div className="dither absolute inset-x-0 bottom-0 h-[34%] opacity-70" />
         <div className="dither absolute inset-x-0 top-0 h-[22%] -scale-y-100 opacity-50" />
         <PixelArt name="swirl" className="absolute top-[14%] left-[5%] w-[12%] min-w-[80px] opacity-75" />
@@ -72,7 +74,7 @@ export default function Hero() {
         <PixelArt name="sparkle" className="twinkle absolute top-[7%] left-[62%] w-[2.6%] min-w-[24px]" />
         <div className="band-grain absolute inset-0" />
         <Sparkle4 className="px sl-par absolute top-[16%] left-[24%] h-4 w-4 text-white" />
-        <Sparkle4 className="px sl-par spin-slow absolute top-[50%] right-[20%] h-7 w-7 text-white/90" />
+        <Sparkle4 className="px sl-par absolute top-[50%] right-[20%] h-7 w-7 text-white/90" />
         <Sparkle4 className="px sl-par absolute top-[28%] right-[38%] h-3 w-3 text-white" />
       </div>
 
@@ -117,14 +119,14 @@ export default function Hero() {
         <div className="px sl-par absolute top-[6%] right-[4%] w-[20%] sm:w-[13%]" style={depth(16)} data-react="leaf">
           <span className="react block"><Leaf className="sway w-full rotate-[152deg]" /></span>
         </div>
-        <div className="px sl-par absolute right-[2%] bottom-[2%] w-[18%] sm:w-[12%]" style={depth(12, "8s")} data-react="leaf">
-          <span className="react block"><Leaf className="sway w-full -rotate-[150deg]" /></span>
+        <div className="px sl-par absolute right-[2%] bottom-[2%] w-[18%] sm:w-[12%]" style={depth(12)} data-react="leaf">
+          <span className="react block"><Leaf className="w-full -rotate-[150deg]" /></span>
         </div>
         <div className="px sl-par absolute top-[4%] left-[30%] w-[6%]" style={depth(22)}>
           <Spiral className="spin-slow w-full" />
         </div>
         <div className="px sl-par absolute top-[22%] right-[30%] w-[4.5%]" style={depth(20)}>
-          <Spiral className="spin-slow w-full" stroke="#b9379d" />
+          <Spiral className="w-full" stroke="#b9379d" />
         </div>
         <div className="px sl-par absolute right-[27%] bottom-[8%] w-[4.5%]" style={depth(26)} data-react="orb">
           <span className="react block"><Orb className="float-badge w-full" /></span>
@@ -136,11 +138,11 @@ export default function Hero() {
         <div className="px sl-par absolute bottom-[4%] left-[4%] w-[9%] sm:w-[7%]" style={depth(10, "9s")} data-react="leaf">
           <span className="react block"><Fern className="sway w-full -rotate-[14deg]" /></span>
         </div>
-        <div className="px sl-par absolute right-[5%] bottom-[6%] w-[8%] sm:w-[6%]" style={depth(10, "10s")} data-react="leaf">
-          <span className="react block"><Fern className="sway w-full rotate-[12deg]" /></span>
+        <div className="px sl-par absolute right-[5%] bottom-[6%] w-[8%] sm:w-[6%]" style={depth(10)} data-react="leaf">
+          <span className="react block"><Fern className="w-full rotate-[12deg]" /></span>
         </div>
-        <div className="px sl-par absolute bottom-[10%] left-[60%] w-[5%] sm:w-[4%]" style={depth(8, "7.5s")} data-react="leaf">
-          <span className="react block"><Fern className="sway dof-mid w-full rotate-[6deg] opacity-80" /></span>
+        <div className="px sl-par absolute bottom-[10%] left-[60%] w-[5%] sm:w-[4%]" style={depth(8)} data-react="leaf">
+          <span className="react block"><Fern className="dof-mid w-full rotate-[6deg] opacity-80" /></span>
         </div>
 
         <div className="px sl-par absolute bottom-[2%] left-[19%] w-[15%] sm:w-[10%]" style={depth(28, "8.5s")} data-react="bell">
@@ -149,8 +151,8 @@ export default function Hero() {
         <div className="px sl-par absolute right-[20%] bottom-[8%] w-[11%] sm:w-[8%]" style={depth(26, "7s")} data-react="bell">
           <span className="react block"><Bellflower className="sway w-full -rotate-[8deg]" deep /></span>
         </div>
-        <div className="px sl-par absolute top-[10%] left-[44%] w-[6%] sm:w-[4%]" style={depth(18, "6s")} data-react="bell">
-          <span className="react block"><Bellflower className="sway dof-mid w-full rotate-[10deg]" /></span>
+        <div className="px sl-par absolute top-[10%] left-[44%] w-[6%] sm:w-[4%]" style={depth(18)} data-react="bell">
+          <span className="react block"><Bellflower className="dof-mid w-full rotate-[10deg]" /></span>
         </div>
         <div className="px sl-par absolute top-[24%] left-[6%] w-[7%] sm:w-[4.5%]" style={depth(24)} data-react="blossom">
           <span className="react block"><Blossom className="spin-slow w-full" deep /></span>
@@ -160,7 +162,7 @@ export default function Hero() {
         </div>
 
         <div className="px absolute top-[2%] left-[38%] w-[5%] sm:w-[3.2%]" style={depth(22)} data-react="pixel">
-          <span className="react block"><PixelFlower className="drift-y w-full" /></span>
+          <span className="react block"><PixelFlower className="w-full" /></span>
         </div>
         <div className="px absolute top-[40%] left-[2%] w-[3.4%] sm:w-[2.2%]" style={depth(16)} data-react="pixel">
           <span className="react block"><PixelFlower className="w-full opacity-90" /></span>
@@ -183,11 +185,11 @@ export default function Hero() {
         <div className="px sl-par absolute bottom-[8%] left-[16%] w-[13%] sm:w-[9%]" style={depth(30, "8s")} data-react="lotus">
           <span className="react block"><Lotus className="sway w-full" deep /></span>
         </div>
-        <div className="px sl-par absolute bottom-[4%] left-[30%] w-[9%] sm:w-[6%]" style={depth(38, "10s")} data-react="lotus">
-          <span className="react block"><Lotus className="sway w-full" /></span>
+        <div className="px sl-par absolute bottom-[4%] left-[30%] w-[9%] sm:w-[6%]" style={depth(38)} data-react="lotus">
+          <span className="react block"><Lotus className="w-full" /></span>
         </div>
-        <div className="px sl-par absolute right-[28%] bottom-[2%] w-[8%] sm:w-[5.5%]" style={depth(40, "6.5s")} data-react="lotus">
-          <span className="react block"><Lotus className="sway w-full" /></span>
+        <div className="px sl-par absolute right-[28%] bottom-[2%] w-[8%] sm:w-[5.5%]" style={depth(40)} data-react="lotus">
+          <span className="react block"><Lotus className="w-full" /></span>
         </div>
 
         <div className="px pointer-events-none absolute -bottom-[8%] -left-[4%] w-[16%] sm:w-[11%]" style={depth(60)}>
