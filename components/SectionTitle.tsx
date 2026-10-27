@@ -66,13 +66,27 @@ export default function SectionTitle({
   );
 }
 
-/** Letters as spans so each can rise on its own slice of the scroll. */
+/** Letters as spans so each can rise on its own slice of the scroll. Each
+    word is held together: inline-block letters would otherwise let a narrow
+    screen break the line mid-word ("pub / mats"). */
 function Chars({ text, offset = 0 }: { text: string; offset?: number }) {
+  // Each word with the --i of its first letter (the space counts as one).
+  const words = text.split(" ").map((word, w, all) => ({
+    word,
+    at: offset + all.slice(0, w).reduce((n, prev) => n + prev.length + 1, 0),
+  }));
   return (
     <span aria-hidden>
-      {Array.from(text).map((ch, i) => (
-        <span key={i} className="sl-char" style={{ "--i": offset + i } as CSSProperties}>
-          {ch === " " ? " " : ch}
+      {words.map(({ word, at }, w) => (
+        <span key={w}>
+          {w > 0 && " "}
+          <span className="inline-block whitespace-nowrap">
+            {Array.from(word).map((ch, k) => (
+              <span key={k} className="sl-char" style={{ "--i": at + k } as CSSProperties}>
+                {ch}
+              </span>
+            ))}
+          </span>
         </span>
       ))}
     </span>
