@@ -24,6 +24,9 @@ const COLS = {
  * With a backdrop, the project's own artwork covers the screen and the text
  * side gets a soft wash in its tone, the type switching light or dark to
  * match. Without one the slide is transparent and sits on the site's sky.
+ *
+ * Stacked on a phone, slides differ in height and the track grows to the
+ * tallest: min-height 100% keeps every artwork filling its slide.
  */
 export default function SlideShell({
   slug,
@@ -56,7 +59,7 @@ export default function SlideShell({
     <article
       id={id}
       aria-label={label}
-      className="relative isolate flex min-h-[100svh] items-center overflow-hidden lg:h-[100svh] lg:max-h-[960px] lg:min-h-[700px]"
+      className="relative isolate flex min-h-[max(100svh,100%)] items-center overflow-hidden lg:h-[100svh] lg:max-h-[960px] lg:min-h-[700px]"
     >
       {backdrop && (
         <>

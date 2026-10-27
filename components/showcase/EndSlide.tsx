@@ -4,7 +4,7 @@ import { Cloud, PixelArt, Star5 } from "../Ethereal";
 /** The closing slide of a carousel: the garden sky and one way onward. */
 export default function EndSlide({ title, accent, note, href, label }: { title: string; accent: string; note: string; href: string; label: string }) {
   return (
-    <article className="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden lg:h-[100svh] lg:max-h-[960px] lg:min-h-[700px]">
+    <article className="relative isolate flex min-h-[max(100svh,100%)] items-center justify-center overflow-hidden lg:h-[100svh] lg:max-h-[960px] lg:min-h-[700px]">
       <div
         aria-hidden
         className="absolute inset-0 -z-10"
