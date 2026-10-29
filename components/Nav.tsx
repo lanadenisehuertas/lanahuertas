@@ -1,43 +1,73 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { PixelFlower } from "./Ethereal";
 
 const LINKS = [
-  { id: "branding", label: "branding", n: "01" },
-  { id: "videos", label: "videos", n: "02" },
-  { id: "code", label: "ui/ux", n: "03" },
-  { id: "about", label: "about", n: "04" },
-  { id: "contact", label: "contact", n: "05" },
+  { id: "branding", label: "branding" },
+  { id: "posters", label: "posters" },
+  { id: "videos", label: "videos" },
+  { id: "code", label: "ui/ux" },
+  { id: "about", label: "about" },
+  { id: "contact", label: "contact" },
 ];
 
 /** The section each sub-page belongs to, so the nav can mark it. */
 const PAGE_SECTION: Record<string, string> = { "/design": "branding", "/videos": "videos", "/ui-ux": "code" };
 
-const MANILA = new Intl.DateTimeFormat("en-PH", { timeZone: "Asia/Manila", hour: "numeric", minute: "2-digit" });
+/** Height of the bar; the tone check samples the page just under its middle. */
+const BAR = 64;
 
 /**
- * Masthead, set like the top of a printed poster: a pixel-flower mark and
- * the name in italic serif; the sections as a printed index, the current one
- * underlined (the section in view on the homepage, the page itself on a
- * sub-page); Manila time and the "hire me" button at the end.
- *
- * Clear over the hero. Once the page scrolls it becomes a pearl band whose
- * lower edge fades out instead of ending on a rule.
+ * A slim bar that fades into whatever is under it — no solid band. It slips
+ * away while you read downwards and comes back when you scroll up or reach
+ * for the top edge. Over a dark artboard (any section marked
+ * `data-tone="dark"` under the bar) its words turn light. The section in view
+ * is underlined. On phones the links fold into a full-screen sheet.
  */
 export default function Nav() {
   const pathname = usePathname();
   const home = pathname === "/";
   const href = (id: string) => (home ? `#${id}` : `/#${id}`);
-  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [dark, setDark] = useState(false);
   const [active, setActive] = useState<string | null>(null);
-  const [time, setTime] = useState("");
+  const [open, setOpen] = useState(false);
+  const menuBtn = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
+    let lastY = window.scrollY;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const y = window.scrollY;
+      if (Math.abs(y - lastY) > 6) {
+        setHidden(y > lastY && y > 240);
+        lastY = y;
+      }
+      // Tone: the toned section that sits under the bar right now.
+      let tone = false;
+      for (const el of document.querySelectorAll<HTMLElement>("[data-tone]")) {
+        const r = el.getBoundingClientRect();
+        if (r.top <= BAR / 2 && r.bottom > BAR / 2) {
+          tone = el.dataset.tone === "dark";
+          break;
+        }
+      }
+      setDark(tone);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const onPointer = (e: PointerEvent) => {
+      if (e.clientY < BAR + 16) setHidden(false);
+    };
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("pointermove", onPointer, { passive: true });
+    // Carousels change tone without a scroll.
+    const tones = new MutationObserver(onScroll);
+    tones.observe(document.body, { subtree: true, attributes: true, attributeFilter: ["data-tone"] });
 
     // The section crossing the middle of the screen is the current one.
     const spy = new IntersectionObserver(
@@ -48,58 +78,94 @@ export default function Nav() {
       const el = document.getElementById(l.id);
       if (el) spy.observe(el);
     });
-    // On the homepage, the hero clears the mark; sub-pages have no hero.
     const top = new IntersectionObserver(([e]) => e.isIntersecting && setActive(null), { rootMargin: "0px 0px -60% 0px" });
-    const hero = home ? document.querySelector("main > section") : null;
+    const hero = home ? document.getElementById("top")?.querySelector("section") : null;
     if (hero) top.observe(hero);
 
-    // Rendered after mount so server and client never disagree on the minute.
-    const tick = () => setTime(MANILA.format(new Date()).toLowerCase());
-    tick();
-    const clock = window.setInterval(tick, 30_000);
-
     return () => {
+      cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pointermove", onPointer);
+      tones.disconnect();
       spy.disconnect();
       top.disconnect();
-      window.clearInterval(clock);
     };
   }, [home]);
 
+  // The sheet: Esc closes it and hands focus back to the button.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        menuBtn.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.documentElement.style.overflow = "";
+    };
+  }, [open]);
+
   const page = PAGE_SECTION[pathname];
+  const current = (id: string) => (page === id ? "page" : active === id ? "location" : undefined);
 
   return (
-    <header className={`masthead fixed inset-x-0 top-0 z-50 ${scrolled ? "is-scrolled" : ""}`}>
-      <nav aria-label="Main" className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2 sm:px-8">
-        <a href={home ? "#top" : "/"} className="group flex min-h-[44px] items-center gap-2.5 text-iris">
-          <PixelFlower className="h-4 w-4 transition-transform duration-500 group-hover:rotate-90" fill="currentColor" />
-          <span className="type-display text-[19px] leading-none italic">Lana Denise Huertas</span>
+    <header
+      className={`masthead fixed inset-x-0 top-0 z-50 ${hidden && !open ? "is-hidden" : ""} ${dark && !open ? "is-dark" : ""}`}
+    >
+      <nav aria-label="Main" className="relative mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-10">
+        <a href={home ? "#top" : "/"} className="masthead-name flex min-h-[44px] items-center">
+          Lana Denise Huertas
         </a>
 
-        <ul className="hidden items-center gap-6 md:flex">
-          {LINKS.map((l) => {
-            const current = page === l.id ? "page" : active === l.id ? "location" : undefined;
-            return (
+        <ul className="hidden items-center gap-7 md:flex">
+          {LINKS.map((l) => (
+            <li key={l.id}>
+              <a href={href(l.id)} aria-current={current(l.id)} className="nav-link">
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div className="flex items-center gap-3">
+          <a href={href("contact")} className="btn btn-sm hidden sm:inline-flex">
+            Hire me <span aria-hidden>↗</span>
+          </a>
+          <div className="md:hidden">
+          <button
+            ref={menuBtn}
+            type="button"
+            aria-expanded={open}
+            aria-controls="nav-sheet"
+            onClick={() => setOpen((o) => !o)}
+            className="nav-link"
+          >
+            {open ? "close" : "menu"}
+          </button>
+          </div>
+        </div>
+      </nav>
+
+      {open && (
+        <div id="nav-sheet" className="nav-sheet md:hidden">
+          <ul>
+            {LINKS.map((l) => (
               <li key={l.id}>
-                <a href={href(l.id)} aria-current={current} className="nav-link">
-                  <span className="opacity-50">{l.n}</span>
+                <a href={href(l.id)} aria-current={current(l.id)} onClick={() => setOpen(false)}>
                   {l.label}
                 </a>
               </li>
-            );
-          })}
-        </ul>
-
-        <div className="flex items-center gap-4">
-          <span className="type-pixel hidden items-center gap-1.5 text-[10px] text-ink/55 lg:flex">
-            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-leaf" />
-            manila {time || " "}
-          </span>
-          <a href="#contact" className="btn inline-flex min-h-[40px] items-center gap-1.5 px-4 text-[16px]">
-            Hire me <span aria-hidden className="text-[13px] not-italic">↗</span>
+            ))}
+          </ul>
+          <a href={href("contact")} onClick={() => setOpen(false)} className="btn mt-10">
+            Hire me <span aria-hidden>↗</span>
           </a>
         </div>
-      </nav>
+      )}
     </header>
   );
 }

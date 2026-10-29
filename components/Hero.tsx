@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { profile } from "@/lib/content";
 import MorphName from "./MorphName";
 import { Lotus, Leaf, Spiral, Sparkle4, Orb, LongVine, Bellflower, Blossom, Fern } from "./Botanicals";
-import { Cloud, Butterfly, Orbit, ShootingStar, GlowSparkle, Star5, StarBurst, PixelFlower, Staff, PixelArt } from "./Ethereal";
+import { Cloud, Orbit, ShootingStar, GlowSparkle, Star5, StarBurst, PixelFlower, Staff, PixelArt } from "./Ethereal";
 
 const d = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
 const depth = (n: number, sway?: string) =>
@@ -18,9 +18,10 @@ const VINE_FRONT: CSSProperties = {
 /**
  * One screen of garden with the name grown into it. The dawn sky fills the
  * hero; far clouds, the orbit and the pixel swirls sit behind the letters,
- * the vine weaves through them, a butterfly rests on the D, and the bed of
- * lotus and bellflowers rises in front of their lower edge. The subline and
- * the one call to action stand on the garden floor.
+ * the vine weaves through them, and the bed of lotus and bellflowers forms
+ * the lower border. The name, subline and call to action are one block,
+ * centred in the screen. The guide butterfly (Butterfly.tsx) starts perched
+ * on the name.
  *
  * Interactive layers are unchanged: the name morphs and scrambles, and the
  * garden drifts with the pointer and reacts when it comes near.
@@ -29,7 +30,7 @@ export default function Hero() {
   // overflow-clip, not -hidden: a hidden box is a scroll container, and the
   // .sl-par layers' view() timeline would bind to it instead of the page.
   return (
-    <section className="bloom-zone relative isolate flex min-h-[100svh] flex-col overflow-clip pt-20">
+    <section className="bloom-zone relative isolate flex min-h-[100svh] flex-col justify-center overflow-clip pt-16 pb-[14svh]">
       {/* The sky, edge to edge, fading into the page at the bottom */}
       <div
         aria-hidden
@@ -79,35 +80,27 @@ export default function Hero() {
       </div>
 
       {/* Vine, behind the name */}
-      <div aria-hidden data-rv className="px sl-par pointer-events-none absolute top-[27%] -left-[6%] w-[112%] sm:top-[30%]" style={depth(-8)}>
+      <div aria-hidden data-rv className="px sl-par pointer-events-none absolute top-[33%] -left-[6%] w-[112%] sm:top-[35%]" style={depth(-8)}>
         <LongVine className="w-full" />
       </div>
 
       {/* The name, in the sky */}
-      <div data-rv style={d(80)} className="relative z-10 mx-auto mt-[14svh] w-full max-w-6xl px-4 text-center sm:mt-[12svh] sm:px-8">
-        <div className="px relative inline-block" style={depth(4)}>
+      <div data-rv style={d(80)} className="relative z-10 mx-auto w-full max-w-6xl px-4 text-center sm:px-8">
+        <div data-perch className="px relative inline-block" style={depth(4)}>
           <MorphName
             label={profile.name}
             words={[
-              { text: "Lana", italic: false, className: "type-name text-[30vw] whitespace-nowrap text-iris sm:mr-[0.22em] sm:inline-block sm:text-[15vw] xl:text-[13.5rem]" },
-              { text: "Denise", italic: false, className: "type-name text-[30vw] whitespace-nowrap text-iris sm:inline-block sm:text-[15vw] xl:text-[13.5rem]" },
+              { text: "Lana", italic: false, className: "type-name text-[24vw] whitespace-nowrap text-iris sm:mr-[0.2em] sm:inline-block sm:text-[11vw] xl:text-[10.5rem]" },
+              { text: "Denise", italic: false, className: "type-name text-[24vw] whitespace-nowrap text-iris sm:inline-block sm:text-[11vw] xl:text-[10.5rem]" },
             ]}
           />
-          {/* Resting on the D */}
-          <div className="absolute top-[38%] left-[2%] w-[16%] sm:top-[-14%] sm:left-[43%] sm:w-[9%]" data-react="butterfly">
-            <span className="react block">
-              <span className="flutter block">
-                <Butterfly className="w-full rotate-[16deg]" />
-              </span>
-            </span>
-          </div>
           <Sparkle4 className="spin-slow pointer-events-none absolute top-[4%] -right-[4%] h-8 w-8 text-sky sm:h-12 sm:w-12" />
           <Sparkle4 className="pointer-events-none absolute bottom-[8%] -left-[3%] h-5 w-5 text-lavender sm:h-7 sm:w-7" />
         </div>
       </div>
 
       {/* Vine, in front of the name where it crosses */}
-      <div aria-hidden data-rv className="px sl-par pointer-events-none absolute top-[27%] -left-[6%] z-20 w-[112%] sm:top-[30%]" style={{ ...depth(-8), ...VINE_FRONT }}>
+      <div aria-hidden data-rv className="px sl-par pointer-events-none absolute top-[33%] -left-[6%] z-20 w-[112%] sm:top-[35%]" style={{ ...depth(-8), ...VINE_FRONT }}>
         <LongVine className="w-full" />
       </div>
 
@@ -168,14 +161,6 @@ export default function Hero() {
           <span className="react block"><PixelFlower className="w-full opacity-90" /></span>
         </div>
 
-        <div className="px absolute top-[30%] left-[24%] w-[5%] sm:w-[3.2%]" style={{ ...depth(10), "--dur": "9s", "--td": "-3s", "--flap": "1.2s" } as CSSProperties} data-react="butterfly">
-          <span className="react block">
-            <span className="flutter block">
-              <Butterfly className="dof-mid w-full -rotate-[18deg]" style={{ "--flap": "1.3s" } as CSSProperties} />
-            </span>
-          </span>
-        </div>
-
         <div className="px sl-par absolute bottom-0 left-[31%] w-[38%] sm:left-[36%] sm:w-[28%]" style={depth(24)} data-react="lotus">
           <span className="react block"><Lotus className="sway w-full" /></span>
         </div>
@@ -200,14 +185,14 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* On the garden floor: the subline and the one call to action */}
-      <div className="relative z-30 mx-auto mt-auto mb-[7svh] w-full max-w-3xl px-4 text-center">
-        <div className="rounded-[28px] bg-[radial-gradient(closest-side,rgb(255_250_240/0.9),rgb(255_250_240/0.55)_70%,transparent)] px-6 py-6">
+      {/* Right under the name: the subline and the one call to action */}
+      <div className="relative z-30 mx-auto mt-2 w-full max-w-3xl px-4 text-center sm:mt-4">
+        <div className="bg-[radial-gradient(closest-side,rgb(255_250_240/0.85),rgb(255_250_240/0.5)_70%,transparent)] px-6 py-5">
           <p data-rv style={d(420)} className="type-display text-2xl leading-tight text-ink italic sm:text-[2.4rem]">
             {profile.heroShort}
           </p>
           <div data-rv style={d(480)} className="mt-6 flex justify-center">
-            <a href="#branding" className="btn flex min-h-[46px] items-center gap-2 px-5">
+            <a href="#branding" className="btn">
               See the work <span aria-hidden>↓</span>
             </a>
           </div>
