@@ -15,6 +15,15 @@ Design: `docs/superpowers/specs/2026-10-29-butterfly-garden-design.md` (supersed
 - About without scrapbook, portrait in the garden; contact = thank-you left, form right.
 - Dead components and 86 dead CSS rules removed. `tsc`, eslint, `next build` pass.
 
+## Done 2026-10-30
+- Pearl buttons (no border), LD mark in the nav over the hero, softer nav text, hero name larger with
+  the subline below the vine, pearl-glass device frames, artboards feathered top and bottom.
+- About: arched pearl frame, poppable app-logo bubbles (`ToolBubbles.tsx`, regrow after 2s), experience
+  as a blooming stem (`BloomTimeline.tsx`), tab content as pearl-glass cards; stats/"made for" removed.
+- Ambient (`app/styles/ambient.css`): growing 3D vine (`ScrollVine.tsx`), dither lantern
+  (`DitherLantern.tsx`, hosts via `data-lantern-host`), star-script (`StarScript.tsx`), dithered dusk sky
+  (`DuskSky.tsx`, art from `scripts/gen-dusk.py`).
+
 ## Earlier
 - 13 brands (BiblioBOO and repeated pubmats removed), 10 videos, 3 UI/UX projects as full-bleed slides; artboards drawn by Codex from each key visual; text set straight on the art with a tone wash.
 - Videos on the site sky, taped-in posters. Ink controls, pen font, doodles, note-paper form, sketchbook About.
