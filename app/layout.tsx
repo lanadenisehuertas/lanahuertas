@@ -5,6 +5,7 @@ import "./globals.css";
 import { profile, socials } from "@/lib/content";
 import { siteUrl } from "@/lib/site";
 import Nav from "@/components/Nav";
+import Butterfly from "@/components/Butterfly";
 import PointerFX from "@/components/PointerFX";
 import { BotanicalDefs } from "@/components/Botanicals";
 import { Starfield } from "@/components/Ethereal";
@@ -201,6 +202,7 @@ export default function RootLayout({
         <Starfield />
         <BotanicalDefs />
         <PointerFX />
+        <Butterfly />
         <Nav />
         {children}
       </body>
