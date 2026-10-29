@@ -38,51 +38,29 @@
       "dir": "01 CS Expo 2026 - NEOSTALGIA",
       "collage": {
         "print": ["01 Key visual, logo & main poster/MAIN POSTER.png"],
-        "phone": ["05 Meet the Officers/7 LANA.png"],
-        "id": ["08 Team posters & nameplates/BYTEME.png"],
-        "sticker": ["03 Stickers/planetcat.png", "03 Stickers/game.png", "03 Stickers/TV.png"]
+        "phone": ["05 Meet the Officers/7 LANA.png"]
       },
       "set": [
         "01 Key visual, logo & main poster/MAIN POSTER.png",
         "01 Key visual, logo & main poster/COVER.png",
         "01 Key visual, logo & main poster/PFP.png",
-        "02 Teaser & sticker-drive teasers/TEASER 2.png",
         "02 Teaser & sticker-drive teasers/STICKER DRIVE PART 1.png",
         "02 Teaser & sticker-drive teasers/STICKER 2.png",
-        "03 Stickers/planetcat.png",
-        "03 Stickers/game.png",
-        "03 Stickers/TV.png",
-        "03 Stickers/glasses.png",
-        "03 Stickers/csexposticker2background.png",
-        "03 Stickers/csexpostickerbackground.png",
-        "04 DP Blast (team display pictures)/1.png",
-        "04 DP Blast (team display pictures)/DP BLAST_3.png",
         "05 Meet the Officers/0 MTO SQUARE.png",
-        "05 Meet the Officers/7 LANA.png",
-        "05 Meet the Officers/14 SHY.png",
-        "07 Call for Sponsors/Call for Sponsors.png",
-        "08 Team posters & nameplates/ByteMe (1080 x 1350 px) (1).png",
-        "08 Team posters & nameplates/A woven thread of motion.png",
-        "08 Team posters & nameplates/Windows into the pattern.png",
-        "08 Team posters & nameplates/Ctrl+C, Ctrl+V.png",
-        "08 Team posters & nameplates/BYTEME.png",
-        "09 Merch - jackets/JACKET- TEAL.png"
+        "05 Meet the Officers/7 LANA.png"
       ]
     },
     "tabitayo": {
       "dir": "06 Freelance & clients/01 Tabitayo (seat-finder app)",
       "collage": {
-        "print": ["FB 1A.png", "POST2.png", "seating arrangement.png"],
-        "phone": ["Layer 2.png"]
+        "print": ["FB 1A.png", "POST2.png"]
       },
       "set": [
         "FB 1A.png",
         "FB 3B.png",
         "FB 3C.png",
         "FB 3E.png",
-        "POST2.png",
-        "Layer 2.png",
-        "seating arrangement.png"
+        "POST2.png"
       ]
     },
     "rock-of-aces": {
@@ -127,26 +105,12 @@
         "2024-06-10 facebook thank 01.jpg"
       ]
     },
-    "dystopia": {
-      "dir": "02 FEU Tech ACM/01 Dystopia (Jun 2024)",
-      "collage": {
-        "key": ["FEUTECH ACM 1.jpg"],
-        "phone": ["2024-07-03 facebook 1783 01.jpg"],
-        "print": ["2024-07-03 facebook 8155 01.jpg"]
-      },
-      "set": [
-        "FEUTECH ACM 1.jpg",
-        "2024-07-03 facebook 1783 01.jpg",
-        "2024-07-03 facebook 8155 01.jpg"
-      ]
-    },
     "technorun": {
       "dir": "03 FEU Tech SCC/06 Technorun 2025",
       "collage": {
         "print": ["2025-07-31 facebook 01.jpg"],
         "item": [
           "3K.png",
-          "485004285_987718973215459_1496984069015702086_n.png",
           "1.png",
           "2.png"
         ]
@@ -156,8 +120,7 @@
         "TECHNORUN INFORMATION.png",
         "1.png",
         "2.png",
-        "3K.png",
-        "485004285_987718973215459_1496984069015702086_n.png"
+        "3K.png"
       ]
     },
     "pacsa": {
@@ -173,21 +136,6 @@
         "02 Ready for PACSA 2025 DP frames/DP FRAME 2.1.png",
         "05 Baguio Teachers Camp house rules/BTC HOUSE RULES.png",
         "05 Baguio Teachers Camp house rules/2.png"
-      ]
-    },
-    "heartwired": {
-      "dir": "02 FEU Tech ACM/17 HeartWired - Meet the Hosts (Feb 2025)",
-      "collage": {
-        "phone": [
-          "2025-02-13 facebook 02.jpg",
-          "2025-02-13 facebook 01.jpg",
-          "2025-02-13 facebook 03.jpg"
-        ]
-      },
-      "set": [
-        "2025-02-13 facebook 01.jpg",
-        "2025-02-13 facebook 02.jpg",
-        "2025-02-13 facebook 03.jpg"
       ]
     },
     "elysium": {

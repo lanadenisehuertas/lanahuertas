@@ -1,22 +1,26 @@
 import { engineeringProjects } from "@/lib/content";
-import SectionTitle from "../SectionTitle";
 import CodeSlide from "./CodeSlide";
+import Spread from "./Spread";
+import { toneOf, WASH } from "./tone";
 
-export default function CodeShowcase() {
+/** UI/UX & code: one product per screen, its real screens in a thin outline. */
+export default function CodeShowcase({ mode = "carousel" }: { mode?: "carousel" | "stack" }) {
   const total = engineeringProjects.length;
   return (
-    <section id="code" className="relative pt-16 pb-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-8">
-        <SectionTitle id="code-heading" index="03" lead="UI/UX &" accent="code" note="designed, then built" ornament="flourish" />
-      </div>
+    <Spread
+      id="code"
+      mode={mode}
+      label="UI/UX projects"
+      title={
+        <>
+          UI/UX &amp; <em>code</em>
+        </>
+      }
+      slides={engineeringProjects.map((p) => ({ key: p.id, name: p.title, tone: toneOf(`code-${p.id}`), wash: WASH[`code-${p.id}`] }))}
+    >
       {engineeringProjects.map((p, i) => (
-        <CodeSlide key={p.id} p={p} n={i + 1} total={total} />
+        <CodeSlide key={p.id} p={p} n={i + 1} total={total} caseLink={mode === "carousel"} />
       ))}
-      <div className="mt-10 text-center">
-        <a href="/ui-ux" className="btn inline-flex min-h-[48px] items-center gap-2 px-6">
-          All case studies <span aria-hidden>→</span>
-        </a>
-      </div>
-    </section>
+    </Spread>
   );
 }

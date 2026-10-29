@@ -30,6 +30,7 @@ export default function Pic({
       alt={alt}
       loading={eager ? "eager" : "lazy"}
       decoding="async"
+      draggable={false}
       className={className}
     />
   );

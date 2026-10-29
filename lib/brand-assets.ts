@@ -129,30 +129,6 @@ export const brandAssets: Record<string, BrandAssets> = {
           "w": 1594,
           "h": 1600
         }
-      ],
-      "id": [
-        {
-          "src": "/work/brands/neostalgia/byteme.webp",
-          "w": 1200,
-          "h": 1600
-        }
-      ],
-      "sticker": [
-        {
-          "src": "/work/brands/neostalgia/planetcat.webp",
-          "w": 1600,
-          "h": 1600
-        },
-        {
-          "src": "/work/brands/neostalgia/game.webp",
-          "w": 1600,
-          "h": 1600
-        },
-        {
-          "src": "/work/brands/neostalgia/tv.webp",
-          "w": 1186,
-          "h": 1600
-        }
       ]
     },
     "set": [
@@ -172,11 +148,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1500
       },
       {
-        "src": "/work/brands/neostalgia/teaser-2.webp",
-        "w": 1538,
-        "h": 1600
-      },
-      {
         "src": "/work/brands/neostalgia/sticker-drive-part-1.webp",
         "w": 1080,
         "h": 1440
@@ -187,46 +158,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "h": 1440
       },
       {
-        "src": "/work/brands/neostalgia/planetcat.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/game.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/tv.webp",
-        "w": 1186,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/glasses.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/csexposticker2background.webp",
-        "w": 885,
-        "h": 963
-      },
-      {
-        "src": "/work/brands/neostalgia/csexpostickerbackground.webp",
-        "w": 1200,
-        "h": 1066
-      },
-      {
-        "src": "/work/brands/neostalgia/1.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/dp-blast-3.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
         "src": "/work/brands/neostalgia/0-mto-square.webp",
         "w": 1080,
         "h": 1080
@@ -235,46 +166,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "src": "/work/brands/neostalgia/7-lana.webp",
         "w": 1594,
         "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/14-shy.webp",
-        "w": 1594,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/call-for-sponsors.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/byteme-1080-x-1350-px-1.webp",
-        "w": 1080,
-        "h": 1350
-      },
-      {
-        "src": "/work/brands/neostalgia/a-woven-thread-of-motion.webp",
-        "w": 1024,
-        "h": 1536
-      },
-      {
-        "src": "/work/brands/neostalgia/windows-into-the-pattern.webp",
-        "w": 1024,
-        "h": 1536
-      },
-      {
-        "src": "/work/brands/neostalgia/ctrl-c-ctrl-v.webp",
-        "w": 1131,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/byteme.webp",
-        "w": 1200,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/neostalgia/jacket-teal.webp",
-        "w": 1600,
-        "h": 766
       }
     ]
   },
@@ -289,18 +180,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         {
           "src": "/work/brands/tabitayo/post2.webp",
           "w": 1297,
-          "h": 1600
-        },
-        {
-          "src": "/work/brands/tabitayo/seating-arrangement.webp",
-          "w": 1131,
-          "h": 1600
-        }
-      ],
-      "phone": [
-        {
-          "src": "/work/brands/tabitayo/layer-2.webp",
-          "w": 739,
           "h": 1600
         }
       ]
@@ -329,16 +208,6 @@ export const brandAssets: Record<string, BrandAssets> = {
       {
         "src": "/work/brands/tabitayo/post2.webp",
         "w": 1297,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/tabitayo/layer-2.webp",
-        "w": 739,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/tabitayo/seating-arrangement.webp",
-        "w": 1131,
         "h": 1600
       }
     ]
@@ -498,48 +367,6 @@ export const brandAssets: Record<string, BrandAssets> = {
       }
     ]
   },
-  "dystopia": {
-    "collage": {
-      "key": [
-        {
-          "src": "/work/brands/dystopia/feutech-acm-1.webp",
-          "w": 1600,
-          "h": 1582
-        }
-      ],
-      "phone": [
-        {
-          "src": "/work/brands/dystopia/2024-07-03-facebook-1783-01.webp",
-          "w": 1600,
-          "h": 1600
-        }
-      ],
-      "print": [
-        {
-          "src": "/work/brands/dystopia/2024-07-03-facebook-8155-01.webp",
-          "w": 1600,
-          "h": 1600
-        }
-      ]
-    },
-    "set": [
-      {
-        "src": "/work/brands/dystopia/feutech-acm-1.webp",
-        "w": 1600,
-        "h": 1582
-      },
-      {
-        "src": "/work/brands/dystopia/2024-07-03-facebook-1783-01.webp",
-        "w": 1600,
-        "h": 1600
-      },
-      {
-        "src": "/work/brands/dystopia/2024-07-03-facebook-8155-01.webp",
-        "w": 1600,
-        "h": 1600
-      }
-    ]
-  },
   "technorun": {
     "collage": {
       "print": [
@@ -554,11 +381,6 @@ export const brandAssets: Record<string, BrandAssets> = {
           "src": "/work/brands/technorun/3k.webp",
           "w": 1600,
           "h": 1545
-        },
-        {
-          "src": "/work/brands/technorun/485004285-987718973215459-1496984069015702086-n.webp",
-          "w": 1053,
-          "h": 790
         },
         {
           "src": "/work/brands/technorun/1.webp",
@@ -597,11 +419,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "src": "/work/brands/technorun/3k.webp",
         "w": 1600,
         "h": 1545
-      },
-      {
-        "src": "/work/brands/technorun/485004285-987718973215459-1496984069015702086-n.webp",
-        "w": 1053,
-        "h": 790
       }
     ]
   },
@@ -654,44 +471,6 @@ export const brandAssets: Record<string, BrandAssets> = {
         "src": "/work/brands/pacsa/2.webp",
         "w": 1000,
         "h": 1000
-      }
-    ]
-  },
-  "heartwired": {
-    "collage": {
-      "phone": [
-        {
-          "src": "/work/brands/heartwired/2025-02-13-facebook-02.webp",
-          "w": 1440,
-          "h": 1440
-        },
-        {
-          "src": "/work/brands/heartwired/2025-02-13-facebook-01.webp",
-          "w": 1376,
-          "h": 718
-        },
-        {
-          "src": "/work/brands/heartwired/2025-02-13-facebook-03.webp",
-          "w": 1440,
-          "h": 1440
-        }
-      ]
-    },
-    "set": [
-      {
-        "src": "/work/brands/heartwired/2025-02-13-facebook-01.webp",
-        "w": 1376,
-        "h": 718
-      },
-      {
-        "src": "/work/brands/heartwired/2025-02-13-facebook-02.webp",
-        "w": 1440,
-        "h": 1440
-      },
-      {
-        "src": "/work/brands/heartwired/2025-02-13-facebook-03.webp",
-        "w": 1440,
-        "h": 1440
       }
     ]
   },

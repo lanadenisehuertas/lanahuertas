@@ -1,5 +1,6 @@
 import Hero from "@/components/Hero";
 import BrandShowcase from "@/components/showcase/BrandShowcase";
+import PosterRow from "@/components/showcase/PosterRow";
 import VideoShowcase from "@/components/showcase/VideoShowcase";
 import CodeShowcase from "@/components/showcase/CodeShowcase";
 import AboutPanel from "@/components/AboutPanel";
@@ -12,9 +13,10 @@ import GardenFX from "@/components/GardenFX";
 export default function Home() {
   return (
     <main id="top">
-      {/* intro -> branding -> videos -> ui/ux & code -> about -> thank you */}
+      {/* intro -> branding -> posters -> videos -> ui/ux & code -> about -> contact */}
       <Hero />
       <BrandShowcase />
+      <PosterRow />
       <VideoShowcase />
       <CodeShowcase />
       <AboutPanel orgs={brandOrgs()} />

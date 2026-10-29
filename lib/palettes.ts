@@ -43,13 +43,6 @@ export const palettes: Record<string, string[]> = {
     "#f0e8a4",
     "#924050"
   ],
-  "dystopia": [
-    "#8f3f84",
-    "#17213e",
-    "#0f0c12",
-    "#49385c",
-    "#cededf"
-  ],
   "technorun": [
     "#bc443d",
     "#c8f1f4",
@@ -64,25 +57,11 @@ export const palettes: Record<string, string[]> = {
     "#485761",
     "#ca5e38"
   ],
-  "heartwired": [
-    "#fcf1de",
-    "#27b0e9",
-    "#3f3940",
-    "#be7f88",
-    "#75c5ea"
-  ],
   "elysium": [
     "#76389b",
     "#ae78c1",
     "#fcebe9",
     "#d6acd5"
-  ],
-  "cs-night": [
-    "#d6ddd3",
-    "#151519",
-    "#47646a",
-    "#928e7e",
-    "#a4b3ac"
   ],
   "techno-week": [
     "#4cd6fc",
@@ -199,10 +178,6 @@ export const tones: Record<string, { left: Tone; right: Tone }> = {
     "left": "dark",
     "right": "dark"
   },
-  "dystopia": {
-    "left": "dark",
-    "right": "dark"
-  },
   "technorun": {
     "left": "light",
     "right": "light"
@@ -211,15 +186,7 @@ export const tones: Record<string, { left: Tone; right: Tone }> = {
     "left": "light",
     "right": "light"
   },
-  "heartwired": {
-    "left": "light",
-    "right": "light"
-  },
   "elysium": {
-    "left": "dark",
-    "right": "dark"
-  },
-  "cs-night": {
     "left": "dark",
     "right": "dark"
   },
