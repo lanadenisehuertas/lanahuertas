@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { experience, education, skillGroups, certifications, languages } from "@/lib/content";
-import AboutMe, { GardenPortrait, type Org } from "./AboutMe";
+import AboutMe, { GardenPortrait } from "./AboutMe";
 import { Sparkle4 } from "./Botanicals";
 
 const TABS = [
@@ -42,7 +42,7 @@ function Bullets({ items, className = "" }: { items: readonly string[]; classNam
  * desktop); the title, the tabs — plain words, the current one underlined —
  * and each tab's content sit on the right as clean ruled rows.
  */
-export default function AboutPanel({ orgs }: { orgs: Org[] }) {
+export default function AboutPanel() {
   const [active, setActive] = useState<TabId>("about");
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const stripRef = useRef<HTMLDivElement>(null);
@@ -77,7 +77,7 @@ export default function AboutPanel({ orgs }: { orgs: Org[] }) {
     <section id="about" aria-labelledby="about-heading" className="overflow-x-clip px-4 pt-24 pb-24 sm:px-8 sm:pt-28">
       {/* Phones read title, portrait, tabs, panel; desktop puts the portrait
           on the left beside all three. */}
-      <div className="mx-auto grid max-w-6xl gap-x-[5%] lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:grid-rows-[auto_auto_1fr]">
+      <div className="mx-auto grid max-w-7xl gap-x-[4%] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:grid-rows-[auto_auto_1fr]">
         <h2
           id="about-heading"
           data-perch
@@ -120,7 +120,7 @@ export default function AboutPanel({ orgs }: { orgs: Org[] }) {
           tabIndex={0}
           className="sheet-in mt-7 min-w-0 text-ink lg:col-start-2 lg:row-start-3"
         >
-          {active === "about" && <AboutMe orgs={orgs} />}
+          {active === "about" && <AboutMe />}
 
           {active === "experience" && (
             <div>

@@ -3,8 +3,8 @@
 @layer components {
   /* The portrait has no frame: its edge feathers out into the sky. */
   .about-photo {
-    -webkit-mask-image: radial-gradient(ellipse 48% 47% at 50% 46%, #000 44%, rgb(0 0 0 / 0.55) 70%, transparent 97%);
-    mask-image: radial-gradient(ellipse 48% 47% at 50% 46%, #000 44%, rgb(0 0 0 / 0.55) 70%, transparent 97%);
+    -webkit-mask-image: radial-gradient(ellipse 52% 52% at 50% 46%, #000 58%, rgb(0 0 0 / 0.6) 78%, transparent 99%);
+    mask-image: radial-gradient(ellipse 52% 52% at 50% 46%, #000 58%, rgb(0 0 0 / 0.6) 78%, transparent 99%);
   }
 
   /* A warm light behind the portrait, drawn with a gradient (no blur). */

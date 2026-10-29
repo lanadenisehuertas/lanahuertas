@@ -33,6 +33,7 @@ export default function Nav() {
   const [dark, setDark] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [onHero, setOnHero] = useState(home);
   const menuBtn = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function Nav() {
     const update = () => {
       frame = 0;
       const y = window.scrollY;
+      setOnHero(home && y < window.innerHeight * 0.6);
       if (Math.abs(y - lastY) > 6) {
         setHidden(y > lastY && y > 240);
         lastY = y;
@@ -117,8 +119,14 @@ export default function Nav() {
       className={`masthead fixed inset-x-0 top-0 z-50 ${hidden && !open ? "is-hidden" : ""} ${dark && !open ? "is-dark" : ""}`}
     >
       <nav aria-label="Main" className="relative mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-10">
-        <a href={home ? "#top" : "/"} className="masthead-name flex min-h-[44px] items-center">
-          Lana Denise Huertas
+        {/* Over the hero the name is already on screen: only the mark. */}
+        <a href={home ? "#top" : "/"} aria-label="Lana Denise Huertas, home" className="masthead-home flex min-h-[44px] items-center gap-3">
+          <span aria-hidden className="masthead-mark">
+            L<i>D</i>
+          </span>
+          <span aria-hidden className={`masthead-name ${onHero ? "is-tucked" : ""}`}>
+            Lana Denise Huertas
+          </span>
         </a>
 
         <ul className="hidden items-center gap-7 md:flex">

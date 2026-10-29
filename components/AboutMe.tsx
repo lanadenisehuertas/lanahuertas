@@ -1,20 +1,7 @@
 import type { CSSProperties } from "react";
-import { profile, engineeringProjects } from "@/lib/content";
-import { brands, posters, videos } from "@/lib/brands";
+import { profile } from "@/lib/content";
 import { Lotus, Leaf, Sparkle4, Orb, Bellflower, Blossom, Fern } from "./Botanicals";
 import { Cloud, Orbit, GlowSparkle, Star5, PixelFlower, PixelArt } from "./Ethereal";
-
-/** An organisation the work was made for, shown by its first brand's key visual. */
-export type Org = { name: string; src: string };
-
-// Everything the folio shows: every brand piece, the posters, the edits and the products.
-const PIECES = brands.reduce((n, b) => n + b.set.length, 0) + posters.length + videos.length + engineeringProjects.length;
-
-const STATS = [
-  { n: "7+", label: "years in Photoshop" },
-  { n: "6", label: "years in Premiere Pro" },
-  { n: String(PIECES), label: "pieces in this folio" },
-];
 
 /* --depth drives the pointer parallax (PointerFX writes `translate` on .px
    elements only); --sway / --dur / --td set each loop's own pace. */
@@ -122,10 +109,9 @@ export function GardenPortrait() {
 }
 
 /**
- * The "about me" tab: the pitch, the numbers on hairline rules and the
- * organisations the work was made for.
+ * The "about me" tab: the pitch.
  */
-export default function AboutMe({ orgs }: { orgs: Org[] }) {
+export default function AboutMe() {
   return (
     <div>
       <h3 className="type-display text-[1.85rem] leading-[1.15] text-iris sm:text-[2.4rem]">{profile.aboutHeadline}</h3>
@@ -135,31 +121,6 @@ export default function AboutMe({ orgs }: { orgs: Org[] }) {
         student, the interfaces I design I can also build. Detail-obsessed and always on time.
       </p>
 
-      <dl className="mt-9 grid grid-cols-3 border-y border-ink/20">
-        {STATS.map((s) => (
-          <div key={s.label} className="flex flex-col py-5 pr-3">
-            <dt className="type-pixel order-2 mt-2 text-[13px] leading-snug text-ink/75">{s.label}</dt>
-            <dd className="type-display -order-1 text-[2.6rem] leading-none text-iris sm:text-5xl">{s.n}</dd>
-          </div>
-        ))}
-      </dl>
-
-      <p className="type-pixel mt-9 text-[13px] text-ink/75">made for —</p>
-      <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-5">
-        {orgs.map((o) => (
-          <li key={o.name} className="flex w-[84px] flex-col items-center gap-2 text-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={o.src}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              className="h-16 w-16 rounded-full object-cover shadow-[0_8px_18px_-10px_rgb(27_7_48/0.5)] ring-1 ring-ink/15"
-            />
-            <span className="text-[13px] leading-tight text-ink/80">{o.name}</span>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

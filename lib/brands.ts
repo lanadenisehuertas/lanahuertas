@@ -4,7 +4,6 @@
 // brand = an entry in scripts/pubmats.json + scripts/backdrops.json + COPY.
 import { brandAssets, moreAssets } from "./brand-assets";
 import { workTabs, type Project, type ProjectImage } from "./content";
-import { small } from "./img";
 
 export type Brand = {
   slug: string;
@@ -207,18 +206,6 @@ export const brands: Brand[] = COPY.map((c) => {
 });
 
 export const backdropSrc = (slug: string) => `/art/backdrops/${slug}.webp`;
-
-/** The organisations the brands were made for, in showcase order, each shown by its first brand's key visual. */
-export function brandOrgs(): { name: string; src: string }[] {
-  const seen = new Map<string, string>();
-  for (const b of brands) {
-    const name = b.org === "Client" ? b.name : b.org.replace(/ \d{4}$/, "");
-    if (seen.has(name)) continue;
-    const img = b.set[b.featured[0]];
-    seen.set(name, img.w > 720 ? small(img.src) : img.src);
-  }
-  return [...seen].map(([name, src]) => ({ name, src }));
-}
 
 /* ---- Posters: one-offs and class work, CS Night first -------------------- */
 

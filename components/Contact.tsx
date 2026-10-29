@@ -141,12 +141,12 @@ export default function Contact() {
                     {
                       text: "Thank",
                       italic: true,
-                      className: "type-name text-[26vw] whitespace-nowrap text-iris italic sm:text-[9rem] xl:text-[10rem]",
+                      className: "type-name block text-[26vw] leading-[0.78] whitespace-nowrap text-iris italic sm:text-[9rem] xl:text-[10rem]",
                     },
                     {
                       text: "you",
                       italic: true,
-                      className: "type-name text-[26vw] whitespace-nowrap text-iris italic sm:text-[9rem] lg:pl-[1.3em] xl:text-[10rem]",
+                      className: "type-name -mt-[0.06em] block text-[26vw] leading-[0.78] whitespace-nowrap text-iris italic sm:text-[9rem] lg:pl-[1.3em] xl:text-[10rem]",
                     },
                   ]}
                 />

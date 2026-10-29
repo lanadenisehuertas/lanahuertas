@@ -946,10 +946,46 @@ html[data-lite] .shoot { display: none; }
 
   .masthead-name {
     font-family: var(--font-display);
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     line-height: 1;
     color: var(--color-iris);
+    transition: opacity 300ms ease-out, transform 300ms ease-out;
   }
+  .masthead-name.is-tucked { opacity: 0; transform: translateX(-6px); pointer-events: none; }
+
+  /* The mark: "LD" in Redaction on a small pearl, a sparkle on its rim. */
+  .masthead-mark {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 17px;
+    letter-spacing: -0.04em;
+    color: #4b0f7a;
+    border: 1px solid rgb(255 255 255 / 0.95);
+    background:
+      radial-gradient(120% 120% at 30% 15%, #fff, rgb(255 255 255 / 0.3) 55%, transparent 75%),
+      conic-gradient(from 200deg, #cdc4ff, #f8bee1, #ffdec8, #beeede, #cdc4ff);
+    box-shadow: inset 0 -4px 10px rgb(214 150 230 / 0.4), 0 6px 16px rgb(150 80 190 / 0.22);
+    transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .masthead-mark i { font-style: italic; color: #8a1f6a; margin-left: -1px; }
+  .masthead-mark::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+    filter: drop-shadow(0 0 2px #f7a8dc);
+  }
+  .masthead-home:hover .masthead-mark { transform: rotate(-10deg) scale(1.06); }
   .is-dark .masthead-name { color: inherit; }
 
   .nav-link {
@@ -959,7 +995,7 @@ html[data-lite] .shoot { display: none; }
     min-height: 44px;
     font-size: 15px;
     color: inherit;
-    opacity: 0.82;
+    opacity: 0.66;
     transition: opacity 160ms ease-out;
   }
   .nav-link:hover,
@@ -1274,17 +1310,6 @@ html[data-lite] .sticker { filter: drop-shadow(0 8px 10px rgb(27 7 48 / 0.3)); }
  *   .halftone   a dot screen that fades out from its centre
  *   .glow       a soft lavender glow on display type
  */
-@property --btn-a {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-@keyframes btn-rim { to { --btn-a: 360deg; } }
-@keyframes btn-twinkle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
-}
-
 @layer components {
   :root {
     --ink-circle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 48' preserveAspectRatio='none'%3E%3Cpath d='M14 31C9 15 43 5 70 6c28 1 46 9 43 20-3 12-33 18-59 17-26-1-45-7-43-19 2-9 20-15 37-16' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
@@ -1310,58 +1335,43 @@ html[data-lite] .sticker { filter: drop-shadow(0 8px 10px rgb(27 7 48 / 0.3)); }
     transition: color 200ms ease-out;
   }
 
-  /* Primary: the butterfly's wings as a glossy pill. Lavender, pink, peach,
-     mint and sky slide across on hover; an iridescent rim turns around the
-     edge; three sparkles sit on the rim and twinkle. Plum text on the
-     pastels is >= 6.5:1 at every stop, so it reads on light and dark art. */
+  /* Primary: a pearl. A white highlight over a soft iridescent film
+     (lavender, pink, peach, mint), a white rim, and a pink glow that rises
+     from below on hover while the film slides. Plum text >= 7:1 throughout. */
   .btn {
-    --btn-a: 0deg;
     padding: 0 24px;
     border-radius: 999px;
     font-family: var(--font-body);
     font-style: normal;
     font-size: 15px;
     color: #3a0b63;
-    background: linear-gradient(110deg, #c3b8ff 0%, #f5a9d8 22%, #ffd4b8 40%, #fff1c9 50%, #aeead6 64%, #b7c8ff 82%, #c3b8ff 100%);
-    background-size: 260% 100%;
-    background-position: 0% 0;
+    border: 1px solid rgb(255 255 255 / 0.95);
+    background:
+      radial-gradient(120% 150% at 28% -10%, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.35) 48%, transparent 70%),
+      linear-gradient(110deg, rgb(205 196 255 / 0.85), rgb(248 190 225 / 0.85) 30%, rgb(255 222 200 / 0.8) 50%, rgb(190 238 222 / 0.85) 72%, rgb(205 196 255 / 0.85));
+    background-size: 100% 100%, 240% 100%;
+    background-position: 0 0, 0% 0;
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.95),
-      inset 0 -3px 8px rgb(140 70 180 / 0.18),
-      0 8px 22px rgb(190 110 210 / 0.38);
+      inset 0 -6px 14px rgb(214 150 230 / 0.35),
+      inset 0 1px 0 #fff,
+      0 8px 24px rgb(150 80 190 / 0.22);
     transition:
       transform 250ms cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 250ms ease-out,
+      box-shadow 300ms ease-out,
       background-position 900ms cubic-bezier(0.22, 1, 0.36, 1);
   }
-  /* The rim: a conic holographic ring, cut to a 1.5px band by a mask. */
+  /* The glow that rises on hover. */
   .btn::before {
     content: "";
     position: absolute;
-    inset: -1.5px;
+    inset: -1px;
     z-index: -1;
     border-radius: inherit;
-    padding: 1.5px;
-    background: conic-gradient(from var(--btn-a), #ffffff, #f7a8dc, #b9a6ff, #9fe6d0, #ffe0b0, #ffffff);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  }
-  /* Sparkles on the edge. */
-  .btn::after {
-    content: "";
-    position: absolute;
-    inset: -7px -6px;
-    pointer-events: none;
-    background:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0l2.2 7.8L20 10l-7.8 2.2L10 20l-2.2-7.8L0 10l7.8-2.2z' fill='%23fff'/%3E%3C/svg%3E") no-repeat right 10px top 0 / 12px 12px,
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0l2.2 7.8L20 10l-7.8 2.2L10 20l-2.2-7.8L0 10l7.8-2.2z' fill='%23fff'/%3E%3C/svg%3E") no-repeat left 14px bottom 0 / 9px 9px,
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0l2.2 7.8L20 10l-7.8 2.2L10 20l-2.2-7.8L0 10l7.8-2.2z' fill='%23fff'/%3E%3C/svg%3E") no-repeat right 30px bottom 2px / 6px 6px;
-    filter: drop-shadow(0 0 2px #f7a8dc) drop-shadow(0 0 4px rgb(255 255 255 / 0.9));
-    transition: opacity 300ms ease-out;
+    background: radial-gradient(70% 130% at 50% 125%, rgb(247 160 215 / 0.75), transparent 70%);
+    opacity: 0;
+    transition: opacity 350ms ease-out;
   }
   .btn-sm { min-height: 38px; padding: 0 16px; font-size: 14px; }
-  .btn-sm::after { inset: -6px -5px; background-size: 9px 9px, 7px 7px, 0 0; }
 
   /* Secondary: an italic label; the pen underline draws in on hover. */
   .btn-ghost {
@@ -1387,11 +1397,10 @@ html[data-lite] .sticker { filter: drop-shadow(0 8px 10px rgb(27 7 48 / 0.3)); }
   @media (hover: hover) and (pointer: fine) {
     .btn:hover {
       transform: translateY(-2px);
-      background-position: 100% 0;
-      box-shadow: inset 0 1px 0 #fff, inset 0 -3px 8px rgb(140 70 180 / 0.18), 0 12px 30px rgb(190 110 210 / 0.55);
+      background-position: 0 0, 100% 0;
+      box-shadow: inset 0 -6px 14px rgb(214 150 230 / 0.45), inset 0 1px 0 #fff, 0 12px 30px rgb(150 80 190 / 0.32);
     }
-    .btn:hover::before { animation: btn-rim 2.4s linear infinite; }
-    .btn:hover::after { animation: btn-twinkle 1.1s ease-in-out infinite; }
+    .btn:hover::before { opacity: 1; }
     .btn-ghost:hover::after { transform: scaleX(1); }
   }
   .btn:focus-visible,
@@ -1480,7 +1489,9 @@ html[data-lite] .sticker { filter: drop-shadow(0 8px 10px rgb(27 7 48 / 0.3)); }
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .btn:hover::before,
-  .btn:hover::after { animation: none; }
-}
+
+/* Hero type: the name a softer plum than the titles, so its weight reads
+   lighter at this size; the subline a muted violet that sits back (5.9:1 on
+   the hero's palest sky). */
+.hero-name { color: #5b2590; letter-spacing: 0.005em; }
+.hero-sub { color: rgb(76 42 110 / 0.88); }

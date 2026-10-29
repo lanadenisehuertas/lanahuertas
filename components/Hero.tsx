@@ -90,8 +90,8 @@ export default function Hero() {
           <MorphName
             label={profile.name}
             words={[
-              { text: "Lana", italic: false, className: "type-name text-[24vw] whitespace-nowrap text-iris sm:mr-[0.2em] sm:inline-block sm:text-[11vw] xl:text-[10.5rem]" },
-              { text: "Denise", italic: false, className: "type-name text-[24vw] whitespace-nowrap text-iris sm:inline-block sm:text-[11vw] xl:text-[10.5rem]" },
+              { text: "Lana", italic: false, className: "type-name hero-name text-[20vw] whitespace-nowrap sm:mr-[0.2em] sm:inline-block sm:text-[8.6vw] xl:text-[8.25rem]" },
+              { text: "Denise", italic: false, className: "type-name hero-name text-[20vw] whitespace-nowrap sm:inline-block sm:text-[8.6vw] xl:text-[8.25rem]" },
             ]}
           />
           <Sparkle4 className="spin-slow pointer-events-none absolute top-[4%] -right-[4%] h-8 w-8 text-sky sm:h-12 sm:w-12" />
@@ -186,9 +186,9 @@ export default function Hero() {
       </div>
 
       {/* Right under the name: the subline and the one call to action */}
-      <div className="relative z-30 mx-auto mt-2 w-full max-w-3xl px-4 text-center sm:mt-4">
+      <div className="relative z-30 mx-auto mt-[9svh] w-full max-w-2xl px-4 text-center sm:mt-[14svh]">
         <div className="bg-[radial-gradient(closest-side,rgb(255_250_240/0.85),rgb(255_250_240/0.5)_70%,transparent)] px-6 py-5">
-          <p data-rv style={d(420)} className="type-display text-2xl leading-tight text-ink italic sm:text-[2.4rem]">
+          <p data-rv style={d(420)} className="hero-sub type-display text-xl leading-snug italic sm:text-[1.65rem]">
             {profile.heroShort}
           </p>
           <div data-rv style={d(480)} className="mt-6 flex justify-center">

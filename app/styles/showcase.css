@@ -103,11 +103,17 @@
     height: 100%;
     isolation: isolate;
   }
+  /* Artboard and wash melt into the page sky at the top and bottom, so one
+     section flows into the next instead of ending on a hard edge. */
+  .sp-bg,
+  .sp-wash {
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 88%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 88%, transparent 100%);
+  }
   .sp-bg {
     position: absolute;
     inset: 0;
     z-index: 0;
-    background: #1a0b2e;
   }
   .sp-bg img {
     width: 100%;
@@ -464,31 +470,41 @@
   .sp-video-poster:focus-visible { outline: 3px solid var(--t-accent); outline-offset: -3px; }
 
   /* ---- device outlines ---------------------------------------------------- */
+  /* Device outlines as pearl glass: a white rim, an iridescent film, soft
+     lavender light, pastel window dots — the site's palette, not black. */
   .dev-browser {
-    width: min(100cqw, calc((100cqh - 38px) * 1.6));
-    border: 2px solid #24143a;
-    border-radius: 12px;
+    width: min(100cqw, calc((100cqh - 54px) * 1.6));
+    padding: 0 8px 8px;
+    border: 1px solid rgb(255 255 255 / 0.95);
+    border-radius: 20px;
     overflow: hidden;
-    background: #fff;
-    box-shadow: 0 24px 50px -20px rgb(40 20 70 / 0.4);
-    color: #24143a;
+    background:
+      radial-gradient(120% 80% at 20% 0%, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.35) 60%),
+      linear-gradient(120deg, rgb(205 196 255 / 0.55), rgb(248 190 225 / 0.5) 40%, rgb(190 238 222 / 0.5));
+    box-shadow:
+      inset 0 -8px 20px rgb(214 150 230 / 0.25),
+      0 30px 60px -24px rgb(90 40 140 / 0.45),
+      0 0 0 6px rgb(255 255 255 / 0.18);
+    color: #3a2458;
   }
   .dev-bar {
     display: flex;
     align-items: center;
     gap: 14px;
-    height: 36px;
-    padding: 0 12px;
-    border-bottom: 2px solid #24143a;
-    background: #fbf9fe;
+    height: 44px;
+    padding: 0 8px;
+    background: transparent;
   }
   .dev-dots { display: flex; gap: 6px; flex: 0 0 auto; }
   .dev-dots i {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    border: 1.5px solid #24143a;
+    background: #f5a9d8;
+    box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.8);
   }
+  .dev-dots i:nth-child(2) { background: #ffd4b8; }
+  .dev-dots i:nth-child(3) { background: #aeead6; }
   .dev-tabs {
     display: flex;
     align-self: stretch;
@@ -506,9 +522,9 @@
     flex: 0 0 auto;
     padding: 0 12px;
     border: 0;
-    border-radius: 0;
     background: none;
-    color: #3d3150;
+    border-radius: 999px;
+    color: #4a3466;
     font: 500 13px/1 var(--font-pixel);
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -521,12 +537,13 @@
     position: absolute;
     inset: -4px 0;
   }
-  button.dev-tab:hover { color: #24143a; background: rgb(36 20 58 / 0.06); }
+  .dev-tabs { align-self: center; height: 30px; }
+  button.dev-tab:hover { color: #2a1640; background: rgb(255 255 255 / 0.5); }
   .dev-tab[aria-pressed="true"],
   .dev-tab[aria-current] {
-    color: #24143a;
-    background: #fff;
-    box-shadow: inset 0 -2px 0 #8a1f6a;
+    color: #3a0b63;
+    background: rgb(255 255 255 / 0.9);
+    box-shadow: 0 2px 8px rgb(150 80 190 / 0.18);
   }
   .dev-tab:focus-visible { outline: 2px solid #8a1f6a; outline-offset: -2px; }
   .dev-url {
@@ -537,9 +554,11 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 13px;
-    color: #3d3150;
+    color: #4a3466;
   }
   .dev-browser .dev-screen {
+    border-radius: 12px;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.9);
     aspect-ratio: 16 / 10;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -556,10 +575,12 @@
     height: min(100cqh, calc(100cqw * 2.1));
     aspect-ratio: 9 / 19;
     padding: 10px;
-    border: 2px solid #24143a;
-    border-radius: 36px;
-    background: rgb(255 255 255 / 0.6);
-    box-shadow: 0 24px 50px -20px rgb(40 20 70 / 0.4);
+    border: 1px solid rgb(255 255 255 / 0.95);
+    border-radius: 38px;
+    background:
+      radial-gradient(120% 60% at 25% 0%, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.35) 60%),
+      linear-gradient(140deg, rgb(205 196 255 / 0.6), rgb(248 190 225 / 0.5) 45%, rgb(190 238 222 / 0.55));
+    box-shadow: inset 0 -8px 20px rgb(214 150 230 / 0.25), 0 30px 60px -24px rgb(90 40 140 / 0.45), 0 0 0 6px rgb(255 255 255 / 0.18);
   }
   .dev-phone .dev-screen {
     height: 100%;
