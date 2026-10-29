@@ -2,6 +2,7 @@
 @import "./styles/showcase.css";
 @import "./styles/butterfly.css";
 @import "./styles/about.css";
+@import "./styles/ambient.css";
 
 @theme {
   /*
@@ -1345,7 +1346,7 @@ html[data-lite] .sticker { filter: drop-shadow(0 8px 10px rgb(27 7 48 / 0.3)); }
     font-style: normal;
     font-size: 15px;
     color: #3a0b63;
-    border: 1px solid rgb(255 255 255 / 0.95);
+    border: 0;
     background:
       radial-gradient(120% 150% at 28% -10%, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.35) 48%, transparent 70%),
       linear-gradient(110deg, rgb(205 196 255 / 0.85), rgb(248 190 225 / 0.85) 30%, rgb(255 222 200 / 0.8) 50%, rgb(190 238 222 / 0.85) 72%, rgb(205 196 255 / 0.85));
@@ -1364,7 +1365,7 @@ html[data-lite] .sticker { filter: drop-shadow(0 8px 10px rgb(27 7 48 / 0.3)); }
   .btn::before {
     content: "";
     position: absolute;
-    inset: -1px;
+    inset: 0;
     z-index: -1;
     border-radius: inherit;
     background: radial-gradient(70% 130% at 50% 125%, rgb(247 160 215 / 0.75), transparent 70%);
