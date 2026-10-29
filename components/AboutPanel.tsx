@@ -1,9 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { experience, education, skillGroups, certifications, languages } from "@/lib/content";
+import { education, skillGroups, certifications, languages, software, type toolkit } from "@/lib/content";
 import AboutMe, { GardenPortrait } from "./AboutMe";
 import { Sparkle4 } from "./Botanicals";
+import BloomTimeline from "./BloomTimeline";
+import { ToolTile, SHORT_NAME } from "./ToolBubbles";
+
+type ToolId = (typeof toolkit)[number]["id"];
 
 const TABS = [
   { id: "about", label: "about me" },
@@ -22,25 +26,29 @@ function PanelHead({ lead, accent }: { lead: string; accent: string }) {
   );
 }
 
-/** A ✦ bullet list, the site's replacement for pills. */
-function Bullets({ items, className = "" }: { items: readonly string[]; className?: string }) {
+/** Short items in a wrapped line, each on a small ✦ — scannable, no pills. */
+function SparkleItems({ items, label, className = "" }: { items: readonly string[]; label?: string; className?: string }) {
   return (
-    <ul className={`space-y-2 ${className}`}>
-      {items.map((it) => (
-        <li key={it} className="flex gap-2.5 text-base leading-relaxed text-ink/85 sm:text-[17px]">
-          <Sparkle4 className="mt-[0.5em] h-2.5 w-2.5 shrink-0 text-eminence" />
-          {it}
-        </li>
-      ))}
-    </ul>
+    <div className={className}>
+      {label && <p className="type-pixel mb-1.5 text-[13px] text-ink/75">{label}</p>}
+      <ul className="flex flex-wrap gap-x-4 gap-y-1">
+        {items.map((it) => (
+          <li key={it} className="inline-flex items-center gap-1.5 text-base leading-snug text-ink/85">
+            <Sparkle4 className="h-2 w-2 shrink-0 translate-y-[-0.1em] text-eminence" />
+            {it}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
 /**
- * About, on the sky with the rest of the page. The portrait stands in the
- * garden on the left (it stays in view while a long tab scrolls past on
- * desktop); the title, the tabs — plain words, the current one underlined —
- * and each tab's content sit on the right as clean ruled rows.
+ * About, on the sky with the rest of the page. The arched portrait stands in
+ * the garden on the left with the app logos floating round it as bubbles (it
+ * stays in view while a long tab scrolls past on desktop); the title, the
+ * tabs — plain words, the current one underlined — and each tab's content sit
+ * on the right: experience as a blooming stem, the rest in pearl cards.
  */
 export default function AboutPanel() {
   const [active, setActive] = useState<TabId>("about");
@@ -125,66 +133,43 @@ export default function AboutPanel() {
           {active === "experience" && (
             <div>
               <PanelHead lead="Where I've" accent="worked" />
-              <ol className="mt-7 border-b border-ink/20">
-                {experience.map((e) => {
-                  const now = /present/i.test(e.period);
-                  return (
-                    <li
-                      key={`${e.role}-${e.org}`}
-                      className="grid gap-2 border-t border-ink/20 py-6 sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-8"
-                    >
-                      <div className="type-pixel space-y-1 text-[13px] leading-snug text-ink/75">
-                        <p>{e.period}</p>
-                        <p>{e.place}</p>
-                        {now && <p className="text-eminence">✦ now</p>}
-                      </div>
-                      <div>
-                        <h4 className="type-display text-[1.6rem] leading-tight text-iris">{e.role}</h4>
-                        <p className="type-display mt-1 text-lg text-eminence italic">{e.org}</p>
-                        <Bullets items={e.points} className="mt-3" />
-                      </div>
-                    </li>
-                  );
-                })}
-              </ol>
+              <BloomTimeline />
             </div>
           )}
 
           {active === "education" && (
             <div>
               <PanelHead lead="Where I" accent="studied" />
-              <ol className="mt-7 border-b border-ink/20">
+              <ul className="mt-7 space-y-4">
                 {education.map((e) => (
-                  <li key={e.school} className="grid gap-2 border-t border-ink/20 py-6 sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-8">
-                    <div className="type-pixel space-y-1 text-[13px] leading-snug text-ink/75">
-                      <p>{e.period}</p>
-                      <p>{e.place}</p>
-                    </div>
-                    <div>
-                      <h4 className="type-display text-[1.6rem] leading-tight text-iris">{e.school}</h4>
-                      <p className="mt-2 text-base leading-relaxed text-ink/85 sm:text-[17px]">{e.detail}</p>
-                      {e.coursework && (
-                        <p className="mt-3 text-base leading-relaxed text-ink/80">
-                          <span className="type-pixel text-[13px] text-ink/75">Coursework · </span>
-                          {e.coursework}
-                        </p>
-                      )}
-                      {e.honors.length > 0 && <Bullets items={e.honors} className="mt-3" />}
-                    </div>
+                  <li key={e.school} className="pearl-card">
+                    <p className="type-pixel flex flex-wrap gap-x-2 text-[13px] leading-snug text-ink/75">
+                      <span>{e.period}</span>
+                      <span aria-hidden>·</span>
+                      <span>{e.place}</span>
+                    </p>
+                    <h4 className="type-display mt-2 text-[1.5rem] leading-[1.1] text-iris">{e.school}</h4>
+                    <p className="mt-1.5 text-base leading-snug text-ink/85 sm:text-[17px]">{e.detail}</p>
+                    {e.honors.length > 0 && (
+                      <SparkleItems label="honors" items={e.honors} className="mt-4" />
+                    )}
+                    {e.coursework && (
+                      <SparkleItems label="coursework" items={e.coursework.split(" · ")} className="mt-3" />
+                    )}
                   </li>
                 ))}
-              </ol>
+              </ul>
 
-              <h4 className="type-pixel mt-12 text-[13px] text-ink/75">certifications</h4>
-              <ul className="mt-3 border-b border-ink/20">
+              <h4 className="type-pixel mt-10 flex items-center gap-2 text-[13px] text-ink/75">
+                <Sparkle4 className="h-2.5 w-2.5 text-eminence" />
+                certifications
+              </h4>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
                 {certifications.map((c) => (
-                  <li key={c.name} className="grid gap-2 border-t border-ink/20 py-5 sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-8">
-                    <p className="type-pixel text-[13px] leading-snug text-ink/75">{c.date}</p>
-                    <div>
-                      <p className="type-display text-[1.35rem] leading-snug text-iris">{c.name}</p>
-                      <p className="mt-1 text-base text-ink/85">{c.issuer}</p>
-                      <p className="mt-1 text-[15px] text-ink/75">{c.detail}</p>
-                    </div>
+                  <li key={c.name} className="pearl-card pearl-card-sm flex flex-col">
+                    <p className="type-pixel text-[13px] text-ink/75">{c.date}</p>
+                    <p className="type-display mt-1.5 text-[1.2rem] leading-[1.15] text-iris">{c.name}</p>
+                    <p className="mt-auto pt-2 text-base leading-snug text-ink/80">{c.issuer}</p>
                   </li>
                 ))}
               </ul>
@@ -194,14 +179,40 @@ export default function AboutPanel() {
           {active === "skills" && (
             <div>
               <PanelHead lead="What I" accent="work with" />
-              <div className="mt-7 grid gap-x-10 sm:grid-cols-2">
-                {[...skillGroups, { label: "languages", items: languages }].map((g) => (
-                  <div key={g.label} className="border-t border-ink/20 py-5">
-                    <h4 className="type-display text-2xl text-iris capitalize">{g.label}</h4>
-                    <Bullets items={g.items} className="mt-3" />
-                  </div>
-                ))}
+
+              <div className="pearl-card mt-7">
+                <h4 className="type-pixel text-[13px] text-ink/75">software</h4>
+                <ul className="mt-3 grid grid-cols-4 gap-x-2 gap-y-4">
+                  {software.map((s) => {
+                    const id = s.toLowerCase() as ToolId;
+                    return (
+                      <li key={s} className="flex flex-col items-center gap-1.5 text-center">
+                        <ToolTile id={id} className="h-12 w-12" />
+                        <span className="text-[15px] leading-tight text-ink/80">{SHORT_NAME[id]}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
+
+              <ul className="mt-3 gap-3 sm:columns-2">
+                {skillGroups.map((g) => (
+                  <li key={g.label} className="pearl-card pearl-card-sm mb-3 break-inside-avoid">
+                    <h4 className="type-display text-[1.3rem] leading-tight text-iris first-letter:uppercase">{g.label}</h4>
+                    <SparkleItems items={g.items} className="mt-2.5" />
+                  </li>
+                ))}
+              </ul>
+
+              <p className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-base text-ink/85 sm:text-[17px]">
+                <span className="type-pixel text-[13px] text-ink/75">languages</span>
+                {languages.map((l, i) => (
+                  <span key={l}>
+                    {i > 0 && <span aria-hidden className="mr-3 text-eminence">✦</span>}
+                    {l}
+                  </span>
+                ))}
+              </p>
             </div>
           )}
         </div>
