@@ -1,1 +1,84 @@
 /* about — see docs/superpowers/specs/2026-10-29-butterfly-garden-design.md */
+
+@layer components {
+  /* The portrait has no frame: its edge feathers out into the sky. */
+  .about-photo {
+    -webkit-mask-image: radial-gradient(ellipse 48% 47% at 50% 46%, #000 44%, rgb(0 0 0 / 0.55) 70%, transparent 97%);
+    mask-image: radial-gradient(ellipse 48% 47% at 50% 46%, #000 44%, rgb(0 0 0 / 0.55) 70%, transparent 97%);
+  }
+
+  /* A warm light behind the portrait, drawn with a gradient (no blur). */
+  .about-halo {
+    pointer-events: none;
+    border-radius: 999px;
+    background: radial-gradient(closest-side, rgb(255 246 234 / 0.95) 0%, rgb(255 246 234 / 0.55) 55%, transparent 100%);
+  }
+
+  /* Tabs: plain words; the current one is underlined. */
+  .about-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 28px;
+  }
+
+  .about-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0;
+    font-size: 16px;
+    line-height: 1.2;
+    white-space: nowrap;
+    color: color-mix(in srgb, var(--color-ink) 74%, transparent);
+    transition: color 200ms ease-out;
+  }
+
+  .about-tab::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 7px;
+    height: 2px;
+    background: var(--color-eminence);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .about-tab[aria-selected="true"] {
+    color: var(--color-iris);
+    font-weight: 500;
+  }
+
+  .about-tab[aria-selected="true"]::after {
+    transform: scaleX(1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .about-tab:hover {
+      color: var(--color-iris);
+    }
+  }
+
+  .about-tab:focus-visible {
+    outline: 2px solid var(--color-eminence);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+
+  /* Contact: the form keeps its note paper; labels in the body face. */
+  .contact-label {
+    display: block;
+    font-size: 17px;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--color-ink) 78%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-tab::after {
+    transition: none;
+  }
+}

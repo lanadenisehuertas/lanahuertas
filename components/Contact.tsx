@@ -3,7 +3,6 @@ import { profile, socials } from "@/lib/content";
 import { Lotus, Leaf, Spiral, Sparkle4, Orb, Bellflower, Blossom, Fern, LongVine } from "./Botanicals";
 import { Cloud, Butterfly, Orbit, ShootingStar, GlowSparkle, Star5, StarBurst, PixelFlower, Staff, Note, PixelArt } from "./Ethereal";
 import { InkArrow } from "./Ink";
-import SectionTitle from "./SectionTitle";
 import MorphName from "./MorphName";
 import ContactForm from "./ContactForm";
 
@@ -32,14 +31,19 @@ const dp = (depth: number, extra: Record<string, string | number> = {}) => ({ "-
  * grain) and the whole garden — lotus, bellflowers, blossoms, ferns,
  * pixel flowers, butterflies — spilling over the edges at three depths.
  *
- * It carries everything you'd act on: the thank-you (morphs like the name),
- * a bloom button per link, and a form that emails Lana directly.
+ * It carries everything you'd act on, in two columns at desktop: on the left
+ * the thank-you (morphs like the name) and a link per profile, on the right
+ * a form that emails Lana directly.
  */
 export default function Contact() {
   return (
-    <section id="contact" className="relative px-4 pb-24 sm:px-8 sm:pb-28">
+    <section id="contact" className="relative px-4 pt-16 pb-24 sm:px-8 sm:pb-28">
       <div className="relative mx-auto max-w-6xl">
-        <SectionTitle id="contact-heading" index="05" lead="Let's" accent="talk" note="let's make something" ornament="flourish" />
+        <header className="mb-8 sm:mb-10">
+          <h2 id="contact-heading" data-perch className="type-display text-[clamp(3rem,5vw,5.25rem)] leading-none text-iris">
+            Let&apos;s <em className="text-lavender italic">talk</em>
+          </h2>
+        </header>
 
         <footer aria-labelledby="contact-heading" className="end-card bloom-zone relative overflow-visible">
           {/* The dusk sky: full-bleed, fading in from the page above and
@@ -120,59 +124,67 @@ export default function Contact() {
             </a>
           </div>
 
-          <div className="relative px-4 pt-4 pb-40 text-center sm:px-10 sm:pt-6 sm:pb-52">
-            {/* The thank-you, ringed by an orbit and flanked by pixel swirls */}
-            <div className="relative">
-              <PixelArt name="swirl" className="absolute top-[18%] -left-2 hidden w-[12%] opacity-80 lg:block" />
-              <PixelArt name="swirl" className="absolute top-[18%] -right-2 hidden w-[12%] -scale-x-100 opacity-80 lg:block" />
-              <span aria-hidden className="pointer-events-none absolute top-1/2 left-1/2 hidden w-[92%] -translate-x-1/2 -translate-y-[46%] sm:block">
-                <Orbit className="w-full -rotate-[6deg]" dur="20s" />
-              </span>
-              <MorphName
-                as="p"
-                label="Thank you"
-                words={[
-                  {
-                    text: "Thank you",
-                    italic: true,
-                    className: "type-name mt-1 text-[15vw] whitespace-nowrap text-iris italic xl:text-[10.5rem]",
-                  },
-                ]}
-              />
+          {/* Two columns at desktop: the thank-you on the left, the form on
+              the right. Phones stack them, thank-you first. */}
+          <div className="relative grid items-center gap-14 px-4 pt-4 pb-40 sm:px-10 sm:pt-6 sm:pb-52 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-12">
+            <div className="relative text-center lg:text-left">
+              {/* The thank-you, ringed by an orbit, a pixel swirl beside it */}
+              <div className="relative">
+                <PixelArt name="swirl" className="absolute top-[4%] right-[2%] hidden w-[22%] -scale-x-100 opacity-80 lg:block" />
+                <span aria-hidden className="pointer-events-none absolute top-1/2 left-1/2 hidden w-[112%] -translate-x-1/2 -translate-y-[46%] sm:block">
+                  <Orbit className="w-full -rotate-[6deg]" dur="20s" />
+                </span>
+                <MorphName
+                  as="p"
+                  label="Thank you"
+                  words={[
+                    {
+                      text: "Thank",
+                      italic: true,
+                      className: "type-name text-[26vw] whitespace-nowrap text-iris italic sm:text-[9rem] xl:text-[10rem]",
+                    },
+                    {
+                      text: "you",
+                      italic: true,
+                      className: "type-name text-[26vw] whitespace-nowrap text-iris italic sm:text-[9rem] lg:pl-[1.3em] xl:text-[10rem]",
+                    },
+                  ]}
+                />
+              </div>
+
+              <p className="mx-auto mt-6 max-w-md text-base leading-relaxed text-ink/85 sm:text-[17px] lg:mx-0">
+                Open to UI/UX and design roles, and to freelance brand, event and product work.
+              </p>
+
+              <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-7 gap-y-1 lg:justify-start">
+                {socials.filter((s) => s.label !== "email").map((s) => (
+                  <li key={s.label}>
+                    <a
+                      href={s.href}
+                      target={s.href.startsWith("http") ? "_blank" : undefined}
+                      rel="noopener noreferrer"
+                      className="link inline-flex min-h-[44px] items-center gap-2 text-[17px]"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        {GLYPH[s.label]}
+                      </svg>
+                      {s.label} <span aria-hidden>↗</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            <p className="mx-auto mt-4 max-w-md text-base text-ink/75 sm:text-[15px]">
-              Open to UI/UX and design roles, and to freelance brand, event and product work.
-            </p>
-
-            <ul className="mx-auto mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-4">
-              {socials.filter((s) => s.label !== "email").map((s) => (
-                <li key={s.label}>
-                  <a
-                    href={s.href}
-                    target={s.href.startsWith("http") ? "_blank" : undefined}
-                    rel="noopener noreferrer"
-                    className="btn-ghost"
-                  >
-                    <svg viewBox="0 0 24 24" aria-hidden className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      {GLYPH[s.label]}
-                    </svg>
-                    {s.label} <span aria-hidden>↗</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-
             {/* The form, with a butterfly resting on its corner */}
-            <div className="relative z-20 mt-12" data-rv>
-              <span aria-hidden data-react="butterfly" className="pointer-events-none absolute -top-10 right-[6%] z-10 w-16 sm:-top-12 sm:right-[calc(50%-18rem)] sm:w-20">
+            <div className="relative z-20" data-rv>
+              <span aria-hidden data-react="butterfly" className="pointer-events-none absolute -top-10 right-[6%] z-10 w-16 sm:-top-12 sm:w-20">
                 <span className="react block">
                   <span className="flutter block" style={{ "--dur": "8s" } as CSSProperties}>
                     <Butterfly className="w-full rotate-[18deg]" style={{ "--flap": "1.4s" } as CSSProperties} />
                   </span>
                 </span>
               </span>
-              <PixelFlower className="pointer-events-none absolute -top-5 left-[8%] z-10 h-7 w-7 sm:left-[calc(50%-17rem)]" />
+              <PixelFlower className="pointer-events-none absolute -top-5 left-[8%] z-10 h-7 w-7" />
               <ContactForm />
             </div>
           </div>
