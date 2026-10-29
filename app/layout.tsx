@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Cormorant_Garamond, DM_Mono, Nanum_Pen_Script } from "next/font/google";
+import { DM_Mono, Inter_Tight } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { profile, socials } from "@/lib/content";
@@ -11,27 +11,17 @@ import { Starfield } from "@/components/Ethereal";
 import GardenLoader from "@/components/GardenLoader";
 
 /*
- * Archivo — one grotesk family for everything set in words. Its width axis
- *     gives two voices from one file: tight at 100% for flim-style
- *     headlines, and fully extended at 125% for the Y2K-tech name.
+ * Redaction (OFL, MCKL) — the display face: the name, section and project
+ *     titles, italic taglines. Its degraded cuts (10/35/70/100) share metrics,
+ *     so the hero name can decay through them on hover.
+ * Inter Tight — body, buttons, links, nav. Neutral, so Redaction carries the
+ *     personality.
  * DM Mono — small uppercase labels and readouts.
- * Nanum Pen Script — the sketchbook hand: margin notes and annotations only.
- * Redaction (OFL, MCKL) — the morph target. Its cuts degrade the same
- *     letterforms step by step and share metrics, so the hero name can decay
- *     through them on hover.
  */
-const archivo = Archivo({
-  variable: "--font-archivo",
+const interTight = Inter_Tight({
+  variable: "--font-inter-tight",
   subsets: ["latin"],
-  axes: ["wdth"],
-  display: "swap",
-});
-
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  style: ["normal", "italic"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -94,12 +84,6 @@ const mono = DM_Mono({
   display: "swap",
 });
 
-const hand = Nanum_Pen_Script({
-  variable: "--font-hand",
-  subsets: ["latin"],
-  weight: "400",
-  display: "swap",
-});
 
 // Leads with both forms of her name, so a search for either matches the snippet.
 const seoDescription = `${profile.short} (${profile.name}) — Manila-based UI/UX designer, graphic designer and video editor. 7+ years in Figma, Photoshop and Premiere Pro, and a Computer Science student at FEU Tech who builds what she designs.`;
@@ -161,7 +145,7 @@ export default function RootLayout({
     <html
       suppressHydrationWarning
       lang="en"
-      className={`${archivo.variable} ${cormorant.variable} ${mono.variable} ${hand.variable} ${redaction.variable} ${r10.variable} ${r35.variable} ${r70.variable} ${r100.variable} h-full antialiased`}
+      className={`${interTight.variable} ${mono.variable} ${redaction.variable} ${r10.variable} ${r35.variable} ${r70.variable} ${r100.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {/*

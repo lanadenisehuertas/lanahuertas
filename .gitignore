@@ -48,3 +48,4 @@ AGENTS.md
 # Codex image generation and screenshot scratch
 .codex-scratch/
 __pycache__/
+.superpowers/
