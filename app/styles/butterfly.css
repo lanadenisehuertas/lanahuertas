@@ -1,0 +1,215 @@
+/* butterfly — see docs/superpowers/specs/2026-10-29-butterfly-garden-design.md */
+
+@layer components {
+  /* Below the fixed nav (z-50), above the page. Only the button takes clicks. */
+  .bf-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    pointer-events: none;
+    contain: strict;
+  }
+
+  .bf-sparks {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* ---- the butterfly: button > perspective > tilt > two sides > fore + hind wings ---- */
+  .bf-fly {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--bf-w);
+    height: var(--bf-h);
+    padding: 0;
+    border: 0;
+    background: none;
+    appearance: none;
+    cursor: pointer;
+    pointer-events: auto;
+    will-change: transform;
+  }
+
+  .bf-persp,
+  .bf-tilt,
+  .bf-side,
+  .bf-wing,
+  .bf-body {
+    display: block;
+    position: absolute;
+  }
+
+  .bf-persp {
+    inset: 0;
+    perspective: 700px;
+  }
+
+  .bf-tilt {
+    inset: 0;
+    transform-style: preserve-3d;
+    transform: rotateX(62deg);
+  }
+
+  .bf-side {
+    top: 0;
+    width: 50%;
+    height: 100%;
+    transform-style: preserve-3d;
+  }
+  .bf-l {
+    left: 0;
+  }
+  .bf-r {
+    right: 0;
+  }
+
+  /* Each wing shows its half of the art; the body sliver is clipped off. */
+  .bf-wing {
+    inset: 0;
+    background-repeat: no-repeat;
+    background-size: 200% 100%;
+  }
+  .bf-fore {
+    background-image: var(--bf-fore);
+  }
+  .bf-hind {
+    background-image: var(--bf-hind);
+  }
+  .bf-l .bf-wing {
+    background-position: 0 0;
+    transform-origin: 100% 50%;
+  }
+  .bf-r .bf-wing {
+    background-position: 100% 0;
+    transform-origin: 0 50%;
+  }
+  /*
+   * Fore and hind wings meet at ~50.2% of the art's height: fore = top half,
+   * hind = bottom half, overlapping by ~2% so no seam shows. The inner 5% of
+   * each half (the body, x 47.5%-52.5%) is clipped off; the still body strip
+   * below draws it.
+   */
+  .bf-l .bf-fore {
+    clip-path: inset(0 5% 48.8% 0);
+  }
+  .bf-r .bf-fore {
+    clip-path: inset(0 0 48.8% 5%);
+  }
+  .bf-l .bf-hind {
+    clip-path: inset(49.2% 5% 0 0);
+  }
+  .bf-r .bf-hind {
+    clip-path: inset(49.2% 0 0 5%);
+  }
+
+  /* Body and antennae: a non-flapping strip from the centre of the art. */
+  .bf-body {
+    left: 46.5%;
+    top: 0;
+    width: 7%;
+    height: 100%;
+    background: var(--bf-body) 50% 0 / 1428.57% 100% no-repeat;
+    transform: translateZ(1px);
+  }
+
+  /* Landed and idle: the loop stops and the wings breathe here instead. */
+  .bf-stage.is-resting .bf-l .bf-fore {
+    animation: bf-rest-l 0.8333s ease-in-out var(--bf-rest-delay, 0s) infinite alternate;
+  }
+  .bf-stage.is-resting .bf-r .bf-fore {
+    animation: bf-rest-r 0.8333s ease-in-out var(--bf-rest-delay, 0s) infinite alternate;
+  }
+  .bf-stage.is-resting .bf-l .bf-hind {
+    animation: bf-rest-l 0.8333s ease-in-out var(--bf-rest-delay-hind, 0s) infinite alternate;
+  }
+  .bf-stage.is-resting .bf-r .bf-hind {
+    animation: bf-rest-r 0.8333s ease-in-out var(--bf-rest-delay-hind, 0s) infinite alternate;
+  }
+
+  /* Lite mode: one wing layer per side, showing the whole half. */
+  html[data-lite] .bf-hind {
+    display: none;
+  }
+  html[data-lite] .bf-l .bf-fore {
+    clip-path: inset(0 5% 0 0);
+  }
+  html[data-lite] .bf-r .bf-fore {
+    clip-path: inset(0 0 0 5%);
+  }
+
+  /* ---- "hi! click me to fly ahead" ---- */
+  .bf-label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 4px 12px;
+    border-radius: 99px;
+    background: rgb(255 255 255 / 0.9);
+    color: var(--color-iris, #51017c);
+    font-family: var(--font-display, Georgia, serif);
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.4;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    cursor: pointer;
+    transition: opacity 0.25s;
+  }
+  .bf-label.on {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ---- sparkles: four-point stars with a soft glow, and dots ---- */
+  .bf-spark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+  }
+  .bf-spark.star::before,
+  .bf-spark.star::after {
+    content: "";
+    position: absolute;
+  }
+  .bf-spark.star::before {
+    inset: -5px;
+    border-radius: 50%;
+    background: radial-gradient(rgb(247 168 220 / 0.75), rgb(247 168 220 / 0) 65%);
+  }
+  .bf-spark.star::after {
+    inset: 0;
+    background: #fff;
+    clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  }
+  .bf-spark.star.pink::after {
+    background: #ffd3ef;
+  }
+  .bf-spark.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(#fff, rgb(255 190 235 / 0) 70%);
+  }
+}
+
+@keyframes bf-rest-l {
+  from {
+    transform: rotateY(10deg);
+  }
+  to {
+    transform: rotateY(65deg);
+  }
+}
+@keyframes bf-rest-r {
+  from {
+    transform: rotateY(-10deg);
+  }
+  to {
+    transform: rotateY(-65deg);
+  }
+}

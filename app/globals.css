@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "./styles/showcase.css";
+@import "./styles/butterfly.css";
+@import "./styles/about.css";
+@import "./styles/ambient.css";
 
 @theme {
   /*
@@ -27,11 +31,13 @@
   --color-sky: #a9b6f0; /* periwinkle blooms */
   --color-blush: #f2b8cf; /* pink petals */
 
-  --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
-  --font-grotesk: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
-  --font-body: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-redaction), Georgia, "Times New Roman", serif;
+  --font-grotesk: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
   --font-pixel: var(--font-pixel), ui-monospace, "Courier New", monospace;
+  /* The pen hand is retired: margin notes now set in the body face. */
+  --font-hand: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
 }
 
 html {
@@ -82,123 +88,29 @@ body {
       linear-gradient(180deg, #e6ebfb 0%, #dce3fa 34%, #e7e4f7 68%, #f3e9f0 100%);
   }
 
-  /* --- Surfaces ------------------------------------------------------------
-   *
-   * .glass       Cream paper panel. Name kept from the previous theme so
-   *              every section picks the new look up unchanged.
-   */
-  /* Paper sheet laid on the paper ground: a lighter, slightly frosted card
-     with a hairline and a printed offset shadow in purple. */
-  .glass {
-    background-color: color-mix(in srgb, #fffaf0 72%, transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
-  }
-
-
-
-
-
-  /* --- Flat Mac system ------------------------------------------------------
-   *
-   * Palette roles, in order of weight:
-   *   deep      the desktop — page ground
-   *   maize     windows — panels, primary type on the ground
-   *   ink       1px lines and type on windows
-   *   fawn      ACTION + SELECTION — buttons, active tab, highlights, caret
-   *   lavender  focus/hover outline and the decay glitch — never behind text
-   *   eminence  small labels on windows
-   *
-   * No gloss, no gradients, no soft shadows. Boxes are 1px, corners 2–4px,
-   * and state changes invert rather than glow — the classic Mac way.
-   */
-
-  /* --- Buttons: Frutiger-Aero gel -------------------------------------------
-   * A glossy pill: violet body, a hard white gloss across the top half, a
-   * soft inner glow at the base, and the label set in italic Cormorant with
-   * a sparkle that turns on hover. Pressing sinks it a pixel.
-   */
-  .gel,
-  .gel-ghost {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    border-radius: 999px;
-    font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 500;
-    font-size: 1.12rem;
-    letter-spacing: 0.005em;
-    line-height: 1;
-    text-transform: none;
-    white-space: nowrap;
-    transition: transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 220ms ease-out, filter 220ms ease-out;
-  }
-
-  .gel {
-    color: #fff;
-    background: linear-gradient(180deg, #9b6ce0 0%, #6a1fa8 48%, #51017c 52%, #7a3cc4 100%);
-    border: 1px solid color-mix(in srgb, var(--color-ink) 70%, transparent);
-    box-shadow:
-      inset 0 -3px 8px rgb(242 184 207 / 0.55),
-      inset 0 1px 0 rgb(255 255 255 / 0.6),
-      0 8px 18px -12px rgb(81 1 124 / 0.5);
-    text-shadow: 0 1px 0 rgb(27 7 48 / 0.45);
-  }
-
-  /* The gloss: a white lens over the top half. */
-  .gel::before,
-  .gel-ghost::before {
+  /* Print texture on the sky, painted once (fixed, static, no blending): a
+     dot screen rising from the bottom like dusk light, and film grain over all. */
+  .graph-ground::before,
+  .graph-ground::after {
     content: "";
     position: absolute;
-    inset: 2px 10px 52% 10px;
-    z-index: -1;
-    border-radius: 999px;
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.08));
-    pointer-events: none;
+    inset: 0;
   }
-
-  /* Sparkle that rides in front of the label and turns on hover. */
-  .gel::after,
-  .gel-ghost::after {
-    content: "";
-    order: -1;
-    width: 0.8em;
-    height: 0.8em;
-    flex-shrink: 0;
-    margin-right: 0.15em;
-    background: currentColor;
-    clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
-    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  .graph-ground::before {
+    top: auto;
+    height: 55vh;
+    background-image: radial-gradient(circle, rgb(185 55 157 / 0.5) 0.9px, transparent 1.4px);
+    background-size: 8px 8px;
+    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 100%);
+    mask-image: linear-gradient(to top, #000 0%, transparent 100%);
+    opacity: 0.32;
   }
-
-  .gel:hover,
-  .gel-ghost:hover {
-    transform: translateY(-2px);
-    filter: saturate(1.15) brightness(1.05);
+  .graph-ground::after {
+    background-image: url("/art/grain-soft.webp");
+    background-size: 160px 160px;
+    opacity: 0.4;
   }
-
-  .gel:hover::after,
-  .gel-ghost:hover::after {
-    transform: rotate(180deg) scale(1.25);
-  }
-
-  .gel:active,
-  .gel-ghost:active {
-    transform: translateY(2px);
-    box-shadow: inset 0 2px 8px rgb(27 7 48 / 0.3);
-  }
-
-
-  /* Secondary gel: frosted clear glass with a violet label. */
-  .gel-ghost {
-    color: var(--color-iris);
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.85), rgb(233 236 253 / 0.65));
-    border: 1px solid color-mix(in srgb, var(--color-iris) 45%, transparent);
-    box-shadow:
-      inset 0 -3px 8px rgb(169 182 240 / 0.45);
-  }
+  html[data-lite] .graph-ground::after { display: none; }
 
   /* Status dot — flat. Set --orb. */
   .orb {
@@ -211,51 +123,8 @@ body {
     background-color: var(--orb);
   }
 
-
-  .orb-live {
-    animation: orb-blink 1.6s steps(1) infinite;
-  }
-
   @keyframes orb-blink {
     50% { opacity: 0.25; }
-  }
-
-  /* Close box — the square in a classic window's title bar. */
-  .closebox {
-    display: inline-block;
-    flex-shrink: 0;
-    width: 9px;
-    height: 9px;
-    border: 1px solid currentColor;
-    background-color: var(--tb-bg, var(--color-ink));
-  }
-
-  /* Title bar, Frutiger-Aero: a glossy periwinkle gel with the hard
-     highlight line across the middle, ink label on a cut-out block. */
-  .titlebar {
-    --tb-bg: transparent;
-    color: var(--color-ink);
-    background-image: linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #e4e8fd 48%,
-      #c3cdf7 52%,
-      #dfe4fc 100%
-    );
-    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 30%, transparent);
-  }
-
-  .titlebar > .tb-label {
-    padding: 0 6px;
-  }
-
-  /* Close box becomes a glossy pink bead. */
-  .titlebar .closebox {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    border: 1px solid color-mix(in srgb, var(--color-ink) 40%, transparent);
-    background: radial-gradient(circle at 35% 30%, #fff 0 18%, #f2b8cf 45%, #b9379d 100%);
   }
 
   /* Work tile. A quiet hover: the cover leans in 3% inside its frame, the
@@ -267,52 +136,14 @@ body {
       border-color 200ms ease-out;
   }
 
-  .tile-img {
-    transition: transform 500ms var(--ease-mist);
-  }
-
-  .tile-cap {
-    opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 220ms ease-out, transform 260ms var(--ease-mist);
-  }
-
   .tile:focus-visible { border-color: var(--color-lavender); }
-  .tile:focus-visible .tile-img { transform: scale(1.03); }
-  .tile:focus-visible .tile-cap { opacity: 1; transform: none; }
 
   @media (hover: hover) and (pointer: fine) {
     .tile:hover { border-color: var(--color-lavender); }
-    .tile:hover .tile-img { transform: scale(1.03); }
-    .tile:hover .tile-cap { opacity: 1; transform: none; }
   }
 
   @media (hover: none) {
-    .tile-cap { opacity: 1; transform: none; }
   }
-
-  /* Tab / filter chip. */
-  .pill {
-    border-radius: 3px;
-    color: var(--color-ink);
-    background-color: color-mix(in srgb, #fffaf0 55%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-ink) 25%, transparent);
-    transition: background-color 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out;
-  }
-
-  .pill:hover {
-    border-color: var(--color-ink);
-  }
-
-  .pill-active,
-  .pill-active:hover {
-    color: var(--color-paper);
-    border-color: var(--color-iris);
-    background-color: var(--color-iris);
-  }
-
-
-
 
   /* --- Cursors ----------------------------------------------------------------
    * Classic 1-bit arrow and pointing hand, drawn as SVG so they stay crisp.
@@ -331,50 +162,14 @@ body {
    * width exactly — nothing is cropped. The ::after filler stops the last row
    * from stretching.
    */
-  /* Every cover tile is an exact-ratio box whose grow factor is its ratio, so
-     all tiles on a line come out the same height. Top-align them (no
-     stretching, which left dark bands under shorter covers) and let only the
-     two text tiles stretch to their line. */
-  .justified {
-    --rowh: 150px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .justified > .bento-info {
-    align-self: stretch;
-  }
-
 
   @media (min-width: 640px) {
-    .justified { --rowh: 210px; }
   }
 
   @media (min-width: 1024px) {
-    .justified { --rowh: 250px; }
-  }
-
-  /* ×100: flexbox hands out only a fraction of the free space when the
-     grow factors on a line sum to less than 1, so a lone portrait tile
-     (ratio ~0.8) used to stop short of the row's end. Scaling keeps the
-     proportions and always fills the line. */
-  .justified > * {
-    flex-grow: calc(var(--ar) * 100);
-    flex-basis: calc(var(--ar) * var(--rowh));
-  }
-
-  .justified > .bento-end {
-    flex-grow: 100000;
-    flex-basis: 180px;
-    align-self: stretch;
-    min-height: calc(var(--rowh) * 0.6);
   }
 
   /* --- Ticker ------------------------------------------------------------------- */
-
-
 
   /* --- Scroll reveal ---------------------------------------------------------------
    * ScrollFX sets data-in when an element enters the viewport. Variants:
@@ -432,18 +227,9 @@ body {
       transform 560ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .reveal.is-visible {
-    opacity: 1;
-    transform: none;
-  }
-
   @keyframes card-in {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: none; }
-  }
-
-  .card-in {
-    animation: card-in 360ms cubic-bezier(0.32, 0.72, 0, 1) both;
   }
 
   @keyframes float-badge {
@@ -456,12 +242,7 @@ body {
     animation-name: float-badge;
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
-    will-change: transform;
   }
-
-
-
-
 
   @keyframes scrim-in {
     from { opacity: 0; }
@@ -473,10 +254,6 @@ body {
     to { opacity: 1; transform: none; }
   }
 
-  .scrim-in {
-    animation: scrim-in 220ms ease-out both;
-  }
-
   .sheet-in {
     animation: sheet-in 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
   }
@@ -484,7 +261,6 @@ body {
   @keyframes blink {
     50% { opacity: 0; }
   }
-
 
   /* --- Botanicals ------------------------------------------------------------
    * Shapes from Botanicals.tsx. Petals fan open on hover (.bloom on any
@@ -497,17 +273,12 @@ body {
     transition: transform 700ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-
   @keyframes sway {
     0%, 100% { transform: rotate(-3deg); }
     50% { transform: rotate(3deg); }
   }
 
-  /* will-change promotes these to their own layer, so the speckle filter is
-     rasterised once and the loop runs on the compositor instead of
-     re-filtering the SVG every frame. */
   .sway {
-    will-change: transform;
     transform-origin: 50% 100%;
     animation: sway var(--sway, 7s) ease-in-out infinite;
   }
@@ -521,7 +292,6 @@ body {
   }
 
   .spin-slow {
-    will-change: transform;
     animation: spin-slow 24s linear infinite;
   }
 
@@ -531,18 +301,11 @@ body {
     transition: stroke-dashoffset 2.2s cubic-bezier(0.65, 0, 0.35, 1) var(--d, 0ms);
   }
 
-  .vine-leaves {
-    opacity: 0;
-    transition: opacity 900ms ease-out calc(var(--d, 0ms) + 1200ms);
-  }
-
   [data-in] .vine-stroke { stroke-dashoffset: 0; }
-  [data-in] .vine-leaves { opacity: 1; }
 
   .px {
     /* 0.4px per depth unit: layers part gently, never slide. */
     translate: calc(var(--px, 0) * var(--depth, 10) * 0.4px) calc(var(--py, 0) * var(--depth, 10) * 0.4px);
-    transition: translate 600ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   /* Sparkle burst on the copy button: five stars fly out on a fan. */
@@ -570,10 +333,6 @@ body {
     100% { object-position: 50% 0%; transform: scale(1); }
   }
 
-  .mock-pan {
-    animation: mock-pan 16s ease-in-out infinite;
-  }
-
   @keyframes mock-cursor {
     0% { left: 82%; top: 88%; }
     30% { left: 12%; top: 48%; }
@@ -583,42 +342,16 @@ body {
     100% { left: 82%; top: 88%; }
   }
 
-  .mock-cursor {
-    animation: mock-cursor 9s cubic-bezier(0.45, 0, 0.25, 1) infinite;
-    filter: drop-shadow(1px 2px 0 rgb(27 7 48 / 0.3));
-  }
-
   @keyframes mock-click {
     0%, 37% { opacity: 0; transform: translate(-30%, -30%) scale(0.3); }
     40% { opacity: 1; }
     52%, 100% { opacity: 0; transform: translate(-30%, -30%) scale(1.6); }
   }
 
-  .mock-click {
-    left: 12%;
-    top: 48%;
-    animation: mock-click 9s ease-out infinite;
-  }
-
-  /* The phone screen is a size container, so the scroll can stop exactly at
-     the bottom of the screenshot: -100% of the image plus one screen. */
-  .mock-screen {
-    container-type: size;
-  }
-
   @keyframes mock-scroll {
     0%, 10% { transform: translateY(0); }
     50%, 60% { transform: translateY(calc(-100% + 100cqh)); }
     100% { transform: translateY(0); }
-  }
-
-  .mock-scroll {
-    animation: mock-scroll 14s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-  }
-
-  .group:hover .mock-scroll,
-  .group:hover .mock-pan {
-    animation-play-state: paused;
   }
 
   /* --- Scroll-linked reveal ------------------------------------------------
@@ -637,85 +370,6 @@ body {
       to { clip-path: inset(-90px -60px -40px -60px); }
     }
 
-
-
-    .sl-curtain {
-      animation: sl-curtain linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 25%;
-    }
-
-  }
-
-  /* Scroll vine (ScrollVine): drawn to the reader's progress down the page,
-     with a bud opening at each section it reaches. */
-  .scroll-vine .grow {
-    stroke-dasharray: 1;
-    stroke-dashoffset: calc(1 - var(--scroll, 0));
-  }
-
-  .scroll-vine .bud {
-    opacity: 0.3;
-    transition: opacity 500ms ease-out;
-  }
-
-  .scroll-vine .bud .petal {
-    transform: rotate(calc(var(--r) * 0.15)) scale(0.45);
-  }
-
-  .scroll-vine .bud.open {
-    opacity: 1;
-  }
-
-  .scroll-vine .bud.open .petal {
-    transform: rotate(calc(var(--r) * 1.2));
-  }
-
-  /* --- End card bloom buttons (Contact) ------------------------------------
-   * A glossy orb per link. Hover: the orb swells and six petals burst out
-   * of it on a spring, then fold back in.
-   */
-  .bloom-orb {
-    color: var(--color-iris);
-    background: radial-gradient(circle at 34% 28%, #fff 0 10%, #fbe3ee 26%, #f2b8cf 52%, #a9b6f0 82%, #7a3cc4 100%);
-    border: 1px solid color-mix(in srgb, var(--color-ink) 45%, transparent);
-    box-shadow:
-      inset 0 -6px 12px rgb(122 60 196 / 0.35),
-      0 10px 20px -14px rgb(81 1 124 / 0.45);
-    transition: transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .bloom-orb::before {
-    content: "";
-    position: absolute;
-    inset: 6% 18% 52% 18%;
-    border-radius: 999px;
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0));
-  }
-
-  .bloom-petal {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 22px;
-    height: 34px;
-    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
-    background: linear-gradient(180deg, #b9379d, #f2b8cf 60%, #f6d3c3);
-    transform-origin: 50% 100%;
-    transform: translate(-50%, -100%) rotate(var(--r)) translateY(0) scale(0.2);
-    opacity: 0;
-    transition: transform 520ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 200ms ease-out;
-  }
-
-  .bloom-btn:hover .bloom-petal,
-  .bloom-btn:focus-visible .bloom-petal {
-    opacity: 1;
-    transform: translate(-50%, -100%) rotate(var(--r)) translateY(-22px) scale(1);
-  }
-
-  .bloom-btn:hover .bloom-orb,
-  .bloom-btn:focus-visible .bloom-orb {
-    transform: scale(1.1) rotate(-8deg);
   }
 
   /* --- Scroll choreography ---------------------------------------------------
@@ -733,24 +387,9 @@ body {
       to { opacity: 1; translate: 0 0; rotate: 0deg; }
     }
 
-    .sl-char {
-      display: inline-block;
-      animation: sl-char linear both;
-      animation-timeline: view();
-      animation-range: cover calc(var(--i) * 1.4%) cover calc(18% + var(--i) * 1.4%);
-    }
-
     @keyframes sl-pop {
       from { opacity: 0; translate: 0 50px; scale: 0.3; rotate: -25deg; }
       to { opacity: 1; translate: 0 0; scale: 1; rotate: 0deg; }
-    }
-
-    .sl-pop {
-      animation: sl-pop linear both;
-      animation-timeline: view();
-      /* Entry-only ranges: these sit at the bottom of the page and must finish
-         before the page runs out of scroll. */
-      animation-range: entry calc(15% + var(--i, 0) * 10%) entry calc(60% + var(--i, 0) * 10%);
     }
 
     @keyframes sl-sprout {
@@ -773,25 +412,11 @@ body {
       to { opacity: 1; scale: 1; rotate: 0deg; }
     }
 
-    .sl-badge {
-      animation: sl-badge linear both;
-      animation-timeline: view();
-      animation-range: entry calc(30% + var(--i, 0) * 9%) cover calc(30% + var(--i, 0) * 4%);
-    }
-
     /* Icons glide against the scroll, each by its own --dy. Combined with
        the spin-in on the same element (two animations, two ranges). */
     @keyframes sl-drift {
       from { translate: 0 var(--dy, 30px); }
       to { translate: 0 calc(var(--dy, 30px) * -1); }
-    }
-
-    .sl-badge.sl-drift {
-      animation: sl-badge linear both, sl-drift linear both;
-      animation-timeline: view(), view();
-      animation-range:
-        entry calc(30% + var(--i, 0) * 9%) cover calc(30% + var(--i, 0) * 4%),
-        cover 0% cover 100%;
     }
 
     @keyframes sl-par {
@@ -820,19 +445,10 @@ body {
 
   .orbit:nth-child(even) { --spin: -1; }
 
-  .portrait-zone:hover .orbit {
-    --hov: 1;
-  }
-
   /* AppShowcase: the active tab fills while its screen is on. */
   @keyframes showcase-progress {
     from { transform: scaleX(0); }
     to { transform: scaleX(1); }
-  }
-
-  .showcase-progress {
-    transform-origin: left center;
-    animation: showcase-progress linear forwards;
   }
 
   /* SiteMockup with several frames: they cross-fade on a loop. */
@@ -842,34 +458,11 @@ body {
     100% { opacity: 1; }
   }
 
-  .mock-frame {
-    animation: mock-frame 10s ease-in-out infinite;
-  }
-
-  .group:hover .mock-frame {
-    animation-play-state: paused;
-  }
-
   /* Grain for the gradient sheets — the same soft tile, a touch stronger. */
   .band-grain {
     opacity: 0.8;
     background-image: url("/art/grain-soft.webp");
     background-size: 160px 160px;
-  }
-
-  /* Cursor sparkle trail (PointerFX). */
-  .trail-star {
-    position: fixed;
-    z-index: 70;
-    pointer-events: none;
-    translate: -50% -50%;
-    animation: trail 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  .trail-star svg {
-    width: 100%;
-    height: 100%;
-    fill: currentColor;
   }
 
   @keyframes trail {
@@ -880,23 +473,21 @@ body {
 
   /* --- Type ----------------------------------------------------------------
    *
-   * .type-display  Archivo, tight. The flim.ai headline voice.
+   * .type-display  Redaction — titles and italic taglines.
    * .type-name     Redaction Regular — the hero name.
-   * .type-pixel    DM Mono labels, uppercase. Never above ~13px.
+   * .type-pixel    DM Mono labels, uppercase. 13px minimum.
    */
-  /* Display: Cormorant Garamond Light — thin, high-contrast, swashy in
-     italic. The voice of the reference posters. */
   .type-display {
     font-family: var(--font-display);
-    font-weight: 300;
-    letter-spacing: -0.015em;
-    line-height: 0.92;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
   }
 
   /* The name: Redaction Regular, the clean cut of the family it decays into. */
   .type-name {
     font-family: var(--font-display);
-    font-weight: 300;
+    font-weight: 400;
     letter-spacing: -0.02em;
     line-height: 0.9;
   }
@@ -944,7 +535,7 @@ body {
   .morph-letter[data-on] .morph-overlay { opacity: 1; }
 
   .morph-letter[data-lit] .morph-base {
-    color: var(--color-fawn);
+    color: #a3307f;
     transition-duration: 0ms;
   }
 
@@ -952,8 +543,6 @@ body {
   .morph-letter[data-cut="r35"] .morph-overlay { font-family: var(--font-r35); }
   .morph-letter[data-cut="r70"] .morph-overlay { font-family: var(--font-r70); }
   .morph-letter[data-cut="r100"] .morph-overlay { font-family: var(--font-r100); }
-
-
 
   .paper {
     position: relative;
@@ -969,19 +558,13 @@ body {
   /* Scroll-driven animations ignore animation-duration, so the blanket
      rule below does not stop them — and a paused one freezes mid-flight
      (tilted, shrunk, clipped). Switch them off outright. */
-  .sl-rise,
-  .sl-char,
-  .sl-pop,
   .sl-sprout,
   .sl-par,
-  .sl-badge,
-  .sl-drift,
-  .sl-curtain,
 
   .reveal,
   [data-rv],
   [data-rv="rule"],
-  [data-rv="mask"] {
+  [data-rv="mask"]{
     opacity: 1;
     transform: none;
     clip-path: none;
@@ -1089,9 +672,10 @@ body {
   }
 
   /* Depth of field. */
-  .dof-far { filter: blur(3px); opacity: 0.75; }
-  .dof-mid { filter: blur(1.2px); }
-  .dof-near { filter: blur(6px); opacity: 0.9; }
+  /* Depth of field by fading only: a blur filter on drifting art re-rasterises
+     every frame. */
+  .dof-far { opacity: 0.72; }
+  .dof-near { opacity: 0.6; }
 
   @keyframes drift-x {
     from { transform: translateX(calc(var(--drift, 24px) * -1)); }
@@ -1099,7 +683,6 @@ body {
   }
 
   .drift-x {
-    will-change: transform;
     animation: drift-x var(--dur, 18s) ease-in-out var(--td, 0s) infinite alternate;
   }
 
@@ -1109,7 +692,6 @@ body {
   }
 
   .drift-y {
-    will-change: transform;
     animation: drift-y var(--dur, 12s) ease-in-out var(--td, 0s) infinite alternate;
   }
 
@@ -1134,7 +716,6 @@ body {
   }
 
   .flutter {
-    will-change: transform;
     animation: flutter var(--dur, 7s) ease-in-out var(--td, 0s) infinite;
   }
 
@@ -1144,11 +725,8 @@ body {
   }
 
   .orbit-spin {
-    will-change: transform;
     animation: orbit-spin var(--dur, 16s) linear infinite;
   }
-
-
 
   /* Shooting star: crosses once per --every, invisible the rest of the loop. */
   @keyframes shoot {
@@ -1168,23 +746,18 @@ body {
    * little, sharpen from a soft blur, settle. Plain transform (not the
    * separate translate/scale properties), which Chrome settles reliably.
    */
-  .tile[data-rv],
-  .focus-rv[data-rv] {
+  .tile[data-rv] {
     opacity: 0;
     transform: translateY(26px) scale(0.97);
-    filter: blur(8px);
     transition:
       opacity 700ms var(--ease-mist) var(--d, 0ms),
       transform 900ms var(--ease-mist) var(--d, 0ms),
-      filter 700ms var(--ease-mist) var(--d, 0ms),
       border-color 200ms ease-out;
   }
 
-  .tile[data-rv][data-in],
-  .focus-rv[data-rv][data-in] {
+  .tile[data-rv][data-in] {
     opacity: 1;
     transform: none;
-    filter: none;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -1247,33 +820,40 @@ body {
   /* --- Contact form ---------------------------------------------------------
    * Visible labels, 48px fields, a lavender focus ring, errors under the field.
    */
+  /* Form fields as lines on note paper: write on the rule, no box. */
   .field {
     width: 100%;
-    min-height: 48px;
-    border-radius: 6px;
-    border: 1px solid color-mix(in srgb, var(--color-ink) 28%, transparent);
-    background: color-mix(in srgb, #fffaf3 90%, transparent);
-    padding: 12px 14px;
+    min-height: 44px;
+    border: 0;
+    border-bottom: 1.5px solid color-mix(in srgb, var(--color-ink) 35%, transparent);
+    border-radius: 0;
+    background: transparent;
+    padding: 8px 2px;
     font-size: 16px;
     line-height: 1.5;
     color: var(--color-ink);
-    transition: border-color 160ms ease-out, box-shadow 160ms ease-out, background-color 160ms ease-out;
+    transition: border-color 160ms ease-out, background-color 160ms ease-out;
   }
 
-  .field::placeholder { color: color-mix(in srgb, var(--color-ink) 45%, transparent); }
+  .field::placeholder { color: color-mix(in srgb, var(--color-ink) 42%, transparent); font-style: italic; }
 
-  .field:hover { border-color: color-mix(in srgb, var(--color-ink) 45%, transparent); }
+  .field:hover { border-bottom-color: color-mix(in srgb, var(--color-ink) 55%, transparent); }
 
   .field:focus-visible {
     outline: none;
-    border-color: var(--color-lavender);
-    background: #fffdf8;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-lavender) 28%, transparent);
+    border-bottom-color: var(--color-lavender);
+    background: color-mix(in srgb, var(--color-blush) 18%, transparent);
   }
 
-  .field[aria-invalid="true"] {
-    border-color: #b42318;
-    box-shadow: 0 0 0 3px rgb(180 35 24 / 0.14);
+  .field[aria-invalid="true"] { border-bottom-color: #b42318; }
+
+  /* Note paper: cream, faint rules, a blush margin line, lifted off the page. */
+  .notepaper {
+    background-color: #fffdf8;
+    background-image:
+      linear-gradient(90deg, transparent 38px, color-mix(in srgb, var(--color-blush) 70%, transparent) 38px 39.5px, transparent 39.5px),
+      repeating-linear-gradient(180deg, transparent 0 31px, color-mix(in srgb, var(--color-sky) 38%, transparent) 31px 32px);
+    box-shadow: 0 30px 50px -30px rgb(27 7 48 / 0.55), 0 2px 6px rgb(27 7 48 / 0.12);
   }
 
   /* Off screen: pause every loop in the section. */
@@ -1288,23 +868,19 @@ body {
 html[data-lite] .dof-far,
 html[data-lite] .dof-mid,
 html[data-lite] .dof-near,
-html[data-lite] .focus-rv[data-rv],
-html[data-lite] .tile[data-rv] {
+html[data-lite] .tile[data-rv]{
   filter: none;
 }
 
 html[data-lite] g[filter] { filter: none; }
-html[data-lite] .glass { backdrop-filter: none; -webkit-backdrop-filter: none; }
 html[data-lite] .sky-extra,
-html[data-lite] .shoot,
-html[data-lite] .lite-hide { display: none; }
+html[data-lite] .shoot { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .shoot,
   .name-glint { display: none; }
 
-  .tile[data-rv],
-  .focus-rv[data-rv] {
+  .tile[data-rv] {
     opacity: 1;
     transform: none;
     filter: none;
@@ -1312,65 +888,124 @@ html[data-lite] .lite-hide { display: none; }
 }
 
 /* --- Masthead (Nav) ---------------------------------------------------------
- * Clear over the hero; a pearl band once scrolled, its lower edge fading out
- * rather than ending on a rule. The current section wears a sparkle.
+ * A slim bar with no band: a soft wash of the sky behind it fades out
+ * downwards. It slides away while reading down and returns on scroll up;
+ * over a dark artboard (.is-dark) the words turn light and the wash darkens.
  */
 @layer utilities {
   .masthead {
-    transition: background-color 300ms ease-out;
+    color: var(--color-ink);
+    transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), color 250ms ease-out;
   }
-
+  .masthead::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 -18px;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(rgb(240 236 250 / 0.92), rgb(240 236 250 / 0.75) 60%, rgb(240 236 250 / 0));
+    transition: opacity 250ms ease-out;
+  }
   .masthead::after {
     content: "";
     position: absolute;
-    inset: 100% 0 auto 0;
-    height: 18px;
+    inset: 0 0 -18px;
+    z-index: -1;
     pointer-events: none;
     opacity: 0;
-    background: linear-gradient(180deg, color-mix(in srgb, var(--color-paper) 82%, transparent), transparent);
-    transition: opacity 300ms ease-out;
+    background: linear-gradient(rgb(6 4 18 / 0.78), rgb(6 4 18 / 0.55) 60%, rgb(6 4 18 / 0));
+    transition: opacity 250ms ease-out;
   }
+  .masthead.is-hidden { transform: translateY(-110%); }
+  .masthead.is-dark { color: #f6f2fb; }
+  .masthead.is-dark::before { opacity: 0; }
+  .masthead.is-dark::after { opacity: 1; }
 
-  .masthead.is-scrolled {
-    background-color: color-mix(in srgb, var(--color-paper) 82%, transparent);
-    backdrop-filter: blur(12px) saturate(1.1);
-    -webkit-backdrop-filter: blur(12px) saturate(1.1);
-  }
-
-  .masthead.is-scrolled::after { opacity: 1; }
-
-  .nav-spark {
-    opacity: 0;
-    transform: translateX(-50%) scale(0.3);
-    transition: opacity 250ms ease-out, transform 450ms var(--ease-petal);
-  }
-
-  .nav-link:hover .nav-spark { opacity: 0.55; transform: translateX(-50%) scale(0.8); }
-  .nav-link[aria-current] .nav-spark { opacity: 1; transform: translateX(-50%) scale(1) rotate(90deg); }
-
-  /* Thin outlined call to action in the display face, filling on hover. */
-  .hire {
+  .masthead-name {
     font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1;
     color: var(--color-iris);
-    border: 1px solid color-mix(in srgb, var(--color-iris) 55%, transparent);
-    background: color-mix(in srgb, #ffffff 40%, transparent);
-    transition: background-color 220ms ease-out, color 220ms ease-out, border-color 220ms ease-out;
+    transition: opacity 300ms ease-out, transform 300ms ease-out;
+  }
+  .masthead-name.is-tucked { opacity: 0; transform: translateX(-6px); pointer-events: none; }
+
+  /* The mark: "LD" in Redaction on a small pearl, a sparkle on its rim. */
+  .masthead-mark {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 17px;
+    letter-spacing: -0.04em;
+    color: #4b0f7a;
+    border: 1px solid rgb(255 255 255 / 0.95);
+    background:
+      radial-gradient(120% 120% at 30% 15%, #fff, rgb(255 255 255 / 0.3) 55%, transparent 75%),
+      conic-gradient(from 200deg, #cdc4ff, #f8bee1, #ffdec8, #beeede, #cdc4ff);
+    box-shadow: inset 0 -4px 10px rgb(214 150 230 / 0.4), 0 6px 16px rgb(150 80 190 / 0.22);
+    transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .masthead-mark i { font-style: italic; color: #8a1f6a; margin-left: -1px; }
+  .masthead-mark::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+    filter: drop-shadow(0 0 2px #f7a8dc);
+  }
+  .masthead-home:hover .masthead-mark { transform: rotate(-10deg) scale(1.06); }
+  .is-dark .masthead-name { color: inherit; }
+
+  .nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 15px;
+    color: inherit;
+    opacity: 0.66;
+    transition: opacity 160ms ease-out;
+  }
+  .nav-link:hover,
+  .nav-link[aria-current] { opacity: 1; }
+  .nav-link[aria-current]::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 9px;
+    height: 1.5px;
+    background: currentColor;
   }
 
-  .hire:hover {
-    color: var(--color-paper);
-    background: var(--color-iris);
-    border-color: var(--color-iris);
+  /* Phones: the links as a full-screen sheet in Redaction. */
+  .nav-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 28px 40px;
+    background: linear-gradient(180deg, #e6ebfb, #f6e3f0 60%, #fbe6ee);
+    color: var(--color-ink);
   }
+  .nav-sheet ul { display: grid; gap: 6px; }
+  .nav-sheet ul a {
+    font-family: var(--font-display);
+    font-size: 2.6rem;
+    line-height: 1.2;
+    color: var(--color-iris);
+  }
+  .nav-sheet ul a[aria-current] { font-style: italic; color: #8a1f6a; }
 }
-
-html[data-lite] .masthead.is-scrolled {
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  background-color: color-mix(in srgb, var(--color-paper) 96%, transparent);
-}
-
-.app-peek > summary::-webkit-details-marker { display: none; }
 
 /* --- Garden reactions (GardenFX) -----------------------------------------------
  * One trigger, one burst, a gesture per kind. Wrappers already own `translate`
@@ -1487,8 +1122,6 @@ html[data-lite] .masthead.is-scrolled {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.12); }
   }
-
-  .bud-now { animation: bud-pulse 3.2s ease-in-out infinite; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1501,37 +1134,8 @@ html[data-lite] .masthead.is-scrolled {
  * band that dissolves in the site's pixel dither. Hairline border, no shadow;
  * on hover the hairline turns orchid and the card lifts 2px.
  */
-.sheet-card {
-  overflow: hidden;
-  border-radius: 10px;
-  border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
-  background: #ffffff;
-  transition: border-color 200ms ease-out, transform 300ms var(--ease-mist);
-}
 
 @media (hover: hover) and (pointer: fine) {
-  .sheet-card:hover {
-    border-color: color-mix(in srgb, var(--color-lavender) 45%, transparent);
-    transform: translateY(-2px);
-  }
-}
-
-.sheet-band {
-  position: relative;
-  isolation: isolate;
-  background: var(--band, linear-gradient(100deg, #d9e0fa 0%, #e6dcf6 55%, #f2d0e1 100%));
-}
-
-.sheet-band::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: #ffffff;
-  mix-blend-mode: soft-light;
-  -webkit-mask: url("/art/dither-fade.webp") repeat-x left bottom / 512px 192px;
-  mask: url("/art/dither-fade.webp") repeat-x left bottom / 512px 192px;
 }
 
 /* --- Budgets for slower hardware --------------------------------------------
@@ -1548,16 +1152,11 @@ html[data-lite] .flutter,
 html[data-lite] .spin-slow,
 html[data-lite] .orbit-spin,
 html[data-lite] .float-badge,
-html[data-lite] .bud-now,
-html[data-lite] .art-wing {
+html[data-lite] .art-wing{
   animation: none;
 }
 
 @media (max-width: 640px) {
-  .dof-far,
-  .dof-mid,
-  .dof-near { filter: none; }
-  .dof-near { opacity: 0.55; }
   .sky-extra,
   .shoot { display: none; }
 }
@@ -1644,3 +1243,232 @@ html.garden-ready #garden-loader * {
   .loader-spark,
   .loader-heart { animation: none; opacity: 1; }
 }
+
+/* --- Brand showcase -------------------------------------------------------
+ * Slides, mockup frames and the carousel. See components/showcase/.
+ */
+
+/* Phone: a feed post inside a handset. */
+.phone {
+  aspect-ratio: 9 / 19;
+  padding: 3.2%;
+  border-radius: 13% / 6%;
+  background: linear-gradient(160deg, #2b2340, #120a1f);
+  box-shadow: 0 30px 50px -28px rgb(27 7 48 / 0.7), inset 0 0 0 1px rgb(255 255 255 / 0.12);
+}
+
+/* Printed poster: white edge, soft lift, a light sheen. */
+.print { background: #fff; box-shadow: 0 28px 50px -28px rgb(27 7 48 / 0.6), 0 2px 6px rgb(27 7 48 / 0.18); }
+
+/* Die-cut sticker: white outline traced by stacked shadows. */
+.sticker {
+  filter: drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff)
+    drop-shadow(0 14px 16px rgb(27 7 48 / 0.3));
+}
+
+html[data-lite] .sticker { filter: drop-shadow(0 8px 10px rgb(27 7 48 / 0.3)); }
+
+@media (prefers-reduced-motion: reduce) {
+}
+
+/* --- Sketchbook ink ----------------------------------------------------------
+ * The interface is drawn into the garden like notes in a sketchbook, not
+ * built from boxes. Every mark is an SVG mask on a pseudo-element, coloured
+ * by CSS, so one drawing serves light and dark slides and costs no markup.
+ *
+ *   .btn        primary action: italic label over a brush swash
+ *   .btn-ghost  secondary action: italic label, pen underline drawn on hover
+ *   .btn-icon   a pen-drawn ring around an icon (add to .btn-ghost)
+ *   .seg-btn    tab / choice; the current one is circled in ink
+ *   .nav-link   masthead link; the current one is underlined
+ *   .chip       a pen-written tag
+ *   .idx        an index or counter in italic numerals
+ *   .note       a paper slip (mockup stats)
+ *   .halftone   a dot screen that fades out from its centre
+ *   .glow       a soft lavender glow on display type
+ */
+@layer components {
+  :root {
+    --ink-circle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 48' preserveAspectRatio='none'%3E%3Cpath d='M14 31C9 15 43 5 70 6c28 1 46 9 43 20-3 12-33 18-59 17-26-1-45-7-43-19 2-9 20-15 37-16' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+    --ink-underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8c18-4 36 1 56-2s38 2 60-2' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+    --ink-ring: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M25 4c12 0 19 8 19 20s-9 20-21 20S4 35 4 23 13 5 27 5' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    --ink-brush: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 44' preserveAspectRatio='none'%3E%3Cpath d='M7 25C3 13 18 8 42 7c40-2 88-4 128-1 22 2 28 9 25 18-3 10-19 13-45 13-40 1-88 3-118 0C15 36 9 32 7 25Z'/%3E%3Cpath d='M20 9c50-4 110-6 165-2M14 37c60 3 120 1 170-3' fill='none' stroke='%23000' stroke-width='2' opacity='.5'/%3E%3C/svg%3E");
+  }
+
+  .btn,
+  .btn-ghost {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45em;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    transition: color 200ms ease-out;
+  }
+
+  /* Primary: a pearl. A white highlight over a soft iridescent film
+     (lavender, pink, peach, mint), a white rim, and a pink glow that rises
+     from below on hover while the film slides. Plum text >= 7:1 throughout. */
+  .btn {
+    padding: 0 24px;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-style: normal;
+    font-size: 15px;
+    color: #3a0b63;
+    border: 0;
+    background:
+      radial-gradient(120% 150% at 28% -10%, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.35) 48%, transparent 70%),
+      linear-gradient(110deg, rgb(205 196 255 / 0.85), rgb(248 190 225 / 0.85) 30%, rgb(255 222 200 / 0.8) 50%, rgb(190 238 222 / 0.85) 72%, rgb(205 196 255 / 0.85));
+    background-size: 100% 100%, 240% 100%;
+    background-position: 0 0, 0% 0;
+    box-shadow:
+      inset 0 -6px 14px rgb(214 150 230 / 0.35),
+      inset 0 1px 0 #fff,
+      0 8px 24px rgb(150 80 190 / 0.22);
+    transition:
+      transform 250ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 300ms ease-out,
+      background-position 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* The glow that rises on hover. */
+  .btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(70% 130% at 50% 125%, rgb(247 160 215 / 0.75), transparent 70%);
+    opacity: 0;
+    transition: opacity 350ms ease-out;
+  }
+  .btn-sm { min-height: 38px; padding: 0 16px; font-size: 14px; }
+
+  /* Secondary: an italic label; the pen underline draws in on hover. */
+  .btn-ghost {
+    padding: 0 4px;
+    font-size: 1.2rem;
+    color: var(--t-title, var(--color-iris));
+  }
+  .btn-ghost::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 6px;
+    height: 9px;
+    background: var(--color-lavender);
+    -webkit-mask: var(--ink-underline) center / 100% 100% no-repeat;
+    mask: var(--ink-underline) center / 100% 100% no-repeat;
+    transform: scaleX(0.35);
+    transform-origin: left center;
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover {
+      transform: translateY(-2px);
+      background-position: 0 0, 100% 0;
+      box-shadow: inset 0 -6px 14px rgb(214 150 230 / 0.45), inset 0 1px 0 #fff, 0 12px 30px rgb(150 80 190 / 0.32);
+    }
+    .btn:hover::before { opacity: 1; }
+    .btn-ghost:hover::after { transform: scaleX(1); }
+  }
+  .btn:focus-visible,
+  .btn-ghost:focus-visible { outline: 2px dashed var(--color-lavender); outline-offset: 4px; border-radius: 4px; }
+
+  /* Icon action: a pen ring around the glyph, no underline. */
+  .btn-icon {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    flex-shrink: 0;
+    color: var(--color-iris);
+  }
+  .btn-icon::after { display: none; }
+  .btn-icon::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    -webkit-mask: var(--ink-ring) center / 100% 100% no-repeat;
+    mask: var(--ink-ring) center / 100% 100% no-repeat;
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-icon:hover::before { transform: rotate(-12deg) scale(1.06); }
+  }
+
+  .link {
+    color: var(--color-iris);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-lavender) 55%, transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 5px;
+    transition: text-decoration-color 160ms ease-out;
+  }
+  .link:hover { text-decoration-color: currentColor; }
+
+  .note {
+    background: #fffaf0;
+    box-shadow: 0 14px 24px -16px rgb(27 7 48 / 0.45), 0 1px 2px rgb(27 7 48 / 0.12);
+  }
+
+  .halftone {
+    background-image: radial-gradient(circle, var(--dot, #b9379d) 0.9px, transparent 1.4px);
+    background-size: 7px 7px;
+    -webkit-mask-image: radial-gradient(closest-side, #000 0%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 0%, transparent 100%);
+  }
+
+  .hand {
+    font-family: var(--font-hand);
+    font-size: 1.5rem;
+    line-height: 1.05;
+    color: var(--color-lavender);
+  }
+
+  /* A strip of washi tape, a little translucent, its ends torn. */
+  .tape {
+    position: absolute;
+    z-index: 2;
+    width: 92px;
+    height: 24px;
+    background: color-mix(in srgb, #f2b8cf 55%, #fffaf0);
+    opacity: 0.85;
+    box-shadow: 0 1px 2px rgb(27 7 48 / 0.15);
+    clip-path: polygon(3% 0, 97% 4%, 100% 30%, 96% 55%, 100% 80%, 97% 100%, 2% 96%, 0 70%, 4% 45%, 0 20%);
+  }
+
+  .glow { text-shadow: 0 0 22px rgb(185 55 157 / 0.32), 0 0 2px rgb(255 255 255 / 0.6); }
+}
+
+/* Mockups as drawn objects: a paper handset with an ink outline. Unlayered,
+   after the originals, so they replace them. */
+.phone {
+  background: #fffdf8;
+  box-shadow: 0 26px 40px -28px rgb(27 7 48 / 0.55), inset 0 0 0 1.5px var(--color-ink);
+}
+
+/* --- Slides: full-bleed backdrop, type set straight on it ---------------------
+ * No card. The text side gets a soft wash in the backdrop's own tone so the
+ * type reads; .on-dark / .on-light switch the type colours to match. On
+ * phones the text sits under the art, so the wash rises from the bottom.
+ */
+@layer components {
+  @media (min-width: 1024px) {
+  }
+}
+
+
+/* Hero type: the name a softer plum than the titles, so its weight reads
+   lighter at this size; the subline a muted violet that sits back (5.9:1 on
+   the hero's palest sky). */
+.hero-name { color: #5b2590; letter-spacing: 0.005em; }
+.hero-sub { color: rgb(76 42 110 / 0.88); }

@@ -1,161 +1,178 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
-import { experience, education, skillGroups, certifications, languages } from "@/lib/content";
-import Folder, { type FolderTab } from "./Folder";
-import AboutMe from "./AboutMe";
-import SectionTitle from "./SectionTitle";
-import { Lotus, Sparkle4, Blossom } from "./Botanicals";
-import { PixelFlower } from "./Ethereal";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { education, skillGroups, certifications, languages, software, type toolkit } from "@/lib/content";
+import AboutMe, { GardenPortrait } from "./AboutMe";
+import { Sparkle4 } from "./Botanicals";
+import BloomTimeline from "./BloomTimeline";
+import { ToolTile, SHORT_NAME } from "./ToolBubbles";
 
-/* The hero's printed sheet, reused as header strips so every tab matches. */
+type ToolId = (typeof toolkit)[number]["id"];
+
+const TABS = [
+  { id: "about", label: "about me" },
+  { id: "experience", label: "experience" },
+  { id: "education", label: "education & certs" },
+  { id: "skills", label: "skills" },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
 
 function PanelHead({ lead, accent }: { lead: string; accent: string }) {
   return (
-    <div>
-      <h3 className="type-display text-4xl text-iris sm:text-6xl">
-        {lead} <span className="text-lavender italic">{accent}</span>
-      </h3>
+    <h3 className="type-display text-[1.85rem] leading-[1.1] text-iris sm:text-[2.4rem]">
+      {lead} <em className="text-eminence italic">{accent}</em>
+    </h3>
+  );
+}
+
+/** Short items in a wrapped line, each on a small ✦ — scannable, no pills. */
+function SparkleItems({ items, label, className = "" }: { items: readonly string[]; label?: string; className?: string }) {
+  return (
+    <div className={className}>
+      {label && <p className="type-pixel mb-1.5 text-[13px] text-ink/75">{label}</p>}
+      <ul className="flex flex-wrap gap-x-4 gap-y-1">
+        {items.map((it) => (
+          <li key={it} className="inline-flex items-center gap-1.5 text-base leading-snug text-ink/85">
+            <Sparkle4 className="h-2 w-2 shrink-0 translate-y-[-0.1em] text-eminence" />
+            {it}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
-const tabs: FolderTab[] = [
-  { id: "about", label: "about me", accent: "eminence" },
-  { id: "experience", label: "experience", accent: "iris" },
-  { id: "education", label: "education & certs", accent: "deep" },
-  { id: "skills", label: "skills", accent: "fawn" },
-];
-
+/**
+ * About, on the sky with the rest of the page. The arched portrait stands in
+ * the garden on the left with the app logos floating round it as bubbles (it
+ * stays in view while a long tab scrolls past on desktop); the title, the
+ * tabs — plain words, the current one underlined — and each tab's content sit
+ * on the right: experience as a blooming stem, the rest in pearl cards.
+ */
 export default function AboutPanel() {
-  const [active, setActive] = useState("about");
+  const [active, setActive] = useState<TabId>("about");
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const stripRef = useRef<HTMLDivElement>(null);
+  const firstRender = useRef(true);
+
+  /*
+   * Keep the panel you just opened in view: tabs differ a lot in height, so
+   * if switching pushes the tab row above the window, pull it back down.
+   */
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    const top = stripRef.current?.getBoundingClientRect().top ?? 0;
+    if (top >= 0) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: window.scrollY + top - 88, behavior: reduced ? "auto" : "smooth" });
+  }, [active]);
+
+  // Arrow keys move along the tabs (roving tabindex, per the ARIA tabs pattern).
+  const onKey = (e: KeyboardEvent<HTMLButtonElement>, i: number) => {
+    const step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+    const to = e.key === "Home" ? 0 : e.key === "End" ? TABS.length - 1 : (i + step + TABS.length) % TABS.length;
+    if (!step && e.key !== "Home" && e.key !== "End") return;
+    e.preventDefault();
+    setActive(TABS[to].id);
+    tabRefs.current[to]?.focus();
+  };
 
   return (
-    <section id="about" className="px-4 pb-20 sm:px-8">
-      <div className="relative mx-auto max-w-6xl">
-        <SectionTitle id="about-heading" index="02" lead="About" accent="me" />
+    <section id="about" aria-labelledby="about-heading" className="overflow-x-clip px-4 pt-24 pb-24 sm:px-8 sm:pt-28">
+      {/* Phones read title, portrait, tabs, panel; desktop puts the portrait
+          on the left beside all three. */}
+      <div className="mx-auto grid max-w-7xl gap-x-[4%] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:grid-rows-[auto_auto_1fr]">
+        <h2
+          id="about-heading"
+          data-perch
+          className="type-display text-[clamp(3rem,5vw,5.25rem)] leading-none text-iris lg:col-start-2 lg:row-start-1"
+        >
+          About <em className="text-lavender italic">me</em>
+        </h2>
 
-        <Folder tabs={tabs} active={active} onSelect={setActive} labelledBy="about-heading">
+        <div className="mt-6 lg:sticky lg:top-24 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:mt-0 lg:self-start">
+          <GardenPortrait />
+        </div>
+
+        <div ref={stripRef} role="tablist" aria-label="About" className="about-tabs mt-4 lg:col-start-2 lg:row-start-2 lg:mt-6">
+          {TABS.map((t, i) => (
+            <button
+              key={t.id}
+              ref={(el) => {
+                tabRefs.current[i] = el;
+              }}
+              type="button"
+              role="tab"
+              id={`tab-${t.id}`}
+              aria-selected={active === t.id}
+              aria-controls={`panel-${t.id}`}
+              tabIndex={active === t.id ? 0 : -1}
+              onClick={() => setActive(t.id)}
+              onKeyDown={(e) => onKey(e, i)}
+              className="about-tab"
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        <div
+          key={active}
+          id={`panel-${active}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${active}`}
+          tabIndex={0}
+          className="sheet-in mt-7 min-w-0 text-ink lg:col-start-2 lg:row-start-3"
+        >
           {active === "about" && <AboutMe />}
 
           {active === "experience" && (
             <div>
               <PanelHead lead="Where I've" accent="worked" />
-
-              {/* Vine timeline: a living stem down the left with a blossom at
-                  each role (a pulsing bud for the current one). Each role is a
-                  layered sheet: a sky band carrying the dates that dissolves in
-                  pixel dither into a near-white page for the reading. */}
-              <ol className="relative mt-10 space-y-6 pl-10 sm:pl-14">
-                <span
-                  aria-hidden
-                  className="absolute top-3 bottom-3 left-[15px] w-[3px] rounded-full sm:left-[23px]"
-                  style={{ background: "linear-gradient(180deg, #4f9a78, #b9e4cf 50%, #4f9a78)" }}
-                />
-                {experience.map((e, idx) => {
-                  const now = /present/i.test(e.period);
-                  return (
-                    <li key={`${e.role}-${e.org}`} data-rv style={{ "--d": `${idx * 70}ms` } as CSSProperties} className="group relative">
-                      <span aria-hidden className="absolute top-4 -left-10 block h-8 w-8 sm:-left-14 sm:h-9 sm:w-9">
-                        {now ? (
-                          <Lotus className="bud-now h-full w-full" deep />
-                        ) : (
-                          <Blossom className="h-full w-full transition-transform duration-700 group-hover:rotate-[72deg]" deep={idx % 2 === 1} />
-                        )}
-                      </span>
-                      <div className="sheet-card">
-                        <div className="sheet-band px-5 pt-4 pb-6 sm:px-6">
-                          <div className="relative flex flex-wrap items-center gap-2">
-                            <span className="type-pixel rounded-full bg-iris px-2.5 py-0.5 text-[10px] text-paper">{e.period}</span>
-                            {now && (
-                              <span className="type-pixel rounded-full border border-lavender bg-white/60 px-2 py-0.5 text-[10px] text-lavender">
-                                ✦ now
-                              </span>
-                            )}
-                            <span className="type-pixel ml-auto text-[10px] text-ink/60">{e.place}</span>
-                          </div>
-                          <h4 className="type-display relative mt-3 text-2xl leading-tight text-iris sm:text-[1.9rem]">{e.role}</h4>
-                          <p className="type-display relative text-lg text-lavender italic">{e.org}</p>
-                        </div>
-                        <ul className="space-y-2 px-5 py-4 sm:px-6">
-                          {e.points.map((pt) => (
-                            <li key={pt} className="flex gap-2.5 text-[15px] leading-relaxed text-ink/85 sm:text-[14px]">
-                              <PixelFlower className="mt-[0.45em] h-2.5 w-2.5 shrink-0" fill="#a9b6f0" />
-                              {pt}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ol>
+              <BloomTimeline />
             </div>
           )}
 
           {active === "education" && (
             <div>
               <PanelHead lead="Where I" accent="studied" />
-
-              <div className="mt-10 grid gap-5 md:grid-cols-2">
-                {education.map((e, idx) => (
-                  <article
-                    key={e.school}
-                    data-rv
-                    style={{ "--d": `${idx * 80}ms` } as CSSProperties}
-                    className="sheet-card group relative"
-                  >
-                    <div className="sheet-band relative h-24 overflow-hidden">
-                      <p className="type-display absolute bottom-2 left-5 text-3xl text-iris italic">{e.period}</p>
-                      <Lotus className="sway absolute -right-2 -bottom-4 w-20 transition-transform duration-500 group-hover:scale-110" deep={idx === 1} />
-                    </div>
-                    <div className="p-5 sm:p-6">
-                      <h4 className="type-display text-2xl leading-tight text-iris">{e.school}</h4>
-                      <p className="mt-1 text-[14px] text-ink/80">{e.detail}</p>
-                      {e.coursework && (
-                        <p className="mt-3 text-[13px] leading-relaxed text-ink/60">
-                          <span className="type-pixel text-[10px] text-ink/50">Coursework </span>
-                          {e.coursework}
-                        </p>
-                      )}
-                      {e.honors.length > 0 && (
-                        <ul className="mt-4 flex flex-wrap gap-2">
-                          {e.honors.map((h) => (
-                            <li key={h} className="flex items-center gap-1.5 rounded-full bg-blush/45 px-3 py-1 text-[12px] text-ink">
-                              <Sparkle4 className="h-3 w-3 text-lavender" />
-                              {h}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  </article>
+              <ul className="mt-7 space-y-4">
+                {education.map((e) => (
+                  <li key={e.school} className="pearl-card">
+                    <p className="type-pixel flex flex-wrap gap-x-2 text-[13px] leading-snug text-ink/75">
+                      <span>{e.period}</span>
+                      <span aria-hidden>·</span>
+                      <span>{e.place}</span>
+                    </p>
+                    <h4 className="type-display mt-2 text-[1.5rem] leading-[1.1] text-iris">{e.school}</h4>
+                    <p className="mt-1.5 text-base leading-snug text-ink/85 sm:text-[17px]">{e.detail}</p>
+                    {e.honors.length > 0 && (
+                      <SparkleItems label="honors" items={e.honors} className="mt-4" />
+                    )}
+                    {e.coursework && (
+                      <SparkleItems label="coursework" items={e.coursework.split(" · ")} className="mt-3" />
+                    )}
+                  </li>
                 ))}
-              </div>
+              </ul>
 
-              <p className="type-pixel mt-12 text-[11px] text-ink/55">✦ Certifications</p>
-              {/* Tickets: a gradient stub, a perforated tear, the details. */}
-              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {certifications.map((c, idx) => (
-                  <div
-                    key={c.name}
-                    data-rv
-                    style={{ "--d": `${idx * 70}ms` } as CSSProperties}
-                    className="sheet-card group flex"
-                  >
-                    <div className="sheet-band flex w-14 shrink-0 items-center justify-center">
-                      <Sparkle4 className="relative h-6 w-6 text-white transition-transform duration-500 group-hover:rotate-180" />
-                    </div>
-                    <div className="border-l border-dashed border-ink/20 p-4">
-                      <p className="type-display text-lg leading-snug text-iris">{c.name}</p>
-                      <p className="mt-1 text-[12px] text-ink/70">{c.issuer}</p>
-                      <p className="type-pixel mt-2 text-[10px] text-ink/50">
-                        {c.date} · {c.detail}
-                      </p>
-                    </div>
-                  </div>
+              <h4 className="type-pixel mt-10 flex items-center gap-2 text-[13px] text-ink/75">
+                <Sparkle4 className="h-2.5 w-2.5 text-eminence" />
+                certifications
+              </h4>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                {certifications.map((c) => (
+                  <li key={c.name} className="pearl-card pearl-card-sm flex flex-col">
+                    <p className="type-pixel text-[13px] text-ink/75">{c.date}</p>
+                    <p className="type-display mt-1.5 text-[1.2rem] leading-[1.15] text-iris">{c.name}</p>
+                    <p className="mt-auto pt-2 text-base leading-snug text-ink/80">{c.issuer}</p>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           )}
 
@@ -163,34 +180,42 @@ export default function AboutPanel() {
             <div>
               <PanelHead lead="What I" accent="work with" />
 
-              <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {[...skillGroups, { label: "languages", items: languages }].map((g, i) => (
-                  <div
-                    key={g.label}
-                    data-rv
-                    style={{ "--d": `${(i % 3) * 70}ms` } as CSSProperties}
-                    className="sheet-card group"
-                  >
-                    <div className="sheet-band flex items-end justify-between px-4 pt-6 pb-2">
-                      <p className="type-display relative text-2xl text-iris capitalize">{g.label}</p>
-                      <p className="type-display relative text-3xl text-white italic">{String(i + 1).padStart(2, "0")}</p>
-                    </div>
-                    <ul className="flex flex-wrap gap-1.5 p-4">
-                      {g.items.map((s) => (
-                        <li
-                          key={s}
-                          className="rounded-full border border-ink/15 bg-white/70 px-3 py-1 text-[12px] transition-colors duration-150 hover:border-iris hover:bg-iris hover:text-paper"
-                        >
-                          {s}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+              <div className="pearl-card mt-7">
+                <h4 className="type-pixel text-[13px] text-ink/75">software</h4>
+                <ul className="mt-3 grid grid-cols-4 gap-x-2 gap-y-4">
+                  {software.map((s) => {
+                    const id = s.toLowerCase() as ToolId;
+                    return (
+                      <li key={s} className="flex flex-col items-center gap-1.5 text-center">
+                        <ToolTile id={id} className="h-12 w-12" />
+                        <span className="text-[15px] leading-tight text-ink/80">{SHORT_NAME[id]}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
+
+              <ul className="mt-3 gap-3 sm:columns-2">
+                {skillGroups.map((g) => (
+                  <li key={g.label} className="pearl-card pearl-card-sm mb-3 break-inside-avoid">
+                    <h4 className="type-display text-[1.3rem] leading-tight text-iris first-letter:uppercase">{g.label}</h4>
+                    <SparkleItems items={g.items} className="mt-2.5" />
+                  </li>
+                ))}
+              </ul>
+
+              <p className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-base text-ink/85 sm:text-[17px]">
+                <span className="type-pixel text-[13px] text-ink/75">languages</span>
+                {languages.map((l, i) => (
+                  <span key={l}>
+                    {i > 0 && <span aria-hidden className="mr-3 text-eminence">✦</span>}
+                    {l}
+                  </span>
+                ))}
+              </p>
             </div>
           )}
-        </Folder>
+        </div>
       </div>
     </section>
   );

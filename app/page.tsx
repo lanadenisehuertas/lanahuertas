@@ -1,5 +1,8 @@
 import Hero from "@/components/Hero";
-import FolderStack from "@/components/FolderStack";
+import BrandShowcase from "@/components/showcase/BrandShowcase";
+import PosterRow from "@/components/showcase/PosterRow";
+import VideoShowcase from "@/components/showcase/VideoShowcase";
+import CodeShowcase from "@/components/showcase/CodeShowcase";
 import AboutPanel from "@/components/AboutPanel";
 import Contact from "@/components/Contact";
 import ScrollFX from "@/components/ScrollFX";
@@ -9,9 +12,12 @@ import GardenFX from "@/components/GardenFX";
 export default function Home() {
   return (
     <main id="top">
-      {/* intro -> the work -> about -> contact */}
+      {/* intro -> branding -> posters -> videos -> ui/ux & code -> about -> contact */}
       <Hero />
-      <FolderStack />
+      <BrandShowcase />
+      <PosterRow />
+      <VideoShowcase />
+      <CodeShowcase />
       <AboutPanel />
       <Contact />
       <ScrollFX />

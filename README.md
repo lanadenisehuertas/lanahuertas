@@ -23,9 +23,12 @@ npm start        # serve the production build
 ```
 app/
   layout.tsx        fonts, metadata, background layers
-  page.tsx          section order: Hero, FolderStack, AboutPanel, Contact
+  page.tsx          section order: Hero, BrandShowcase, VideoShowcase,
+                    CodeShowcase, AboutPanel, Contact
+  design/ videos/ ui-ux/   the full page behind each showcase
   globals.css       design tokens (@theme) and every utility/keyframe
-components/         one component per piece of the page
+components/         one component per piece of the page; showcase/ holds the carousels
+lib/brands.ts       brand copy and order; lib/palettes.ts the light/dark tone per slide
 lib/content.ts      all copy, projects, experience, skills — the single source of truth
 public/work/        images
 figma-plugin/       generates a Figma snapshot of the design (see below)
@@ -43,7 +46,16 @@ only. `lavender` in particular is never used behind text.
 
 ## Adding a project
 
-Add an entry to the relevant tab's `projects` array in `lib/content.ts`:
+Brands are added in three places: curate the brand's pubmats in
+`scripts/pubmats.json`, give it a backdrop prompt in `scripts/backdrops.json`,
+and write its copy in `COPY` in `lib/brands.ts`. Then run
+`python -I scripts/import-pubmats.py` (converts the images and regenerates
+`lib/brand-assets.ts`) and `python -I scripts/gen-backdrops.py` (generates any
+missing backdrop with the Codex CLI). `node scripts/check-brands.mjs` confirms
+every asset exists.
+
+Other work — videos, UI/UX case studies, one-off posters — is an entry in
+`lib/content.ts`:
 
 ```ts
 {
@@ -52,15 +64,12 @@ Add an entry to the relevant tab's `projects` array in `lib/content.ts`:
   description: "What it was and what you did.",
   year: "2026",
   images: [{ src: "/work/filename.webp", w: 1200, h: 1500 }],
-  span: 3,            // 3 or 6 — the masonry grid only accepts these
 }
 ```
 
-Put the image in `public/work/`. The grid sizes each card from the `w`/`h` you
-supply, so they must match the real file or the layout will jump once it loads.
-
-`span` is restricted to 3 and 6 on purpose: in a 12-column grid, mixing 3 and 4
-leaves gaps that cannot be filled (3+4+3 = 10, and nothing fits the remaining 2).
+Put the image in `public/work/`. Cards are sized from the `w`/`h` you supply, so
+they must match the real file or the layout will jump once it loads. (`span` is
+left over from the old masonry grid; nothing reads it.)
 
 ## Deploying
 
@@ -83,10 +92,13 @@ delete the old frame first, since it appends rather than replaces.
 
 Verified in the browser rather than assumed:
 
-- All text meets WCAG AA contrast (4.5:1 body, 3:1 large), measured across every
-  folder tab
 - The project dialog traps focus, closes on Escape, and returns focus to the card
   that opened it
-- `prefers-reduced-motion` stops the drifting background and removes the sparkle
-  layer
-- No horizontal overflow from 320px to 1920px
+- `prefers-reduced-motion` switches off the scroll-driven animations outright (a
+  paused one would freeze mid-flight) and hides the shooting stars and bursts
+- Contrast was measured to WCAG AA on the earlier design. On the brand slides the
+  type now sits on each artboard behind a tone wash, light or dark per side
+  (`lib/palettes.ts`, from `scripts/extract-palettes.py`); re-run the audit on
+  these before launch
+- No horizontal overflow on any page from 320px to 1920px
+  (`node scripts/check-overflow.mjs`)

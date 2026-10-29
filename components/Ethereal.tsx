@@ -74,14 +74,15 @@ export function Butterfly({ className = "", style }: { className?: string; style
 }
 
 /** Flat cloud bank with stretched wisps underneath (Codex, site palette). */
-export function Cloud({ className = "", style }: { className?: string; style?: CSSProperties }) {
+export function Cloud({ className = "", style, priority = false }: { className?: string; style?: CSSProperties; priority?: boolean }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src="/art/cloud.webp"
       alt=""
       aria-hidden
-      loading="lazy"
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : undefined}
       decoding="async"
       draggable={false}
       width={900}
@@ -158,6 +159,8 @@ export function ShootingStar({ className = "", style }: { className?: string; st
  * The page sky. Fixed behind everything, so the work scrolls over it while
  * the stars hold still, and each one drifts with the pointer at its own depth.
  * Placed in the margins and gutters; `extra` ones are dropped in lite mode.
+ * The sky never pauses (it is fixed on every page), so only some twinkle:
+ * `still` ones hold their light.
  */
 type Spot = {
   x: string;
@@ -169,16 +172,17 @@ type Spot = {
   depth: number;
   tw: number;
   extra?: boolean;
+  still?: boolean;
 };
 
 const SKY: Spot[] = [
   { x: "6%", y: "9%", s: 12, kind: "spark", c: "#ffffff", depth: 6, tw: 4.2 },
-  { x: "93%", y: "14%", s: 13, kind: "star", c: "#f2b8cf", depth: 10, tw: 5.1 },
-  { x: "88%", y: "6%", s: 7, kind: "spark", c: "#ffffff", depth: 4, tw: 3.6 },
-  { x: "3%", y: "32%", s: 8, kind: "star", c: "#ffffff", depth: 8, tw: 4.8 },
+  { x: "93%", y: "14%", s: 13, kind: "star", c: "#f2b8cf", depth: 10, tw: 5.1, still: true },
+  { x: "88%", y: "6%", s: 7, kind: "spark", c: "#ffffff", depth: 4, tw: 3.6, still: true },
+  { x: "3%", y: "32%", s: 8, kind: "star", c: "#ffffff", depth: 8, tw: 4.8, still: true },
   { x: "97%", y: "38%", s: 10, kind: "spark", c: "#e3a88a", depth: 7, tw: 3.9 },
   { x: "95%", y: "58%", s: 8, kind: "burst", c: "#ffffff", depth: 12, tw: 5.6, extra: true },
-  { x: "2.5%", y: "62%", s: 12, kind: "spark", c: "#f2b8cf", depth: 9, tw: 4.4 },
+  { x: "2.5%", y: "62%", s: 12, kind: "spark", c: "#f2b8cf", depth: 9, tw: 4.4, still: true },
   { x: "7%", y: "84%", s: 7, kind: "star", c: "#ffffff", depth: 5, tw: 3.3, extra: true },
   { x: "91%", y: "82%", s: 11, kind: "spark", c: "#ffffff", depth: 11, tw: 4.9 },
   { x: "50%", y: "3%", s: 6, kind: "spark", c: "#ffffff", depth: 3, tw: 3.1, extra: true },
@@ -187,10 +191,10 @@ const SKY: Spot[] = [
   { x: "97%", y: "26%", s: 46, kind: "glow", c: "", depth: -6, tw: 7 },
   { x: "1%", y: "48%", s: 60, kind: "glow", c: "", depth: -8, tw: 8.5 },
   { x: "94%", y: "72%", s: 38, kind: "glow", c: "", depth: -5, tw: 6.4, extra: true },
-  { x: "4.5%", y: "20%", s: 16, kind: "note", c: "#a9b6f0", depth: 7, tw: 6.2 },
-  { x: "96%", y: "47%", s: 18, kind: "notes", c: "#f2b8cf", depth: 9, tw: 7.4 },
+  { x: "4.5%", y: "20%", s: 16, kind: "note", c: "#a9b6f0", depth: 7, tw: 6.2, still: true },
+  { x: "96%", y: "47%", s: 18, kind: "notes", c: "#f2b8cf", depth: 9, tw: 7.4, still: true },
   { x: "5%", y: "73%", s: 14, kind: "note", c: "#b9379d", depth: 6, tw: 5.8, extra: true },
-  { x: "95.5%", y: "8%", s: 30, kind: "px", art: "moon", c: "", depth: 4, tw: 9 },
+  { x: "95.5%", y: "8%", s: 30, kind: "px", art: "moon", c: "", depth: 4, tw: 9, still: true },
   { x: "3.5%", y: "41%", s: 34, kind: "px", art: "sparkle", c: "", depth: 7, tw: 6.6 },
   { x: "96.5%", y: "90%", s: 18, kind: "px", art: "sparkle", c: "", depth: 9, tw: 5.2, extra: true },
   { x: "4%", y: "93%", s: 16, kind: "px", art: "heart", c: "", depth: 6, tw: 4.6, extra: true },
@@ -206,7 +210,7 @@ export function Starfield() {
           style={{ left: p.x, top: p.y, width: p.s, height: p.s, margin: `${-p.s / 2}px 0 0 ${-p.s / 2}px`, "--depth": p.depth } as CSSProperties}
         >
           <span
-            className={`block h-full w-full ${p.extra ? "opacity-70" : "twinkle"} ${p.kind === "glow" ? "dof-far" : ""}`}
+            className={`block h-full w-full ${p.extra || p.still ? "opacity-70" : "twinkle"} ${p.kind === "glow" ? "dof-far" : ""}`}
             style={{ "--tw": `${p.tw}s`, "--td": `${-i * 0.7}s` } as CSSProperties}
           >
             {p.kind === "spark" && <Sparkle4 className="h-full w-full" fill={p.c} />}
