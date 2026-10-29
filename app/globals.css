@@ -372,30 +372,6 @@ body {
 
   }
 
-  /* Scroll vine (ScrollVine): drawn to the reader's progress down the page,
-     with a bud opening at each section it reaches. */
-  .scroll-vine .grow {
-    stroke-dasharray: 1;
-    stroke-dashoffset: calc(1 - var(--scroll, 0));
-  }
-
-  .scroll-vine .bud {
-    opacity: 0.3;
-    transition: opacity 500ms ease-out;
-  }
-
-  .scroll-vine .bud .petal {
-    transform: rotate(calc(var(--r) * 0.15)) scale(0.45);
-  }
-
-  .scroll-vine .bud.open {
-    opacity: 1;
-  }
-
-  .scroll-vine .bud.open .petal {
-    transform: rotate(calc(var(--r) * 1.2));
-  }
-
   /* --- Scroll choreography ---------------------------------------------------
    * Scroll-driven (rewinds when you scroll up). Without support, everything
    * simply shows.
@@ -559,7 +535,7 @@ body {
   .morph-letter[data-on] .morph-overlay { opacity: 1; }
 
   .morph-letter[data-lit] .morph-base {
-    color: var(--color-fawn);
+    color: #a3307f;
     transition-duration: 0ms;
   }
 

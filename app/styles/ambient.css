@@ -1,0 +1,357 @@
+/* ambient — vine, dither lantern, star-script, dusk sky. See docs/superpowers/specs/2026-10-29-butterfly-garden-design.md
+ *
+ * Unlayered on purpose: these rules must win over the utility-layer `.lotus
+ * .petal` defaults. Every class here is prefixed (av- vine, al- lantern,
+ * ss- star-script, dk- dusk) so nothing else is touched.
+ *
+ * Budget: transform and opacity only, no filters; ambient loops hold still
+ * while the page scrolls (html[data-scrolling]) and drop out in lite mode and
+ * for reduced motion.
+ */
+
+/* ---- Scroll vine (components/ScrollVine.tsx) -------------------------------- */
+.av-vine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 25;
+  display: none;
+  pointer-events: none;
+  contain: layout style;
+}
+@media (min-width: 1280px) and (hover: hover) and (pointer: fine) {
+  .av-vine { display: block; }
+}
+
+/* The reveal: the window slides down to the tip, the stem slides back up. */
+.av-win {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  transform: translate3d(0, calc((var(--tip, 0) - var(--h, 0)) * 1px), 0);
+  will-change: transform;
+}
+.av-stem {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  overflow: visible;
+  transform: translate3d(0, calc((var(--h, 0) - var(--tip, 0)) * 1px), 0);
+  will-change: transform;
+}
+
+.av-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate3d(calc(var(--tx, 0) * 1px - 15px * var(--s, 1)), calc(var(--tip, 0) * 1px - 12px * var(--s, 1)), 0);
+  will-change: transform;
+}
+.av-tip svg {
+  display: block;
+  transform-origin: 50% 10%;
+  animation: av-nod 4.6s ease-in-out infinite;
+}
+@keyframes av-nod {
+  0%, 100% { rotate: -6deg; }
+  50% { rotate: 7deg; }
+}
+
+/* Leaves: placed by transform; the sway wraps the blade; the blade unfurls. */
+.av-leaf {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+.av-sway {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+.av-leaf.near.open .av-sway {
+  animation: av-sway var(--sd, 6s) ease-in-out var(--sdl, 0s) infinite;
+}
+@keyframes av-sway {
+  0%, 100% { rotate: -4deg; }
+  50% { rotate: 5deg; }
+}
+.av-blade {
+  position: absolute;
+  left: 0;
+  display: block;
+  overflow: visible;
+  transform-origin: 0 50%;
+  transform: perspective(120px) rotateY(84deg) rotate(30deg) scale(0.1);
+  opacity: 0;
+  transition:
+    transform 950ms cubic-bezier(0.2, 0.9, 0.25, 1.2),
+    opacity 250ms ease-out;
+}
+.av-leaf.open .av-blade {
+  transform: perspective(120px) rotateY(0deg) rotate(0deg) scale(1);
+  opacity: 1;
+}
+
+/* Lotuses: a bud pops out on the stem, then the petals fan open. */
+.av-bloom {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.av-bloom-in {
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 98%;
+  transform: perspective(200px) rotateX(50deg) scale(0.2);
+  opacity: 0;
+  transition:
+    transform 1100ms cubic-bezier(0.3, 1.45, 0.5, 1),
+    opacity 300ms ease-out;
+}
+.av-bloom.open .av-bloom-in {
+  transform: perspective(200px) rotateX(0deg) scale(1);
+  opacity: 1;
+}
+.av-bloom .lotus {
+  display: block;
+  overflow: visible;
+  transform-origin: 50% 98%;
+}
+.av-bloom .lotus .petal {
+  transform: rotate(calc(var(--r) * 0.12)) scale(0.5);
+  transition: transform 900ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.av-bloom.open .lotus .petal {
+  transform: rotate(var(--r));
+  transition-delay: 380ms;
+}
+.av-bloom.open.near .lotus {
+  animation: av-sway 7s ease-in-out infinite;
+}
+
+html[data-scrolling] .av-sway,
+html[data-scrolling] .av-bloom .lotus,
+html[data-scrolling] .av-tip svg {
+  animation-play-state: paused;
+}
+html[data-lite] .av-vine *,
+html[data-lite] .av-vine .lotus .petal {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ---- Dither lantern (components/DitherLantern.tsx) ------------------------- */
+.al-root {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 700ms ease-out;
+}
+.al-root.on { opacity: 1; }
+.al-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  contain: strict;
+}
+.al-hosted {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* A window that follows the pointer, feathered by a static mask... */
+.al-ring {
+  --r: 190px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(var(--r) * 2);
+  height: calc(var(--r) * 2);
+  overflow: hidden;
+  transform: translate3d(calc(var(--mx, -999px) - var(--r)), calc(var(--my, -999px) - var(--r)), 0);
+  -webkit-mask-image: radial-gradient(closest-side, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
+  will-change: transform;
+}
+.al-ring-core { --r: 96px; }
+/* ...over a dot screen that moves back, so the dots stay put on the page. */
+.al-dots {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: max(100vw, 100%);
+  height: max(100vh, 100%);
+  transform: translate3d(calc(var(--r) - var(--mx, -999px)), calc(var(--r) - var(--my, -999px)), 0);
+  will-change: transform;
+}
+.al-hosted .al-dots {
+  width: calc(100vw + 400px);
+  height: calc(100vh + 400px);
+}
+.al-ring-wide .al-dots {
+  background-image: radial-gradient(circle, rgb(178 128 226 / 0.85) 1.3px, transparent 1.8px);
+  background-size: 7px 7px;
+}
+.al-ring-core .al-dots {
+  background-image: radial-gradient(circle, rgb(240 140 205 / 0.85) 2px, transparent 2.5px);
+  background-size: 7px 7px;
+  background-position: 3.5px 3.5px;
+}
+
+.al-flowers {
+  position: absolute;
+  inset: 0;
+}
+.al-flower {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.al-flower img {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  image-rendering: pixelated;
+}
+
+/* ---- Star-script (components/StarScript.tsx) ------------------------------- */
+.ss-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+.ss-word {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: opacity 650ms ease-out;
+}
+.ss-word.ss-out { opacity: 0; }
+
+/* The word itself: hidden only while its stars write it, then inked back in. */
+[data-ss="hide"] { opacity: 0; }
+[data-ss="ink"] {
+  opacity: 1;
+  transition: opacity 800ms ease-out;
+}
+
+.ss-star,
+.ss-tw {
+  position: absolute;
+  background: var(--c);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+}
+.ss-star {
+  opacity: 0;
+  animation: ss-in 520ms cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+@keyframes ss-in {
+  0% { opacity: 0; transform: scale(0) rotate(-40deg); }
+  60% { opacity: 1; transform: scale(1.5) rotate(10deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+.ss-tw {
+  animation: ss-twinkle 3s ease-in-out infinite;
+}
+@keyframes ss-twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.5) rotate(0deg); }
+  45% { opacity: 1; transform: scale(1.15) rotate(45deg); }
+  60% { opacity: 0.85; transform: scale(1) rotate(45deg); }
+}
+html[data-scrolling] .ss-tw { animation-play-state: paused; }
+html[data-lite] .ss-layer { display: none; }
+html[data-lite] [data-ss] { opacity: 1 !important; }
+
+/* ---- Dusk sky (components/DuskSky.tsx) ------------------------------------- */
+/* Keep the colours in step with scripts/gen-dusk.py. */
+.dk-sky {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.dk-sky:not([data-on]) { display: none; }
+.dk-sky > *,
+.dk-mid > * {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.dk-band {
+  background-repeat: repeat-x;
+  background-position: 0 0;
+  image-rendering: pixelated;
+}
+.dk-a {
+  top: 0;
+  height: 360px;
+  background-image: url("/art/dusk/band-a.png");
+  background-size: 192px 360px;
+}
+.dk-l1 {
+  top: 360px;
+  height: max(0px, calc(var(--dk-mid, 360px) - 360px));
+  background: rgb(214 198 243 / 0.4);
+}
+.dk-mid {
+  top: var(--dk-mid, 360px);
+  bottom: var(--dk-deep, 0px);
+}
+.dk-b {
+  top: 0;
+  height: 240px;
+  background-image: url("/art/dusk/band-b.png");
+  background-size: 192px 240px;
+}
+.dk-l2 {
+  top: 240px;
+  bottom: 0;
+  background: rgb(186 164 233 / 0.52);
+}
+.dk-stars {
+  inset: 0;
+  background: url("/art/dusk/stars.png") 0 0 / 288px 288px repeat;
+  image-rendering: pixelated;
+}
+.dk-stars-soft {
+  top: 240px;
+  opacity: 0.75;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 60%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 60%);
+}
+.dk-deep {
+  bottom: 0;
+  height: var(--dk-deep, 0px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.dk-deep > .dk-band,
+.dk-deep > .dk-flat {
+  position: relative;
+  flex: none;
+}
+.dk-c { height: 168px; background-image: url("/art/dusk/band-c.png"); background-size: 192px 168px; }
+.dk-d { height: 120px; background-image: url("/art/dusk/band-d.png"); background-size: 192px 120px; }
+.dk-e { height: 72px; background-image: url("/art/dusk/band-e.png"); background-size: 192px 72px; }
+.dk-deep > .dk-night { flex: 1 0 0; background: #2a1d55; }
+.dk-deep > .dk-stars {
+  position: absolute;
+  background-position: 37px 11px;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 150px);
+  mask-image: linear-gradient(180deg, transparent 0, #000 150px);
+}

@@ -34,6 +34,7 @@ export default function Hero() {
       {/* The sky, edge to edge, fading into the page at the bottom */}
       <div
         aria-hidden
+        data-lantern-host
         className="sheet-fade absolute inset-0 -z-10 overflow-clip"
         style={{
           background:

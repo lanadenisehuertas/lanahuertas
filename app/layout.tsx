@@ -10,6 +10,9 @@ import PointerFX from "@/components/PointerFX";
 import { BotanicalDefs } from "@/components/Botanicals";
 import { Starfield } from "@/components/Ethereal";
 import GardenLoader from "@/components/GardenLoader";
+import DuskSky from "@/components/DuskSky";
+import DitherLantern from "@/components/DitherLantern";
+import StarScript from "@/components/StarScript";
 
 /*
  * Redaction (OFL, MCKL) — the display face: the name, section and project
@@ -199,9 +202,12 @@ export default function RootLayout({
           }}
         />
         <div className="graph-ground" aria-hidden />
+        <DuskSky />
         <Starfield />
+        <DitherLantern />
         <BotanicalDefs />
         <PointerFX />
+        <StarScript />
         <Butterfly />
         <Nav />
         {children}
