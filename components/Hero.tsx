@@ -19,8 +19,8 @@ const VINE_FRONT: CSSProperties = {
  * One screen of garden with the name grown into it. The dawn sky fills the
  * hero; far clouds, the orbit and the pixel swirls sit behind the letters,
  * the vine weaves through them, and the bed of lotus and bellflowers forms
- * the lower border. The name, subline and call to action are one block,
- * centred in the screen. The guide butterfly (Butterfly.tsx) starts perched
+ * the lower border. The name sits in the upper sky; the subline and call to
+ * action stand low over the lotus glow. The guide butterfly (Butterfly.tsx) starts perched
  * on the name.
  *
  * Interactive layers are unchanged: the name morphs and scrambles, and the
@@ -30,7 +30,7 @@ export default function Hero() {
   // overflow-clip, not -hidden: a hidden box is a scroll container, and the
   // .sl-par layers' view() timeline would bind to it instead of the page.
   return (
-    <section className="bloom-zone relative isolate flex min-h-[100svh] flex-col justify-center overflow-clip pt-16 pb-[14svh]">
+    <section className="bloom-zone relative isolate flex min-h-[100svh] flex-col overflow-clip pt-[24svh] sm:pt-[22svh]">
       {/* The sky, edge to edge, fading into the page at the bottom */}
       <div
         aria-hidden
@@ -81,7 +81,7 @@ export default function Hero() {
       </div>
 
       {/* Vine, behind the name */}
-      <div aria-hidden data-rv className="px sl-par pointer-events-none absolute top-[26%] -left-[6%] w-[112%] sm:top-[26%]" style={depth(-8)}>
+      <div aria-hidden data-rv className="px sl-par pointer-events-none absolute top-[33%] -left-[6%] w-[112%] sm:top-[33%]" style={depth(-8)}>
         <LongVine className="w-full" />
       </div>
 
@@ -91,8 +91,8 @@ export default function Hero() {
           <MorphName
             label={profile.name}
             words={[
-              { text: "Lana", italic: false, className: "type-name hero-name text-[23vw] whitespace-nowrap sm:mr-[0.2em] sm:inline-block sm:text-[10.4vw] xl:text-[10rem]" },
-              { text: "Denise", italic: false, className: "type-name hero-name text-[23vw] whitespace-nowrap sm:inline-block sm:text-[10.4vw] xl:text-[10rem]" },
+              { text: "Lana", italic: false, className: "type-name hero-name text-[23vw] whitespace-nowrap sm:mr-[0.2em] sm:inline-block sm:text-[12vw] xl:text-[11.75rem]" },
+              { text: "Denise", italic: false, className: "type-name hero-name text-[23vw] whitespace-nowrap sm:inline-block sm:text-[12vw] xl:text-[11.75rem]" },
             ]}
           />
           <Sparkle4 className="spin-slow pointer-events-none absolute top-[4%] -right-[4%] h-8 w-8 text-sky sm:h-12 sm:w-12" />
@@ -101,7 +101,7 @@ export default function Hero() {
       </div>
 
       {/* Vine, in front of the name where it crosses */}
-      <div aria-hidden data-rv className="px sl-par pointer-events-none absolute top-[26%] -left-[6%] z-20 w-[112%] sm:top-[26%]" style={{ ...depth(-8), ...VINE_FRONT }}>
+      <div aria-hidden data-rv className="px sl-par pointer-events-none absolute top-[33%] -left-[6%] z-20 w-[112%] sm:top-[33%]" style={{ ...depth(-8), ...VINE_FRONT }}>
         <LongVine className="w-full" />
       </div>
 
@@ -186,8 +186,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Right under the name: the subline and the one call to action */}
-      <div className="relative z-30 mx-auto mt-[12svh] w-full max-w-2xl px-4 text-center sm:mt-[19svh]">
+      {/* Low on the garden floor, over the lotus glow: the subline and the one call to action */}
+      <div className="absolute inset-x-0 bottom-[13svh] z-30 mx-auto w-full max-w-2xl px-4 text-center sm:bottom-[14svh]">
         <div className="bg-[radial-gradient(closest-side,rgb(255_250_240/0.85),rgb(255_250_240/0.5)_70%,transparent)] px-6 py-5">
           <p data-rv style={d(420)} className="hero-sub type-display text-xl leading-snug italic sm:text-[1.65rem]">
             {profile.heroShort}

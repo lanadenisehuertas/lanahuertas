@@ -820,40 +820,45 @@ body {
   /* --- Contact form ---------------------------------------------------------
    * Visible labels, 48px fields, a lavender focus ring, errors under the field.
    */
-  /* Form fields as lines on note paper: write on the rule, no box. */
+  /* Fields as soft pearl wells inside the pearl-glass form. */
   .field {
     width: 100%;
-    min-height: 44px;
-    border: 0;
-    border-bottom: 1.5px solid color-mix(in srgb, var(--color-ink) 35%, transparent);
-    border-radius: 0;
-    background: transparent;
-    padding: 8px 2px;
+    min-height: 46px;
+    border: 1px solid rgb(255 255 255 / 0.95);
+    border-radius: 14px;
+    background: rgb(255 255 255 / 0.62);
+    box-shadow: inset 0 2px 6px rgb(120 80 200 / 0.08);
+    padding: 10px 14px;
     font-size: 16px;
     line-height: 1.5;
     color: var(--color-ink);
-    transition: border-color 160ms ease-out, background-color 160ms ease-out;
+    transition: border-color 160ms ease-out, background-color 160ms ease-out, box-shadow 160ms ease-out;
   }
 
   .field::placeholder { color: color-mix(in srgb, var(--color-ink) 42%, transparent); font-style: italic; }
 
-  .field:hover { border-bottom-color: color-mix(in srgb, var(--color-ink) 55%, transparent); }
+  .field:hover { background: rgb(255 255 255 / 0.8); }
 
   .field:focus-visible {
     outline: none;
-    border-bottom-color: var(--color-lavender);
-    background: color-mix(in srgb, var(--color-blush) 18%, transparent);
+    background: rgb(255 255 255 / 0.9);
+    box-shadow: 0 0 0 3px rgb(185 55 157 / 0.35), inset 0 2px 6px rgb(120 80 200 / 0.08);
   }
 
-  .field[aria-invalid="true"] { border-bottom-color: #b42318; }
+  .field[aria-invalid="true"] { border-color: #b42318; }
 
-  /* Note paper: cream, faint rules, a blush margin line, lifted off the page. */
+  /* The form panel: the site's pearl glass (same family as the About cards
+     and device frames) — white rim, translucent film, a soft iridescent wash. */
   .notepaper {
-    background-color: #fffdf8;
-    background-image:
-      linear-gradient(90deg, transparent 38px, color-mix(in srgb, var(--color-blush) 70%, transparent) 38px 39.5px, transparent 39.5px),
-      repeating-linear-gradient(180deg, transparent 0 31px, color-mix(in srgb, var(--color-sky) 38%, transparent) 31px 32px);
-    box-shadow: 0 30px 50px -30px rgb(27 7 48 / 0.55), 0 2px 6px rgb(27 7 48 / 0.12);
+    border: 1px solid rgb(255 255 255 / 0.95);
+    border-radius: 28px;
+    background:
+      radial-gradient(120% 70% at 15% 0%, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.45) 60%),
+      linear-gradient(135deg, rgb(205 196 255 / 0.45), rgb(248 190 225 / 0.4) 45%, rgb(190 238 222 / 0.4));
+    box-shadow:
+      inset 0 -10px 24px rgb(214 150 230 / 0.2),
+      0 30px 60px -28px rgb(90 40 140 / 0.45),
+      0 0 0 6px rgb(255 255 255 / 0.2);
   }
 
   /* Off screen: pause every loop in the section. */
@@ -930,39 +935,19 @@ html[data-lite] .shoot { display: none; }
   }
   .masthead-name.is-tucked { opacity: 0; transform: translateX(-6px); pointer-events: none; }
 
-  /* The mark: "LD" in Redaction on a small pearl, a sparkle on its rim. */
+  /* The mark: a pearl with a lotus opening in front of it (NavEmblem). */
   .masthead-mark {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-family: var(--font-display);
-    font-size: 17px;
-    letter-spacing: -0.04em;
-    color: #4b0f7a;
-    border: 1px solid rgb(255 255 255 / 0.95);
-    background:
-      radial-gradient(120% 120% at 30% 15%, #fff, rgb(255 255 255 / 0.3) 55%, transparent 75%),
-      conic-gradient(from 200deg, #cdc4ff, #f8bee1, #ffdec8, #beeede, #cdc4ff);
-    box-shadow: inset 0 -4px 10px rgb(214 150 230 / 0.4), 0 6px 16px rgb(150 80 190 / 0.22);
+    display: block;
+    width: 42px;
+    height: 42px;
     transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .masthead-mark i { font-style: italic; color: #8a1f6a; margin-left: -1px; }
-  .masthead-mark::after {
-    content: "";
-    position: absolute;
-    top: -3px;
-    right: -2px;
-    width: 10px;
-    height: 10px;
-    background: #fff;
-    clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
-    filter: drop-shadow(0 0 2px #f7a8dc);
-  }
-  .masthead-home:hover .masthead-mark { transform: rotate(-10deg) scale(1.06); }
+  .masthead-mark .nm-spark { transform-origin: 33px 9px; animation: nm-twinkle 3.2s ease-in-out infinite; }
+  .masthead-home:hover .masthead-mark .nm-petal { transform: rotate(var(--r)) scaleY(1.12); }
+  .masthead-mark .nm-petal { transform: rotate(var(--r)); transform-origin: 21px 31px; transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .masthead-home:hover .masthead-mark { transform: translateY(-2px) scale(1.06); }
+  @keyframes nm-twinkle { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.6); } }
+  @media (prefers-reduced-motion: reduce) { .masthead-mark .nm-spark { animation: none; } }
   .is-dark .masthead-name { color: inherit; }
 
   .nav-link {
@@ -1468,7 +1453,7 @@ html[data-lite] .sticker { filter: drop-shadow(0 8px 10px rgb(27 7 48 / 0.3)); }
 
 
 /* Hero type: the name a softer plum than the titles, so its weight reads
-   lighter at this size; the subline a muted violet that sits back (5.9:1 on
-   the hero's palest sky). */
+   lighter at this size; the subline a muted violet that sits back on the
+   lotus glow (about 5:1). */
 .hero-name { color: #5b2590; letter-spacing: 0.005em; }
-.hero-sub { color: rgb(76 42 110 / 0.88); }
+.hero-sub { color: rgb(76 42 110 / 0.74); }

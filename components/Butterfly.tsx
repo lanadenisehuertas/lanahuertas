@@ -22,7 +22,7 @@ const H = 86;
 const NAV_H = 72; // fixed nav height plus a little air: the butterfly stays below it
 const EDGE = 14; // viewport margin
 const READING = 0.35; // reading line, as a fraction of the viewport height
-const SETTLE_MS = 700; // scrolling stopped this long: land on a perch
+const SETTLE_MS = 350; // scrolling stopped this long: land on a perch
 const SLEEP_MS = 3000; // landed and idle this long: hand the wings to CSS and stop the loop
 const SPARK_CAP = 36;
 const REST_HZ = 0.6;
@@ -426,7 +426,8 @@ function ButterflyStage() {
       }
 
       /* critically damped spring: no overshoot */
-      const w = away ? 3.2 : landing ? 5 : 6;
+      // Landing is stiffer so it arrives quickly and stops dead, still with no overshoot.
+      const w = away ? 3.2 : landing ? 10 : 6;
       const ex = x - tx;
       const ey = y - ty;
       const e = Math.exp(-w * dt);
@@ -439,7 +440,7 @@ function ButterflyStage() {
 
       const speed = Math.hypot(vx, vy);
       const gap = Math.hypot(tx - x, ty - y);
-      const resting = landing && !act && gap < 2 && speed < 12;
+      const resting = landing && !act && gap < 3 && speed < 20;
       if (resting && !landedAt) landedAt = now;
       if (!resting) landedAt = 0;
 
@@ -461,7 +462,8 @@ function ButterflyStage() {
         amp = 8 + 32 * glide * glide;
         base = 30 - amp / 3;
       }
-      const ease = 1 - Math.exp(-dt * 4);
+      // Fold into the resting pose quickly once landed.
+      const ease = 1 - Math.exp(-dt * (landing ? 10 : 4));
       ampS += (amp - ampS) * ease;
       baseS += (base - baseS) * ease;
       flight += ((resting ? 0 : 1) - flight) * ease;

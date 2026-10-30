@@ -420,10 +420,11 @@
     position: relative;
     width: min(100cqw, calc(100cqh * 16 / 9));
     aspect-ratio: 16 / 9;
-    border-radius: 6px;
+    border-radius: 20px;
     overflow: hidden;
     background: #140a22;
-    box-shadow: 0 24px 50px -16px rgb(40 20 70 / 0.45);
+    /* pearl rim, as the device frames and cards */
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.95), 0 0 0 7px rgb(255 255 255 / 0.35), 0 30px 60px -24px rgb(90 40 140 / 0.45);
   }
   .sp-video iframe,
   .sp-video-poster {
@@ -760,15 +761,15 @@
     width: 48px;
     height: 48px;
     padding: 0;
-    border: 1.5px solid rgb(236 232 244 / 0.5);
+    border: 1px solid rgb(255 255 255 / 0.95);
     border-radius: 50%;
-    background: rgb(20 10 34 / 0.55);
-    color: #fff;
+    background: radial-gradient(120% 120% at 30% 15%, #fff, rgb(255 255 255 / 0.55) 55%), linear-gradient(135deg, #cdc4ff, #f8bee1 50%, #beeede);
+    color: #3a0b63;
     font: 400 22px/1 var(--font-body);
     cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
   }
-  .lb-btn:hover { background: rgb(75 15 122 / 0.9); border-color: #fff; }
+  .lb-btn:hover { transform: scale(1.06); box-shadow: 0 8px 22px rgb(247 160 215 / 0.55); }
   .lb-btn:focus-visible { outline: 2px solid #f2b6dc; outline-offset: 3px; }
   .lb-prev { left: 18px; top: 50%; margin-top: -24px; }
   .lb-next { right: 18px; top: 50%; margin-top: -24px; }
@@ -849,8 +850,8 @@
     width: auto;
     height: 100%;
     object-fit: contain;
-    border-radius: 3px;
-    box-shadow: 0 18px 32px -12px rgb(40 20 70 / 0.38), 0 2px 6px rgb(40 20 70 / 0.12);
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.9), 0 0 0 6px rgb(255 255 255 / 0.32), 0 22px 40px -16px rgb(90 40 140 / 0.4);
     pointer-events: none;
     user-select: none;
   }

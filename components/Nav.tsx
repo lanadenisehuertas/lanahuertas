@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import NavEmblem from "./NavEmblem";
 
 const LINKS = [
   { id: "branding", label: "branding" },
@@ -121,9 +122,7 @@ export default function Nav() {
       <nav aria-label="Main" className="relative mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-10">
         {/* Over the hero the name is already on screen: only the mark. */}
         <a href={home ? "#top" : "/"} aria-label="Lana Denise Huertas, home" className="masthead-home flex min-h-[44px] items-center gap-3">
-          <span aria-hidden className="masthead-mark">
-            L<i>D</i>
-          </span>
+          <NavEmblem />
           <span aria-hidden className={`masthead-name ${onHero ? "is-tucked" : ""}`}>
             Lana Denise Huertas
           </span>
