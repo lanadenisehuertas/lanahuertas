@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore, type CSSProperties } from "react";
-import { isMuted, onMute, setMuted } from "@/lib/dusk/sound";
+import { useEffect, useRef, type CSSProperties } from "react";
 
 /* Small static pieces of the dusk sky. Motion is CSS (app/styles/dusk.css). */
 
@@ -56,23 +55,6 @@ export function GStar({ size, style }: { size: number; style: Pos }) {
   return <div aria-hidden className="dk-gstar" style={{ "--s": `${size}px`, ...style } as CSSProperties} />;
 }
 
-/** A hand-drawn curl that draws itself in. */
-export function Curl({ style, color = "#fdf3e1", flip, delay = 0.4 }: { style: Pos; color?: string; flip?: boolean; delay?: number }) {
-  return (
-    <svg aria-hidden className="dk-curl" width="200" height="120" viewBox="0 0 200 120" style={{ ...(flip ? { scale: "-1 1" } : {}), ...style }}>
-      <path
-        style={{ "--len": 330, "--dd": `${delay}s` } as Pos}
-        d="M10 100 C 40 20 120 10 140 60 C 160 110 90 120 100 70 C 110 30 170 30 190 50"
-        fill="none"
-        stroke={color}
-        strokeOpacity=".7"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
 /** A thin tilted ring with a gold star riding it. */
 export function SkyRing({ style }: { style: Pos }) {
   return (
@@ -117,20 +99,14 @@ export function Stars({ count = 170 }: { count?: number }) {
   return <canvas ref={ref} aria-hidden className="dk-canvas" style={{ zIndex: 0 }} />;
 }
 
-/** The one sound switch for the whole garden. */
-export function MuteToggle({ className = "dk-mute" }: { className?: string }) {
-  const m = useSyncExternalStore(onMute, isMuted, () => false);
-  return (
-    <button type="button" className={className} aria-pressed={!m} onClick={() => setMuted(!m)}>
-      {m ? "♪ sound off" : "♪ sound on"}
-    </button>
-  );
-}
-
-/** Painted art from public/art/garden (matte, grainy, transparent). */
-export function Art({ name, alt = "", className = "", style, w, h }: { name: string; alt?: string; className?: string; style?: Pos; w: number; h: number }) {
+/**
+ * Painted art from public/art/garden (matte, grainy, transparent). Art below
+ * the fold loads lazily; `priority` is for the hero's first screen, where a
+ * lazy image would hold back the largest paint.
+ */
+export function Art({ name, alt = "", className = "", style, w, h, priority = false }: { name: string; alt?: string; className?: string; style?: Pos; w: number; h: number; priority?: boolean }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={`/art/garden/${name}.webp`} alt={alt} aria-hidden={alt ? undefined : true} width={w} height={h} loading="lazy" decoding="async" draggable={false} className={`dk-art ${className}`} style={style} />
+    <img src={`/art/garden/${name}.webp`} alt={alt} aria-hidden={alt ? undefined : true} width={w} height={h} loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : undefined} decoding="async" draggable={false} className={`dk-art ${className}`} style={style} />
   );
 }

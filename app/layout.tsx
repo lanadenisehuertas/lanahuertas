@@ -154,11 +154,13 @@ export default function RootLayout({
         {/*
          * Lite mode, decided before first paint: few cores, little memory,
          * Save-Data or a touch-first device get the same garden held still.
+         * data-js marks that scripts run at all, so CSS can lay out what the
+         * scripts will drive (About's phone tabs) from the first paint.
          */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var n=navigator,c=n.hardwareConcurrency||8,m=n.deviceMemory||8,s=n.connection&&n.connection.saveData;if(c<=4||m<=4||s||matchMedia('(pointer: coarse)').matches)document.documentElement.setAttribute('data-lite','')}catch(e){}",
+              "document.documentElement.setAttribute('data-js','');try{var n=navigator,c=n.hardwareConcurrency||8,m=n.deviceMemory||8,s=n.connection&&n.connection.saveData;if(c<=4||m<=4||s||matchMedia('(pointer: coarse)').matches)document.documentElement.setAttribute('data-lite','')}catch(e){}",
           }}
         />
         <GardenLoader />

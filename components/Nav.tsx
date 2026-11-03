@@ -82,7 +82,10 @@ export default function Nav() {
       const el = document.getElementById(l.id);
       if (el) spy.observe(el);
     });
-    const top = new IntersectionObserver(([e]) => e.isIntersecting && setActive(null), { rootMargin: "0px 0px -60% 0px" });
+    // The hero clears it on the same middle line. (A top band would still
+    // touch the hero while the first section is current, so jumping back
+    // home would never register and the old link would stay lit.)
+    const top = new IntersectionObserver(([e]) => e.isIntersecting && setActive(null), { rootMargin: "-45% 0px -50% 0px" });
     const hero = home ? document.getElementById("top")?.querySelector("section") : null;
     if (hero) top.observe(hero);
 

@@ -251,12 +251,6 @@ export const skillGroups = [
   },
 ];
 
-/*
- * Hero tile row. Figma leads, matching the sub-line — it was missing from this
- * list entirely, which read oddly on a page positioned around UI/UX work.
- */
-export const software = ["Fg", "Ps", "Ai", "Pr", "Ae", "Ca", "Py", "Js"];
-
 export const languages = ["Filipino (Native)", "English (Advanced)"];
 
 // ---------------------------------------------------------------------------

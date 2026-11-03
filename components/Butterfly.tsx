@@ -88,6 +88,7 @@ type Spark = {
 
 const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
 const smooth = (u: number) => u * u * (3 - 2 * u);
+const lerpPt = (a: { x: number; y: number }, b: { x: number; y: number }, t: number) => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
 
 function ButterflyStage() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -221,7 +222,20 @@ function ButterflyStage() {
         while (i < pts.length - 2 && pts[i + 1].key <= R) i++;
         const a = pts[i];
         const b = pts[i + 1];
-        const u = (R - a.key) / Math.max(1, b.key - a.key);
+        const gap = b.key - a.key;
+        const u = (R - a.key) / Math.max(1, gap);
+        // A long stretch of reading between two titles (About's cards): an
+        // arc across it would cross the text for screens on end. Instead the
+        // butterfly leaves the title, waits in the top corner while you read,
+        // and comes down to the next title as it nears.
+        if (gap > vh * 2) {
+          const go = Math.min(0.45, (vh * 0.7) / gap);
+          const A = { x: a.x, y: a.y - sy };
+          const B = { x: b.x, y: b.y - sy };
+          if (u < go) return lerpPt(A, hm, smooth(u / go));
+          if (u > 1 - go) return lerpPt(hm, B, smooth((u - 1 + go) / go));
+          return hm;
+        }
         // Part smoothstep: lingers a little at each title, never races.
         p = arc(a, b, u + (smooth(u) - u) * 0.65);
       }

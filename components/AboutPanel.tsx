@@ -1,16 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
-import { education, skillGroups, certifications, languages, software, type toolkit } from "@/lib/content";
+import { education, skillGroups, certifications, languages } from "@/lib/content";
 import AboutMe from "./AboutMe";
 import SkyNotes from "./dusk/SkyNotes";
 import DuskPortrait from "./dusk/DuskPortrait";
 import DuskAboutSky from "./dusk/DuskAboutSky";
 import { Sparkle4 } from "./Botanicals";
 import BloomTimeline from "./BloomTimeline";
-import { ToolTile, SHORT_NAME } from "./ToolBubbles";
-
-type ToolId = (typeof toolkit)[number]["id"];
 
 const TABS = [
   { id: "about", label: "about me" },
@@ -76,10 +73,13 @@ export default function AboutPanel() {
     let raf = 0;
     const read = () => {
       raf = 0;
-      if (!phone) {
+      // Asks the screen, not `phone`: on the first pass after hydration that
+      // still holds the server's guess, and on a phone the hidden parts have
+      // no box, so they would all read as above the line.
+      if (!isPhone()) {
         let cur: TabId = TABS[0].id;
         panels.current.forEach((el, i) => {
-          if (el && el.getBoundingClientRect().top < innerHeight * 0.4) cur = TABS[i].id;
+          if (el && el.offsetHeight && el.getBoundingClientRect().top < innerHeight * 0.4) cur = TABS[i].id;
         });
         setActive(cur);
       }
@@ -182,7 +182,11 @@ export default function AboutPanel() {
                 panels.current[i] = el;
               }}
               id={`panel-${t.id}`}
-              hidden={phone && active !== t.id}
+              // On phones only the active part shows. CSS hides the rest
+              // (dusk.css, .dk-apanel[data-rest]) so the server's HTML is
+              // already right on first paint, instead of laying out all four
+              // parts and hiding three once React wakes up.
+              data-rest={active !== t.id ? "" : undefined}
               aria-label={t.label}
               role="region"
               className="dk-apanel order-3 min-w-0 pt-12 text-ink lg:min-h-[78svh]"
@@ -239,22 +243,9 @@ export default function AboutPanel() {
             <div>
               <PanelHead lead="What I" accent="work with" />
 
-              <div className="pearl-card mt-7">
-                <h4 className="type-pixel text-[13px] text-ink/75">software</h4>
-                <ul className="mt-3 grid grid-cols-4 gap-x-2 gap-y-4">
-                  {software.map((s) => {
-                    const id = s.toLowerCase() as ToolId;
-                    return (
-                      <li key={s} className="flex flex-col items-center gap-1.5 text-center">
-                        <ToolTile id={id} className="h-12 w-12" />
-                        <span className="text-[15px] leading-tight text-ink/80">{SHORT_NAME[id]}</span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-
-              <ul className="mt-3 gap-3 sm:columns-2">
+              {/* The software itself is the constellation round the portrait
+                  (a row of stars on phones), so it is not listed again here. */}
+              <ul className="mt-7 gap-3 sm:columns-2">
                 {skillGroups.map((g) => (
                   <li key={g.label} className="pearl-card pearl-card-sm mb-3 break-inside-avoid">
                     <h4 className="type-display text-[1.3rem] leading-tight text-iris first-letter:uppercase">{g.label}</h4>

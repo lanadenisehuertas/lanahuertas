@@ -51,11 +51,7 @@
 
 /* --- skies --------------------------------------------------------------- */
 .dk-sky-hero { background: linear-gradient(180deg, #1d2366 0%, #2f3591 22%, #5550b8 44%, #9370c6 62%, #d790c0 78%, #f4b3b8 90%, #f8cdb0 100%); }
-.dk-sky-deep { background: linear-gradient(180deg, #1b2160 0%, #2d3b97 30%, #5c55bd 56%, #b47cc6 80%, #f1b0bd 100%); }
-.dk-sky-violet { background: linear-gradient(180deg, #2a2f86 0%, #5551b8 30%, #9a73c8 60%, #e3a0c0 85%, #f6c8b4 100%); }
-.dk-sky-night { background: linear-gradient(180deg, #171b55 0%, #262f86 40%, #3d3f9f 75%, #4c46ab 100%); }
 
-.dk-layer { position: absolute; inset: 0; pointer-events: none; }
 .dk-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
 /* grain: the same soft paper grain the painted objects carry */
@@ -132,11 +128,6 @@ html[data-lite] .dk-grain { display: none; }
 @keyframes dk-fall { from { transform: translate3d(0, -60px, 0); } to { transform: translate3d(var(--fx, 140px), 105svh, 0); } }
 @keyframes dk-flutter { from { transform: rotate(-35deg) rotateX(0); } to { transform: rotate(45deg) rotateX(65deg); } }
 
-/* hand-drawn curls that draw themselves in */
-.dk-curl { position: absolute; z-index: 12; pointer-events: none; animation: dk-drift var(--t, 10s) ease-in-out infinite; }
-.dk-curl path { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: dk-draw 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards var(--dd, 0s); }
-@keyframes dk-draw { to { stroke-dashoffset: 0; } }
-
 /* a Bayer dither band at a horizon, drawn by the dither module */
 .dk-art { position: absolute; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; }
 .dk-sway { transform-origin: 50% 100%; animation: dk-sway var(--t, 7s) ease-in-out infinite; }
@@ -156,9 +147,6 @@ html[data-lite] .dk-grain { display: none; }
 .dk-hero .hero-name { color: var(--dk-cream); text-shadow: 0 2px 26px rgb(44 34 120 / 0.5), 0 1px 3px rgb(44 34 120 / 0.35), 0 0 30px rgb(255 214 230 / 0.35); }
 .dk-hero .hero-name + .hero-name, .dk-hero .dk-name-accent { color: var(--dk-pink); }
 .dk-hero .morph-letter { position: relative; }
-
-.dk-badge { position: absolute; z-index: 6; cursor: pointer; translate: calc(var(--mx, 0) * 16px) calc(var(--my, 0) * 16px); }
-.dk-badge svg { display: block; overflow: visible; }
 
 .dk-ustar { position: absolute; z-index: 9; width: 22px; height: 22px; margin: -11px; pointer-events: none; animation: dk-upop 0.5s cubic-bezier(0.3, 1.7, 0.5, 1), dk-tw 3.4s ease-in-out 0.5s infinite; }
 .dk-ustar::before { content: ""; position: absolute; inset: -120%; border-radius: 50%; background: radial-gradient(closest-side, rgb(255 240 250 / 0.5), transparent); }
@@ -431,7 +419,6 @@ html[data-lite] .dk-grain { display: none; }
   97.222% { transform: translate(-46.07%, -6.08%); }
   100% { transform: translate(-46.79%, 0.00%); }
 }
-@keyframes dk-twk { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.35; } }
 .dk-yarn .roll { transition: transform 1.1s cubic-bezier(0.3, 1.2, 0.5, 1); }
 .dk-yarn:hover .roll { transform: rotate(-8deg) translateY(-3px); }
 .dk-mic { transform-origin: 50% 100%; animation: dk-sway 6s ease-in-out infinite; }
@@ -440,7 +427,9 @@ html[data-lite] .dk-grain { display: none; }
 
 /* About sits on the sky: the page's ink tokens turn to cream and pink here,
    and back to ink inside the cream cards */
-.dk-sky-about { background: linear-gradient(180deg, #232873 0%, #2b3290 24%, #353a9e 55%, #4f4cb4 82%, #8a6cc4 100%); }
+/* night is falling (the evening clock reads past 8 here): deeper than the
+   videos sky, so cream type and the tool stars carry, lilac only at the foot */
+.dk-sky-about { background: linear-gradient(180deg, #171a52 0%, #1e2368 24%, #272c80 55%, #3a3a9c 82%, #6a56b8 100%); }
 .dk-about, .dk-night { --color-ink: #fdf3e1; --color-iris: #fdf3e1; --color-eminence: #ffcfe0; --color-lavender: #ffcfe0; color: var(--color-ink); }
 .dk-apanel { text-shadow: 0 1px 12px rgb(30 20 80 / 0.45); }
 /* the contact form is a dusk panel like every other text container; its
@@ -522,6 +511,9 @@ html[data-lite] .dk-grain { display: none; }
 .dk-apanel { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
 .dk-apanel[data-in] { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .dk-apanel { opacity: 1; transform: none; } }
+/* Phones show one part at a time (AboutPanel). Only with scripts on: without
+   them the tabs cannot switch, so every part stays in the flow. */
+@media (max-width: 1023px) { html[data-js] .dk-apanel[data-rest] { display: none; } }
 
 /* the portrait grows into place as it develops; the vines glow */
 .dk-portrait { transform: scale(calc(0.84 + var(--p, 0) * 0.16)) rotate(calc((1 - var(--p, 0)) * -3deg)); transform-origin: 50% 60%; transition: transform 0.15s linear; }
@@ -542,17 +534,11 @@ html[data-lite] .dk-grain { display: none; }
 @media (prefers-reduced-motion: reduce) { .dk-rider { display: none; } }
 
 /* cream cards on the sky: dark ink inside */
-.dk-card {
-  border-radius: 22px; padding: 18px 20px; color: #221a4f;
-  background: rgb(253 243 225 / 0.9); box-shadow: 0 20px 44px -24px rgb(20 10 70 / 0.7);
-  transition: box-shadow 0.3s;
-}
-.dk-card:hover { box-shadow: 0 26px 50px -22px rgb(20 10 70 / 0.8), 0 0 0 1.5px rgb(255 207 224 / 0.9); }
 
 /* --- quiet modes ------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   .dk *, .dk *::before, .dk *::after { animation: none !important; transition: none !important; }
-  .dk-curl path { stroke-dashoffset: 0; }
+  
 }
 html[data-lite] .dk-blob, html[data-lite] .dk-planet, html[data-lite] .dk-oring, html[data-lite] .dk-confetti,
 html[data-lite] .dk-confetti > svg, html[data-lite] .dk-gstar, html[data-lite] .dk-tex, html[data-lite] .dk-cloud,
@@ -705,13 +691,9 @@ html[data-lite] .dk-mote:nth-of-type(n + 6) { display: none; }
 }
 
 /* the band behind the About tabs appears only while the row is stuck, so it
-   never sits over the portrait or the tool bubbles above it */
+   never sits over the portrait or the tool stars above it */
 .dk-abtabs::before { opacity: 0; transition: opacity 0.35s ease-out; }
 .dk-abtabs[data-stuck]::before { opacity: 1; }
-
-/* The bubble's name label is a white pill: in About, where the ink tokens
-   turn cream, its text keeps a dark violet so it stays readable. */
-.dk-about .tb-label { color: #3b2a8f; }
 
 /* Phones: the hero gets its own calmer layout instead of the desktop one
    squeezed. The streams thin out behind the name so it reads on clean sky,
@@ -828,8 +810,6 @@ html[data-lite] .ts-glint, html[data-lite] .ts-halo, html[data-lite] .ts-minor {
 html[data-lite] .ts-lines { filter: none; }
 @media (prefers-reduced-motion: reduce) { .ts-glint, .ts-halo, .ts-minor { animation: none; } }
 
-
-
 /* ---------------------------------------------------------------------------
    Focus words (components/Words.tsx). Each word starts faint and soft and
    sharpens in reading order: scrubbed by its place in the viewport where view
@@ -888,7 +868,6 @@ html[data-lite] .wd[data-in] .wd-w { transition: opacity 0.3s ease-out; transiti
 @keyframes dk-stand { 0% { background-position-x: 80%; } 88% { background-position-x: 100%; } }
 @media (prefers-reduced-motion: reduce) { .dk-walk .spr { animation: none; } }
 
-
 /* ---------------------------------------------------------------------------
    UI/UX boards at dusk: their pale backdrops are multiplied with the evening
    sky so the section reads as one more stretch of the same night, and the
@@ -913,18 +892,18 @@ html[data-lite] .wd[data-in] .wd-w { transition: opacity 0.3s ease-out; transiti
 .dk-abtabs { isolation: isolate; }
 .dk-abtabs::before {
   content: ""; position: absolute; z-index: -1; pointer-events: none;
-  inset: -72px -24px -30px;
+  inset: -72px -24px -48px;
   /* frosted sky, not a painted box: the About sky runs from deep blue to
      lilac, so a solid band read as a dark slab; the blur is what hides the
      cards passing under the labels */
-  background: linear-gradient(180deg, rgb(64 62 160 / 0.62) 0%, rgb(70 66 166 / 0.5) 70%, rgb(70 66 166 / 0) 100%);
+  background: linear-gradient(180deg, rgb(34 38 112 / 0.72) 0%, rgb(38 42 120 / 0.58) 64%, rgb(38 42 120 / 0) 100%);
   -webkit-backdrop-filter: blur(22px) saturate(1.05);
   backdrop-filter: blur(22px) saturate(1.05);
 }
 @media (min-width: 1024px) {
   /* runs off the right edge of the screen, so only its soft left side shows */
   .dk-abtabs::before {
-    inset: -88px -50vw -34px -56px;
+    inset: -88px -50vw -52px -56px;
     -webkit-mask-image: linear-gradient(#000 72%, transparent), linear-gradient(90deg, transparent, #000 72px);
     mask-image: linear-gradient(#000 72%, transparent), linear-gradient(90deg, transparent, #000 72px);
   }
@@ -940,7 +919,7 @@ img[src*="/art/garden/"] { image-rendering: pixelated; }
    move with the scroll anyway, and pausing them would freeze them mid-way. */
 [data-off], [data-off]::before, [data-off]::after,
 [data-off] *, [data-off] *::before, [data-off] *::after { animation-play-state: paused !important; }
-[data-off] .wd-w, [data-off] .sl-sprout, [data-off] .sl-par { animation-play-state: running !important; }
+[data-off] .wd-w{ animation-play-state: running !important; }
 /* one looping decoration out of view, inside a section that is on screen */
 [data-unseen], [data-unseen]::before, [data-unseen]::after { animation-play-state: paused !important; }
 

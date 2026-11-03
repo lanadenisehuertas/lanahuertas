@@ -53,22 +53,19 @@ export default function Contact() {
         </header>
 
         <footer aria-labelledby="contact-heading" className="end-card bloom-zone relative overflow-visible">
-          {/* The dusk sky: full-bleed, fading in from the page above and
-              running to the very bottom — no frame, like the hero. */}
+          {/* The night sky: full-bleed, fading in from the page above and
+              running to the very bottom — no frame, like the hero. The
+              evening ends here, so it is the deepest sky on the page, with
+              the lit horizon kept for the lotus bed at its foot. */}
           <div
             aria-hidden
             className="sheet-fade-top dk-contact-sky absolute -top-[240px] -bottom-24 left-[calc(50%-50vw)] w-screen overflow-hidden sm:-bottom-28"
             style={{
               background:
-                "radial-gradient(42% 30% at 50% 30%, rgb(255 214 190 / 0.28) 0%, transparent 72%), linear-gradient(180deg, #2d3b97 0%, #33379a 22%, #4f4cb4 48%, #6c5cbc 70%, #a07cc4 88%, #e3a0c0 100%)",
+                "radial-gradient(42% 30% at 50% 30%, rgb(255 214 190 / 0.2) 0%, transparent 72%), linear-gradient(180deg, #1c2160 0%, #22276e 22%, #2a2e84 46%, #36369a 66%, #5a4ab0 82%, #a27ac4 93%, #e3a0c0 100%)",
             }}
           >
             <div className="light-leak absolute inset-0" />
-            <span className="bokeh drift-y absolute top-[4%] left-[8%] h-28 w-28 opacity-60" style={{ "--bk": "#ffffff", "--dur": "15s" } as CSSProperties} />
-            <span className="bokeh drift-y absolute top-[30%] right-[4%] h-40 w-40 opacity-45" style={{ "--bk": "#f2b8cf", "--dur": "18s", "--td": "-6s" } as CSSProperties} />
-            <span className="bokeh drift-y absolute bottom-[26%] left-[3%] h-32 w-32 opacity-40" style={{ "--bk": "#a9b6f0", "--dur": "16s", "--td": "-3s" } as CSSProperties} />
-            <span className="bokeh-ring drift-y absolute top-[18%] right-[22%] h-12 w-12" style={{ "--dur": "12s" } as CSSProperties} />
-            <span className="bokeh-ring drift-y absolute bottom-[34%] left-[18%] h-8 w-8" style={{ "--dur": "10s", "--td": "-4s" } as CSSProperties} />
 
             {/* Stars and a comet in the upper sky */}
             <div className="absolute top-[6%] right-[10%] h-20 w-20 sm:h-28 sm:w-28">
@@ -93,32 +90,10 @@ export default function Contact() {
             <div className="dither absolute inset-x-0 bottom-0 h-[30%] opacity-70" />
             <PixelArt name="ornament" className="absolute top-[14%] left-[3%] hidden h-48 w-auto opacity-50 md:block" />
             <PixelArt name="ornament" className="absolute top-[14%] right-[3%] hidden h-48 w-auto opacity-50 md:block" />
-            <PixelArt name="butterfly" className="drift-y absolute top-[40%] left-[30%] w-5 opacity-90" />
             <PixelArt name="moon" className="absolute top-[7%] left-[16%] w-12 opacity-90 sm:w-16" />
-            <PixelArt name="note" className="drift-y absolute top-[56%] left-[44%] w-7 opacity-80" style={{ "--dur": "8s" } as CSSProperties} />
-            <PixelArt name="note" className="drift-y absolute top-[60%] right-[14%] w-5 opacity-70" style={{ "--dur": "10s", "--td": "-3s" } as CSSProperties} />
-            <PixelArt name="heart" className="absolute top-[33%] right-[27%] w-3.5 opacity-90" />
-            <PixelArt name="heart" className="absolute top-[37%] left-[25%] w-2.5 opacity-80" />
             <PixelArt name="sparkle" className="twinkle absolute top-[22%] right-[9%] w-10" />
-            <PixelArt name="daisy" className="absolute bottom-[30%] right-[30%] w-6 opacity-90" />
             <div className="band-grain absolute inset-0" />
             <Art name="cloud-bank" w={1400} h={196} className="dk-cloud" style={{ left: "-8%", bottom: "-1%", width: "116%", "--t": "24s", "--cx": "24px" } as CSSProperties} />
-          </div>
-
-          {/* Poster corners */}
-          <div className="type-pixel relative flex items-start justify-between p-4 text-[10px] text-ink/65 sm:p-6 sm:text-[11px]">
-            <span>
-              ©2026 {profile.name}
-              <br />
-              {profile.location}
-            </span>
-            <a
-              href="#top"
-              aria-label="Back to top"
-              className="btn-ghost btn-icon"
-            >
-              <InkArrow dir="up" className="h-5 w-8" />
-            </a>
           </div>
 
           {/* Two columns at desktop: the thank-you on the left, the form on
@@ -175,17 +150,9 @@ export default function Contact() {
               </ul>
             </div>
 
-            {/* The form, with a butterfly resting on its corner */}
+            {/* The form, with Peanut peeking over it */}
             <div className="relative z-20" data-rv>
-              <span aria-hidden data-react="butterfly" className="pointer-events-none absolute -top-10 right-[6%] z-10 w-16 sm:-top-12 sm:w-20">
-                <span className="react block">
-                  <span className="flutter block" style={{ "--dur": "8s" } as CSSProperties}>
-                    <Butterfly className="w-full rotate-[18deg]" style={{ "--flap": "1.4s" } as CSSProperties} />
-                  </span>
-                </span>
-              </span>
               <PixelFlower className="pointer-events-none absolute -top-5 left-[8%] z-10 h-7 w-7" />
-              {/* Peanut peeks over the form */}
               <PeanutPeek style={{ left: "38%", top: 2, width: "clamp(108px, 10vw, 156px)" }} />
               <ContactForm />
             </div>
@@ -210,6 +177,22 @@ export default function Contact() {
               </span>
             </div>
 
+          </div>
+
+          {/* The page's closing line: the credit and the way back up, at the
+              very end where they are looked for (they sat under the heading,
+              where a "back to top" made no sense yet). It sits in the light strip
+              of cloud under the lotus beds, so it is set in plum ink. */}
+          <div
+            className="type-pixel absolute inset-x-0 -bottom-[86px] z-30 flex items-center justify-center gap-3 px-4 text-center text-[12px] sm:-bottom-[104px] sm:gap-4 sm:text-[13px]"
+            style={{ "--color-ink": "#3b2a6e", "--color-iris": "#3b2a6e", color: "#3b2a6e" } as CSSProperties}
+          >
+            <span>
+              ©2026 {profile.name} · {profile.location}
+            </span>
+            <a href="#top" aria-label="Back to top" className="btn-ghost btn-icon">
+              <InkArrow dir="up" className="h-5 w-8" />
+            </a>
           </div>
         </footer>
       </div>

@@ -10,12 +10,3 @@ export function InkArrow({ dir = "right", className = "" }: { dir?: "left" | "ri
     </svg>
   );
 }
-
-/** A pen-drawn play mark: a soft triangle, its first stroke overshooting. */
-export function InkPlay({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden className={className} fill="currentColor" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round">
-      <path d="M8.6 5.2c4 2.1 7.4 4.3 10.3 6.6-3 2.4-6.4 4.7-10.3 6.9-.3-4.6-.3-9 0-13.5Z" />
-    </svg>
-  );
-}

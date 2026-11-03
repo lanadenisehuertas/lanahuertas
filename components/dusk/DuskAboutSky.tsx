@@ -40,10 +40,12 @@ export default function DuskAboutSky() {
     offs.push(
       ambient(host, {
         leanEl: sec,
-        petals: 5,
-        motes: 12,
+        // fewer, and only at the edges: About is read, card by card, and
+        // drifting bits over the text pulled the eye off it
+        petals: 3,
+        motes: 6,
         shooting: 7000,
-        confetti: [[46, 4], [92, 18], [4, 40], [60, 34], [96, 70], [36, 88]],
+        confetti: [[92, 18], [4, 40], [96, 70]],
         textures: [
           ["meshStar", [70, "#fff"], "left:40%;top:3%;width:140px;--t:7s", "spark"],
           ["halftoneFade", [440, 300, { color: "#9fe3d6", dir: "br", shape: "diamond", step: 12 }], "right:0;bottom:0;width:440px;opacity:.4;z-index:7", ""],

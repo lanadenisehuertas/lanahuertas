@@ -104,7 +104,6 @@ export const STICKERS: Sticker[] = [
 /** Images by src. SVGs get a real size first, so every browser can draw them on a canvas. */
 const imgs = new Map<string, HTMLImageElement>();
 const pending = new Map<string, Promise<HTMLImageElement>>();
-export const imageFor = (src: string) => imgs.get(src);
 export function loadImage(src: string): Promise<HTMLImageElement> {
   const have = imgs.get(src);
   if (have) return Promise.resolve(have);

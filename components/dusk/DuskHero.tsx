@@ -309,9 +309,9 @@ export default function DuskHero() {
         <p className="dk-hline type-display mx-auto mt-3 max-w-[30ch] text-lg leading-snug italic sm:mt-4 sm:max-w-[38ch] sm:text-[1.55rem]">{profile.heroShort}</p>
       </div>
 
-      <Art name="cloud-bank" w={1400} h={196} className="dk-cloud" style={v({ left: "-8%", bottom: "3%", width: "116%", zIndex: 50, "--t": "18s", "--cx": "30px" })} />
+      <Art priority name="cloud-bank" w={1400} h={196} className="dk-cloud" style={v({ left: "-8%", bottom: "3%", width: "116%", zIndex: 50, "--t": "18s", "--cx": "30px" })} />
       <canvas ref={staffCv} aria-hidden className="dk-canvas hidden sm:block" style={{ zIndex: 52 }} />
-      <Art name="lotus-cluster" w={1000} h={471} className="dk-sway" style={v({ left: "-4%", bottom: "4%", width: "max(32%, 240px)", zIndex: 56, "--t": "7s" })} />
+      <Art priority name="lotus-cluster" w={1000} h={471} className="dk-sway" style={v({ left: "-4%", bottom: "4%", width: "max(32%, 240px)", zIndex: 56, "--t": "7s" })} />
       <Art name="lotus-cluster" w={1000} h={471} className="dk-sway" style={v({ right: "-6%", bottom: "3%", width: "max(26%, 200px)", zIndex: 56, scale: "-1 1", "--t": "8s" })} />
 
       <button ref={bass} type="button" aria-label="Bass guitar (click to play a note)" onClick={strum} className="dk-obj dk-bass hidden border-0 bg-transparent p-0 md:block" style={{ left: "-3%", bottom: "15%", width: "clamp(220px, 25%, 380px)", zIndex: 53 }}>

@@ -73,26 +73,6 @@ export function Butterfly({ className = "", style }: { className?: string; style
   );
 }
 
-/** Flat cloud bank with stretched wisps underneath (Codex, site palette). */
-export function Cloud({ className = "", style, priority = false }: { className?: string; style?: CSSProperties; priority?: boolean }) {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src="/art/cloud.webp"
-      alt=""
-      aria-hidden
-      loading={priority ? "eager" : "lazy"}
-      fetchPriority={priority ? "high" : undefined}
-      decoding="async"
-      draggable={false}
-      width={900}
-      height={333}
-      className={`pointer-events-none max-w-none select-none ${className}`}
-      style={style}
-    />
-  );
-}
-
 /*
  * A thin elliptical orbit with a sparkle travelling round it, after the
  * butterfly reference. The line is static SVG; the rider is HTML. It spins on

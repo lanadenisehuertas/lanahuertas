@@ -235,14 +235,12 @@ export default function DuskVideos() {
       );
     offs.push(
       ambient(sec, {
-        petals: 4,
-        motes: 10,
+        // kept light: the film and its timeline are the subject here
+        petals: 3,
+        motes: 6,
         shooting: 6500,
         confetti: [
           [72, 12],
-          [86, 40],
-          [40, 8],
-          [58, 10],
           [3, 46],
           [30, 92],
         ],
