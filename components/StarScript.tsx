@@ -108,6 +108,13 @@ export default function StarScript() {
     const timers: number[] = [];
     const done = new Set<HTMLElement>();
     const twinkles = new Map<HTMLElement, HTMLElement>();
+    // Twinklers sleep (display: none) while their word is well off screen.
+    // Every written heading leaves eight of them, and running ones still cost
+    // the browser a style pass per frame even where nobody can see them.
+    const awake = new IntersectionObserver(
+      (es) => es.forEach((e) => twinkles.get(e.target as HTMLElement)?.classList.toggle("ss-sleep", !e.isIntersecting)),
+      { rootMargin: "200px 0px" }
+    );
     const later = (fn: () => void, ms: number) => timers.push(window.setTimeout(fn, ms));
     const restore = (em: HTMLElement) => {
       if (em.dataset.ss === "hide") em.dataset.ss = "ink";
@@ -130,6 +137,10 @@ export default function StarScript() {
       }
       root.appendChild(g);
       twinkles.set(em, g);
+      // Re-observing reports the word's current place, so a fresh group
+      // starts asleep if its word is already off screen.
+      awake.unobserve(em);
+      awake.observe(em);
     };
 
     const write = (em: HTMLElement) => {
@@ -165,27 +176,43 @@ export default function StarScript() {
       }, dur * 1000 + 1600);
     };
 
-    // Two observers: hide the word just before it can be seen, write it once it is.
+    // Two observers. `pre` hides a word while it is still below the screen,
+    // so it is never seen before its stars write it; it comes back as plain
+    // ink if it leaves that zone unwritten (scrolling back up). `play` writes
+    // it once most of it is on screen; a word that shows but never gets that
+    // far (clipped, parked at the bottom edge) is written after a moment
+    // anyway, so a word is never left hidden in view.
+    const guard = new Map<HTMLElement, number>();
+    const go = (em: HTMLElement) => {
+      if (done.has(em)) return;
+      done.add(em);
+      window.clearTimeout(guard.get(em));
+      pre.unobserve(em);
+      play.unobserve(em);
+      em.dataset.ss = "hide";
+      write(em);
+    };
     const pre = new IntersectionObserver(
       (es) =>
         es.forEach((e) => {
           const em = e.target as HTMLElement;
-          if (e.isIntersecting && !done.has(em) && !em.dataset.ss) em.dataset.ss = "hide";
+          if (done.has(em)) return;
+          if (e.isIntersecting) {
+            if (!em.dataset.ss) em.dataset.ss = "hide";
+          } else if (em.dataset.ss === "hide") delete em.dataset.ss;
         }),
-      { rootMargin: "0px 0px 30% 0px" }
+      { rootMargin: "0px 0px 40% 0px" }
     );
     const play = new IntersectionObserver(
       (es) =>
         es.forEach((e) => {
           const em = e.target as HTMLElement;
-          if (!e.isIntersecting || done.has(em)) return;
-          done.add(em);
-          pre.unobserve(em);
-          play.unobserve(em);
-          em.dataset.ss = "hide";
-          write(em);
+          if (done.has(em)) return;
+          window.clearTimeout(guard.get(em));
+          if (e.intersectionRatio >= 0.6) go(em);
+          else if (e.isIntersecting) guard.set(em, window.setTimeout(() => go(em), 900));
         }),
-      { rootMargin: "0px 0px -16% 0px", threshold: 1 }
+      { threshold: [0, 0.6] }
     );
 
     let ready = false;
@@ -216,7 +243,9 @@ export default function StarScript() {
       ready = true;
       pre.disconnect();
       play.disconnect();
+      awake.disconnect();
       timers.forEach((t) => window.clearTimeout(t));
+      guard.forEach((t) => window.clearTimeout(t));
       window.clearTimeout(rs);
       window.removeEventListener("resize", onResize);
       words.forEach((em) => delete em.dataset.ss);

@@ -110,9 +110,17 @@
   transition: opacity 800ms ease-out;
 }
 
+/* The star shape sits on a child: a clip-path on the animated element itself
+   would cost the GPU an offscreen pass per star on every frame. */
 .ss-star,
 .ss-tw {
   position: absolute;
+}
+.ss-star::before,
+.ss-tw::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: var(--c);
   clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
 }
@@ -134,6 +142,8 @@
   60% { opacity: 0.85; transform: scale(1) rotate(45deg); }
 }
 html[data-scrolling] .ss-tw { animation-play-state: paused; }
+/* a word's twinklers while it is off screen (StarScript) */
+.ss-sleep { display: none; }
 html[data-lite] .ss-layer { display: none; }
 html[data-lite] [data-ss] { opacity: 1 !important; }
 

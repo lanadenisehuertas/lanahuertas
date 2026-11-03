@@ -87,6 +87,13 @@ export const palettes: Record<string, string[]> = {
     "#c4927b",
     "#9a7468"
   ],
+  "code-bloom": [
+    "#135c4c",
+    "#f472a0",
+    "#7fd6aa",
+    "#f9bd33",
+    "#6bb8f5"
+  ],
   "video-breaking-barriers": [
     "#edece4",
     "#d1cdc1",
@@ -195,15 +202,19 @@ export const tones: Record<string, { left: Tone; right: Tone }> = {
     "right": "light"
   },
   "code-psyclick": {
-    "left": "light",
-    "right": "light"
+    "left": "dark",
+    "right": "dark"
   },
   "code-debt-ledger": {
-    "left": "light",
-    "right": "light"
+    "left": "dark",
+    "right": "dark"
   },
   "code-algebrawl": {
-    "left": "light",
-    "right": "light"
+    "left": "dark",
+    "right": "dark"
+  },
+  "code-bloom": {
+    "left": "dark",
+    "right": "dark"
   }
 };

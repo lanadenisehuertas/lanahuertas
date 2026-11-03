@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import Words from "@/components/Words";
 
 /**
  * A project's words in the spread's left column, set on the wash: meta
@@ -36,7 +37,7 @@ export default function SpreadCopy({
         {title}
       </Heading>
       {tagline && <p className="sp-tag">{tagline}</p>}
-      <p className="sp-body">{body}</p>
+      <Words key={body} mode="play" className="sp-body" text={body} />
       {palette.length > 0 && (
         <div className="sp-row">
           <span className="sp-label" aria-hidden>

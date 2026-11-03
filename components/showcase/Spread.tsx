@@ -53,6 +53,39 @@ const reduced = () => typeof window !== "undefined" && window.matchMedia("(prefe
  *
  * The section's `data-tone` follows the slide on screen, for the nav.
  */
+/**
+ * A slow, eased glide between slides (the browser's own smooth scroll is short
+ * and abrupt). Snapping is held off while it runs so it can't tug the motion,
+ * and a new glide, a drag or a wheel cancels the old one.
+ */
+const glides = new WeakMap<HTMLElement, number>();
+function glide(el: HTMLElement, to: number) {
+  cancelAnimationFrame(glides.get(el) ?? 0);
+  const from = el.scrollLeft,
+    dist = to - from;
+  if (Math.abs(dist) < 1) return;
+  const dur = Math.min(1150, 700 + (Math.abs(dist) / el.clientWidth) * 150),
+    t0 = performance.now(),
+    ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  el.style.scrollSnapType = "none";
+  const stop = () => {
+    cancelAnimationFrame(glides.get(el) ?? 0);
+    glides.delete(el);
+    el.style.scrollSnapType = "";
+    el.removeEventListener("pointerdown", stop);
+    el.removeEventListener("wheel", stop);
+  };
+  el.addEventListener("pointerdown", stop, { once: true });
+  el.addEventListener("wheel", stop, { once: true, passive: true });
+  const step = (now: number) => {
+    const k = Math.min(1, (now - t0) / dur);
+    el.scrollLeft = from + dist * ease(k);
+    if (k < 1) glides.set(el, requestAnimationFrame(step));
+    else stop();
+  };
+  glides.set(el, requestAnimationFrame(step));
+}
+
 export default function Spread({
   id,
   title,
@@ -144,7 +177,8 @@ function Carousel({
       const next = wrap(i);
       const from = Math.round(el.scrollLeft / el.clientWidth);
       const far = Math.abs(next - from) > 1 && (i < 0 || i >= count);
-      el.scrollTo({ left: next * el.clientWidth, behavior: reduced() || far ? "auto" : "smooth" });
+      if (reduced() || far) el.scrollTo({ left: next * el.clientWidth, behavior: "auto" });
+      else glide(el, next * el.clientWidth);
     },
     [count, wrap]
   );
@@ -166,12 +200,37 @@ function Carousel({
     let frame = 0;
     const read = () => {
       frame = 0;
-      setActive(Math.min(count - 1, Math.max(0, Math.round(el.scrollLeft / el.clientWidth))));
+      // read once, before any writes: reading scrollLeft between the writes
+      // below would make the browser restyle the page once per slide
+      const pos = el.scrollLeft / (el.clientWidth || 1);
+      setActive(Math.min(count - 1, Math.max(0, Math.round(pos))));
+      // Each slide's offset from the middle (0 = in place, ±1 = a slide away)
+      // drives the layered swipe in showcase.css: art, words and backdrop
+      // travel at different speeds and tilt as they pass.
+      for (const c of el.children) {
+        const cell = c as HTMLElement;
+        const o = Math.max(-1.5, Math.min(1.5, Number(cell.dataset.i) - pos)),
+          v = o.toFixed(3);
+        // slides parked off screen keep their value: no style work for them
+        if (cell.dataset.o === v) continue;
+        cell.dataset.o = v;
+        cell.style.setProperty("--o", v);
+      }
     };
+    // data-moving is on only while the track moves: the melt masks in
+    // showcase.css apply then, and slides at rest carry none
+    let still = 0;
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(read);
+      if (!still) el.setAttribute("data-moving", "");
+      clearTimeout(still);
+      still = window.setTimeout(() => {
+        still = 0;
+        el.removeAttribute("data-moving");
+      }, 180);
     };
     el.addEventListener("scroll", onScroll, { passive: true });
+    read();
     // Keep the slide in place when the window resizes.
     let last = Math.round(el.scrollLeft / (el.clientWidth || 1));
     const ro = new ResizeObserver(() => el.scrollTo({ left: last * el.clientWidth, behavior: "auto" }));
@@ -183,6 +242,7 @@ function Carousel({
       el.removeEventListener("scrollend", keep);
       ro.disconnect();
       cancelAnimationFrame(frame);
+      clearTimeout(still);
     };
   }, [count]);
 
@@ -291,7 +351,7 @@ function Carousel({
       className="sp sp--carousel"
       style={{ "--head": cur.wash ? `rgb(${cur.wash})` : "transparent" } as CSSProperties}
     >
-      <h2 id={`${id}-name`} className="sp-name">
+      <h2 id={`${id}-name`} data-rv="mist" className="sp-name">
         {title}
       </h2>
 
@@ -341,6 +401,10 @@ function Carousel({
           <div
             key={slides[i].key}
             data-i={i}
+            // the starting offsets (the track opens on the first slide), so the
+            // first read on mount finds nothing to write
+            data-o={Math.min(1.5, i).toFixed(3)}
+            style={{ "--o": Math.min(1.5, i).toFixed(3) } as CSSProperties}
             data-active={i === active ? "" : undefined}
             inert={ready && i !== active}
             role="group"

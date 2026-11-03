@@ -671,11 +671,25 @@ function ButterflyStage() {
     };
 
     // Re-measure while idle (cheap), and wake if the perch it sits on moved.
+    // Mid-scroll it waits: perches are kept in page coordinates, so they stay
+    // right while the page moves, and measuring would force a layout each time.
+    // With no title on screen it rests on its path instead; it wakes only if
+    // that spot moved too (waking on every check kept its loop running for
+    // good in sections without titles).
+    const spot = () => {
+      if (settleOn) return { x: settleOn.x, y: settleOn.y };
+      const p = perches.length ? pathTarget(window.scrollY) : home();
+      return { x: p.x, y: p.y + window.scrollY };
+    };
     const interval = window.setInterval(() => {
-      if (document.hidden) return;
-      const before = settleOn ? { x: settleOn.x, y: settleOn.y, el: settleOn.el } : null;
+      if (document.hidden || performance.now() - lastScrollAt < SETTLE_MS) return;
+      const had = !!settleOn;
+      const before = spot();
       measure();
-      if (sleeping && (!settleOn || !before || Math.abs(settleOn.x - before.x) > 2 || Math.abs(settleOn.y - before.y) > 2)) wake();
+      const after = spot();
+      const moved = had !== !!settleOn || Math.abs(after.x - before.x) > 2 || Math.abs(after.y - before.y) > 2;
+      // or a title came into view (a carousel turned) that it could sit on
+      if (sleeping && (moved || (!settleOn && nearestVisible(window.scrollY, x, y)))) wake();
     }, 500);
 
     const ro = new ResizeObserver(markDirty);

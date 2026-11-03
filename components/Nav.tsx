@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import NavEmblem from "./NavEmblem";
+import SoundToggle from "./SoundToggle";
 
 const LINKS = [
   { id: "branding", label: "branding" },
@@ -139,6 +140,7 @@ export default function Nav() {
         </ul>
 
         <div className="flex items-center gap-3">
+          <SoundToggle />
           <a href={href("contact")} className="btn btn-sm hidden sm:inline-flex">
             Hire me <span aria-hidden>↗</span>
           </a>

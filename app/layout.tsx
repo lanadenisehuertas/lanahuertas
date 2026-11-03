@@ -10,7 +10,6 @@ import PointerFX from "@/components/PointerFX";
 import { BotanicalDefs } from "@/components/Botanicals";
 import { Starfield } from "@/components/Ethereal";
 import GardenLoader from "@/components/GardenLoader";
-import DuskSky from "@/components/DuskSky";
 import DitherLantern from "@/components/DitherLantern";
 import StarScript from "@/components/StarScript";
 
@@ -164,15 +163,21 @@ export default function RootLayout({
         />
         <GardenLoader />
         {/*
-         * Lift the opening screen once the document is parsed — never before
-         * ~0.7s so it doesn't flash, never after 3.5s — then tell the page
-         * (MorphName waits for this before its first wave). Seen once per
-         * session; later loads skip straight in.
+         * Lift the opening screen once the page has loaded and the name has
+         * finished writing in — never before ~2.6s, never after 4.5s — then
+         * tell the page (MorphName waits for this before its first wave).
+         * It plays on every load; reduced motion lifts it after 0.4s.
+         * fly() measures everything first, then writes each word's offsets as
+         * one small style rule: a custom property set on <html> itself would
+         * make the browser restyle the whole page, and React's spans stay
+         * untouched.
+         * Once the curtain is up (1.7s) the loader leaves the page entirely
+         * (garden-gone), so its paused animations stop holding GPU layers.
          */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}try{if(sessionStorage.getItem('garden-seen')){go();return}}catch(e){}var t0=performance.now();function later(){setTimeout(go,Math.max(0,700-(performance.now()-t0)))}if(document.readyState!=='loading')later();else document.addEventListener('DOMContentLoaded',later);setTimeout(go,3500)})();",
+              "(function(){var d=document.documentElement,done=false,t0=performance.now(),min=matchMedia('(prefers-reduced-motion: reduce)').matches?400:2600;function fly(){try{if(min<1000)return;var L=document.querySelectorAll('#garden-loader .loader-word'),H=document.querySelectorAll('.dk-hero .hero-name');if(L.length<2||H.length<2)return;var css='';for(var j=0;j<2;j++){var a=L[j].getBoundingClientRect(),b=H[j].getBoundingClientRect();if(b.bottom<0||b.top>innerHeight||!a.width)return;var k=parseFloat(getComputedStyle(H[j]).fontSize)/parseFloat(getComputedStyle(L[j]).fontSize);css+='#garden-loader .loader-word:nth-child('+(j+1)+'){--mx:'+(b.left+b.width/2-(a.left+a.width/2))+'px;--my:'+(b.top+b.height/2-(a.top+a.height/2))+'px;--ms:'+k+'}';}var s=document.createElement('style');s.textContent=css;document.head.appendChild(s);}catch(_){}}function go(){if(done)return;done=true;fly();d.classList.add('garden-ready');setTimeout(function(){d.classList.add('garden-gone')},1800);window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'))}function later(){setTimeout(go,Math.max(0,min-(performance.now()-t0)))}if(document.readyState==='complete')later();else window.addEventListener('load',later);setTimeout(go,4500)})();",
           }}
         />
         {/*
@@ -202,7 +207,6 @@ export default function RootLayout({
           }}
         />
         <div className="graph-ground" aria-hidden />
-        <DuskSky />
         <Starfield />
         <DitherLantern />
         <BotanicalDefs />

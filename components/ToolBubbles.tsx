@@ -140,12 +140,12 @@ function Bubble({ spot, i, onPop }: { spot: Spot; i: number; onPop: (text: strin
 
 /* Around the arched portrait: three in each margin, clear of the photo. */
 const ORBIT: Spot[] = [
-  { id: "ps", x: "7%", y: "13%" },
-  { id: "ai", x: "9.5%", y: "41%" },
-  { id: "pr", x: "6%", y: "67%" },
-  { id: "ae", x: "93%", y: "19%" },
-  { id: "fg", x: "90.5%", y: "46%" },
-  { id: "ca", x: "93.5%", y: "72%" },
+  { id: "ps", x: "3%", y: "16%" },
+  { id: "ai", x: "1%", y: "42%" },
+  { id: "pr", x: "4%", y: "68%" },
+  { id: "ae", x: "98%", y: "20%" },
+  { id: "fg", x: "100%", y: "46%" },
+  { id: "ca", x: "97%", y: "72%" },
 ];
 
 /* In the empty space under the about text (desktop). */

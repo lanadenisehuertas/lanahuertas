@@ -4,7 +4,7 @@ Writes to public/art/seams/:
 
   seam-bottom.png  an alpha mask, opaque at the top and dissolving to nothing
                    at the bottom through an ordered (Bayer 8x8) dither in
-                   3px cells over 240px, eased. Each cell mixes the smooth
+                   3px cells over 150px, eased. Each cell mixes the smooth
                    gradient with the dither (SOFT), so the pixel grain shows
                    without hard on/off contrast. Tiles horizontally (24px).
   seam-top.png     the same idea over 72px, flipped, for the top edge: short,
@@ -38,7 +38,7 @@ BAYER = [
 ]
 CELL = 3
 COLS = 8  # one Bayer period across, so the tile repeats seamlessly
-ROWS = 80  # 80 cells = 240px
+ROWS = 50  # 50 cells = 150px: short enough that a seam never swallows the words near it
 SOFT = 0.55  # share of the smooth gradient in each cell; the rest is dither
 
 
@@ -85,7 +85,12 @@ def stars(width: int = 360, rows: int = ROWS) -> Image.Image:
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     # masks: white with the dither in alpha
-    for name, img in (("seam-bottom.png", seam()), ("seam-top.png", seam(24).transpose(Image.FLIP_TOP_BOTTOM))):
+    for name, img in (
+        ("seam-bottom.png", seam()),
+        ("seam-top.png", seam(24).transpose(Image.FLIP_TOP_BOTTOM)),
+        # the full-height seam flipped, for the tops of the dusk sections (app/styles/dusk.css)
+        ("seam-top-tall.png", seam(42).transpose(Image.FLIP_TOP_BOTTOM)),
+    ):
         rgba = Image.new("RGBA", img.size, (255, 255, 255, 0))
         rgba.putalpha(img)
         rgba.save(OUT / name, optimize=True)

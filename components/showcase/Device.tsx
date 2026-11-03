@@ -51,12 +51,37 @@ export default function Device({
     />
   );
 
+  const tabs = screens.map((x, k) => (
+    <button
+      key={x.src}
+      type="button"
+      aria-pressed={k === i}
+      className="dev-tab"
+      onClick={() => {
+        setI(k);
+        if (screen.current) screen.current.scrollTop = 0;
+      }}
+    >
+      {x.label}
+    </button>
+  ));
+
   if (kind === "phone") {
-    return (
+    const phone = (
       <div className="dev-phone">
         <div ref={screen} className="dev-screen" tabIndex={0} aria-label={`${title}: ${s.label}, scrollable`}>
           {img}
         </div>
+      </div>
+    );
+    if (screens.length < 2) return phone;
+    // several app screens: the same pill tabs as the browser bar, in a column beside the phone
+    return (
+      <div className="dev-phone-wrap">
+        <div className="dev-phone-tabs" role="group" aria-label={`${title} screens`}>
+          {tabs}
+        </div>
+        {phone}
       </div>
     );
   }
@@ -71,20 +96,7 @@ export default function Device({
         </span>
         {screens.length > 1 ? (
           <div className="dev-tabs" role="group" aria-label={`${title} pages`}>
-            {screens.map((x, k) => (
-              <button
-                key={x.src}
-                type="button"
-                aria-pressed={k === i}
-                className="dev-tab"
-                onClick={() => {
-                  setI(k);
-                  if (screen.current) screen.current.scrollTop = 0;
-                }}
-              >
-                {x.label}
-              </button>
-            ))}
+            {tabs}
           </div>
         ) : (
           <span className="dev-tabs">

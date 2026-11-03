@@ -3,6 +3,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import { profile } from "@/lib/content";
 import { Sparkle4 } from "./Botanicals";
+import { oops, sent } from "@/lib/dusk/sound";
 
 /*
  * Message form. Posts straight to Lana's inbox through FormSubmit's AJAX
@@ -55,12 +56,14 @@ export default function ContactForm() {
     setErrors(found);
     const first = (Object.keys(found) as (keyof Fields)[])[0];
     if (first) {
+      oops();
       formRef.current?.querySelector<HTMLElement>(`[name="${first}"]`)?.focus();
       return;
     }
     // Bots fill the hidden field; pretend it worked and send nothing.
     if (honey.current?.value) {
       setStatus("sent");
+      sent();
       return;
     }
 
@@ -85,10 +88,12 @@ export default function ContactForm() {
       const data = (await res.json().catch(() => ({}))) as { success?: string | boolean };
       if (!res.ok || String(data.success) !== "true") throw new Error("not sent");
       setStatus("sent");
+      sent();
       // The guide butterfly flies off with a burst (Butterfly.tsx listens).
       window.dispatchEvent(new Event("butterfly:send"));
     } catch {
       setStatus("failed");
+      oops();
     } finally {
       window.clearTimeout(timeout);
     }
@@ -96,7 +101,7 @@ export default function ContactForm() {
 
   if (status === "sent") {
     return (
-      <div role="status" className="notepaper relative mx-auto max-w-xl px-6 py-10 text-center">
+      <div role="status" className="notepaper dusk-panel relative mx-auto max-w-xl px-6 py-10 text-center">
           <span aria-hidden className="relative mx-auto block h-10 w-10">
           {[0, 1, 2, 3, 4].map((k) => (
             <Sparkle4 key={k} className="burst absolute h-3 w-3 text-lavender" />
@@ -130,7 +135,7 @@ export default function ContactForm() {
       onSubmit={submit}
       noValidate
       aria-labelledby="form-heading"
-      className="notepaper relative mx-auto w-full max-w-xl p-6 text-left sm:p-8"
+      className="notepaper dusk-panel relative mx-auto w-full max-w-xl p-6 text-left sm:p-8"
     >
       <h3 id="form-heading" className="type-display text-3xl text-iris italic">
         Send a message

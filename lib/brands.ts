@@ -164,15 +164,16 @@ const COPY: BrandCopy[] = [
     name: "ACM Elysium",
     short: "Elysium",
     org: ACM,
-    date: "2024–25",
-    year: "2024",
+    date: "SY 2025–26",
+    year: "2025",
     tagline: "One violet glow for a whole year.",
     brief:
-      "The chapter's look for the 2024–25 year: soft violet gradients, chrome and script. It ran from What is ACM, the vision and the mission through the kick-off, merch, sponsors, congratulations and greetings.",
+      "The ACM FEU Tech chapter theme for school year 2025–26: soft violet gradients, chrome and script. It ran from What is ACM, the vision and the mission through the kick-off, merch, sponsors, congratulations and greetings.",
     roles: ["Org identity", "Social media", "Merch"],
     tools: ["Photoshop", "Illustrator"],
     accent: "#9b5de5",
-    feature: ["2024-08-31-facebook-01", "2024-09-19-facebook-01", "2025-04-21-facebook-02"],
+    // Women's Month leads (Lana's pick)
+    feature: ["2025-03-06-facebook-01", "2024-08-31-facebook-01", "2025-04-21-facebook-02"],
     href: "https://www.facebook.com/feutechACM/posts/pfbid022vVEsU35o3qXJByNrH2cEGbuNy3oYkvEF17znYsmv7BadJJK5bY73vo2jJK9U4tPl",
   },
   {
@@ -237,4 +238,6 @@ export const posters: Poster[] = [
 
 /* ---- Videos --------------------------------------------------------------- */
 
-export const videos: Project[] = workTabs.find((t) => t.id === "videos")?.projects ?? [];
+// Brenia leads (Lana's pick for the first video); the rest keep their order.
+const allVideos: Project[] = workTabs.find((t) => t.id === "videos")?.projects ?? [];
+export const videos: Project[] = [...allVideos.filter((p) => p.id === "brenia-18"), ...allVideos.filter((p) => p.id !== "brenia-18")];

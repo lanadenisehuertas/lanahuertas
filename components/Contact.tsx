@@ -1,10 +1,16 @@
 import type { CSSProperties } from "react";
 import { profile, socials } from "@/lib/content";
-import { Lotus, Leaf, Spiral, Sparkle4, Orb, Bellflower, Blossom, Fern, LongVine } from "./Botanicals";
-import { Cloud, Butterfly, Orbit, ShootingStar, GlowSparkle, Star5, StarBurst, PixelFlower, Staff, Note, PixelArt } from "./Ethereal";
+import { Butterfly, Orbit, ShootingStar, GlowSparkle, Star5, StarBurst, PixelFlower, Staff, Note, PixelArt } from "./Ethereal";
+import { Sparkle4 } from "./Botanicals";
 import { InkArrow } from "./Ink";
 import MorphName from "./MorphName";
 import ContactForm from "./ContactForm";
+import { Art } from "./dusk/Decor";
+import { PeanutPeek } from "./dusk/Peanut";
+import LetterBloom from "./dusk/LetterBloom";
+import SkyNotes from "./dusk/SkyNotes";
+import Words from "@/components/Words";
+import Guestbook from "./garden/Guestbook";
 
 /* Small glyphs for the bloom buttons — drawn, not emoji, so they match. */
 const GLYPH: Record<string, React.ReactNode> = {
@@ -37,10 +43,11 @@ const dp = (depth: number, extra: Record<string, string | number> = {}) => ({ "-
  */
 export default function Contact() {
   return (
-    <section id="contact" className="relative px-4 pt-16 pb-24 sm:px-8 sm:pb-28">
-      <div className="relative mx-auto max-w-6xl">
-        <header className="mb-8 sm:mb-10">
-          <h2 id="contact-heading" data-perch className="type-display text-[clamp(3rem,5vw,5.25rem)] leading-none text-iris">
+    <section id="contact" data-tone="dark" className="dk dk-night dk-contact relative px-4 pt-16 pb-24 sm:px-[3.4%] sm:pb-28">
+      <SkyNotes />
+      <div className="relative mx-auto max-w-6xl lg:max-w-none">
+        <header className="relative z-10 mb-8 sm:mb-10">
+          <h2 id="contact-heading" data-perch data-rv="mist" className="type-display text-[clamp(3rem,5vw,5.25rem)] leading-none text-iris">
             Let&apos;s <em className="text-lavender italic">talk</em>
           </h2>
         </header>
@@ -50,10 +57,10 @@ export default function Contact() {
               running to the very bottom — no frame, like the hero. */}
           <div
             aria-hidden
-            className="sheet-fade-top absolute -top-[6%] -bottom-24 left-[calc(50%-50vw)] w-screen overflow-hidden sm:-bottom-28"
+            className="sheet-fade-top dk-contact-sky absolute -top-[240px] -bottom-24 left-[calc(50%-50vw)] w-screen overflow-hidden sm:-bottom-28"
             style={{
               background:
-                "radial-gradient(42% 30% at 50% 24%, #fff6ea 0%, transparent 72%), linear-gradient(180deg, #e6ebfb 0%, #f6d3c3 12%, #f2b8cf 28%, #c9b9ec 50%, #b3c0f2 74%, #9fb0ee 100%)",
+                "radial-gradient(42% 30% at 50% 30%, rgb(255 214 190 / 0.28) 0%, transparent 72%), linear-gradient(180deg, #2d3b97 0%, #33379a 22%, #4f4cb4 48%, #6c5cbc 70%, #a07cc4 88%, #e3a0c0 100%)",
             }}
           >
             <div className="light-leak absolute inset-0" />
@@ -81,31 +88,21 @@ export default function Contact() {
             <Note className="drift-y absolute top-[26%] left-[24%] h-5 w-5 text-white/80" />
             <Note kind="beamed" className="drift-y absolute top-[34%] right-[18%] h-6 w-6 text-white/70 [animation-delay:-4s]" />
 
-            {/* Cloud bank along the bottom, three depths */}
-            <div className="px absolute -left-[14%] bottom-[10%] w-[60%]" style={dp(-4)}>
-              <Cloud className="drift-x dof-mid w-full opacity-80" style={{ "--dur": "24s" } as CSSProperties} />
-            </div>
-            <div className="px absolute -right-[16%] bottom-[16%] w-[54%]" style={dp(-3)}>
-              <Cloud className="drift-x dof-far w-full -scale-x-100 opacity-70" style={{ "--dur": "28s", "--td": "-9s" } as CSSProperties} />
-            </div>
-            <div className="px absolute -bottom-[3%] left-[14%] w-[76%]" style={dp(-6)}>
-              <Cloud className="drift-x w-full" style={{ "--dur": "32s", "--drift": "-34px" } as CSSProperties} />
-            </div>
-
+            {/* painted clouds along the foot, two depths */}
+            <Art name="cloud-bank" w={1400} h={196} className="dk-cloud" style={{ left: "-20%", bottom: "16%", width: "90%", opacity: 0.75, scale: "-1 1", "--t": "28s", "--cx": "-20px" } as CSSProperties} />
             <div className="dither absolute inset-x-0 bottom-0 h-[30%] opacity-70" />
-            <div className="dither absolute inset-x-0 top-[6%] h-[18%] -scale-y-100 opacity-50" />
             <PixelArt name="ornament" className="absolute top-[14%] left-[3%] hidden h-48 w-auto opacity-50 md:block" />
             <PixelArt name="ornament" className="absolute top-[14%] right-[3%] hidden h-48 w-auto opacity-50 md:block" />
             <PixelArt name="butterfly" className="drift-y absolute top-[40%] left-[30%] w-5 opacity-90" />
             <PixelArt name="moon" className="absolute top-[7%] left-[16%] w-12 opacity-90 sm:w-16" />
-            <PixelArt name="note" className="drift-y absolute top-[56%] left-[12%] w-7 opacity-80" style={{ "--dur": "8s" } as CSSProperties} />
+            <PixelArt name="note" className="drift-y absolute top-[56%] left-[44%] w-7 opacity-80" style={{ "--dur": "8s" } as CSSProperties} />
             <PixelArt name="note" className="drift-y absolute top-[60%] right-[14%] w-5 opacity-70" style={{ "--dur": "10s", "--td": "-3s" } as CSSProperties} />
             <PixelArt name="heart" className="absolute top-[33%] right-[27%] w-3.5 opacity-90" />
             <PixelArt name="heart" className="absolute top-[37%] left-[25%] w-2.5 opacity-80" />
             <PixelArt name="sparkle" className="twinkle absolute top-[22%] right-[9%] w-10" />
-            <PixelArt name="cloud" className="drift-x absolute bottom-[38%] left-[6%] w-28 opacity-70" style={{ "--dur": "24s", "--drift": "30px" } as CSSProperties} />
             <PixelArt name="daisy" className="absolute bottom-[30%] right-[30%] w-6 opacity-90" />
             <div className="band-grain absolute inset-0" />
+            <Art name="cloud-bank" w={1400} h={196} className="dk-cloud" style={{ left: "-8%", bottom: "-1%", width: "116%", "--t": "24s", "--cx": "24px" } as CSSProperties} />
           </div>
 
           {/* Poster corners */}
@@ -126,14 +123,15 @@ export default function Contact() {
 
           {/* Two columns at desktop: the thank-you on the left, the form on
               the right. Phones stack them, thank-you first. */}
-          <div className="relative grid items-center gap-14 px-4 pt-4 pb-40 sm:px-10 sm:pt-6 sm:pb-52 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-12">
-            <div className="relative text-center lg:text-left">
+          <div className="relative grid items-center gap-14 px-4 pt-4 pb-16 sm:px-10 sm:pt-6 sm:pb-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-12">
+            <div className="relative text-center">
               {/* The thank-you, ringed by an orbit, a pixel swirl beside it */}
               <div className="relative">
                 <PixelArt name="swirl" className="absolute top-[4%] right-[2%] hidden w-[22%] -scale-x-100 opacity-80 lg:block" />
                 <span aria-hidden className="pointer-events-none absolute top-1/2 left-1/2 hidden w-[112%] -translate-x-1/2 -translate-y-[46%] sm:block">
                   <Orbit className="w-full -rotate-[6deg]" dur="20s" />
                 </span>
+                <LetterBloom>
                 <MorphName
                   as="p"
                   label="Thank you"
@@ -150,13 +148,15 @@ export default function Contact() {
                     },
                   ]}
                 />
+                </LetterBloom>
               </div>
 
-              <p className="mx-auto mt-6 max-w-md text-base leading-relaxed text-ink/85 sm:text-[17px] lg:mx-0">
-                Open to UI/UX and design roles, and to freelance brand, event and product work.
-              </p>
+              <Words
+                className="mx-auto mt-6 max-w-md text-base leading-relaxed text-ink/85 sm:text-[17px] lg:mt-14"
+                text="Open to UI/UX and design roles, and to freelance brand, event and product work."
+              />
 
-              <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-7 gap-y-1 lg:justify-start">
+              <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-7 gap-y-1">
                 {socials.filter((s) => s.label !== "email").map((s) => (
                   <li key={s.label}>
                     <a
@@ -185,61 +185,21 @@ export default function Contact() {
                 </span>
               </span>
               <PixelFlower className="pointer-events-none absolute -top-5 left-[8%] z-10 h-7 w-7" />
+              {/* Peanut peeks over the form */}
+              <PeanutPeek style={{ left: "38%", top: 2, width: "clamp(108px, 10vw, 156px)" }} />
               <ContactForm />
             </div>
           </div>
 
+          {/* The guestbook: visitors plant pixel flowers in the bed above the lotus */}
+          <Guestbook />
+
           {/* The garden, spilling over the card edges at three depths */}
           <div aria-hidden className="pointer-events-none">
-            {/* one vine weaving the whole bed together */}
-            <div data-rv className="absolute bottom-[4%] left-[-3%] w-[106%]">
-              <LongVine className="w-full" flip />
-            </div>
-            {/* back: ferns and leaves */}
-            <div className="px sl-sprout absolute bottom-[2%] left-[9%] w-[9%] max-w-[80px]" style={dp(10, { "--i": 1, "--sway": "9s" })} data-react="leaf">
-              <span className="react block"><Fern className="sway w-full -rotate-[10deg]" /></span>
-            </div>
-            <div className="px sl-sprout absolute right-[12%] bottom-[3%] w-[8%] max-w-[72px]" style={dp(10, { "--i": 2, "--sway": "10s" })} data-react="leaf">
-              <span className="react block"><Fern className="sway w-full rotate-[12deg]" /></span>
-            </div>
-            <div className="px sl-sprout absolute top-[18%] -left-6 hidden w-[14%] sm:block" style={dp(-10, { "--i": 1 })} data-react="leaf">
-              <span className="react block"><Leaf className="sway w-full -rotate-[20deg]" /></span>
-            </div>
-            <div className="px sl-sprout absolute top-[8%] -right-6 hidden w-[16%] sm:block" style={dp(-12, { "--i": 3 })} data-react="leaf">
-              <span className="react block"><Leaf className="sway w-full rotate-[200deg]" /></span>
-            </div>
 
-            {/* mid: the flower bed */}
-            <div className="px sl-sprout absolute -bottom-6 -left-4 w-[22%] max-w-[190px] sm:-left-8" style={dp(18)} data-react="lotus">
-              <span className="react block"><Lotus className="sway w-full" deep /></span>
-            </div>
-            <div className="px sl-sprout absolute -right-4 -bottom-8 w-[26%] max-w-[230px] sm:-right-10" style={dp(24, { "--i": 2 })} data-react="lotus">
-              <span className="react block"><Lotus className="sway w-full" /></span>
-            </div>
-            <div className="px sl-sprout absolute bottom-0 left-[17%] w-[11%] max-w-[110px]" style={dp(22, { "--i": 2, "--sway": "8.5s" })} data-react="bell">
-              <span className="react block"><Bellflower className="sway w-full" /></span>
-            </div>
-            <div className="px sl-sprout absolute right-[22%] bottom-0 w-[9%] max-w-[90px]" style={dp(20, { "--i": 3, "--sway": "7.5s" })} data-react="bell">
-              <span className="react block"><Bellflower className="sway w-full -rotate-[6deg]" deep /></span>
-            </div>
-            <div className="px sl-sprout absolute right-[33%] bottom-[2%] w-[5%] max-w-[52px]" style={dp(14, { "--i": 4, "--sway": "6.5s" })} data-react="bell">
-              <span className="react block"><Bellflower className="sway dof-mid w-full rotate-[8deg]" /></span>
-            </div>
-            <div className="px absolute bottom-[10%] left-[28%] w-[5%] max-w-[54px]" style={dp(16)} data-react="blossom">
-              <span className="react block"><Blossom className="spin-slow w-full" deep /></span>
-            </div>
-            <div className="px absolute right-[8%] bottom-[22%] w-[4%] max-w-[44px]" style={dp(14)} data-react="blossom">
-              <span className="react block"><Blossom className="w-full" /></span>
-            </div>
-            <div className="px absolute bottom-[6%] left-[42%] w-[3%] max-w-[34px]" style={dp(12)} data-react="pixel">
-              <span className="react block"><PixelFlower className="w-full" /></span>
-            </div>
-            <div className="px absolute right-[40%] bottom-[14%] w-[2.2%] max-w-[24px]" style={dp(10)} data-react="pixel">
-              <span className="react block"><PixelFlower className="w-full opacity-80" /></span>
-            </div>
-            <Spiral className="spin-slow absolute top-[30%] left-[10%] hidden w-12 sm:block" />
-            <Orb className="float-badge absolute top-[44%] right-[12%] h-7 w-7" />
-            <Orb className="float-badge absolute bottom-[26%] left-[22%] h-5 w-5" />
+            {/* the painted lotus bed at both corners */}
+            <Art name="lotus-cluster" w={1000} h={471} className="dk-sway" style={{ left: "-6%", bottom: "-2%", width: "max(30%, 220px)", "--t": "8s" } as CSSProperties} />
+            <Art name="lotus-cluster" w={1000} h={471} className="dk-sway" style={{ right: "-6%", bottom: "-3%", width: "max(26%, 190px)", scale: "-1 1", "--t": "9s" } as CSSProperties} />
 
             {/* a far butterfly crossing the upper sky */}
             <div className="px absolute top-[12%] left-[20%] w-10 sm:w-12" style={dp(8)} data-react="butterfly">
@@ -250,13 +210,6 @@ export default function Contact() {
               </span>
             </div>
 
-            {/* front: out of focus, closest to the viewer */}
-            <div className="px absolute -bottom-[4%] left-[30%] w-[12%] max-w-[120px]" style={dp(50)}>
-              <Blossom className="dof-near w-full" />
-            </div>
-            <div className="px absolute right-[2%] -bottom-[3%] w-[9%] max-w-[90px]" style={dp(46)}>
-              <Blossom className="dof-near w-full" deep />
-            </div>
           </div>
         </footer>
       </div>

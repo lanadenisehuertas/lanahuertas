@@ -24,6 +24,7 @@ const DEVICES: Record<EngineeringProject["visual"], { kind: "browser" | "phone";
     screens: [
       PSY("landing-hero", "Landing", 1111),
       PSY("app-dashboard", "Dashboard"),
+      PSY("app-clients", "Clients"),
       PSY("app-intake", "Intake"),
       PSY("app-report", "Report"),
       PSY("app-typing", "Typing"),
@@ -34,10 +35,26 @@ const DEVICES: Record<EngineeringProject["visual"], { kind: "browser" | "phone";
     kind: "phone",
     screens: [{ label: "This week", src: "/work/shot-debtledger.webp", w: 500, h: 1140 }],
   },
+  // the real phone app, one tab per screen
+  bloom: {
+    kind: "phone",
+    screens: (["Today", "Food", "Cycle", "Progress"] as const).map((label) => ({
+      label,
+      src: `/work/bloom/${label.toLowerCase()}.webp`,
+      w: 500,
+      h: 1082,
+    })),
+  },
   algebrawl: {
     kind: "browser",
     url: "algebrawl.vercel.app",
-    screens: [{ label: "Title screen", src: "/work/algebrawl-title.webp", w: 1040, h: 780 }],
+    screens: [
+      { label: "Title", src: "/work/algebrawl-title.webp", w: 1040, h: 780 },
+      { label: "Pick a foe", src: "/work/algebrawl/select.webp", w: 1040, h: 780 },
+      { label: "Battle", src: "/work/algebrawl/battle.webp", w: 1040, h: 780 },
+      { label: "Story", src: "/work/algebrawl/story.webp", w: 1040, h: 780 },
+      { label: "Tutorial", src: "/work/algebrawl/tutorial.webp", w: 1040, h: 780 },
+    ],
   },
 };
 

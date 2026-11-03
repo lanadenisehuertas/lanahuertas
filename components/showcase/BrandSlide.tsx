@@ -8,7 +8,7 @@ import Lightbox from "./Lightbox";
 import Pic from "./Pic";
 import { useSlide } from "./Spread";
 import SpreadCopy from "./SpreadCopy";
-import { pad, washVar } from "./tone";
+import { pad, washVar, toneOf } from "./tone";
 
 /**
  * One brand, one screen: its artboard edge to edge, the words on the wash,
@@ -28,7 +28,7 @@ export default function BrandSlide({ brand, n, total, link = true }: { brand: Br
   const name = (i: number) => `${brand.name}, piece ${i + 1} of ${set.length}`;
 
   return (
-    <article className="sp-slide sp-slide--brand" style={washVar(brand.slug)} aria-label={brand.name}>
+    <article className="sp-slide sp-slide--brand" data-board={toneOf(brand.slug)} style={washVar(brand.slug)} aria-label={brand.name}>
       <Backdrop slug={brand.slug} eager={near} />
 
       <SpreadCopy

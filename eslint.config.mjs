@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     // Screenshot/Codex scratch and agent worktrees.
     ".codex-scratch/**",
     ".claude/**",
+    // Brainstorm mockups (git-ignored).
+    ".superpowers/**",
   ]),
 ]);
 

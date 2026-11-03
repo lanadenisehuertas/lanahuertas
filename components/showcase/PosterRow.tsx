@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { posters } from "@/lib/brands";
 import Lightbox from "./Lightbox";
+import SkyNotes from "../dusk/SkyNotes";
 import Pic from "./Pic";
 
 const still = () =>
@@ -80,13 +81,15 @@ export default function PosterRow({ id = "posters" }: { id?: string }) {
   };
 
   return (
-    <section id={id} data-tone="light" aria-labelledby={`${id}-h`} className="pr">
+    <section id={id} data-tone="dark" aria-labelledby={`${id}-h`} className="pr dk-pr">
+      <SkyNotes skip="[class*=pr-row],[class*=pr-track],[class*=pr-rail],[class*=pr-card]" />
       <div className="pr-head">
-        <h2 id={`${id}-h`} data-perch className="pr-title">
+        <h2 id={`${id}-h`} data-perch data-rv="mist" className="pr-title">
           One-off <em>posters</em>
         </h2>
         <p className="pr-hint">
-          {posters.length} posters · drag the row · click to open
+          {/* each phrase stays whole when the line wraps on a phone */}
+          <span>{posters.length} posters</span> · <span>drag the row</span> · <span>click to open</span>
         </p>
       </div>
       <ul
@@ -111,11 +114,14 @@ export default function PosterRow({ id = "posters" }: { id?: string }) {
             <button
               type="button"
               className="pr-btn"
-              aria-label={`Open ${p.title}`}
               onPointerMove={tilt}
               onPointerLeave={untilt}
               onClick={() => setOpen(i)}
             >
+              {/* named by its own caption plus a hidden "Open", so the name
+                  holds the words on screen and voice control users can say
+                  what they see */}
+              <span className="sr-only">Open </span>
               <figure className="pr-fig">
                 <Pic img={p.img} sizes="(min-width: 768px) 420px, 70vw" />
                 <figcaption>
