@@ -133,10 +133,20 @@ export const metadata: Metadata = {
     images: ["/og.jpg"],
   },
   robots: { index: true, follow: true },
+  // Added to an iPhone home screen it opens full screen under a black
+  // status bar, which meets the near-black top of the sky. (A translucent
+  // bar would sit over the fixed nav unless the page also ran under the
+  // notch, which would push text beneath it in landscape.)
+  appleWebApp: { capable: true, title: profile.short, statusBarStyle: "black" },
 };
 
+/*
+ * The browser's own bar on phones takes the colour of the top of the dusk
+ * sky (#18192d, sampled from the hero's top edge), so it runs straight into
+ * the page instead of sitting on it as a pale strip.
+ */
 export const viewport: Viewport = {
-  themeColor: "#e6ebfb",
+  themeColor: "#18192d",
 };
 
 export default function RootLayout({
