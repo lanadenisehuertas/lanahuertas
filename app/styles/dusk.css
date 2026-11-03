@@ -501,7 +501,9 @@ html[data-lite] .dk-grain { display: none; }
 /* phones: the video copy stacks above the frame, so Peanut sits at its right
    end, clear of the play buttons */
 @media (max-width: 1023px) {
-  #videos .dk-perch { left: auto !important; right: 3%; }
+  /* sized to the screen so on a 360px phone she stays clear of the end of
+     "Open in Drive" instead of sitting on its arrow */
+  #videos .dk-perch { left: auto !important; right: 2%; width: clamp(62px, 19vw, 78px) !important; }
 }
 /* the "now" pill on the timeline: the remapped tokens made it pink on white */
 .dk-about .bt-badge { background: #ffcfe0; color: #4a1260; font-weight: 500; }
@@ -514,6 +516,9 @@ html[data-lite] .dk-grain { display: none; }
 /* Phones show one part at a time (AboutPanel). Only with scripts on: without
    them the tabs cannot switch, so every part stays in the flow. */
 @media (max-width: 1023px) { html[data-js] .dk-apanel[data-rest] { display: none; } }
+/* Phones: About's sky ornaments on fixed spots clear of the content: the pink
+   planet up beside the portrait, the dotted diamond beside the heading. */
+@media (max-width: 1023px) { .dk-about { --pk-y: 250px; --dd-x: 70%; --dd-y: 36px; } }
 
 /* the portrait grows into place as it develops; the vines glow */
 .dk-portrait { transform: scale(calc(0.84 + var(--p, 0) * 0.16)) rotate(calc((1 - var(--p, 0)) * -3deg)); transform-origin: 50% 60%; transition: transform 0.15s linear; }

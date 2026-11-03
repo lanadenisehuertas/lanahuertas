@@ -47,7 +47,7 @@ export default function Contact() {
       <SkyNotes />
       <div className="relative mx-auto max-w-6xl lg:max-w-none">
         <header className="relative z-10 mb-8 sm:mb-10">
-          <h2 id="contact-heading" data-perch data-rv="mist" className="type-display text-[clamp(3rem,5vw,5.25rem)] leading-none text-iris">
+          <h2 id="contact-heading" data-perch data-rv="mist" className="type-display text-center text-[clamp(3rem,5vw,5.25rem)] leading-none text-iris lg:text-left">
             Let&apos;s <em className="text-lavender italic">talk</em>
           </h2>
         </header>
@@ -187,8 +187,15 @@ export default function Contact() {
             className="type-pixel absolute inset-x-0 -bottom-[86px] z-30 flex items-center justify-center gap-3 px-4 text-center text-[12px] sm:-bottom-[104px] sm:gap-4 sm:text-[13px]"
             style={{ "--color-ink": "#3b2a6e", "--color-iris": "#3b2a6e", color: "#3b2a6e" } as CSSProperties}
           >
-            <span>
-              ©2026 {profile.name} · {profile.location}
+            {/* phones stack the name over the place (no dangling dot);
+                from sm up it is one line */}
+            <span className="flex flex-col sm:block">
+              <span>©2026 {profile.name}</span>
+              <span aria-hidden className="hidden sm:inline">
+                {" "}
+                ·{" "}
+              </span>
+              <span>{profile.location}</span>
             </span>
             <a href="#top" aria-label="Back to top" className="btn-ghost btn-icon">
               <InkArrow dir="up" className="h-5 w-8" />

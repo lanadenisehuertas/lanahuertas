@@ -51,7 +51,7 @@ export default function DuskAboutSky() {
           ["halftoneFade", [440, 300, { color: "#9fe3d6", dir: "br", shape: "diamond", step: 12 }], "right:0;bottom:0;width:440px;opacity:.4;z-index:7", ""],
           ["halftoneFade", [420, 280, { color: "#c9b8ff", dir: "tl", shape: "dot", step: 11, angle: 0.4 }], "left:0;top:0;width:420px;opacity:.35", ""],
           ["dotStar", [24, "#fdf3e1"], "right:6%;top:24%;width:48px;opacity:.8", "twk"],
-          ["dotDiamond", [36, "#ffcfe0"], "left:3%;top:62%;width:76px;opacity:.55", "twk"],
+          ["dotDiamond", [36, "#ffcfe0"], "left:var(--dd-x,3%);top:var(--dd-y,62%);width:76px;opacity:.55", "twk"],
         ],
       })
     );
@@ -112,7 +112,11 @@ export default function DuskAboutSky() {
       <canvas ref={streamCv} aria-hidden className="dk-canvas dk-astreams" style={{ zIndex: 4 }} />
 
       <div className="pointer-events-auto">
-        <Planet hue="pink" size={46} onPress={() => chime(880)} style={v({ left: "2%", top: "44%", "--t": "14s" })} />
+        {/* Placed by percentage on wide screens; phones move it (and the
+            dotted diamond) to fixed spots by the portrait, since there the
+            section's height changes with the open tab and a percentage
+            would land on the tools or the text (dusk.css, .dk-about). */}
+        <Planet hue="pink" size={46} onPress={() => chime(880)} style={v({ left: "2%", top: "var(--pk-y, 44%)", "--t": "14s" })} />
         <Planet hue="peach" size={30} onPress={() => chime(660)} style={v({ right: "8%", top: "3%", "--t": "11s" })} />
       </div>
       <GStar size={26} style={v({ left: "38%", top: "16%", "--tw": "3.4s" })} />

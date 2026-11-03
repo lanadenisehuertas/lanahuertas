@@ -129,7 +129,12 @@ export default function Guestbook() {
     <div ref={root} id="garden" className="gb" aria-labelledby="gb-h">
       <div className="gb-head dusk-panel">
         <p className="gb-k">
-          The guestbook garden · {all.length} flower{all.length === 1 ? "" : "s"} planted
+          {/* each half kept whole, so a narrow card breaks between them and
+              not inside "2 flowers planted" */}
+          <span className="whitespace-nowrap">The guestbook garden</span> ·{" "}
+          <span className="whitespace-nowrap">
+            {all.length} flower{all.length === 1 ? "" : "s"} planted
+          </span>
         </p>
         <h3 id="gb-h" className="gb-title">
           Leave a <em>flower</em>

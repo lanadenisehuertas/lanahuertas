@@ -743,6 +743,9 @@
       height: 84px;
       margin-top: 14px;
       padding: 6px 16px 0;
+      /* under the centred poster, a short set sits centred too; "safe" keeps
+         a long one starting at the left edge so it can still scroll */
+      justify-content: safe center;
     }
   }
 
