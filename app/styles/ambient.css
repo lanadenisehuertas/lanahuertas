@@ -1,0 +1,149 @@
+/* ambient — dither lantern, star-script, dusk sky. See docs/superpowers/specs/2026-10-29-butterfly-garden-design.md
+ *
+ * Unlayered on purpose: these rules must win over the utility-layer `.lotus
+ * .petal` defaults. Every class here is prefixed (al- lantern,
+ * ss- star-script, dk- dusk) so nothing else is touched.
+ *
+ * Budget: transform and opacity only, no filters; ambient loops hold still
+ * while the page scrolls (html[data-scrolling]) and drop out in lite mode and
+ * for reduced motion.
+ */
+
+/* ---- Dither lantern (components/DitherLantern.tsx) ------------------------- */
+.al-root {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 700ms ease-out;
+}
+.al-root.on { opacity: 1; }
+.al-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  contain: strict;
+}
+.al-hosted {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* A window that follows the pointer, feathered by a static mask... */
+.al-ring {
+  --r: 190px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(var(--r) * 2);
+  height: calc(var(--r) * 2);
+  overflow: hidden;
+  transform: translate3d(calc(var(--mx, -999px) - var(--r)), calc(var(--my, -999px) - var(--r)), 0);
+  -webkit-mask-image: radial-gradient(closest-side, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
+  will-change: transform;
+}
+.al-ring-core { --r: 96px; }
+/* ...over a dot screen that moves back, so the dots stay put on the page. */
+.al-dots {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: max(100vw, 100%);
+  height: max(100vh, 100%);
+  transform: translate3d(calc(var(--r) - var(--mx, -999px)), calc(var(--r) - var(--my, -999px)), 0);
+  will-change: transform;
+}
+.al-hosted .al-dots {
+  width: calc(100vw + 400px);
+  height: calc(100vh + 400px);
+}
+.al-ring-wide .al-dots {
+  background-image: radial-gradient(circle, rgb(178 128 226 / 0.85) 1.3px, transparent 1.8px);
+  background-size: 7px 7px;
+}
+.al-ring-core .al-dots {
+  background-image: radial-gradient(circle, rgb(240 140 205 / 0.85) 2px, transparent 2.5px);
+  background-size: 7px 7px;
+  background-position: 3.5px 3.5px;
+}
+
+.al-flowers {
+  position: absolute;
+  inset: 0;
+}
+.al-flower {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.al-flower img {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  image-rendering: pixelated;
+}
+
+/* ---- Star-script (components/StarScript.tsx) ------------------------------- */
+.ss-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+.ss-word {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: opacity 650ms ease-out;
+}
+.ss-word.ss-out { opacity: 0; }
+
+/* The word itself: hidden only while its stars write it, then inked back in. */
+[data-ss="hide"] { opacity: 0; }
+[data-ss="ink"] {
+  opacity: 1;
+  transition: opacity 800ms ease-out;
+}
+
+/* The star shape sits on a child: a clip-path on the animated element itself
+   would cost the GPU an offscreen pass per star on every frame. */
+.ss-star,
+.ss-tw {
+  position: absolute;
+}
+.ss-star::before,
+.ss-tw::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--c);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+}
+.ss-star {
+  opacity: 0;
+  animation: ss-in 520ms cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+@keyframes ss-in {
+  0% { opacity: 0; transform: scale(0) rotate(-40deg); }
+  60% { opacity: 1; transform: scale(1.5) rotate(10deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+.ss-tw {
+  animation: ss-twinkle 3s ease-in-out infinite;
+}
+@keyframes ss-twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.5) rotate(0deg); }
+  45% { opacity: 1; transform: scale(1.15) rotate(45deg); }
+  60% { opacity: 0.85; transform: scale(1) rotate(45deg); }
+}
+html[data-scrolling] .ss-tw { animation-play-state: paused; }
+/* a word's twinklers while it is off screen (StarScript) */
+.ss-sleep { display: none; }
+html[data-lite] .ss-layer { display: none; }
+html[data-lite] [data-ss] { opacity: 1 !important; }
+

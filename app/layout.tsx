@@ -1,36 +1,30 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Cormorant_Garamond, DM_Mono } from "next/font/google";
+import { DM_Mono, Inter_Tight } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { profile, socials } from "@/lib/content";
 import { siteUrl } from "@/lib/site";
 import Nav from "@/components/Nav";
+import Butterfly from "@/components/Butterfly";
 import PointerFX from "@/components/PointerFX";
 import { BotanicalDefs } from "@/components/Botanicals";
 import { Starfield } from "@/components/Ethereal";
 import GardenLoader from "@/components/GardenLoader";
+import DitherLantern from "@/components/DitherLantern";
+import StarScript from "@/components/StarScript";
 
 /*
- * Archivo — one grotesk family for everything set in words. Its width axis
- *     gives two voices from one file: tight at 100% for flim-style
- *     headlines, and fully extended at 125% for the Y2K-tech name.
- * DM Mono — small uppercase labels, readouts, and buttons.
- * Redaction (OFL, MCKL) — the morph target. Its cuts degrade the same
- *     letterforms step by step and share metrics, so the hero name can decay
- *     through them on hover.
+ * Redaction (OFL, MCKL) — the display face: the name, section and project
+ *     titles, italic taglines. Its degraded cuts (10/35/70/100) share metrics,
+ *     so the hero name can decay through them on hover.
+ * Inter Tight — body, buttons, links, nav. Neutral, so Redaction carries the
+ *     personality.
+ * DM Mono — small uppercase labels and readouts.
  */
-const archivo = Archivo({
-  variable: "--font-archivo",
+const interTight = Inter_Tight({
+  variable: "--font-inter-tight",
   subsets: ["latin"],
-  axes: ["wdth"],
-  display: "swap",
-});
-
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  style: ["normal", "italic"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -93,6 +87,7 @@ const mono = DM_Mono({
   display: "swap",
 });
 
+
 // Leads with both forms of her name, so a search for either matches the snippet.
 const seoDescription = `${profile.short} (${profile.name}) — Manila-based UI/UX designer, graphic designer and video editor. 7+ years in Figma, Photoshop and Premiere Pro, and a Computer Science student at FEU Tech who builds what she designs.`;
 
@@ -138,10 +133,20 @@ export const metadata: Metadata = {
     images: ["/og.jpg"],
   },
   robots: { index: true, follow: true },
+  // Added to an iPhone home screen it opens full screen under a black
+  // status bar, which meets the near-black top of the sky. (A translucent
+  // bar would sit over the fixed nav unless the page also ran under the
+  // notch, which would push text beneath it in landscape.)
+  appleWebApp: { capable: true, title: profile.short, statusBarStyle: "black" },
 };
 
+/*
+ * The browser's own bar on phones takes the colour of the top of the dusk
+ * sky (#18192d, sampled from the hero's top edge), so it runs straight into
+ * the page instead of sitting on it as a pale strip.
+ */
 export const viewport: Viewport = {
-  themeColor: "#e6ebfb",
+  themeColor: "#18192d",
 };
 
 export default function RootLayout({
@@ -153,30 +158,38 @@ export default function RootLayout({
     <html
       suppressHydrationWarning
       lang="en"
-      className={`${archivo.variable} ${cormorant.variable} ${mono.variable} ${redaction.variable} ${r10.variable} ${r35.variable} ${r70.variable} ${r100.variable} h-full antialiased`}
+      className={`${interTight.variable} ${mono.variable} ${redaction.variable} ${r10.variable} ${r35.variable} ${r70.variable} ${r100.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {/*
-         * Lite mode, decided before first paint: few cores, little memory or
-         * Save-Data get the same garden without blur and grain filters.
+         * Lite mode, decided before first paint: few cores, little memory,
+         * Save-Data or a touch-first device get the same garden held still.
+         * data-js marks that scripts run at all, so CSS can lay out what the
+         * scripts will drive (About's phone tabs) from the first paint.
          */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var n=navigator,c=n.hardwareConcurrency||8,m=n.deviceMemory||8,s=n.connection&&n.connection.saveData;if(c<=4||m<=4||s)document.documentElement.setAttribute('data-lite','')}catch(e){}",
+              "document.documentElement.setAttribute('data-js','');try{var n=navigator,c=n.hardwareConcurrency||8,m=n.deviceMemory||8,s=n.connection&&n.connection.saveData;if(c<=4||m<=4||s||matchMedia('(pointer: coarse)').matches)document.documentElement.setAttribute('data-lite','')}catch(e){}",
           }}
         />
         <GardenLoader />
         {/*
-         * Lift the opening screen when the page has loaded — never before
-         * ~0.7s so it doesn't flash, never after 3.5s — then tell the page
-         * (MorphName waits for this before its first wave). Seen once per
-         * session; later loads skip straight in.
+         * Lift the opening screen once the page has loaded and the name has
+         * finished writing in — never before ~2.6s, never after 4.5s — then
+         * tell the page (MorphName waits for this before its first wave).
+         * It plays on every load; reduced motion lifts it after 0.4s.
+         * fly() measures everything first, then writes each word's offsets as
+         * one small style rule: a custom property set on <html> itself would
+         * make the browser restyle the whole page, and React's spans stay
+         * untouched.
+         * Once the curtain is up (1.7s) the loader leaves the page entirely
+         * (garden-gone), so its paused animations stop holding GPU layers.
          */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}try{if(sessionStorage.getItem('garden-seen')){go();return}}catch(e){}var t0=performance.now();function later(){setTimeout(go,Math.max(0,700-(performance.now()-t0)))}if(document.readyState==='complete')later();else window.addEventListener('load',later);setTimeout(go,3500)})();",
+              "(function(){var d=document.documentElement,done=false,t0=performance.now(),min=matchMedia('(prefers-reduced-motion: reduce)').matches?400:2600;function fly(){try{if(min<1000)return;var L=document.querySelectorAll('#garden-loader .loader-word'),H=document.querySelectorAll('.dk-hero .hero-name');if(L.length<2||H.length<2)return;var css='';for(var j=0;j<2;j++){var a=L[j].getBoundingClientRect(),b=H[j].getBoundingClientRect();if(b.bottom<0||b.top>innerHeight||!a.width)return;var k=parseFloat(getComputedStyle(H[j]).fontSize)/parseFloat(getComputedStyle(L[j]).fontSize);css+='#garden-loader .loader-word:nth-child('+(j+1)+'){--mx:'+(b.left+b.width/2-(a.left+a.width/2))+'px;--my:'+(b.top+b.height/2-(a.top+a.height/2))+'px;--ms:'+k+'}';}var s=document.createElement('style');s.textContent=css;document.head.appendChild(s);}catch(_){}}function go(){if(done)return;done=true;fly();d.classList.add('garden-ready');setTimeout(function(){d.classList.add('garden-gone')},1800);window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'))}function later(){setTimeout(go,Math.max(0,min-(performance.now()-t0)))}if(document.readyState==='complete')later();else window.addEventListener('load',later);setTimeout(go,4500)})();",
           }}
         />
         {/*
@@ -207,8 +220,11 @@ export default function RootLayout({
         />
         <div className="graph-ground" aria-hidden />
         <Starfield />
+        <DitherLantern />
         <BotanicalDefs />
         <PointerFX />
+        <StarScript />
+        <Butterfly />
         <Nav />
         {children}
       </body>

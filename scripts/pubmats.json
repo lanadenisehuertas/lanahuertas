@@ -1,0 +1,206 @@
+{
+  "root": "D:/WORK/PORTFOLIO/PUBMATS",
+  "brands": {
+    "revival-x": {
+      "dir": "02 FEU Tech ACM/03 ACM Revival (Jan 2025)",
+      "collage": {
+        "key": ["FEUTECH ACM 5.jpg"],
+        "phone": ["481149552_976832484554048_769970505119435199_n.jpg"],
+        "print": ["2025-01-15 facebook 02.jpg"]
+      },
+      "set": [
+        "FEUTECH ACM 5.jpg",
+        "2025-01-15 facebook 02.jpg",
+        "481149552_976832484554048_769970505119435199_n.jpg"
+      ]
+    },
+    "into-the-code": {
+      "dir": "02 FEU Tech ACM/26 Into the Code F++ 5.0 (Mar 2024)",
+      "collage": {
+        "card": [
+          "2024-03-12 facebook 01.jpg",
+          "481216125_943444407966501_8110898586236233914_n.jpg",
+          "480943022_943444411299834_2983571026855481067_n.jpg",
+          "481297602_943447034632905_1925747471807246309_n.jpg",
+          "480701802_943447334632875_5198496494793374174_n.jpg"
+        ]
+      },
+      "set": [
+        "2024-03-12 facebook 01.jpg",
+        "480802928_943459784631630_4796821517324185567_n.jpg",
+        "480701802_943447334632875_5198496494793374174_n.jpg",
+        "480943022_943444411299834_2983571026855481067_n.jpg",
+        "481216125_943444407966501_8110898586236233914_n.jpg",
+        "481297602_943447034632905_1925747471807246309_n.jpg"
+      ]
+    },
+    "neostalgia": {
+      "dir": "01 CS Expo 2026 - NEOSTALGIA",
+      "collage": {
+        "print": ["01 Key visual, logo & main poster/MAIN POSTER.png"],
+        "phone": ["05 Meet the Officers/7 LANA.png"]
+      },
+      "set": [
+        "01 Key visual, logo & main poster/MAIN POSTER.png",
+        "01 Key visual, logo & main poster/COVER.png",
+        "01 Key visual, logo & main poster/PFP.png",
+        "02 Teaser & sticker-drive teasers/STICKER DRIVE PART 1.png",
+        "02 Teaser & sticker-drive teasers/STICKER 2.png",
+        "05 Meet the Officers/0 MTO SQUARE.png",
+        "05 Meet the Officers/7 LANA.png"
+      ]
+    },
+    "tabitayo": {
+      "dir": "06 Freelance & clients/01 Tabitayo (seat-finder app)",
+      "collage": {
+        "print": ["FB 1A.png", "POST2.png"]
+      },
+      "set": [
+        "FB 1A.png",
+        "FB 3B.png",
+        "FB 3C.png",
+        "FB 3E.png",
+        "POST2.png"
+      ]
+    },
+    "rock-of-aces": {
+      "dir": "03 FEU Tech SCC/18 ROCK OF ACES 2025",
+      "collage": {
+        "phone": [
+          "485890480_1038198698332880_2237026441107111527_n.jpg",
+          "486249497_1038197598332990_6310595202686295411_n.jpg",
+          "486249653_1040034958149254_381792705508701673_n.jpg"
+        ],
+        "key": ["496303697_1238893154916941_2972311716057454172_n.jpg"]
+      },
+      "set": [
+        "496303697_1238893154916941_2972311716057454172_n.jpg",
+        "485890480_1038198698332880_2237026441107111527_n.jpg",
+        "486035236_1038201021665981_1949268813322141460_n.jpg",
+        "486249497_1038197598332990_6310595202686295411_n.jpg",
+        "485645831_1038197611666322_2038601161552503484_n.jpg",
+        "486288255_1039087391577344_4766816782571373435_n.jpg",
+        "486249653_1040034958149254_381792705508701673_n.jpg",
+        "BOTB x ROA fonts.png"
+      ]
+    },
+    "battle-of-the-bands": {
+      "dir": "03 FEU Tech SCC/02 Battle of the Bands 2024",
+      "collage": {
+        "print": ["2024-05-09 facebook 01.jpg", "2024-06-08 facebook d-day 01.jpg"],
+        "phone": ["2024-06-07 facebook meet 01.jpg"]
+      },
+      "set": [
+        "2024-05-09 facebook 01.jpg",
+        "2024-05-10 facebook 01.jpg",
+        "2024-05-12 facebook 01.jpg",
+        "2024-05-25 facebook last 01.jpg",
+        "2024-06-07 facebook meet 01.jpg",
+        "2024-06-07 facebook meet 02.jpg",
+        "2024-06-07 facebook meet 05.jpg",
+        "2024-06-08 facebook d-day 01.jpg",
+        "2024-06-08 facebook now 01.jpg",
+        "2024-06-08 facebook champion 01.jpg",
+        "2024-06-10 facebook band 01.jpg",
+        "2024-06-10 facebook thank 01.jpg"
+      ]
+    },
+    "technorun": {
+      "dir": "03 FEU Tech SCC/06 Technorun 2025",
+      "collage": {
+        "print": ["2025-07-31 facebook 01.jpg"],
+        "item": [
+          "3K.png",
+          "1.png",
+          "2.png"
+        ]
+      },
+      "set": [
+        "2025-07-31 facebook 01.jpg",
+        "TECHNORUN INFORMATION.png",
+        "1.png",
+        "2.png",
+        "3K.png"
+      ]
+    },
+    "pacsa": {
+      "dir": "05 PACSA 2025 - Kulay PACSA",
+      "collage": {
+        "print": ["03 Guest & keynote speakers/ALL SPEAKERS.png"],
+        "phone": ["05 Baguio Teachers Camp house rules/BTC HOUSE RULES.png"],
+        "id": ["02 Ready for PACSA 2025 DP frames/DP FRAME 2.1.png"]
+      },
+      "set": [
+        "03 Guest & keynote speakers/ALL SPEAKERS.png",
+        "03 Guest & keynote speakers/Keynote Speaker - Andrea Strachan.png",
+        "02 Ready for PACSA 2025 DP frames/DP FRAME 2.1.png",
+        "05 Baguio Teachers Camp house rules/BTC HOUSE RULES.png",
+        "05 Baguio Teachers Camp house rules/2.png"
+      ]
+    },
+    "elysium": {
+      "dir": "02 FEU Tech ACM/00 ACM Overall Theme 2024-2025",
+      "collage": {
+        "print": ["2024-08-31 facebook 01.jpg"],
+        "item": [
+          "2024-09-19 facebook 01.jpg",
+          "2025-04-21 facebook 02.jpg",
+          "2025-04-21 facebook 05.jpg",
+          "2025-03-06 facebook 01.jpg",
+          "2025-04-21 facebook 01.jpg",
+          "2024-12-27 facebook 01.jpg",
+          "2025-07-24 facebook 01.jpg",
+          "2024-11-04 facebook 01.jpg"
+        ]
+      },
+      "set": [
+        "2024-08-31 facebook 01.jpg",
+        "2024-08-31 facebook 02.jpg",
+        "2024-09-19 facebook 01.jpg",
+        "2024-11-04 facebook 01.jpg",
+        "2024-12-11 facebook 01.jpg",
+        "2024-12-27 facebook 01.jpg",
+        "2025-03-06 facebook 01.jpg",
+        "2025-04-21 facebook 01.jpg",
+        "2025-04-21 facebook 02.jpg",
+        "2025-04-21 facebook 05.jpg",
+        "2025-07-24 facebook 01.jpg",
+        "FEUTECH ACM 2.jpg"
+      ]
+    },
+    "cs-night": {
+      "dir": "02 FEU Tech ACM/10 CS Night - performers",
+      "collage": { "key": ["PERFORMERS.png"] },
+      "set": ["PERFORMERS.png"]
+    },
+    "techno-week": {
+      "dir": "03 FEU Tech SCC/05 Techno Week 2025",
+      "collage": {
+        "print": ["FEUTECH SCC 6.jpg", "3 (1).png"],
+        "phone": ["2025-02-09 facebook 01.jpg"]
+      },
+      "set": [
+        "FEUTECH SCC 6.jpg",
+        "2025-02-09 facebook 01.jpg",
+        "3 (1).png"
+      ]
+    }
+  },
+  "more": {
+    "handog-ngiti": [
+      "03 FEU Tech SCC/01 Handog Ngiti 2023/Main Poster (TARP).png",
+      "03 FEU Tech SCC/01 Handog Ngiti 2023/THANK YOU.png"
+    ],
+    "pixels-persona": ["03 FEU Tech SCC/00 SCC General/COSPLAY 3.png"],
+    "always-queer": ["03 FEU Tech SCC/00 SCC General/2025-06-28 facebook 01.jpg"],
+    "students-recognition": ["03 FEU Tech SCC/00 SCC General/MAIN POSTER 2 (2).png"],
+    "womens-month-library": ["04 FEU Tech Library/11 Womens Month/WOMEN'S MONTH LIB.png"],
+    "class-work": [
+      "07 School & personal/02 Class design work/COPERNICAN REVOLUTION INFOGRAPHIC.png",
+      "07 School & personal/02 Class design work/HUERTAS.png",
+      "07 School & personal/02 Class design work/HUERTAS_SA3.png",
+      "07 School & personal/02 Class design work/Mediocre at best.png",
+      "07 School & personal/02 Class design work/MOVIE POSTER.png"
+    ]
+  }
+}

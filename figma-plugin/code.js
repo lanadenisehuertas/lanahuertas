@@ -106,7 +106,7 @@ async function pick(candidates, styles) {
         await figma.loadFontAsync({ family: family, style: style });
       }
       return family;
-    } catch (e) {
+    } catch {
       /* try the next one */
     }
   }
@@ -192,16 +192,6 @@ function pill(label, bg, fg, size, radius) {
   const f = frame("pill", "HORIZONTAL", { padX: 18, padY: 9, gap: 0, fill: bg });
   f.cornerRadius = radius === undefined ? 999 : radius;
   f.appendChild(pixel(label, size || 10, fg));
-  return f;
-}
-
-function chip(label) {
-  const f = frame("chip", "HORIZONTAL", { padX: 14, padY: 7, gap: 0 });
-  f.cornerRadius = 999;
-  f.fills = [];
-  f.strokes = solid(C.ink);
-  f.strokeWeight = 1;
-  f.appendChild(text(label, { size: 12, color: C.ink }));
   return f;
 }
 
