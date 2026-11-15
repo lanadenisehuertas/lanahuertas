@@ -9,6 +9,8 @@ import PointerFX from "@/components/PointerFX";
 import { BotanicalDefs } from "@/components/Botanicals";
 import { Starfield } from "@/components/Ethereal";
 import GardenLoader from "@/components/GardenLoader";
+import PauseOffscreen from "@/components/PauseOffscreen";
+import MotionToggle from "@/components/MotionToggle";
 
 /*
  * Archivo — one grotesk family for everything set in words. Its width axis
@@ -168,15 +170,17 @@ export default function RootLayout({
         />
         <GardenLoader />
         {/*
-         * Lift the opening screen when the page has loaded — never before
-         * ~0.7s so it doesn't flash, never after 3.5s — then tell the page
+         * Lift the opening screen 0.6s after it appears: long enough that
+         * it doesn't flash, and not tied to scripts or images arriving, which
+         * on a slow phone held the whole first screen back for seconds. Then
+         * tell the page
          * (MorphName waits for this before its first wave). Seen once per
          * session; later loads skip straight in.
          */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}try{if(sessionStorage.getItem('garden-seen')){go();return}}catch(e){}var t0=performance.now();function later(){setTimeout(go,Math.max(0,700-(performance.now()-t0)))}if(document.readyState==='complete')later();else window.addEventListener('load',later);setTimeout(go,3500)})();",
+              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}try{if(sessionStorage.getItem('garden-seen')){go();return}}catch(e){}setTimeout(go,600)})();",
           }}
         />
         {/*
@@ -211,6 +215,8 @@ export default function RootLayout({
         <PointerFX />
         <Nav />
         {children}
+        <MotionToggle />
+        <PauseOffscreen />
       </body>
     </html>
   );

@@ -25,6 +25,13 @@ const MOCKS = {
     url: "debt-ledger-puce.vercel.app",
     app: false,
   },
+  bloom: {
+    kind: "phone" as const,
+    src: "/work/bloom/today.webp",
+    src2: undefined,
+    url: "bloom-liart-delta.vercel.app",
+    app: false,
+  },
   algebrawl: {
     kind: "browser" as const,
     src: "/work/algebrawl-title.webp",

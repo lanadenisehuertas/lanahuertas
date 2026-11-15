@@ -81,7 +81,7 @@ export default function Folder({
           className="-mx-1 mb-3 flex gap-1.5 overflow-x-auto px-1 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           role="tablist"
         >
-          {tabs.map((t, i) => {
+          {tabs.map((t) => {
             const isActive = t.id === active;
             return (
               <button
@@ -91,11 +91,10 @@ export default function Folder({
                 aria-selected={isActive}
                 aria-controls={`panel-${t.id}`}
                 onClick={() => onSelect(t.id)}
-                className={`pill type-pixel flex min-h-[40px] shrink-0 items-center gap-2 px-3.5 text-[11px] whitespace-nowrap ${
+                className={`pill type-pixel flex min-h-[44px] shrink-0 items-center gap-2 px-4 text-[14px] whitespace-nowrap ${
                   isActive ? "pill-active" : ""
                 }`}
               >
-                <span className="tabular-nums opacity-60">{String(i + 1).padStart(2, "0")}</span>
                 {t.label}
               </button>
             );

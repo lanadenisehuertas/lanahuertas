@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "./styles/showcase.css";
+@import "./styles/work.css";
 
 @theme {
   /*
@@ -138,24 +140,25 @@ body {
 
   .gel {
     color: #fff;
-    background: linear-gradient(180deg, #9b6ce0 0%, #6a1fa8 48%, #51017c 52%, #7a3cc4 100%);
+    /* white on the lightest stop is 5.7:1 */
+    background: linear-gradient(180deg, #7d47cf 0%, #6a1fa8 48%, #51017c 52%, #6a2bb5 100%);
     border: 1px solid color-mix(in srgb, var(--color-ink) 70%, transparent);
     box-shadow:
-      inset 0 -3px 8px rgb(242 184 207 / 0.55),
+      inset 0 -2px 4px rgb(242 184 207 / 0.45),
       inset 0 1px 0 rgb(255 255 255 / 0.6),
       0 8px 18px -12px rgb(81 1 124 / 0.5);
     text-shadow: 0 1px 0 rgb(27 7 48 / 0.45);
   }
 
-  /* The gloss: a white lens over the top half. */
+  /* The gloss: a white lens over the top third, clear of the label. */
   .gel::before,
   .gel-ghost::before {
     content: "";
     position: absolute;
-    inset: 2px 10px 52% 10px;
+    inset: 2px 12px 76% 12px;
     z-index: -1;
     border-radius: 999px;
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.08));
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.6), rgb(255 255 255 / 0));
     pointer-events: none;
   }
 
@@ -904,8 +907,9 @@ body {
   .type-pixel {
     font-family: var(--font-pixel);
     font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    /* sentence case: tracked capitals read as a template */
+    text-transform: none;
+    letter-spacing: 0.02em;
   }
 
   /* --- Morphing hero name ----------------------------------------------------
@@ -1332,7 +1336,7 @@ html[data-lite] .lite-hide { display: none; }
   }
 
   .masthead.is-scrolled {
-    background-color: color-mix(in srgb, var(--color-paper) 82%, transparent);
+    background-color: color-mix(in srgb, var(--color-paper) 94%, transparent);
     backdrop-filter: blur(12px) saturate(1.1);
     -webkit-backdrop-filter: blur(12px) saturate(1.1);
   }

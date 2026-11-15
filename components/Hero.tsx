@@ -4,7 +4,6 @@ import MorphName from "./MorphName";
 import { Lotus, Leaf, Spiral, Sparkle4, Orb, LongVine, Bellflower, Blossom, Fern } from "./Botanicals";
 import { Cloud, Butterfly, Orbit, ShootingStar, GlowSparkle, Star5, StarBurst, PixelFlower, Staff, PixelArt } from "./Ethereal";
 
-const d = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
 const depth = (n: number, sway?: string) =>
   ({ "--depth": n, ...(sway ? { "--sway": sway } : {}) }) as CSSProperties;
 
@@ -19,10 +18,10 @@ const depth = (n: number, sway?: string) =>
  */
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden pt-24 pb-16 sm:pt-28 sm:pb-24">
+    <section className="relative overflow-hidden pt-24 pb-10 sm:pt-28 sm:pb-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-8">
         {/* Name — one line, one size */}
-        <div data-rv style={d(80)} className="relative mt-6 text-center sm:mt-10">
+        <div className="relative mt-6 text-center sm:mt-10">
           <MorphName
             label={profile.name}
             words={[
@@ -36,13 +35,32 @@ export default function Hero() {
           <Sparkle4 className="spin-slow pointer-events-none absolute top-[6%] right-[4%] h-8 w-8 text-sky sm:h-12 sm:w-12" />
           <Sparkle4 className="pointer-events-none absolute bottom-[8%] left-[3%] h-5 w-5 text-lavender sm:h-7 sm:w-7" />
         </div>
+
+        {/* What I do and the way in, straight under the name, so both are on
+            the first screen at any size; the garden grows below them. None of
+            the three waits for a script to show: they are the first paint. */}
+        <p
+          className="type-display mx-auto mt-3 max-w-2xl text-center text-[1.6rem] leading-tight text-ink italic sm:mt-4 sm:text-[2.1rem]"
+        >
+          {profile.heroShort}
+        </p>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 sm:mt-6">
+          <a href="#work" className="gel flex min-h-[46px] items-center gap-2 px-5">
+            See the work <span aria-hidden>↓</span>
+          </a>
+          <a href="#contact" className="hero-link">
+            Open to work: get in touch
+          </a>
+        </div>
       </div>
 
-      {/* Garden band. No frame: the dawn sky behind it runs edge to edge and
+      {/* The first screen's art: asked for before the stylesheet finds it */}
+      <link rel="preload" as="image" href="/art/cloud.webp" imageSrcSet="/art/cloud-sm.webp 480w, /art/cloud.webp 900w" imageSizes="(min-width: 768px) 50vw, 70vw" />
+      {/* Garden band. Shown at once, like the name above it. No frame: the dawn sky behind it runs edge to edge and
           dissolves into the page on every side, so the garden grows out of
           the hero instead of sitting on it in a box. The end card closes the
           page on the same sky at dusk. */}
-      <div data-rv style={d(260)} className="relative mx-auto mt-2 max-w-6xl px-0 sm:px-8">
+      <div className="relative mx-auto mt-6 max-w-6xl px-0 sm:mt-8 sm:px-8">
         <div className="bloom-zone relative h-[80vw] max-h-[460px] min-h-[290px] sm:h-[50vw]">
           {/* The sky: full-bleed, edges dissolved */}
           <div
@@ -55,13 +73,13 @@ export default function Hero() {
           >
             {/* Sky inside the sheet: far clouds, an orbit, a comet */}
             <div className="px absolute top-[6%] right-[10%] w-[26%]" style={depth(-3)}>
-              <Cloud className="drift-x dof-far w-full opacity-70" style={{ "--dur": "26s" } as CSSProperties} />
+              <Cloud eager className="drift-x dof-far w-full opacity-70" style={{ "--dur": "26s" } as CSSProperties} />
             </div>
             <div className="px absolute top-[30%] -left-[12%] w-[46%]" style={depth(-4)}>
-              <Cloud className="drift-x dof-mid w-full -scale-x-100 opacity-85" style={{ "--dur": "22s", "--td": "-8s" } as CSSProperties} />
+              <Cloud eager className="drift-x dof-mid w-full -scale-x-100 opacity-85" style={{ "--dur": "22s", "--td": "-8s" } as CSSProperties} />
             </div>
             <div className="px absolute -right-[14%] bottom-[2%] w-[70%]" style={depth(-6)}>
-              <Cloud className="drift-x w-full" style={{ "--dur": "30s", "--drift": "-36px" } as CSSProperties} />
+              <Cloud eager className="drift-x w-full" style={{ "--dur": "30s", "--drift": "-36px" } as CSSProperties} />
             </div>
             {/* A staff of music drifting through the sky, behind the bed */}
             <div className="absolute top-[30%] -left-[6%] w-[112%] opacity-50">
@@ -215,26 +233,6 @@ export default function Hero() {
           </div>
         </div>
       </div>
-
-      {/* Subline, after ref 1's "GRAPHIC DESIGN / Graphic / Visual / …" */}
-      <div className="mx-auto mt-12 max-w-6xl px-4 text-center sm:px-8">
-
-        <p
-          data-rv
-          style={d(420)}
-          className="type-display mx-auto mt-8 max-w-2xl text-3xl leading-tight text-ink italic sm:text-[2.6rem]"
-        >
-          {profile.heroShort}
-        </p>
-
-        <div data-rv style={d(480)} className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <a href="#work" className="gel flex min-h-[46px] items-center gap-2 px-5">
-            See the work <span aria-hidden>↓</span>
-          </a>
-        </div>
-
-      </div>
-
     </section>
   );
 }

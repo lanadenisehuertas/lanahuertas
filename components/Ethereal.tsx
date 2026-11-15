@@ -62,6 +62,8 @@ export function Butterfly({ className = "", style }: { className?: string; style
         <img
           key={side}
           src="/art/butterfly.webp"
+          srcSet="/art/butterfly-sm.webp 280w, /art/butterfly.webp 560w"
+          sizes="140px"
           alt=""
           loading="lazy"
           decoding="async"
@@ -73,15 +75,17 @@ export function Butterfly({ className = "", style }: { className?: string; style
   );
 }
 
-/** Flat cloud bank with stretched wisps underneath (Codex, site palette). */
-export function Cloud({ className = "", style }: { className?: string; style?: CSSProperties }) {
+/** Flat cloud bank with stretched wisps underneath (Codex, site palette). `eager` for the ones on the first screen. */
+export function Cloud({ className = "", style, eager = false }: { className?: string; style?: CSSProperties; eager?: boolean }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src="/art/cloud.webp"
+      srcSet="/art/cloud-sm.webp 480w, /art/cloud.webp 900w"
+      sizes="(min-width: 768px) 50vw, 70vw"
       alt=""
       aria-hidden
-      loading="lazy"
+      loading={eager ? "eager" : "lazy"}
       decoding="async"
       draggable={false}
       width={900}
@@ -157,7 +161,7 @@ export function ShootingStar({ className = "", style }: { className?: string; st
 /*
  * The page sky. Fixed behind everything, so the work scrolls over it while
  * the stars hold still, and each one drifts with the pointer at its own depth.
- * Placed in the margins and gutters; `extra` ones are dropped in lite mode.
+ * Placed in the right margin; `extra` ones are dropped in lite mode.
  */
 type Spot = {
   x: string;
@@ -171,29 +175,18 @@ type Spot = {
   extra?: boolean;
 };
 
+// One column down the right margin, evenly spaced, mirroring the vine that
+// grows down the left one. Nothing floats over the content any more.
+const X = "97.5%";
 const SKY: Spot[] = [
-  { x: "6%", y: "9%", s: 12, kind: "spark", c: "#ffffff", depth: 6, tw: 4.2 },
-  { x: "93%", y: "14%", s: 13, kind: "star", c: "#f2b8cf", depth: 10, tw: 5.1 },
-  { x: "88%", y: "6%", s: 7, kind: "spark", c: "#ffffff", depth: 4, tw: 3.6 },
-  { x: "3%", y: "32%", s: 8, kind: "star", c: "#ffffff", depth: 8, tw: 4.8 },
-  { x: "97%", y: "38%", s: 10, kind: "spark", c: "#e3a88a", depth: 7, tw: 3.9 },
-  { x: "95%", y: "58%", s: 8, kind: "burst", c: "#ffffff", depth: 12, tw: 5.6, extra: true },
-  { x: "2.5%", y: "62%", s: 12, kind: "spark", c: "#f2b8cf", depth: 9, tw: 4.4 },
-  { x: "7%", y: "84%", s: 7, kind: "star", c: "#ffffff", depth: 5, tw: 3.3, extra: true },
-  { x: "91%", y: "82%", s: 11, kind: "spark", c: "#ffffff", depth: 11, tw: 4.9 },
-  { x: "50%", y: "3%", s: 6, kind: "spark", c: "#ffffff", depth: 3, tw: 3.1, extra: true },
-  { x: "74%", y: "95%", s: 8, kind: "star", c: "#f2b8cf", depth: 6, tw: 5.4, extra: true },
-  { x: "22%", y: "96%", s: 7, kind: "burst", c: "#ffffff", depth: 8, tw: 4.1, extra: true },
-  { x: "97%", y: "26%", s: 46, kind: "glow", c: "", depth: -6, tw: 7 },
-  { x: "1%", y: "48%", s: 60, kind: "glow", c: "", depth: -8, tw: 8.5 },
-  { x: "94%", y: "72%", s: 38, kind: "glow", c: "", depth: -5, tw: 6.4, extra: true },
-  { x: "4.5%", y: "20%", s: 16, kind: "note", c: "#a9b6f0", depth: 7, tw: 6.2 },
-  { x: "96%", y: "47%", s: 18, kind: "notes", c: "#f2b8cf", depth: 9, tw: 7.4 },
-  { x: "5%", y: "73%", s: 14, kind: "note", c: "#b9379d", depth: 6, tw: 5.8, extra: true },
-  { x: "95.5%", y: "8%", s: 30, kind: "px", art: "moon", c: "", depth: 4, tw: 9 },
-  { x: "3.5%", y: "41%", s: 34, kind: "px", art: "sparkle", c: "", depth: 7, tw: 6.6 },
-  { x: "96.5%", y: "90%", s: 18, kind: "px", art: "sparkle", c: "", depth: 9, tw: 5.2, extra: true },
-  { x: "4%", y: "93%", s: 16, kind: "px", art: "heart", c: "", depth: 6, tw: 4.6, extra: true },
+  { x: X, y: "16%", s: 13, kind: "star", c: "#f2b8cf", depth: 10, tw: 5.1 },
+  { x: X, y: "26%", s: 40, kind: "glow", c: "", depth: -6, tw: 7 },
+  { x: X, y: "36%", s: 10, kind: "spark", c: "#e3a88a", depth: 7, tw: 3.9 },
+  { x: X, y: "46%", s: 18, kind: "notes", c: "#f2b8cf", depth: 9, tw: 7.4 },
+  { x: X, y: "56%", s: 8, kind: "burst", c: "#ffffff", depth: 12, tw: 5.6, extra: true },
+  { x: X, y: "66%", s: 34, kind: "glow", c: "", depth: -5, tw: 6.4, extra: true },
+  { x: X, y: "76%", s: 11, kind: "spark", c: "#ffffff", depth: 11, tw: 4.9 },
+  { x: X, y: "86%", s: 18, kind: "px", art: "sparkle", c: "", depth: 9, tw: 5.2, extra: true },
 ];
 
 export function Starfield() {

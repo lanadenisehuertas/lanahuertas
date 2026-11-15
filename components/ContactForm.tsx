@@ -102,7 +102,7 @@ export default function ContactForm() {
           <Sparkle4 className="spin-slow h-10 w-10 text-lavender" />
         </span>
         <p className="type-display mt-4 text-3xl text-iris italic">Message sent</p>
-        <p className="mx-auto mt-2 max-w-sm text-[15px] leading-relaxed text-ink/75">
+        <p className="mx-auto mt-2 max-w-sm text-base leading-relaxed text-ink/75">
           Thank you{fields.name.trim() ? `, ${fields.name.trim().split(" ")[0]}` : ""}. I&apos;ll reply to{" "}
           {fields.email.trim() || "your email"} within a few days.
         </p>
@@ -133,7 +133,7 @@ export default function ContactForm() {
       <h3 id="form-heading" className="type-display text-3xl text-iris italic">
         Send a message
       </h3>
-      <p className="mt-1 text-[14px] text-ink/70">It goes straight to my inbox. I reply within a few days.</p>
+      <p className="mt-1 text-base text-ink/80">It goes straight to my inbox. I reply within a few days.</p>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <Field id="cf-name" label="Name" error={errors.name}>
@@ -193,7 +193,7 @@ export default function ContactForm() {
       <input ref={honey} type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
 
       {status === "failed" && (
-        <p role="alert" className="mt-4 rounded-[6px] border border-[#b42318]/40 bg-[#fdecea] px-3.5 py-2.5 text-[14px] text-[#7a1a12]">
+        <p role="alert" className="mt-4 rounded-[6px] border border-[#b9379d]/50 bg-[#fbeaf4] px-3.5 py-2.5 text-[14px] text-[#6d1458]">
           Your message didn&apos;t send — the connection dropped or the mail service didn&apos;t answer. Everything you typed
           is still here: try again, or email{" "}
           <a href={`mailto:${profile.email}`} className="font-semibold underline underline-offset-2">
@@ -206,7 +206,7 @@ export default function ContactForm() {
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <a
           href={`mailto:${profile.email}`}
-          className="inline-flex min-h-[44px] items-center text-[13px] text-ink/65 underline decoration-ink/25 underline-offset-4 transition-colors hover:text-lavender"
+          className="inline-flex min-h-[44px] items-center text-[14px] text-ink/80 underline decoration-ink/40 underline-offset-4 transition-colors hover:text-lavender"
         >
           or email {profile.email}
         </a>
@@ -234,12 +234,13 @@ export default function ContactForm() {
 function Field({ id, label, error, children }: { id: string; label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label htmlFor={id} className="type-pixel mb-1.5 block text-[11px] text-ink/70">
+      <label htmlFor={id} className="type-pixel mb-1.5 block text-[14px] text-ink/70">
         {label}
       </label>
       {children}
       {error && (
-        <p id={`${id}-err`} className="mt-1.5 text-[13px] text-[#a1251a]">
+        <p id={`${id}-err`} className="mt-1.5 text-[14px] font-medium text-[#8a1f6a]">
+          <span aria-hidden>✦ </span>
           {error}
         </p>
       )}

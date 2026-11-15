@@ -1,0 +1,84 @@
+"use client";
+
+import { useEffect } from "react";
+
+/**
+ * Two savings for what is out of view (ported from the later site):
+ *
+ * - data-off pauses every CSS animation in a section well out of view (more
+ *   than 300px off screen): twinkles, sways and floating art keep costing
+ *   frames otherwise, which an older phone feels.
+ * - data-unseen does the same for each looping decoration on its own, so the
+ *   parts of an on-screen section you can't see hold still too. Only endless,
+ *   time-driven CSS animations are watched; scroll-driven ones and one-off
+ *   reveals are left alone. Sideways there is a whole screen of margin, so
+ *   things that drift across never freeze just out of sight.
+ *
+ * The rules that act on both attributes are at the foot of work.css.
+ */
+export default function PauseOffscreen() {
+  useEffect(() => {
+    // Safari has no requestIdleCallback
+    const ric = window.requestIdleCallback as typeof window.requestIdleCallback | undefined;
+    const soon = (fn: () => void, timeout: number) => (ric ? ric(fn, { timeout }) : window.setTimeout(fn, 300));
+    const cancel = (id: number) => (ric ? cancelIdleCallback(id) : clearTimeout(id));
+
+    /* each looping decoration, paused while it is itself out of view */
+    const watched = new WeakSet<Element>();
+    const deco = new IntersectionObserver(
+      (es) => es.forEach((e) => e.target.toggleAttribute("data-unseen", !e.isIntersecting)),
+      { rootMargin: "200px 100%" }
+    );
+    let scanId = 0;
+    const scan = () => {
+      scanId = 0;
+      for (const a of document.getAnimations()) {
+        if (!(a instanceof CSSAnimation) || !(a.timeline instanceof DocumentTimeline)) continue;
+        const fx = a.effect as KeyframeEffect | null;
+        const el = fx?.target;
+        if (!fx || !el || watched.has(el)) continue;
+        if (fx.getComputedTiming().iterations !== Infinity) continue;
+        watched.add(el);
+        deco.observe(el);
+      }
+    };
+    // sections paused offscreen start their animations only when they come
+    // near, so look again whenever one does
+    const rescan = () => {
+      if (!scanId) scanId = soon(scan, 1000);
+    };
+
+    const secs = Array.from(document.querySelectorAll<HTMLElement>("#top section")).filter(
+      (s) => !s.parentElement?.closest("section")
+    );
+    const io = new IntersectionObserver(
+      (es) => {
+        let woke = false;
+        es.forEach((e) => {
+          (e.target as HTMLElement).toggleAttribute("data-off", !e.isIntersecting);
+          if (e.isIntersecting) woke = true;
+        });
+        if (woke) rescan();
+      },
+      { rootMargin: "300px 0px" }
+    );
+    secs.forEach((s) => io.observe(s));
+
+    // after the page has settled, find the looping decorations to watch
+    let idle = 0;
+    const later = () => {
+      idle = soon(scan, 2000);
+    };
+    if (document.readyState === "complete") later();
+    else window.addEventListener("load", later, { once: true });
+
+    return () => {
+      io.disconnect();
+      deco.disconnect();
+      window.removeEventListener("load", later);
+      cancel(idle);
+      if (scanId) cancel(scanId);
+    };
+  }, []);
+  return null;
+}

@@ -251,12 +251,6 @@ export const skillGroups = [
   },
 ];
 
-/*
- * Hero tile row. Figma leads, matching the sub-line — it was missing from this
- * list entirely, which read oddly on a page positioned around UI/UX work.
- */
-export const software = ["Fg", "Ps", "Ai", "Pr", "Ae", "Ca", "Py", "Js"];
-
 export const languages = ["Filipino (Native)", "English (Advanced)"];
 
 // ---------------------------------------------------------------------------
@@ -280,7 +274,7 @@ export type EngineeringProject = {
   href?: string;
   hrefLabel?: string;
   /** Which visual to render beside it. */
-  visual: "psyclick" | "debtledger" | "algebrawl";
+  visual: "psyclick" | "debtledger" | "algebrawl" | "bloom";
 };
 
 export const engineeringProjects: EngineeringProject[] = [
@@ -300,6 +294,34 @@ export const engineeringProjects: EngineeringProject[] = [
   },
   {
     n: "02",
+    id: "bloom",
+    title: "Bloom",
+    tagline: "A private coach that follows your cycle",
+    description:
+      "A mobile-first app that turns a strength and nutrition plan into a coach that adapts: workouts ease off during your period and push harder in your strongest week, targets come from your own stats, and progress is read on a seven-day average. It installs to the home screen, works offline and keeps every log on the phone. No login, no backend.",
+    role: "Designer · Full-stack developer — personal project",
+    year: "2026",
+    stack: ["React", "TypeScript", "Vite", "Dexie", "Tailwind", "Chart.js", "Vitest", "PWA"],
+    href: "https://bloom-liart-delta.vercel.app",
+    hrefLabel: "Open the app",
+    visual: "bloom",
+  },
+  {
+    n: "03",
+    id: "algebrawl",
+    title: "Algebrawl",
+    tagline: "A pixel-art math battle arena",
+    description:
+      "An arcade-style, turn-based math game where you duel Gauss, Newton and Fibonacci; right answers land hits, wrong ones cost lives. Built as a four-person college project in Java, later ported to the web. I designed the entire UI and hand-drew every sprite: the title screen, menus, buttons, boss animations and battle backgrounds.",
+    role: "UI designer · Pixel artist — college course project",
+    year: "January 2025",
+    stack: ["Pixel art", "Java Swing", "React", "TypeScript", "Vite", "Tailwind", "KaTeX"],
+    href: "https://algebrawl.vercel.app",
+    hrefLabel: "Play the game",
+    visual: "algebrawl",
+  },
+  {
+    n: "04",
     id: "debt-ledger",
     title: "Debt Payoff Ledger",
     tagline: "Weekly allocator for a student budget",
@@ -311,20 +333,6 @@ export const engineeringProjects: EngineeringProject[] = [
     href: "https://debt-ledger-puce.vercel.app/",
     hrefLabel: "Visit the live site",
     visual: "debtledger",
-  },
-  {
-    n: "03",
-    id: "algebrawl",
-    title: "Algebrawl",
-    tagline: "A pixel-art math battle arena",
-    description:
-      "An arcade-style, turn-based math game where you duel Gauss, Newton and Fibonacci; right answers land hits, wrong ones cost lives. Built as a four-person college project in Java, later ported to the web. I designed the entire UI and hand-drew every sprite: the title screen, menus, buttons, boss animations and battle backgrounds.",
-    role: "UI designer · Pixel artist — college course project",
-    year: "2026",
-    stack: ["Pixel art", "Java Swing", "React", "TypeScript", "Vite", "Tailwind", "KaTeX"],
-    href: "https://algebrawl.vercel.app",
-    hrefLabel: "Play the game",
-    visual: "algebrawl",
   },
 ];
 
@@ -524,9 +532,8 @@ export const workTabs: WorkTab[] = [
         role: "Concept, copy, and design",
         tools: ["Photoshop", "Illustrator"],
         description:
-          "An ongoing series for the campus library, where the brief was almost always the same: make an administrative notice worth stopping for.\n\nThe database announcement became a what-this-means-for-you list. The Halloween reading activity became a detective corkboard, its game mechanics doubling as the layout. Finals-week opening hours arrived disguised as a multiple-choice question — the schedule only turns up after the joke has landed.",
+          "An ongoing series for the campus library, where the brief was almost always the same: make an administrative notice worth stopping for.\n\nThe database announcement became a what-this-means-for-you list. Finals-week opening hours arrived disguised as a multiple-choice question — the schedule only turns up after the joke has landed.",
         images: [
-          { src: "/work/biblioboo.webp", w: 1600, h: 1600, caption: "Biblioboo's Haunted Book Nook" },
           { src: "/work/finals-motivation.webp", w: 1600, h: 1600, caption: "You Can Do It, iTamaraw — finals hours" },
           { src: "/work/ebsco-office365.webp", w: 1080, h: 1080, caption: "EBSCO in Office 365" },
         ],

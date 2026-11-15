@@ -31,8 +31,8 @@ export default function AboutPanel() {
   const [active, setActive] = useState("about");
 
   return (
-    <section id="about" className="px-4 pb-20 sm:px-8">
-      <div className="relative mx-auto max-w-6xl">
+    <section id="about" className="page-x page-y">
+      <div className="relative">
         <SectionTitle id="about-heading" index="02" lead="About" accent="me" />
 
         <Folder tabs={tabs} active={active} onSelect={setActive} labelledBy="about-heading">
@@ -66,20 +66,20 @@ export default function AboutPanel() {
                       <div className="sheet-card">
                         <div className="sheet-band px-5 pt-4 pb-6 sm:px-6">
                           <div className="relative flex flex-wrap items-center gap-2">
-                            <span className="type-pixel rounded-full bg-iris px-2.5 py-0.5 text-[10px] text-paper">{e.period}</span>
+                            <span className="type-pixel rounded-full bg-iris px-2.5 py-0.5 text-[14px] text-paper">{e.period}</span>
                             {now && (
-                              <span className="type-pixel rounded-full border border-lavender bg-white/60 px-2 py-0.5 text-[10px] text-lavender">
+                              <span className="type-pixel rounded-full border border-lavender bg-white/60 px-2 py-0.5 text-[14px] text-lavender">
                                 ✦ now
                               </span>
                             )}
-                            <span className="type-pixel ml-auto text-[10px] text-ink/60">{e.place}</span>
+                            <span className="type-pixel ml-auto text-[14px] text-ink/75">{e.place}</span>
                           </div>
                           <h4 className="type-display relative mt-3 text-2xl leading-tight text-iris sm:text-[1.9rem]">{e.role}</h4>
                           <p className="type-display relative text-lg text-lavender italic">{e.org}</p>
                         </div>
                         <ul className="space-y-2 px-5 py-4 sm:px-6">
                           {e.points.map((pt) => (
-                            <li key={pt} className="flex gap-2.5 text-[15px] leading-relaxed text-ink/85 sm:text-[14px]">
+                            <li key={pt} className="flex gap-2.5 text-base leading-relaxed text-ink/85 sm:text-[14px]">
                               <PixelFlower className="mt-[0.45em] h-2.5 w-2.5 shrink-0" fill="#a9b6f0" />
                               {pt}
                             </li>
@@ -113,15 +113,15 @@ export default function AboutPanel() {
                       <h4 className="type-display text-2xl leading-tight text-iris">{e.school}</h4>
                       <p className="mt-1 text-[14px] text-ink/80">{e.detail}</p>
                       {e.coursework && (
-                        <p className="mt-3 text-[13px] leading-relaxed text-ink/60">
-                          <span className="type-pixel text-[10px] text-ink/50">Coursework </span>
+                        <p className="mt-3 text-[14px] leading-relaxed text-ink/75">
+                          <span className="type-pixel text-[14px] text-ink/75">Coursework </span>
                           {e.coursework}
                         </p>
                       )}
                       {e.honors.length > 0 && (
                         <ul className="mt-4 flex flex-wrap gap-2">
                           {e.honors.map((h) => (
-                            <li key={h} className="flex items-center gap-1.5 rounded-full bg-blush/45 px-3 py-1 text-[12px] text-ink">
+                            <li key={h} className="flex items-center gap-1.5 rounded-full bg-blush/45 px-3 py-1 text-[14px] text-ink">
                               <Sparkle4 className="h-3 w-3 text-lavender" />
                               {h}
                             </li>
@@ -133,7 +133,7 @@ export default function AboutPanel() {
                 ))}
               </div>
 
-              <p className="type-pixel mt-12 text-[11px] text-ink/55">✦ Certifications</p>
+              <p className="type-pixel mt-12 text-[14px] text-ink/75">✦ Certifications</p>
               {/* Tickets: a gradient stub, a perforated tear, the details. */}
               <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {certifications.map((c, idx) => (
@@ -148,8 +148,8 @@ export default function AboutPanel() {
                     </div>
                     <div className="border-l border-dashed border-ink/20 p-4">
                       <p className="type-display text-lg leading-snug text-iris">{c.name}</p>
-                      <p className="mt-1 text-[12px] text-ink/70">{c.issuer}</p>
-                      <p className="type-pixel mt-2 text-[10px] text-ink/50">
+                      <p className="mt-1 text-[14px] text-ink/70">{c.issuer}</p>
+                      <p className="type-pixel mt-2 text-[14px] text-ink/75">
                         {c.date} · {c.detail}
                       </p>
                     </div>
@@ -179,7 +179,7 @@ export default function AboutPanel() {
                       {g.items.map((s) => (
                         <li
                           key={s}
-                          className="rounded-full border border-ink/15 bg-white/70 px-3 py-1 text-[12px] transition-colors duration-150 hover:border-iris hover:bg-iris hover:text-paper"
+                          className="rounded-full border border-ink/15 bg-white/70 px-3 py-1 text-[14px] transition-colors duration-150 hover:border-iris hover:bg-iris hover:text-paper"
                         >
                           {s}
                         </li>

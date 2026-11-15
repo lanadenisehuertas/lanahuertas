@@ -37,8 +37,8 @@ const dp = (depth: number, extra: Record<string, string | number> = {}) => ({ "-
  */
 export default function Contact() {
   return (
-    <section id="contact" className="relative px-4 pb-24 sm:px-8 sm:pb-28">
-      <div className="relative mx-auto max-w-6xl">
+    <section id="contact" className="page-x page-y relative">
+      <div className="relative">
         <SectionTitle id="contact-heading" index="03" lead="Get in" accent="touch" ornament="flourish" />
 
         <footer aria-labelledby="contact-heading" className="end-card bloom-zone relative overflow-visible">
@@ -105,7 +105,7 @@ export default function Contact() {
           </div>
 
           {/* Poster corners */}
-          <div className="type-pixel relative flex items-start justify-between p-4 text-[10px] text-ink/65 sm:p-6 sm:text-[11px]">
+          <div className="type-pixel relative flex items-start justify-between py-4 text-[14px] text-ink/65 sm:py-6 ">
             <span>
               ©2026 {profile.name}
               <br />
@@ -113,7 +113,7 @@ export default function Contact() {
             </span>
             <a
               href="#top"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-ink/40 bg-white/40 px-4 transition-colors hover:bg-iris hover:text-paper sm:min-h-[34px] sm:px-3"
+              className="inline-flex min-h-[44px] items-center rounded-full border border-ink/40 bg-white/40 px-4 transition-colors hover:bg-iris hover:text-paper sm:px-4"
             >
               Back to top ↑
             </a>
@@ -140,7 +140,7 @@ export default function Contact() {
               />
             </div>
 
-            <p className="mx-auto mt-4 max-w-md text-base text-ink/75 sm:text-[15px]">
+            <p className="mx-auto mt-4 max-w-md text-base text-ink/75 ">
               Open to UI/UX and design roles, and to freelance brand, event and product work.
             </p>
 
