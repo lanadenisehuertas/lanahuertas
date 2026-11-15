@@ -543,6 +543,14 @@ html[data-lite] .mp-screen img[data-cut] { animation: none; }
 [data-off] *, [data-off] *::before, [data-off] *::after { animation-play-state: paused !important; }
 [data-unseen], [data-unseen]::before, [data-unseen]::after { animation-play-state: paused !important; }
 
+/* the slow decorative loops hold still while the page is scrolling and pick
+   up again a moment after it stops (ScrollFX sets data-scrolling). Each one
+   repaints its patch of the screen every frame, and during a scroll those
+   frames belong to the scroll. Scroll-driven effects are not on this list. */
+html[data-scrolling] :is(.sway, .spin-slow, .twinkle, .drift-x, .drift-y, .art-wing, .flutter, .orbit-spin, .shoot, .float-badge) {
+  animation-play-state: paused;
+}
+
 /* ---- UX pass: second round ------------------------------------------------ */
 /* anchors land clear of the fixed bar */
 #posters, #videos, #about, #contact { scroll-margin-top: 64px; }
@@ -747,33 +755,75 @@ html[data-lite] .mp-bloom { display: none; }
   contain-intrinsic-size: auto calc(100svh + 120px);
 }
 
-/* ==== Text that rises as you reach it =========================================
-   One small effect, tied to the scroll position itself: a heading or a block
-   of words lifts 14px and comes into focus over the first part of its way
-   into the screen. Scroll-driven CSS only (transform and opacity, on the
-   compositor): no script, no observers, nothing running while the page is
-   still. Browsers without scroll timelines show the text as it is, and it is
-   off for reduced motion and on lite machines. */
-@keyframes text-rise {
-  from { opacity: 0; transform: translateY(14px); }
+/* ==== Scroll effects ==========================================================
+   Tied to the scroll position itself, so they follow the reader both ways:
+   - the hero's name drifts up and fades as you leave it, and the garden under
+     it sinks a little slower than the page (a short parallax);
+   - each section's heading rises into place, its words follow, and its art
+     rises and settles from a slightly smaller size, piece by piece.
+   Scroll-driven CSS only, on the compositor: opacity and the individual
+   translate and scale properties, so they add to any transform an element
+   already has (tilted windows, hover lifts, the carousel's slide). No
+   filter, mask or clip-path, no script, nothing running while the page is
+   still. Browsers without scroll timelines show everything as it is; off for
+   reduced motion.
+
+   Each section names its own view timeline (--sec) and its content follows
+   that, because the sections clip their overflow and a plain view() inside
+   them would follow the section instead of the page. */
+@keyframes fx-rise {
+  from { opacity: 0; translate: 0 var(--rise, 36px); }
+}
+@keyframes fx-art {
+  from { opacity: 0; translate: 0 64px; scale: 0.92; }
+}
+@keyframes fx-leave {
+  to { opacity: 0.1; translate: 0 -80px; }
+}
+@keyframes fx-sink {
+  to { translate: 0 90px; }
 }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    /* each section is the timeline: its words move with the section's own
-       way into the screen, whichever inner scroller they happen to sit in */
     .sp--carousel,
     .sp--stack > .sp-cell,
     .pr,
-    .mp { view-timeline-name: --sec; }
-    html:not([data-lite]) :is(.pr-title, .mp-title, .sp--carousel > .sp-name, .sp--stack .sp-name) {
-      animation: text-rise linear both;
-      animation-timeline: --sec;
-      animation-range: entry 0% entry 40%;
+    .mp,
+    #about,
+    #contact { view-timeline-name: --sec; }
+
+    .hero-name {
+      animation: fx-leave linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 75vh;
     }
-    html:not([data-lite]) :is(.sec-tools, .sp-cell[data-active] .sp-copy > *, .sp--stack .sp-copy > *, .mp-copy > *) {
-      animation: text-rise linear both;
-      animation-timeline: --sec;
-      animation-range: entry 12% entry 62%;
+    .hero-bloom {
+      animation: fx-sink linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100vh;
     }
+
+    /* headings */
+    :is(.pr-title, .mp-title, .sp--carousel > .sp-name, .sp--stack .sp-name, #about h2, #contact h2) {
+      --rise: 48px;
+      animation: fx-rise ease-out both;
+      animation-timeline: --sec;
+      animation-range: entry 0% entry 45%;
+    }
+    /* words */
+    :is(.sec-tools, .sp-cell[data-active] .sp-copy > *, .sp--stack .sp-copy > *, .mp-copy > *, #about p, #contact p, #contact form) {
+      animation: fx-rise ease-out both;
+      animation-timeline: --sec;
+      animation-range: entry 10% entry 60%;
+    }
+    /* art, one piece after another */
+    :is(.sp-piece, .sp-stage--frame, .mp-win, .pr-item) {
+      animation: fx-art ease-out both;
+      animation-timeline: --sec;
+      animation-range: entry 8% entry 70%;
+    }
+    :is(.sp-piece, .pr-item):nth-child(2) { animation-range: entry 14% entry 76%; }
+    :is(.sp-piece, .pr-item):nth-child(3) { animation-range: entry 20% entry 82%; }
+    :is(.sp-piece, .pr-item):nth-child(n + 4) { animation-range: entry 26% entry 88%; }
   }
 }

@@ -654,7 +654,7 @@ body {
      with a bud opening at each section it reaches. */
   .scroll-vine .grow {
     stroke-dasharray: 1;
-    stroke-dashoffset: calc(1 - var(--scroll, 0));
+    stroke-dashoffset: 1; /* ScrollVine sets it on the path as you read */
   }
 
   .scroll-vine .bud {
@@ -1567,8 +1567,9 @@ html[data-lite] .art-wing {
 }
 
 /* --- Opening screen (GardenLoader) --------------------------------------------
- * Dawn sky, a pixel flower blooming in dither order, a line of mono text.
- * Lifts when <html> gets .garden-ready; lifts on its own at 4.5s regardless.
+ * Dawn sky, the pixel butterfly fluttering, a trail of pixel dots filling in
+ * and one line of text. Lifts when <html> gets .garden-ready; lifts on its own
+ * at 4.5s regardless.
  */
 #garden-loader {
   position: fixed;
@@ -1577,15 +1578,16 @@ html[data-lite] .art-wing {
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 18px;
+  gap: 20px;
   background:
     radial-gradient(40% 36% at 50% 46%, #fff6ea 0%, transparent 72%),
     linear-gradient(180deg, #c8d0f6 0%, #c9b9ec 38%, #f2b8cf 72%, #f6d3c3 100%);
-  transition: opacity 650ms var(--ease-mist), visibility 0s linear 650ms;
+  transition: opacity 420ms var(--ease-mist), visibility 0s linear 420ms;
   animation: loader-out 600ms ease-out 4.5s forwards;
 }
 
 html.garden-ready #garden-loader {
+  animation: none;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -1601,50 +1603,65 @@ html.garden-ready #garden-loader * {
   to { opacity: 0; visibility: hidden; }
 }
 
-.loader-stage { position: relative; width: 104px; height: 104px; }
-.loader-px { width: 100%; height: 100%; fill: #ffffff; filter: drop-shadow(0 0 10px rgb(185 55 157 / 0.35)); }
-
-.loader-px rect {
-  opacity: 0.16;
-  animation: px-bloom 1.8s ease-in-out infinite;
-  animation-delay: calc(var(--i) * 22ms);
+/* a still, soft light behind the butterfly (a gradient, not a filter) */
+.loader-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 280px;
+  height: 280px;
+  margin: -170px 0 0 -140px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.75), rgb(255 255 255 / 0));
+  pointer-events: none;
 }
 
-@keyframes px-bloom {
-  0%, 100% { opacity: 0.16; }
-  35%, 65% { opacity: 1; }
+.loader-fly {
+  position: relative;
+  width: 104px;
+  animation: loader-bob 1.6s ease-in-out infinite alternate;
+}
+.loader-bf { display: block; width: 100%; height: auto; fill: #51017c; overflow: visible; }
+.loader-wing { fill: #6a2bb5; transform-box: view-box; animation: loader-flap 0.52s ease-in-out infinite; }
+.loader-wing-l { transform-origin: 6px 4.5px; }
+.loader-wing-r { transform-origin: 7px 4.5px; }
+
+@keyframes loader-flap {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(0.3); }
+}
+@keyframes loader-bob {
+  from { transform: translateY(4px) rotate(-3deg); }
+  to { transform: translateY(-8px) rotate(3deg); }
 }
 
-.loader-spark { position: absolute; fill: #ffffff; animation: twinkle 2.4s ease-in-out infinite; }
-.loader-spark-a { width: 16px; height: 16px; top: -10px; right: -16px; }
-.loader-spark-b { width: 11px; height: 11px; bottom: -4px; left: -18px; animation-delay: -1.1s; }
+/* the path it leaves: five pixel dots lighting up in turn */
+.loader-trail { position: relative; display: flex; gap: 8px; }
+.loader-trail span {
+  width: 8px;
+  height: 8px;
+  background: #6a2bb5;
+  opacity: 0.2;
+  animation: loader-dot 1.5s steps(1, end) infinite;
+  animation-delay: calc(var(--i) * 0.18s);
+}
+@keyframes loader-dot {
+  0% { opacity: 1; }
+  45% { opacity: 0.2; }
+}
 
 .loader-text {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-pixel), ui-monospace, monospace;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: color-mix(in srgb, var(--color-ink) 65%, transparent);
-}
-
-.loader-heart {
-  width: 13px;
-  height: 12px;
-  fill: #b9379d;
-  animation: heart-beat 1.1s ease-in-out infinite;
-}
-
-@keyframes heart-beat {
-  0%, 100% { transform: scale(1); }
-  15% { transform: scale(1.3); }
-  30% { transform: scale(0.95); }
-  45% { transform: scale(1.18); }
+  position: relative;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--color-ink);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .loader-px rect,
-  .loader-spark,
-  .loader-heart { animation: none; opacity: 1; }
+  .loader-fly,
+  .loader-wing,
+  .loader-trail span { animation: none; opacity: 1; }
 }

@@ -61,10 +61,28 @@ export default function ScrollFX() {
     );
     document.querySelectorAll("main > section").forEach((s) => idle.observe(s));
 
+    // While the page scrolls, the decorative loops hold still (see
+    // "data-scrolling" in work.css). The attribute changes twice per scroll,
+    // at its start and 180ms after its end, never on every frame.
+    const html = document.documentElement;
+    let still = 0;
+    const onScroll = () => {
+      if (!still) html.dataset.scrolling = "";
+      else clearTimeout(still);
+      still = window.setTimeout(() => {
+        still = 0;
+        delete html.dataset.scrolling;
+      }, 180);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+
     return () => {
       io.disconnect();
       mo.disconnect();
       idle.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      clearTimeout(still);
+      delete html.dataset.scrolling;
     };
   }, []);
 

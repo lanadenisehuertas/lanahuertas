@@ -170,17 +170,17 @@ export default function RootLayout({
         />
         <GardenLoader />
         {/*
-         * Lift the opening screen 0.6s after it appears: long enough that
-         * it doesn't flash, and not tied to scripts or images arriving, which
-         * on a slow phone held the whole first screen back for seconds. Then
-         * tell the page
+         * Lift the opening screen once the document has been read, and not
+         * before 0.45s so it doesn't flash. It is not tied to scripts or
+         * images arriving, which on a slow phone held the whole first screen
+         * back for seconds. Then tell the page
          * (MorphName waits for this before its first wave). Seen once per
          * session; later loads skip straight in.
          */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}try{if(sessionStorage.getItem('garden-seen')){go();return}}catch(e){}setTimeout(go,600)})();",
+              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}try{if(sessionStorage.getItem('garden-seen')){go();return}}catch(e){}var t0=Date.now();function later(){setTimeout(go,Math.max(0,450-(Date.now()-t0)))}if(document.readyState!=='loading')later();else document.addEventListener('DOMContentLoaded',later);setTimeout(go,2500)})();",
           }}
         />
         {/*

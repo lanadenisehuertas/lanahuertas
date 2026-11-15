@@ -21,7 +21,7 @@ export default function Hero() {
     <section className="relative overflow-hidden pt-24 pb-10 sm:pt-28 sm:pb-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-8">
         {/* Name — one line, one size */}
-        <div className="relative mt-6 text-center sm:mt-10">
+        <div className="hero-name relative mt-6 text-center sm:mt-10">
           <MorphName
             label={profile.name}
             words={[
@@ -61,7 +61,7 @@ export default function Hero() {
           the hero instead of sitting on it in a box. The end card closes the
           page on the same sky at dusk. */}
       <div className="relative mx-auto mt-6 max-w-6xl px-0 sm:mt-8 sm:px-8">
-        <div className="bloom-zone relative h-[80vw] max-h-[460px] min-h-[290px] sm:h-[50vw]">
+        <div className="bloom-zone hero-bloom relative h-[80vw] max-h-[460px] min-h-[290px] sm:h-[50vw]">
           {/* The sky: full-bleed, edges dissolved */}
           <div
             aria-hidden
