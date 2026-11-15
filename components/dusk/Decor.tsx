@@ -98,15 +98,3 @@ export function Stars({ count = 170 }: { count?: number }) {
   }, [count]);
   return <canvas ref={ref} aria-hidden className="dk-canvas" style={{ zIndex: 0 }} />;
 }
-
-/**
- * Painted art from public/art/garden (matte, grainy, transparent). Art below
- * the fold loads lazily; `priority` is for the hero's first screen, where a
- * lazy image would hold back the largest paint.
- */
-export function Art({ name, alt = "", className = "", style, w, h, priority = false }: { name: string; alt?: string; className?: string; style?: Pos; w: number; h: number; priority?: boolean }) {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={`/art/garden/${name}.webp`} alt={alt} aria-hidden={alt ? undefined : true} width={w} height={h} loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : undefined} decoding="async" draggable={false} className={`dk-art ${className}`} style={style} />
-  );
-}

@@ -4,6 +4,9 @@
 @import "./styles/about.css";
 @import "./styles/ambient.css";
 @import "./styles/dusk.css";
+@import "./styles/pastel.css";
+@import "./styles/holo.css";
+@import "./styles/lace.css";
 
 @theme {
   /*

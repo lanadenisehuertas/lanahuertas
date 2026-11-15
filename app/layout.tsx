@@ -225,6 +225,10 @@ export default function RootLayout({
         <PointerFX />
         <StarScript />
         <Butterfly />
+        {/* keyboard users can jump past the hero garden straight to the work */}
+        <a href="#branding" className="skip-link">
+          Skip to the work
+        </a>
         <Nav />
         {children}
       </body>

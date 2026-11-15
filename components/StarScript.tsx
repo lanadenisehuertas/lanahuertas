@@ -126,7 +126,7 @@ export default function StarScript() {
       g.className = "ss-word";
       g.style.transform = `translate(${s.left.toFixed(1)}px, ${s.top.toFixed(1)}px)`;
       const size = Math.max(6, s.size / 7);
-      const glints = ["#fff6dc", "#f7a8dc", "#ffffff", "#ffe39a"];
+      const glints = ["#b9379d", "#7a3cc4", "#e3a88a", "#962480"]; // pastel theme: glints that show on mist
       for (let i = 0; i < 8; i++) {
         const p = s.pts[Math.floor(((i + 0.5) / 8) * s.pts.length)];
         // Nudge each twinkler off the glyph edge, alternately up and down.
@@ -162,7 +162,7 @@ export default function StarScript() {
       g.className = "ss-word";
       g.style.transform = `translate(${s.left.toFixed(1)}px, ${s.top.toFixed(1)}px)`;
       s.pts.forEach((p, i) => {
-        const st = star(p.x, p.y, size * (i % 5 === 0 ? 1.6 : 1), i % 4 === 0 ? "#fff6dc" : s.color, "ss-star");
+        const st = star(p.x, p.y, size * (i % 5 === 0 ? 1.6 : 1), i % 4 === 0 ? "#b9379d" : s.color, "ss-star");
         st.style.animationDelay = `${((i / n) * dur).toFixed(3)}s`;
         g.appendChild(st);
       });

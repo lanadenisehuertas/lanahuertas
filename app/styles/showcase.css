@@ -221,7 +221,7 @@
   }
   /* Over the art, the index needs its own ground on busy boards. */
   .sp--carousel[data-tone="light"] .sp-index { text-shadow: 0 0 8px rgb(255 255 255 / 0.9), 0 0 2px rgb(255 255 255 / 0.9); }
-  .sp--carousel[data-tone="dark"] .sp-index { text-shadow: 0 0 8px rgb(0 0 0 / 0.8), 0 0 2px rgb(0 0 0 / 0.9); }
+  .sp--carousel[data-tone="dark"] .sp-index { text-shadow: 0 0 8px rgb(81 1 124 / 0.22), 0 0 2px rgb(81 1 124 / 0.22); }
 
   /* ---- copy column -------------------------------------------------------- */
   .sp-copy {
@@ -372,7 +372,7 @@
     max-height: 100%;
     object-fit: contain;
     border-radius: 3px;
-    box-shadow: 0 18px 34px -10px rgb(10 10 40 / 0.45), 0 2px 6px rgb(10 10 40 / 0.18);
+    box-shadow: 0 18px 34px -10px rgb(81 1 124 / 0.158), 0 2px 6px rgb(81 1 124 / 0.063);
     transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
   }
   .sp-piece:hover img { transform: translateY(-4px) scale(1.01); }
@@ -443,9 +443,9 @@
     aspect-ratio: 16 / 9;
     border-radius: 24px; /* large frames share 24px: video, browser, the dusk video screen */
     overflow: hidden;
-    background: #140a22;
+    background: #fffaf0;
     /* pearl rim, as the device frames and cards */
-    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.95), 0 0 0 7px rgb(255 255 255 / 0.35), 0 30px 60px -24px rgb(90 40 140 / 0.45);
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.95), 0 0 0 7px rgb(255 255 255 / 0.35), 0 30px 60px -24px rgb(81 1 124 / 0.158);
   }
   .sp-video iframe,
   .sp-video-poster {
@@ -475,7 +475,7 @@
     margin: -38px 0 0 -38px;
     border-radius: 50%;
     background: rgb(255 255 255 / 0.94);
-    box-shadow: 0 8px 24px rgb(20 10 34 / 0.35);
+    box-shadow: 0 8px 24px rgb(81 1 124 / 0.122);
     transition: transform 0.25s;
   }
   .sp-play::after {
@@ -497,15 +497,14 @@
   .dev-browser {
     width: min(100cqw, calc((100cqh - 54px) * 1.6));
     padding: 0 8px 8px;
-    border: 1px solid rgb(255 255 255 / 0.95);
+    border: 1px solid rgb(51 12 75 / 0.95);
     border-radius: 24px;
     overflow: hidden;
     background:
       radial-gradient(120% 80% at 20% 0%, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.35) 60%),
       linear-gradient(120deg, rgb(205 196 255 / 0.55), rgb(248 190 225 / 0.5) 40%, rgb(190 238 222 / 0.5));
-    box-shadow:
-      inset 0 -8px 20px rgb(214 150 230 / 0.25),
-      0 30px 60px -24px rgb(90 40 140 / 0.45),
+    box-shadow: inset 0 -8px 20px rgb(214 150 230 / 0.25),
+      0 30px 60px -24px rgb(81 1 124 / 0.158),
       0 0 0 6px rgb(255 255 255 / 0.18);
     color: #3a2458;
   }
@@ -597,12 +596,12 @@
     height: min(100cqh, calc(100cqw * 2.1));
     aspect-ratio: 9 / 19;
     padding: 10px;
-    border: 1px solid rgb(255 255 255 / 0.95);
+    border: 1px solid rgb(51 12 75 / 0.95);
     border-radius: 38px;
     background:
       radial-gradient(120% 60% at 25% 0%, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.35) 60%),
       linear-gradient(140deg, rgb(205 196 255 / 0.6), rgb(248 190 225 / 0.5) 45%, rgb(190 238 222 / 0.55));
-    box-shadow: inset 0 -8px 20px rgb(214 150 230 / 0.25), 0 30px 60px -24px rgb(90 40 140 / 0.45), 0 0 0 6px rgb(255 255 255 / 0.18);
+    box-shadow: inset 0 -8px 20px rgb(214 150 230 / 0.25), 0 30px 60px -24px rgb(81 1 124 / 0.158), 0 0 0 6px rgb(255 255 255 / 0.18);
   }
   .dev-phone-wrap {
     display: flex;
@@ -649,13 +648,13 @@
     pointer-events: none;
     padding: 9px 16px;
     border-radius: 999px;
-    background: #4b0f7a;
-    color: #fff;
+    background: #fffaf0;
+    color: #330c4b;
     font: 500 15px/1.2 var(--font-body);
     white-space: nowrap;
     opacity: 0;
     transition: opacity 0.15s;
-    box-shadow: 0 8px 22px rgb(75 15 122 / 0.35);
+    box-shadow: 0 8px 22px rgb(81 1 124 / 0.122);
   }
   .sp-cursor[data-on] { opacity: 1; }
   .sp-cursor small {
@@ -761,7 +760,7 @@
     padding: 64px 84px 40px;
     border: 0;
     background: transparent;
-    color: #ece8f4;
+    color: #330c4b;
     overflow: hidden;
   }
   .lb[open] {
@@ -769,7 +768,7 @@
     align-items: center;
     justify-content: center;
   }
-  .lb::backdrop { background: rgb(20 10 34 / 0.9); }
+  .lb::backdrop { background: rgb(255 250 240 / 0.9); }
   .lb-fig {
     display: flex;
     flex-direction: column;
@@ -802,7 +801,7 @@
     width: 48px;
     height: 48px;
     padding: 0;
-    border: 1px solid rgb(255 255 255 / 0.95);
+    border: 1px solid rgb(51 12 75 / 0.95);
     border-radius: 50%;
     background: radial-gradient(120% 120% at 30% 15%, #fff, rgb(255 255 255 / 0.55) 55%), linear-gradient(135deg, #cdc4ff, #f8bee1 50%, #beeede);
     color: #3a0b63;
@@ -893,7 +892,7 @@
     height: 100%;
     object-fit: contain;
     border-radius: 10px;
-    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.9), 0 0 0 6px rgb(255 255 255 / 0.32), 0 22px 40px -16px rgb(90 40 140 / 0.4);
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.9), 0 0 0 6px rgb(255 255 255 / 0.32), 0 22px 40px -16px rgb(81 1 124 / 0.14);
     pointer-events: none;
     user-select: none;
   }
@@ -936,7 +935,7 @@
   html[data-lite] .pr-fig img,
   html[data-lite] .sp-video,
   html[data-lite] .dev-browser,
-  html[data-lite] .dev-phone { box-shadow: 0 6px 14px -6px rgb(10 10 40 / 0.4); }
+  html[data-lite] .dev-phone { box-shadow: 0 6px 14px -6px rgb(81 1 124 / 0.14); }
   html[data-lite] .sp--carousel > .sp-index { text-shadow: none; }
 }
 

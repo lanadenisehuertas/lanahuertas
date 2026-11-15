@@ -15,91 +15,17 @@ import { streams } from "@/lib/dusk/streams";
 import {
   ambient,
   calm,
-  local,
   reducedMotion,
-  whileVisible,
 } from "@/lib/dusk/fx";
-import { chime, scratch, tone } from "@/lib/dusk/sound";
+import { chime } from "@/lib/dusk/sound";
 import { PeanutPerch } from "./Peanut";
-import { Art, Blob, GStar, ORing, Planet, Stars } from "./Decor";
+import { Blob, GStar, ORing, Planet, Stars } from "./Decor";
+import GardenBed from "../pastel/GardenBed";
 import { pad } from "../showcase/tone";
 import Words from "@/components/Words";
 
 const v = (o: Record<string, string | number>) => o as CSSProperties;
 const SEG = 6; // seconds per clip on the timeline
-
-/* The earbuds' gold rings and notes, as their own layers (source pixels of earbuds-bare.webp). */
-const EBW = 719,
-  EBH = 1330;
-const RINGS: [number, number, number, number, number, string][] = [
-  [203.4, 803.7, 207, 72.7, 31.9, ""],
-  [543.7, 1168.6, 195.1, 69.8, 31.5, " w2"],
-];
-const ENOTES: [number, number, number][] = [
-  [22, 515, 90],
-  [0, 876, 81],
-  [640, 906, 73],
-  [337, 1243, 79],
-];
-const HOLES: [number, number][] = [
-  [128, 812],
-  [612, 1188],
-];
-
-const pct = (n: number, of: number) => `${(n / of) * 100}%`;
-
-/**
- * One half of the ring layer: the back half sits behind the buds, the front
- * half over them. Each ring is a plain element turned to its tilt and
- * clipped to its half, and everything that moves in it (the wobble, the
- * sparkle riding the ring, the sound pulses) is a transform on an element of
- * its own, so the compositor runs it. Animated SVG shapes inside one SVG kept
- * the main thread repainting the page every frame while the earbuds were on
- * screen. The sparkle's path round each ring is in dusk.css (dk-ebride0/1).
- */
-function RingHalf({ half }: { half: "b" | "f" }) {
-  return (
-    <div aria-hidden className={`r${half}`}>
-      {RINGS.map(([cx, cy, rx, ry, rot, w], i) => {
-        const bw = 2 * rx + 80,
-          bh = 2 * ry + 120;
-        return (
-          <div
-            key={i}
-            className={`eb-ring eb-${half}`}
-            style={{ left: pct(cx - bw / 2, EBW), top: pct(cy - bh / 2, EBH), width: pct(bw, EBW), height: pct(bh, EBH), transform: `rotate(${rot}deg)` }}
-          >
-            <div className={`wob${w}`}>
-              <svg viewBox={`${-bw / 2} ${-bh / 2} ${bw} ${bh}`}>
-                <ellipse rx={rx} ry={ry} fill="none" stroke="#c98f2c" strokeWidth="13" opacity=".55" />
-                <ellipse rx={rx} ry={ry} fill="none" stroke="#e8b84b" strokeWidth="9" />
-                <ellipse rx={rx} ry={ry} fill="none" stroke="#fff4c8" strokeWidth="2.6" strokeDasharray="3 22" strokeLinecap="round" />
-              </svg>
-              <span className={`eb-orbit eb-orbit${i}`} style={{ animationDuration: `${4.6 + i}s` }}>
-                <svg viewBox="-16 -16 32 32" style={{ width: pct(32, bw) }}>
-                  <path d="M0 -16L3.5 -3.5L16 0L3.5 3.5L0 16L-3.5 3.5L-16 0L-3.5 -3.5Z" fill="#fffaf0" />
-                </svg>
-              </span>
-            </div>
-          </div>
-        );
-      })}
-      {half === "f" &&
-        HOLES.map(([x, y]) =>
-          [0, 0.8, 1.6].map((dl) => (
-            <svg
-              key={`${x}${dl}`}
-              className="pulse"
-              viewBox="-36 -46 72 92"
-              style={{ left: pct(x - 36, EBW), top: pct(y - 46, EBH), width: pct(72, EBW), height: pct(92, EBH), animationDelay: `${dl}s` }}
-            >
-              <ellipse rx="34" ry="44" fill="none" stroke="#fdf3e1" strokeWidth="3" />
-            </svg>
-          )),
-        )}
-    </div>
-  );
-}
 
 /**
  * Moving pictures, at dusk. The copy for the clip on screen sits on the left;
@@ -107,15 +33,12 @@ function RingHalf({ half }: { half: "b" | "f" }) {
  * only when asked). Under it, a little Premiere: V1 clips, an A1 waveform, a
  * playhead and a running timecode that moves through the edits on its own
  * (paused while a video plays, off for reduced motion); click a clip to jump.
- * Around it: the earbuds hang with their gold rings orbiting through the
- * buds, notes bob and drift out, sound pulses ring from the buds, the level
- * meters follow the waveform, and the record spins (click it to scratch).
+ * Around it: the level meters follow the waveform, Peanut perches on the
+ * frame, and a drawn lotus garden grows along the foot.
  */
 export default function DuskVideos() {
   const root = useRef<HTMLElement>(null);
   const streamCv = useRef<HTMLCanvasElement>(null);
-  const ebuds = useRef<HTMLButtonElement>(null);
-  const vinyl = useRef<HTMLImageElement>(null);
   const frame = useRef<HTMLDivElement>(null);
   const ph = useRef<HTMLDivElement>(null);
   const tc = useRef<HTMLSpanElement>(null);
@@ -187,7 +110,7 @@ export default function DuskVideos() {
         streams(
           streamCv.current,
           [
-            // the streams pour out of the earbuds and run down behind the screen, clear of the words
+            // the streams pour in from the upper right and run down behind the screen, clear of the words
             {
               from: [0.88, 0.24],
               ctrl: [0.72, 0.6],
@@ -276,45 +199,6 @@ export default function DuskVideos() {
         ],
       }),
     );
-
-    // notes drift out of the buds towards the video
-    const flyNote = (fast: boolean) => {
-      const b = ebuds.current;
-      if (!b) return;
-      const r = b.getBoundingClientRect(),
-        [hx, hy] = HOLES[Math.random() < 0.5 ? 0 : 1],
-        [x, y] = local(
-          sec,
-          r.left + (r.width * hx) / EBW,
-          r.top + (r.height * hy) / EBH,
-        ),
-        n = document.createElement("img");
-      n.className = "dk-flynote";
-      n.alt = "";
-      n.src = `/art/garden/note-${(Math.random() * 4) | 0}.webp`;
-      n.style.width = `${22 + Math.random() * 16}px`;
-      n.style.left = `${x - 14}px`;
-      n.style.top = `${y - 20}px`;
-      n.style.setProperty(
-        "--fx",
-        `${-(40 + Math.random() * (fast ? 220 : 120))}px`,
-      );
-      n.style.setProperty("--fy", `${-(60 + Math.random() * 110)}px`);
-      n.style.setProperty("--fr", `${(Math.random() - 0.5) * 60}deg`);
-      sec.appendChild(n);
-      setTimeout(() => n.remove(), 3500);
-    };
-    if (!still) offs.push(whileVisible(sec, 1300, () => flyNote(false)));
-    const eb = ebuds.current;
-    const onBuds = () => {
-      [523, 659, 784, 659].forEach((f, k) =>
-        tone(f, { type: "sine", vol: 0.08, dur: 0.55, at: k * 0.18 }),
-      );
-      if (!reducedMotion())
-        for (let k = 0; k < 7; k++) setTimeout(() => flyNote(true), k * 90);
-    };
-    eb?.addEventListener("click", onBuds);
-    offs.push(() => eb?.removeEventListener("click", onBuds));
 
     // the frame leans with the cursor
     let vis = false,
@@ -499,15 +383,6 @@ export default function DuskVideos() {
     }
   };
 
-  const onScratch = () => {
-    const an = vinyl.current?.getAnimations()[0];
-    scratch();
-    if (!an) return;
-    an.playbackRate = -6;
-    setTimeout(() => (an.playbackRate = 3), 380);
-    setTimeout(() => (an.playbackRate = 1), 1100);
-  };
-
   return (
     <section
       ref={root}
@@ -572,70 +447,12 @@ export default function DuskVideos() {
       <GStar size={18} style={v({ left: "3%", top: "20%", "--tw": "4.4s" })} />
       <GStar size={30} style={v({ right: "4%", top: "58%", "--tw": "3.1s" })} />
 
-      {/* the record, behind everything; click it to scratch */}
-      <button
-        type="button"
-        aria-label="Vinyl record (click to scratch)"
-        onClick={onScratch}
-        className="dk-obj absolute right-[-14%] bottom-[-10%] z-[5] hidden w-[46%] max-w-[700px] rounded-full border-0 bg-transparent p-0 md:block"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          ref={vinyl}
-          className="dk-vinyl"
-          src="/art/garden/vinyl.webp"
-          alt=""
-          width={900}
-          height={900}
-          loading="lazy"
-          decoding="async"
-        />
-      </button>
       <canvas
         ref={streamCv}
         aria-hidden
         className="dk-canvas dk-streams-fade"
         style={{ zIndex: 8 }}
       />
-
-      {/* the earbuds hang from the top, rings orbiting through the buds */}
-      <button
-        ref={ebuds}
-        type="button"
-        aria-label="Earbuds (click for a chime)"
-        className="dk-ebuds hidden border-0 bg-transparent p-0 md:block"
-        style={{ right: "3%", top: "-2%", width: "clamp(150px, 12.5%, 210px)" }}
-      >
-        <RingHalf half="b" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className="bud"
-          src="/art/garden/earbuds-bare.webp"
-          alt=""
-          width={EBW}
-          height={EBH}
-          loading="lazy"
-          decoding="async"
-        />
-        <RingHalf half="f" />
-        {ENOTES.map(([x, y, w], k) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={k}
-            className="enote"
-            src={`/art/garden/note-${k}.webp`}
-            alt=""
-            style={v({
-              left: `${(x / EBW) * 100}%`,
-              top: `${(y / EBH) * 100}%`,
-              width: `${(w / EBW) * 100}%`,
-              "--t": `${2.6 + k * 0.45}s`,
-              "--dl": `${-k * 0.7}s`,
-              "--nx": `${k % 2 ? -5 : 5}px`,
-            })}
-          />
-        ))}
-      </button>
 
       <div className="relative z-30 mx-auto max-w-[1400px] px-4 sm:px-[3.4%] lg:max-w-none lg:pr-[15%]">
         {/* one header across both columns: the title, and what's playing on the right */}
@@ -646,7 +463,7 @@ export default function DuskVideos() {
             data-rv="mist"
             className="type-display text-[clamp(2.8rem,5vw,4.8rem)] leading-[0.95]"
           >
-            Moving <em className="text-[#ffcfe0] italic">pictures</em>
+            Moving <em className="text-[#962480] italic">pictures</em>
           </h2>
           <p className="dk-k pb-2" aria-live="polite">
             Now playing · {meta}
@@ -659,7 +476,7 @@ export default function DuskVideos() {
               {p.title}
             </h3>
             {p.role && (
-              <p className="type-display mt-1 text-xl text-[#ffcfe0] italic">
+              <p className="type-display mt-1 text-xl text-[#962480] italic">
                 {p.role}
               </p>
             )}
@@ -690,7 +507,7 @@ export default function DuskVideos() {
                   href={p.videoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[15px] text-[#fdf3e1] underline decoration-[#ffcfe0]/70 underline-offset-4 hover:decoration-[#ffcfe0]"
+                  className="text-[15px] text-[#51017c] underline decoration-[#b9379d]/70 underline-offset-4 hover:decoration-[#b9379d]"
                 >
                   Open in Drive <span aria-hidden>↗</span>
                 </a>
@@ -699,7 +516,7 @@ export default function DuskVideos() {
           </div>
 
           <div className="relative min-w-0">
-            <div ref={frame} className="dk-vframe">
+            <div ref={frame} className="dk-vframe" data-file={`${p.id}.mov`}>
               <span className="o2" />
               <span className="o1" />
               <div className="screen">
@@ -806,20 +623,8 @@ export default function DuskVideos() {
         </div>
       </div>
 
-      <Art
-        name="cloud-bank"
-        w={1400}
-        h={196}
-        className="dk-cloud"
-        style={v({
-          left: "-10%",
-          bottom: "3%",
-          width: "84%",
-          zIndex: 12,
-          "--t": "20s",
-          "--cx": "-30px",
-        })}
-      />
+      {/* the first portfolio's drawn garden along the foot */}
+      <GardenBed variant="corners" style={{ zIndex: 12 }} />
       <div aria-hidden className="dk-grain" />
     </section>
   );

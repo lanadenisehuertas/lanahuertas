@@ -15,11 +15,13 @@ import { useEffect } from "react";
  *   CSS animations are watched; scroll-driven ones and one-off reveals are
  *   left alone. Sideways there is a whole screen of margin, so things that
  *   drift across never freeze just out of sight.
- * - data-cv lets the browser skip a far section's layout and paint entirely
- *   (content-visibility: auto). Each keeps its measured height as its
- *   placeholder size, so the scrollbar and anchor jumps do not shift. Only
- *   sections that already clip their overflow get it, so nothing that spills
- *   past a section edge is cut. Nothing fixed-position lives inside a section.
+ *
+ * Sections no longer get content-visibility: auto. Skipping a far section's
+ * rendering kept its height, but the decorations inside it (grain, canvases,
+ * floating art) were laid out afresh each time it came back into view, and
+ * the browser counted every return as layout shift (0.07 to 0.22 per visit
+ * in testing; zero without it). Paint is already limited to what is on
+ * screen, so the pause above keeps most of the saving.
  */
 export default function PauseOffscreen() {
   useEffect(() => {
@@ -47,7 +49,7 @@ export default function PauseOffscreen() {
         deco.observe(el);
       }
     };
-    // sections that skip their rendering start their animations only when they
+    // sections paused offscreen start their animations only when they
     // come near, so look again whenever one does
     const rescan = () => {
       if (!scanId) scanId = soon(scan, 1000);
@@ -69,19 +71,10 @@ export default function PauseOffscreen() {
     );
     secs.forEach((s) => io.observe(s));
 
-    // after the page has settled (fonts, first images), so the sizes are real
+    // after the page has settled, find the looping decorations to watch
     let idle = 0;
-    const skip = () => {
-      secs.forEach((s) => {
-        const ov = getComputedStyle(s).overflowY;
-        if (ov !== "clip" && ov !== "hidden") return;
-        s.style.containIntrinsicSize = `auto ${Math.round(s.getBoundingClientRect().height)}px`;
-        s.setAttribute("data-cv", "");
-      });
-      scan();
-    };
     const later = () => {
-      idle = soon(skip, 2000);
+      idle = soon(scan, 2000);
     };
     if (document.readyState === "complete") later();
     else window.addEventListener("load", later, { once: true });

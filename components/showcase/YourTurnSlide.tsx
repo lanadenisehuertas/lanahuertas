@@ -7,6 +7,7 @@ import { useSlide } from "./Spread";
 import SpreadCopy from "./SpreadCopy";
 import { pad } from "./tone";
 import { tone } from "@/lib/dusk/sound";
+import { Lotus } from "../Botanicals";
 
 // The studio is its own chunk: nothing of it loads until someone opens it.
 const Studio = dynamic(() => import("@/components/studio/Studio"), { ssr: false });
@@ -106,8 +107,7 @@ export default function YourTurnSlide({ n, total }: { n: number; total: number }
                 </span>
                 <span className="yt-sub">a night in the garden</span>
                 <span className="yt-date">NOV 28 · 6 PM · THE GARDEN</span>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/art/garden/lotus-cluster.webp" alt="" className="yt-lotus" loading="lazy" />
+                <Lotus className="yt-lotus" deep />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/art/pixel-butterfly.svg" alt="" className="yt-bfly" />
               </span>

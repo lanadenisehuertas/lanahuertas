@@ -87,18 +87,7 @@ export const STICKERS: Sticker[] = [
   { src: "/art/peanut/awake.svg", label: "Peanut, awake", ar: 52 / 35, pixel: true, w: 320 },
   { src: "/art/peanut/peek.svg", label: "Peanut, peeking", ar: 48 / 31, pixel: true, w: 320 },
   { src: "/art/butterfly.webp", label: "Butterfly", ar: 560 / 460, w: 300 },
-  { src: "/art/garden/lotus-cluster.webp", label: "Lotus bed", ar: 1000 / 471, w: 640 },
-  { src: "/art/garden/cloud-bank.webp", label: "Cloud bank", ar: 1400 / 196, w: 1080 },
-  { src: "/art/garden/vinyl.webp", label: "Vinyl", ar: 1, w: 420 },
-  { src: "/art/garden/bass.webp", label: "Bass", ar: 640 / 425, w: 520 },
-  { src: "/art/garden/mic.webp", label: "Mic", ar: 360 / 528, w: 260 },
-  { src: "/art/garden/yarn.webp", label: "Yarn", ar: 460 / 260, w: 320 },
-  { src: "/art/garden/crane.webp", label: "Paper crane", ar: 1400 / 689, w: 520 },
-  { src: "/art/garden/note-1.webp", label: "Note", ar: 81 / 109, w: 120 },
-  { src: "/art/garden/note-0.webp", label: "Quaver", ar: 90 / 109, w: 120 },
-  { src: "/art/garden/note-3.webp", label: "Little note", ar: 79 / 87, w: 110 },
   { src: "/art/cloud.webp", label: "Soft cloud", ar: 900 / 333, w: 620 },
-  { src: "/art/garden/earbuds.webp", label: "Earbuds", ar: 719 / 1330, w: 260 },
 ];
 
 /** Images by src. SVGs get a real size first, so every browser can draw them on a canvas. */
@@ -407,8 +396,8 @@ export const TEMPLATES: Template[] = [
       txt("DUSK FEST", { x: W / 2, y: H * 0.36, text: "Dusk\nFest", font: "redaction-bold", size: 230, lead: 0.86, color: "#fdf3e1", shadow: true }),
       txt("a night in the garden", { x: W / 2, y: H * 0.555, text: "a night in the garden", font: "redaction-italic", size: 64, color: "#ffcfe0" }),
       ...pill("Details", W / 2, H * 0.64, 640, 72, "#fdf3e1", "NOV 28 · 6 PM · THE GARDEN", "#2d3b97", 28),
-      stickerLayer(st("lotus-cluster.webp"), W * 0.22, H - W * 0.17, 560),
-      { ...stickerLayer(st("lotus-cluster.webp"), W * 0.84, H - W * 0.13, 460) },
+      stickerLayer(st("pixel-lotus.svg"), W * 0.22, H - W * 0.15, 420),
+      { ...stickerLayer(st("pixel-lotus.svg"), W * 0.82, H - W * 0.12, 340) },
       { ...stickerLayer(st("pixel-butterfly.svg"), W * 0.72, H * 0.75, 150), rot: 12 },
       fx("grain", 0.35, "Grain"),
     ],
@@ -455,7 +444,7 @@ export const TEMPLATES: Template[] = [
       txt("Day", { x: W / 2, y: H * 0.46, text: "28", font: "redaction-bold", size: 520, color: "#ff9ec4", shadow: true }),
       txt("Month", { x: W / 2, y: H * 0.665, text: "NOVEMBER", font: "mono", size: 46, track: 520, color: "#51017c" }),
       txt("Event", { x: W / 2, y: H * 0.75, text: "Lantern Night in the Garden", font: "redaction", size: 60, color: "#2d3b97" }),
-      { ...stickerLayer(st("cloud-bank.webp"), W / 2, H - W * 0.06, W * 1.2), opacity: 0.95 },
+      { ...stickerLayer(st("cloud.webp"), W / 2, H - W * 0.12, W * 1.1), opacity: 0.95 },
       { ...stickerLayer(st("pixel-butterfly.svg"), W * 0.17, H * 0.6, 130), rot: -14 },
       fx("dither", 0.22, "Dither"),
     ],
@@ -468,7 +457,6 @@ export const TEMPLATES: Template[] = [
     make: (W, H) => [
       bg("radial", "#924050", "#232424"),
       { ...shape("Sun", { x: W / 2, y: H * 0.45, w: W * 0.68, h: W * 0.68, fill: "#f0e8a4", shape: "ellipse" }), opacity: 0.9 },
-      { ...stickerLayer(st("bass.webp"), W * 0.5, H * 0.48, 860), rot: -18, shadow: true },
       fx("halftone", 0.6, "Color Halftone"),
       txt("LIVE AT DUSK", { x: W / 2, y: H * 0.1, text: "LIVE AT DUSK", font: "redaction-35", size: 118, color: "#f0e8a4", track: -10 }),
       txt("Line-up", { x: W / 2, y: H * 0.8, text: "the strays · peanut & the purrs\nmoonlit bass club", font: "redaction-italic", size: 52, lead: 1.25, color: "#f0e8a4" }),
@@ -492,7 +480,6 @@ export const TEMPLATES: Template[] = [
         gap = H * 0.105;
       return [
         bg("linear", "#1b0730", "#330c4b"),
-        { ...stickerLayer(st("vinyl.webp"), W * 0.97, H * 0.03, 360), rot: 14, opacity: 0.85 },
         txt("Kicker", { x: W / 2, y: H * 0.08, text: "FRIDAY · THE GARDEN STAGE", font: "mono", size: 26, track: 260, color: "#ffcfe0" }),
         txt("Title", { x: W / 2, y: H * 0.22, text: "Tonight's\nline-up", font: "redaction-bold", size: 150, lead: 0.92, color: "#ffd98a", shadow: true }),
         ...rows.flatMap(([t, act], i): Layer[] => {
@@ -504,8 +491,8 @@ export const TEMPLATES: Template[] = [
           ];
         }),
         rule("Rule end", W / 2, top + gap * 3.5, W * 0.8, "#fdf3e1", 0.22),
-        { ...stickerLayer(st("note-1.webp"), W * 0.12, H * 0.91, 90), rot: -12 },
-        { ...stickerLayer(st("note-3.webp"), W * 0.88, H * 0.91, 90), rot: 10 },
+        { ...stickerLayer(st("pixel-note.svg"), W * 0.12, H * 0.91, 90), rot: -12 },
+        { ...stickerLayer(st("pixel-note.svg"), W * 0.88, H * 0.91, 90), rot: 10 },
         txt("Details", { x: W / 2, y: H * 0.91, text: "FREE ENTRY · BRING A FRIEND", font: "mono", size: 28, track: 220, color: "#fdf3e1" }),
         fx("grain", 0.3, "Grain"),
       ];
@@ -578,8 +565,7 @@ export const TEMPLATES: Template[] = [
       txt("Thank you", { x: W / 2, y: H * 0.33, text: "Thank\nyou", font: "redaction-italic", size: 270, lead: 0.86, color: "#fdf3e1", shadow: true }),
       txt("Line", { x: W / 2, y: H * 0.545, text: "for making Dusk Fest a night to remember", font: "inter", size: 40, color: "#fdf3e1" }),
       txt("Count", { x: W / 2, y: H * 0.61, text: "320 GUESTS · 4 BANDS · 1 VERY HAPPY CAT", font: "mono", size: 24, track: 200, color: "#ffcfe0" }),
-      { ...stickerLayer(st("crane.webp"), W * 0.68, H * 0.73, 420), rot: -8, shadow: true },
-      stickerLayer(st("cloud-bank.webp"), W / 2, H - W * 0.05, W * 1.25),
+      stickerLayer(st("cloud.webp"), W / 2, H - W * 0.1, W * 1.15),
       { ...stickerLayer(st("pixel-butterfly.svg"), W * 0.24, H * 0.76, 130), rot: -10 },
       fx("grain", 0.3, "Grain"),
     ],

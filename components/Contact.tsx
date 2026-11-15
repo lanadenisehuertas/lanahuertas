@@ -5,7 +5,7 @@ import { Sparkle4 } from "./Botanicals";
 import { InkArrow } from "./Ink";
 import MorphName from "./MorphName";
 import ContactForm from "./ContactForm";
-import { Art } from "./dusk/Decor";
+import GardenBed from "./pastel/GardenBed";
 import { PeanutPeek } from "./dusk/Peanut";
 import LetterBloom from "./dusk/LetterBloom";
 import SkyNotes from "./dusk/SkyNotes";
@@ -85,15 +85,12 @@ export default function Contact() {
             <Note className="drift-y absolute top-[26%] left-[24%] h-5 w-5 text-white/80" />
             <Note kind="beamed" className="drift-y absolute top-[34%] right-[18%] h-6 w-6 text-white/70 [animation-delay:-4s]" />
 
-            {/* painted clouds along the foot, two depths */}
-            <Art name="cloud-bank" w={1400} h={196} className="dk-cloud" style={{ left: "-20%", bottom: "16%", width: "90%", opacity: 0.75, scale: "-1 1", "--t": "28s", "--cx": "-20px" } as CSSProperties} />
             <div className="dither absolute inset-x-0 bottom-0 h-[30%] opacity-70" />
             <PixelArt name="ornament" className="absolute top-[14%] left-[3%] hidden h-48 w-auto opacity-50 md:block" />
             <PixelArt name="ornament" className="absolute top-[14%] right-[3%] hidden h-48 w-auto opacity-50 md:block" />
             <PixelArt name="moon" className="absolute top-[7%] left-[16%] w-12 opacity-90 sm:w-16" />
             <PixelArt name="sparkle" className="twinkle absolute top-[22%] right-[9%] w-10" />
             <div className="band-grain absolute inset-0" />
-            <Art name="cloud-bank" w={1400} h={196} className="dk-cloud" style={{ left: "-8%", bottom: "-1%", width: "116%", "--t": "24s", "--cx": "24px" } as CSSProperties} />
           </div>
 
           {/* Two columns at desktop: the thank-you on the left, the form on
@@ -164,9 +161,8 @@ export default function Contact() {
           {/* The garden, spilling over the card edges at three depths */}
           <div aria-hidden className="pointer-events-none">
 
-            {/* the painted lotus bed at both corners */}
-            <Art name="lotus-cluster" w={1000} h={471} className="dk-sway" style={{ left: "-6%", bottom: "-2%", width: "max(30%, 220px)", "--t": "8s" } as CSSProperties} />
-            <Art name="lotus-cluster" w={1000} h={471} className="dk-sway" style={{ right: "-6%", bottom: "-3%", width: "max(26%, 190px)", scale: "-1 1", "--t": "9s" } as CSSProperties} />
+            {/* the first portfolio's drawn lotus bed at both corners */}
+            <GardenBed variant="corners" style={{ zIndex: 0 }} />
 
             {/* a far butterfly crossing the upper sky */}
             <div className="px absolute top-[12%] left-[20%] w-10 sm:w-12" style={dp(8)} data-react="butterfly">
@@ -182,9 +178,9 @@ export default function Contact() {
           {/* The page's closing line: the credit and the way back up, at the
               very end where they are looked for (they sat under the heading,
               where a "back to top" made no sense yet). It sits in the light strip
-              of cloud under the lotus beds, so it is set in plum ink. */}
+              of mist under the lotus beds, so it is set in plum ink. */}
           <div
-            className="type-pixel absolute inset-x-0 -bottom-[86px] z-30 flex items-center justify-center gap-3 px-4 text-center text-[12px] sm:-bottom-[104px] sm:gap-4 sm:text-[13px]"
+            className="type-pixel absolute inset-x-0 -bottom-[86px] z-30 flex items-center justify-center gap-3 px-4 text-center text-[14px] sm:-bottom-[104px] sm:gap-4"
             style={{ "--color-ink": "#3b2a6e", "--color-iris": "#3b2a6e", color: "#3b2a6e" } as CSSProperties}
           >
             {/* phones stack the name over the place (no dangling dot);

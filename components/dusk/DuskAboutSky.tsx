@@ -1,25 +1,23 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties } from "react";
-import { ambient, calm, floatText, local } from "@/lib/dusk/fx";
+import { ambient, calm } from "@/lib/dusk/fx";
 import { streams } from "@/lib/dusk/streams";
-import { chime, la, tone } from "@/lib/dusk/sound";
-import { Art, Blob, GStar, Planet, Stars } from "./Decor";
+import { chime } from "@/lib/dusk/sound";
+import { Blob, GStar, Planet, Stars } from "./Decor";
+import GardenBed from "../pastel/GardenBed";
 import { PeanutWalk } from "./Peanut";
 
 const v = (o: Record<string, string | number>) => o as CSSProperties;
 
 /**
  * The sky behind About: stars, drifting colour, print textures, streams that
- * brighten as the portrait develops (they read --p off the section), lotus and
- * clouds at the foot, and two of my interests to play with — the yarn rolls
- * off and back, the mic sings a little phrase.
+ * brighten as the portrait develops (they read --p off the section), and a
+ * drawn lotus garden at the foot with Peanut wandering it.
  */
 export default function DuskAboutSky() {
   const layer = useRef<HTMLDivElement>(null);
   const streamCv = useRef<HTMLCanvasElement>(null);
-  const yarn = useRef<HTMLButtonElement>(null);
-  const mic = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const host = layer.current,
@@ -58,51 +56,6 @@ export default function DuskAboutSky() {
     return () => offs.forEach((f) => f());
   }, []);
 
-  // the yarn rolls over to Peanut, she pounces on it, it rolls home
-  const rollYarn = () => {
-    const r = yarn.current?.querySelector<HTMLElement>(".roll"),
-      host = layer.current,
-      cat = host?.querySelector<HTMLElement>(".dk-walk");
-    if (!r) return;
-    r.style.transform = "translateX(min(84px, 16vw)) rotate(260deg)";
-    tone(392, { type: "sine", vol: 0.05, dur: 0.5 });
-    if (cat && host)
-      setTimeout(() => {
-        delete cat.dataset.hop;
-        void cat.offsetWidth;
-        cat.dataset.hop = "";
-        tone(660, { type: "triangle", vol: 0.04, dur: 0.18 });
-        const b = cat.getBoundingClientRect(),
-          [x, y] = local(host, b.left + b.width / 2, b.top);
-        floatText(host, x - 14, y - 4, "mrrp!", "#ffcfe0");
-      }, 750);
-    setTimeout(() => (r.style.transform = ""), 1500);
-  };
-
-  // the mic sings four notes while little notes float up
-  const sing = () => {
-    const m = mic.current,
-      host = layer.current;
-    if (!m || !host) return;
-    delete m.dataset.sing;
-    void m.offsetWidth;
-    m.dataset.sing = "";
-    (
-      [
-        [523, 0, 0.32],
-        [587, 0.34, 0.32],
-        [659, 0.68, 0.5],
-        [784, 1.2, 0.7],
-      ] as const
-    ).forEach(([f, at, d]) => la(f, at, d));
-    const b = m.getBoundingClientRect();
-    for (let k = 0; k < 6; k++)
-      setTimeout(() => {
-        const [x, y] = local(host, b.left + b.width * 0.45 + (Math.random() - 0.5) * 40, b.top + 10);
-        floatText(host, x, y, ["♪", "♫", "♬"][k % 3], ["#fdf3e1", "#ffcfe0", "#a8e6dc"][k % 3]);
-      }, k * 220);
-  };
-
   return (
     <div ref={layer} className="pointer-events-none absolute inset-0 overflow-hidden">
       <Stars />
@@ -123,36 +76,9 @@ export default function DuskAboutSky() {
       <GStar size={18} style={v({ right: "10%", top: "40%", "--tw": "4.2s" })} />
       <GStar size={22} style={v({ left: "6%", top: "74%", "--tw": "3.8s" })} />
 
-      <Art name="cloud-bank" w={1400} h={196} className="dk-cloud" style={v({ left: "-8%", bottom: "34px", width: "116%", zIndex: 48, "--t": "22s", "--cx": "26px" })} />
-      <Art name="lotus-cluster" w={1000} h={471} className="dk-sway" style={v({ left: "-3%", bottom: "44px", width: "max(30%, 220px)", zIndex: 50, "--t": "8s" })} />
-
-      <button
-        ref={yarn}
-        type="button"
-        aria-label="A ball of yarn and a crochet hook (click to roll it)"
-        onClick={rollYarn}
-        className="dk-obj dk-yarn pointer-events-auto border-0 bg-transparent p-0"
-        style={{ left: "max(24%, 170px)", bottom: "74px", width: "clamp(96px, 10vw, 150px)", zIndex: 52 }}
-      >
-        <span className="roll block">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/art/garden/yarn.webp" alt="" width={460} height={260} loading="lazy" decoding="async" />
-        </span>
-      </button>
-      {/* Peanut wanders the cloud past the yarn and pounces when it rolls to her */}
-      <PeanutWalk style={{ left: "calc(max(24%, 170px) + clamp(110px, 11vw, 170px))", width: "clamp(220px, 24vw, 380px)", bottom: "74px", zIndex: 51 }} size="clamp(76px, 7vw, 112px)" />
-
-      <button
-        ref={mic}
-        type="button"
-        aria-label="A microphone (click to hear it sing)"
-        onClick={sing}
-        className="dk-obj dk-mic pointer-events-auto border-0 bg-transparent p-0"
-        style={{ right: "4%", bottom: "84px", width: "clamp(70px, 7.5vw, 120px)", zIndex: 52 }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/art/garden/mic.webp" alt="" width={360} height={528} loading="lazy" decoding="async" />
-      </button>
+      {/* the first portfolio's drawn garden along the foot, Peanut wandering it */}
+      <GardenBed variant="corners" style={{ bottom: "34px", zIndex: 48 }} />
+      <PeanutWalk style={{ left: "max(22%, 150px)", width: "clamp(220px, 24vw, 380px)", bottom: "48px", zIndex: 51 }} size="clamp(76px, 7vw, 112px)" />
     </div>
   );
 }

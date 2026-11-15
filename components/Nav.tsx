@@ -54,7 +54,8 @@ export default function Nav() {
       for (const el of document.querySelectorAll<HTMLElement>("[data-tone]")) {
         const r = el.getBoundingClientRect();
         if (r.top <= BAR / 2 && r.bottom > BAR / 2) {
-          tone = el.dataset.tone === "dark";
+          // Pastel theme: every section is light now, so the bar keeps its dark words.
+          tone = false && el.dataset.tone === "dark";
           break;
         }
       }

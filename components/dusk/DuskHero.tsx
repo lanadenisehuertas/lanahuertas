@@ -15,7 +15,8 @@ import { cleanTitle, decode, type Star } from "@/lib/dusk/skySong";
 
 // the composer is its own chunk, loaded when someone opens it or follows a song link
 const SkyComposer = dynamic(() => import("./SkyComposer"), { ssr: false });
-import { Art, Blob, GStar, SkyRing, Stars } from "./Decor";
+import { Blob, GStar, SkyRing, Stars } from "./Decor";
+import GardenBed from "../pastel/GardenBed";
 
 const v = (o: Record<string, string | number>) => o as CSSProperties;
 
@@ -47,10 +48,10 @@ const heartSvg = (c: string) =>
 /**
  * The hero at dusk: the name in the upper sky (MorphName: hover morph,
  * click scramble — unchanged), a glowing door with streams pouring out of
- * it, the bass's strings running on into a music staff across the floor
- * (from tablet width up), pixel clouds and lotus, and things to play with —
- * Peanut asleep on her cloud (stroke her, click her), the bass (click to play
- * a note), the door (confetti), and the sky itself (click to place stars that
+ * it, a music staff running across the floor (from tablet width up), a drawn
+ * lotus garden, and things to play with — Peanut asleep in the garden (stroke
+ * her, click her), the door (confetti), and the sky itself (click to place
+ * stars that
  * join into a constellation). Kept deliberately spare: no planets, badge or
  * checker diamonds, so the name has the sky to itself. Touching a letter of the name
  * also blooms a small cluster of pixel flowers round it.
@@ -61,7 +62,6 @@ export default function DuskHero() {
   const staffCv = useRef<HTMLCanvasElement>(null);
   const nameBox = useRef<HTMLDivElement>(null);
   const peanut = useRef<HTMLButtonElement>(null);
-  const bass = useRef<HTMLButtonElement>(null);
   const [song, setSong] = useState<{ mode: "write" | "listen"; stars: Star[]; title: string } | null>(null);
   const [hint, setHint] = useState(false);
 
@@ -253,18 +253,6 @@ export default function DuskHero() {
     burst(hero, x, y, 26, PALETTE);
     [523, 659, 784, 988].forEach((f, k) => tone(f, { type: "sine", vol: 0.06, dur: 1.2, at: k * 0.07 }));
   };
-  const strum = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const hero = root.current,
-      el = e.currentTarget;
-    delete el.dataset.strum;
-    void el.offsetWidth;
-    el.dataset.strum = "";
-    playNextNote();
-    if (!hero) return;
-    const [x, y] = local(hero, e.clientX, e.clientY);
-    for (let k = 0; k < 4; k++) setTimeout(() => floatText(hero, x + k * 26, y - 20 - k * 6, k % 2 ? "♫" : "♪"), k * 70);
-  };
-
   return (
     // overflow-clip, not -hidden: a hidden box is a scroll container (see the old Hero).
     <section ref={root} data-tone="dark" aria-label="Intro" className="dk dk-hero dk-sky-hero dk-seam-b relative h-[max(100svh,640px)] min-h-[640px]">
@@ -309,15 +297,9 @@ export default function DuskHero() {
         <p className="dk-hline type-display mx-auto mt-3 max-w-[30ch] text-lg leading-snug italic sm:mt-4 sm:max-w-[38ch] sm:text-[1.55rem]">{profile.heroShort}</p>
       </div>
 
-      <Art priority name="cloud-bank" w={1400} h={196} className="dk-cloud" style={v({ left: "-8%", bottom: "3%", width: "116%", zIndex: 50, "--t": "18s", "--cx": "30px" })} />
       <canvas ref={staffCv} aria-hidden className="dk-canvas hidden sm:block" style={{ zIndex: 52 }} />
-      <Art priority name="lotus-cluster" w={1000} h={471} className="dk-sway" style={v({ left: "-4%", bottom: "4%", width: "max(32%, 240px)", zIndex: 56, "--t": "7s" })} />
-      <Art name="lotus-cluster" w={1000} h={471} className="dk-sway" style={v({ right: "-6%", bottom: "3%", width: "max(26%, 200px)", zIndex: 56, scale: "-1 1", "--t": "8s" })} />
-
-      <button ref={bass} type="button" aria-label="Bass guitar (click to play a note)" onClick={strum} className="dk-obj dk-bass hidden border-0 bg-transparent p-0 md:block" style={{ left: "-3%", bottom: "15%", width: "clamp(220px, 25%, 380px)", zIndex: 53 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/art/garden/bass.webp" alt="" width={640} height={425} decoding="async" />
-      </button>
+      {/* the first portfolio's drawn garden along the foot */}
+      <GardenBed variant="full" style={{ zIndex: 54, bottom: "clamp(36px, 7%, 84px)" }} />
 
       <button ref={peanut} type="button" aria-label="Peanut, my cat, asleep (stroke her, or click to wake her)" className="dk-obj dk-peanut border-0 bg-transparent p-0" style={{ left: "15%", bottom: "8%", width: "clamp(120px, 12.5vw, 196px)", zIndex: 58 }}>
         <span className="pz block">

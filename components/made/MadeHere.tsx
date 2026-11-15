@@ -312,7 +312,6 @@ export default function MadeHere() {
       </section>
 
       <footer className="mh-foot">
-        <img src="/art/garden/cloud-bank.webp" alt="" className="mh-clouds" width={1400} height={196} loading="lazy" />
         <div className="mh-footin">
           <a className="link" href="/">
             <span aria-hidden>←</span> Back to the portfolio
