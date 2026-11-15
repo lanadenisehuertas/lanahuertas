@@ -47,7 +47,7 @@ const reduced = () => typeof window !== "undefined" && window.matchMedia("(prefe
  * The spread: one project per screen. In "carousel" mode (homepage) the
  * slides sit side by side in a native scroll-snap track, so they swipe and
  * scroll before JS; once mounted, the track adds a project index along the
- * top, back/next edge zones with a cursor label, mouse drag and ←/→ while the
+ * top, back/next buttons, edge zones with a cursor label, mouse drag and ←/→ while the
  * section is on screen. Off-screen slides are inert. In "stack" mode (the
  * /design, /videos and /ui-ux pages) the same slides run down the page.
  *
@@ -117,7 +117,13 @@ export default function Spread({
               id={s.key}
               data-tone={s.tone}
               className="sp-cell"
-              style={s.wash ? ({ "--head": `rgb(${s.wash})` } as CSSProperties) : undefined}
+              // its own wash colour, and the next cell's to melt into
+              style={
+                {
+                  ...(s.wash ? { "--head": `rgb(${s.wash})` } : {}),
+                  ...(slides[i + 1]?.wash ? { "--next": `rgb(${slides[i + 1].wash})` } : {}),
+                } as CSSProperties
+              }
             >
               {i === 0 ? (
                 <h1 className="sp-name">{title}</h1>
@@ -351,7 +357,7 @@ function Carousel({
       className="sp sp--carousel"
       style={{ "--head": cur.wash ? `rgb(${cur.wash})` : "transparent" } as CSSProperties}
     >
-      <h2 id={`${id}-name`} data-rv="mist" className="sp-name">
+      <h2 id={`${id}-name`} className="sp-name">
         {title}
       </h2>
 
@@ -376,6 +382,17 @@ function Carousel({
           {pad(active + 1)} / {pad(count)}
           <span className="sr-only">: {cur.name}</span>
         </span>
+        {/* the edge zones and the arrow keys are easy to miss: real buttons too */}
+        {count > 1 && (
+          <span className="sp-arrows">
+            <button type="button" className="rail-arrow" aria-label={`Previous: ${short(slides[wrap(active - 1)])}`} onClick={() => step(-1)}>
+              <span aria-hidden>←</span>
+            </button>
+            <button type="button" className="rail-arrow" aria-label={`Next: ${short(slides[wrap(active + 1)])}`} onClick={() => step(1)}>
+              <span aria-hidden>→</span>
+            </button>
+          </span>
+        )}
       </div>
 
       <div

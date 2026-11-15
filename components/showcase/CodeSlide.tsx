@@ -65,7 +65,8 @@ export default function CodeSlide({ p, n, total, caseLink = true }: { p: Enginee
   const d = DEVICES[p.visual];
   return (
     <article className="sp-slide sp-slide--code" style={washVar(slug)} aria-label={p.title}>
-      <Backdrop slug={slug} eager={near} />
+      {/* the UI/UX slides sit on the dawn sky, not an artboard */}
+      <Backdrop />
       <SpreadCopy
         meta={`${pad(n)} / ${pad(total)} · ${p.year}`}
         title={p.title}

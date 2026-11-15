@@ -3,7 +3,6 @@
 import { useRef, useState, type FormEvent } from "react";
 import { profile } from "@/lib/content";
 import { Sparkle4 } from "./Botanicals";
-import { oops, sent } from "@/lib/dusk/sound";
 
 /*
  * Message form. Posts straight to Lana's inbox through FormSubmit's AJAX
@@ -56,14 +55,12 @@ export default function ContactForm() {
     setErrors(found);
     const first = (Object.keys(found) as (keyof Fields)[])[0];
     if (first) {
-      oops();
       formRef.current?.querySelector<HTMLElement>(`[name="${first}"]`)?.focus();
       return;
     }
     // Bots fill the hidden field; pretend it worked and send nothing.
     if (honey.current?.value) {
       setStatus("sent");
-      sent();
       return;
     }
 
@@ -88,12 +85,8 @@ export default function ContactForm() {
       const data = (await res.json().catch(() => ({}))) as { success?: string | boolean };
       if (!res.ok || String(data.success) !== "true") throw new Error("not sent");
       setStatus("sent");
-      sent();
-      // The guide butterfly flies off with a burst (Butterfly.tsx listens).
-      window.dispatchEvent(new Event("butterfly:send"));
     } catch {
       setStatus("failed");
-      oops();
     } finally {
       window.clearTimeout(timeout);
     }
@@ -101,15 +94,15 @@ export default function ContactForm() {
 
   if (status === "sent") {
     return (
-      <div role="status" className="notepaper dusk-panel relative mx-auto max-w-xl px-6 py-10 text-center">
-          <span aria-hidden className="relative mx-auto block h-10 w-10">
+      <div role="status" className="glass relative mx-auto max-w-xl rounded-[8px] px-6 py-10 text-center">
+        <span aria-hidden className="relative mx-auto block h-10 w-10">
           {[0, 1, 2, 3, 4].map((k) => (
             <Sparkle4 key={k} className="burst absolute h-3 w-3 text-lavender" />
           ))}
           <Sparkle4 className="spin-slow h-10 w-10 text-lavender" />
         </span>
         <p className="type-display mt-4 text-3xl text-iris italic">Message sent</p>
-        <p className="mx-auto mt-2 max-w-sm text-base leading-relaxed text-ink/80">
+        <p className="mx-auto mt-2 max-w-sm text-base leading-relaxed text-ink/75">
           Thank you{fields.name.trim() ? `, ${fields.name.trim().split(" ")[0]}` : ""}. I&apos;ll reply to{" "}
           {fields.email.trim() || "your email"} within a few days.
         </p>
@@ -119,7 +112,7 @@ export default function ContactForm() {
             setFields({ name: "", email: "", message: "" });
             setStatus("idle");
           }}
-          className="link mt-6 inline-flex min-h-[44px] items-center text-base"
+          className="gel-ghost mt-6 inline-flex min-h-[46px] items-center px-5"
         >
           Send another message
         </button>
@@ -135,7 +128,7 @@ export default function ContactForm() {
       onSubmit={submit}
       noValidate
       aria-labelledby="form-heading"
-      className="notepaper dusk-panel relative mx-auto w-full max-w-xl p-6 text-left sm:p-8"
+      className="glass relative mx-auto max-w-xl rounded-[8px] p-5 text-left sm:p-7"
     >
       <h3 id="form-heading" className="type-display text-3xl text-iris italic">
         Send a message
@@ -200,7 +193,7 @@ export default function ContactForm() {
       <input ref={honey} type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
 
       {status === "failed" && (
-        <p role="alert" className="mt-4 border-l-2 border-[#b42318] bg-[#fdecea]/70 px-3.5 py-2.5 text-[15px] text-[#7a1a12]">
+        <p role="alert" className="mt-4 rounded-[6px] border border-[#b9379d]/50 bg-[#fbeaf4] px-3.5 py-2.5 text-[14px] text-[#6d1458]">
           Your message didn&apos;t send — the connection dropped or the mail service didn&apos;t answer. Everything you typed
           is still here: try again, or email{" "}
           <a href={`mailto:${profile.email}`} className="font-semibold underline underline-offset-2">
@@ -213,7 +206,7 @@ export default function ContactForm() {
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <a
           href={`mailto:${profile.email}`}
-          className="link inline-flex min-h-[44px] items-center text-[15px]"
+          className="inline-flex min-h-[44px] items-center text-[14px] text-ink/80 underline decoration-ink/40 underline-offset-4 transition-colors hover:text-lavender"
         >
           or email {profile.email}
         </a>
@@ -221,7 +214,7 @@ export default function ContactForm() {
           type="submit"
           disabled={sending}
           aria-busy={sending}
-          className="btn inline-flex min-h-[48px] items-center gap-2 px-6 disabled:cursor-wait disabled:opacity-70"
+          className="gel inline-flex min-h-[48px] items-center gap-2 px-6 disabled:cursor-wait disabled:opacity-70"
         >
           {sending ? (
             <>
@@ -241,12 +234,13 @@ export default function ContactForm() {
 function Field({ id, label, error, children }: { id: string; label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label htmlFor={id} className="contact-label">
+      <label htmlFor={id} className="type-pixel mb-1.5 block text-[14px] text-ink/70">
         {label}
       </label>
       {children}
       {error && (
-        <p id={`${id}-err`} className="mt-1.5 text-[15px] text-[#a1251a]">
+        <p id={`${id}-err`} className="mt-1.5 text-[14px] font-medium text-[#8a1f6a]">
+          <span aria-hidden>✦ </span>
           {error}
         </p>
       )}

@@ -2,12 +2,5 @@ import type { MetadataRoute } from "next";
 import { siteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
-  return [
-    { url: siteUrl, lastModified: now, changeFrequency: "monthly", priority: 1 },
-    { url: `${siteUrl}/design`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${siteUrl}/videos`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${siteUrl}/ui-ux`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${siteUrl}/made-here`, lastModified: now, changeFrequency: "daily", priority: 0.5 },
-  ];
+  return [{ url: siteUrl, lastModified: new Date(), changeFrequency: "monthly", priority: 1 }];
 }

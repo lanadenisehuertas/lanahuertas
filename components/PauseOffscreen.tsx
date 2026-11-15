@@ -3,23 +3,18 @@
 import { useEffect } from "react";
 
 /**
- * Three savings for what is out of view:
+ * Two savings for what is out of view (ported from the later site):
  *
  * - data-off pauses every CSS animation in a section well out of view (more
- *   than 300px off screen): twinkles, sways, floating art and the like keep
- *   costing frames otherwise, which an older phone feels. The canvases already
- *   stop themselves offscreen. dusk.css does the rest.
+ *   than 300px off screen): twinkles, sways and floating art keep costing
+ *   frames otherwise, which an older phone feels.
  * - data-unseen does the same for each looping decoration on its own, so the
- *   parts of an on-screen section you can't see (the far end of a tall one,
- *   a blob drifting below the fold) hold still too. Only endless, time-driven
- *   CSS animations are watched; scroll-driven ones and one-off reveals are
- *   left alone. Sideways there is a whole screen of margin, so things that
- *   drift across never freeze just out of sight.
- * - data-cv lets the browser skip a far section's layout and paint entirely
- *   (content-visibility: auto). Each keeps its measured height as its
- *   placeholder size, so the scrollbar and anchor jumps do not shift. Only
- *   sections that already clip their overflow get it, so nothing that spills
- *   past a section edge is cut. Nothing fixed-position lives inside a section.
+ *   parts of an on-screen section you can't see hold still too. Only endless,
+ *   time-driven CSS animations are watched; scroll-driven ones and one-off
+ *   reveals are left alone. Sideways there is a whole screen of margin, so
+ *   things that drift across never freeze just out of sight.
+ *
+ * The rules that act on both attributes are at the foot of work.css.
  */
 export default function PauseOffscreen() {
   useEffect(() => {
@@ -47,8 +42,8 @@ export default function PauseOffscreen() {
         deco.observe(el);
       }
     };
-    // sections that skip their rendering start their animations only when they
-    // come near, so look again whenever one does
+    // sections paused offscreen start their animations only when they come
+    // near, so look again whenever one does
     const rescan = () => {
       if (!scanId) scanId = soon(scan, 1000);
     };
@@ -69,19 +64,10 @@ export default function PauseOffscreen() {
     );
     secs.forEach((s) => io.observe(s));
 
-    // after the page has settled (fonts, first images), so the sizes are real
+    // after the page has settled, find the looping decorations to watch
     let idle = 0;
-    const skip = () => {
-      secs.forEach((s) => {
-        const ov = getComputedStyle(s).overflowY;
-        if (ov !== "clip" && ov !== "hidden") return;
-        s.style.containIntrinsicSize = `auto ${Math.round(s.getBoundingClientRect().height)}px`;
-        s.setAttribute("data-cv", "");
-      });
-      scan();
-    };
     const later = () => {
-      idle = soon(skip, 2000);
+      idle = soon(scan, 2000);
     };
     if (document.readyState === "complete") later();
     else window.addEventListener("load", later, { once: true });

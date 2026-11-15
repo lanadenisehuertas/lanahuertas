@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { posters } from "@/lib/brands";
 import Lightbox from "./Lightbox";
-import SkyNotes from "../dusk/SkyNotes";
 import Pic from "./Pic";
 
 const still = () =>
@@ -11,8 +10,8 @@ const still = () =>
 
 /**
  * One-off posters: one row on the site's sky. Mouse drag flings it (with
- * momentum); wheel, trackpad and touch scroll it natively; Tab walks the
- * posters. The poster under the pointer lifts and tilts toward it; a click
+ * momentum); wheel, trackpad and touch scroll it natively; the arrows page
+ * it; Tab walks the posters. The poster under the pointer lifts and tilts toward it; a click
  * (not a drag) opens the lightbox.
  */
 export default function PosterRow({ id = "posters" }: { id?: string }) {
@@ -66,6 +65,14 @@ export default function PosterRow({ id = "posters" }: { id?: string }) {
     coast.current = requestAnimationFrame(glide);
   };
 
+  // the arrows page the row by most of a screen
+  const page = (dir: -1 | 1) => {
+    const el = row.current;
+    if (!el) return;
+    cancelAnimationFrame(coast.current);
+    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: still() ? "auto" : "smooth" });
+  };
+
   const tilt = (e: ReactPointerEvent<HTMLButtonElement>) => {
     if (e.pointerType !== "mouse" || drag.current?.moved || still()) return;
     const fig = e.currentTarget.firstElementChild as HTMLElement | null;
@@ -81,16 +88,22 @@ export default function PosterRow({ id = "posters" }: { id?: string }) {
   };
 
   return (
-    <section id={id} data-tone="dark" aria-labelledby={`${id}-h`} className="pr dk-pr">
-      <SkyNotes skip="[class*=pr-row],[class*=pr-track],[class*=pr-rail],[class*=pr-card]" />
-      <div className="pr-head">
-        <h2 id={`${id}-h`} data-perch data-rv="mist" className="pr-title">
+    <section id={id} aria-labelledby={`${id}-h`} className="pr">
+      <div className="pr-head sec-head">
+        <h2 id={`${id}-h`} className="pr-title">
           One-off <em>posters</em>
         </h2>
-        <p className="pr-hint">
-          {/* each phrase stays whole when the line wraps on a phone */}
-          <span>{posters.length} posters</span> · <span>drag the row</span> · <span>click to open</span>
-        </p>
+        <div className="sec-tools">
+          <p className="pr-hint">{posters.length} posters. Click one to open it.</p>
+          <span className="pr-arrows">
+            <button type="button" className="rail-arrow" aria-label="Earlier posters" onClick={() => page(-1)}>
+              <span aria-hidden>←</span>
+            </button>
+            <button type="button" className="rail-arrow" aria-label="More posters" onClick={() => page(1)}>
+              <span aria-hidden>→</span>
+            </button>
+          </span>
+        </div>
       </div>
       <ul
         ref={row}

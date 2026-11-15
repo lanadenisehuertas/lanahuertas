@@ -41,6 +41,7 @@ export default function BrandSlide({ brand, n, total, link = true }: { brand: Br
         parts={brand.roles}
         actions={
           <>
+            {/* on the homepage the whole set lives on /design; there, the post is the action */}
             {link && (
               <a href={`/design#${brand.slug}`} className="btn">
                 View the full set <span aria-hidden>→</span>
