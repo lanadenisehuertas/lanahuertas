@@ -171,6 +171,8 @@ function Carousel({
   const [active, setActive] = useState(0);
   const [ready, setReady] = useState(false);
   const [inReach, setInReach] = useState(false);
+  // phones fetch only the slide in view at once; the rest load as they are swiped to
+  const [phone, setPhone] = useState(false);
   const [edge, setEdge] = useState<-1 | 1 | null>(null);
 
   const wrap = useCallback((i: number) => ((i % count) + count) % count, [count]);
@@ -256,7 +258,14 @@ function Carousel({
   useEffect(() => {
     const el = section.current;
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => e.isIntersecting && setInReach(true), { rootMargin: "100% 0px" });
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        setPhone(window.matchMedia("(max-width: 767px)").matches);
+        setInReach(true);
+      },
+      { rootMargin: "100% 0px" }
+    );
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -432,7 +441,7 @@ function Carousel({
             <SlideCtx.Provider
               value={{
                 active: i === active,
-                near: inReach && (Math.abs(i - active) <= 1 || Math.abs(i - active) === count - 1),
+                near: inReach && (i === active || (!phone && (Math.abs(i - active) <= 1 || Math.abs(i - active) === count - 1))),
                 heading: "h3",
               }}
             >

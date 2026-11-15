@@ -90,7 +90,8 @@ export default function AboutMe() {
             ))}
           </div>
 
-          <div aria-hidden className="pointer-events-none">
+          {/* on a phone only the first (lotus) and last (butterfly) stay */}
+          <div aria-hidden className="portrait-decor pointer-events-none">
             <div className="sl-sprout absolute -bottom-10 -left-12 z-10 w-28 sm:w-36" style={{ "--i": 1 } as CSSProperties} data-react="lotus">
               <span className="react block"><Lotus className="sway w-full" deep /></span>
             </div>

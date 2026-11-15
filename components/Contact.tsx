@@ -195,8 +195,9 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* The garden, spilling over the card edges at three depths */}
-          <div aria-hidden className="pointer-events-none">
+          {/* The garden, spilling over the card edges at three depths
+              (laptops and up: on a phone it is left out, see work.css) */}
+          <div aria-hidden className="end-garden pointer-events-none">
             {/* one vine weaving the whole bed together */}
             <div data-rv className="absolute bottom-[4%] left-[-3%] w-[106%]">
               <LongVine className="w-full" flip />

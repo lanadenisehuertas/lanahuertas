@@ -136,8 +136,11 @@ export default function MorphName({
     reduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const t = timers.current;
     // The first wave plays as the opening screen lifts, not underneath it.
+    // On a phone it waits a little longer: the wave fetches the four rough
+    // Redaction cuts, and those should not queue with the first screen.
     let start = 0;
-    const begin = () => (start = window.setTimeout(wave, 350));
+    const phone = window.matchMedia("(max-width: 767px)").matches;
+    const begin = () => (start = window.setTimeout(wave, phone ? 1600 : 350));
     const w = window as Window & { __gardenReady?: boolean };
     if (w.__gardenReady) begin();
     else window.addEventListener("garden:ready", begin, { once: true });

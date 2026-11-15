@@ -54,14 +54,34 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* The first screen's art: asked for before the stylesheet finds it */}
-      <link rel="preload" as="image" href="/art/cloud.webp" imageSrcSet="/art/cloud-sm.webp 480w, /art/cloud.webp 900w" imageSizes="(min-width: 768px) 50vw, 70vw" />
+      {/* The first screen's art, asked for before the stylesheet finds it:
+          the still garden on phones, the first cloud of the live one above */}
+      <link rel="preload" as="image" href="/art/still/hero-garden.webp" imageSrcSet="/art/still/hero-garden-sm.webp 430w, /art/still/hero-garden.webp 860w" imageSizes="100vw" media="(max-width: 767px)" />
+      <link rel="preload" as="image" href="/art/cloud.webp" imageSrcSet="/art/cloud-sm.webp 480w, /art/cloud.webp 900w" imageSizes="50vw" media="(min-width: 768px)" />
       {/* Garden band. Shown at once, like the name above it. No frame: the dawn sky behind it runs edge to edge and
           dissolves into the page on every side, so the garden grows out of
           the hero instead of sitting on it in a box. The end card closes the
           page on the same sky at dusk. */}
       <div className="relative mx-auto mt-6 max-w-6xl px-0 sm:mt-8 sm:px-8">
         <div className="bloom-zone hero-bloom relative h-[80vw] max-h-[460px] min-h-[290px] sm:h-[50vw]">
+          {/* Phones: the whole garden band below, rendered once into one
+              picture (scripts/gen-phone-stills.py). A phone decodes one image
+              instead of laying out and repainting some 400 live pieces; from
+              768px the live garden takes over and this is not shown. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="hero-still pointer-events-none absolute top-0 left-[calc(50%-50vw)] h-[111.6%] w-screen max-w-none object-cover object-bottom select-none"
+            src="/art/still/hero-garden.webp"
+            srcSet="/art/still/hero-garden-sm.webp 430w, /art/still/hero-garden.webp 860w"
+            sizes="100vw"
+            width={860}
+            height={768}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            decoding="async"
+            draggable={false}
+          />
           {/* The sky: full-bleed, edges dissolved */}
           <div
             aria-hidden

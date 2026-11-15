@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { experience, education, skillGroups, certifications, languages } from "@/lib/content";
+import { experience, education, skillGroups, certifications, awards, languages } from "@/lib/content";
 import Folder, { type FolderTab } from "./Folder";
 import AboutMe from "./AboutMe";
 import SectionTitle from "./SectionTitle";
@@ -130,6 +130,27 @@ export default function AboutPanel() {
                       )}
                     </div>
                   </article>
+                ))}
+              </div>
+
+              <p className="type-pixel mt-12 text-[14px] text-ink/75">✦ Awards</p>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {awards.map((a, idx) => (
+                  <div
+                    key={a.event}
+                    data-rv
+                    style={{ "--d": `${idx * 70}ms` } as CSSProperties}
+                    className="sheet-card group flex"
+                  >
+                    <div className="sheet-band flex w-14 shrink-0 items-center justify-center">
+                      <Lotus className="relative w-10 transition-transform duration-500 group-hover:scale-110" deep />
+                    </div>
+                    <div className="border-l border-dashed border-ink/20 p-4">
+                      <p className="type-display text-xl leading-snug text-iris lining-nums">{a.place}</p>
+                      <p className="mt-1 text-[14px] text-ink/80">{a.event}</p>
+                      {a.year && <p className="type-pixel mt-2 text-[14px] text-ink/75">{a.year}</p>}
+                    </div>
+                  </div>
                 ))}
               </div>
 

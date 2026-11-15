@@ -39,6 +39,10 @@ const cormorant = Cormorant_Garamond({
 const redaction = localFont({
   variable: "--font-redaction",
   display: "swap",
+  // No rule reads --font-redaction today (the name morph uses the r10-r100
+  // cuts below), so its three files are not preloaded: on a phone they
+  // queued ahead of the first screen's picture for nothing.
+  preload: false,
   src: [
     { path: "./fonts/redaction/Redaction-Regular.woff2", weight: "400", style: "normal" },
     { path: "./fonts/redaction/Redaction-Italic.woff2", weight: "400", style: "italic" },
@@ -171,16 +175,16 @@ export default function RootLayout({
         <GardenLoader />
         {/*
          * Lift the opening screen once the document has been read, and not
-         * before 0.45s so it doesn't flash. It is not tied to scripts or
-         * images arriving, which on a slow phone held the whole first screen
-         * back for seconds. Then tell the page
-         * (MorphName waits for this before its first wave). Seen once per
-         * session; later loads skip straight in.
+         * before the butterfly has had its moment: 1.3s on the first visit of
+         * a session, 0.7s on later loads. It is not tied to scripts or images
+         * arriving, which on a slow phone held the whole first screen back
+         * for seconds. Then tell the page
+         * (MorphName waits for this before its first wave).
          */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}try{if(sessionStorage.getItem('garden-seen')){go();return}}catch(e){}var t0=Date.now();function later(){setTimeout(go,Math.max(0,450-(Date.now()-t0)))}if(document.readyState!=='loading')later();else document.addEventListener('DOMContentLoaded',later);setTimeout(go,2500)})();",
+              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}var seen=false;try{seen=!!sessionStorage.getItem('garden-seen')}catch(e){}var hold=seen?700:1300,t0=Date.now();function later(){setTimeout(go,Math.max(0,hold-(Date.now()-t0)))}if(document.readyState!=='loading')later();else document.addEventListener('DOMContentLoaded',later);setTimeout(go,2500)})();",
           }}
         />
         {/*

@@ -756,42 +756,31 @@ html[data-lite] .mp-bloom { display: none; }
 }
 
 /* ==== Scroll effects ==========================================================
-   Tied to the scroll position itself, so they follow the reader both ways:
-   - the hero's name drifts up and fades as you leave it, and the garden under
-     it sinks a little slower than the page (a short parallax);
-   - each section's heading rises into place, its words follow, and its art
-     rises and settles from a slightly smaller size, piece by piece.
-   Scroll-driven CSS only, on the compositor: opacity and the individual
-   translate and scale properties, so they add to any transform an element
-   already has (tilted windows, hover lifts, the carousel's slide). No
-   filter, mask or clip-path, no script, nothing running while the page is
-   still. Browsers without scroll timelines show everything as it is; off for
-   reduced motion.
+   Two kinds, both off for reduced motion.
 
-   Each section names its own view timeline (--sec) and its content follows
-   that, because the sections clip their overflow and a plain view() inside
-   them would follow the section instead of the page. */
-@keyframes fx-rise {
-  from { opacity: 0; translate: 0 var(--rise, 36px); }
-}
-@keyframes fx-art {
-  from { opacity: 0; translate: 0 64px; scale: 0.92; }
-}
+   1. Reveals, in every browser. As each piece reaches the screen (ScrollFX
+      marks it data-fx-in), it plays once:
+      - headings wipe up out of their own baseline and rise;
+      - the words under them follow, one block after another;
+      - artwork rises and settles from a slightly smaller size, piece by piece.
+      Opacity, the individual translate and scale properties, and a one-off
+      clip-path on headings: they add to any transform an element already has
+      (tilted windows, hover lifts, the carousel's slide) and nothing keeps
+      running once they have played. The hidden "before" state only applies
+      once ScrollFX has started (html.fx-on), so without scripts nothing is
+      ever hidden.
+
+   2. Tied to the scroll position, where the browser has scroll timelines:
+      the hero's name drifts up and fades as you leave it, and the garden under
+      it sinks a little slower than the page. */
 @keyframes fx-leave {
   to { opacity: 0.1; translate: 0 -80px; }
 }
 @keyframes fx-sink {
   to { translate: 0 90px; }
 }
-@supports (animation-timeline: view()) {
+@supports (animation-timeline: scroll()) {
   @media (prefers-reduced-motion: no-preference) {
-    .sp--carousel,
-    .sp--stack > .sp-cell,
-    .pr,
-    .mp,
-    #about,
-    #contact { view-timeline-name: --sec; }
-
     .hero-name {
       animation: fx-leave linear both;
       animation-timeline: scroll(root);
@@ -802,28 +791,55 @@ html[data-lite] .mp-bloom { display: none; }
       animation-timeline: scroll(root);
       animation-range: 0 100vh;
     }
-
-    /* headings */
-    :is(.pr-title, .mp-title, .sp--carousel > .sp-name, .sp--stack .sp-name, #about h2, #contact h2) {
-      --rise: 48px;
-      animation: fx-rise ease-out both;
-      animation-timeline: --sec;
-      animation-range: entry 0% entry 45%;
-    }
-    /* words */
-    :is(.sec-tools, .sp-cell[data-active] .sp-copy > *, .sp--stack .sp-copy > *, .mp-copy > *, #about p, #contact p, #contact form) {
-      animation: fx-rise ease-out both;
-      animation-timeline: --sec;
-      animation-range: entry 10% entry 60%;
-    }
-    /* art, one piece after another */
-    :is(.sp-piece, .sp-stage--frame, .mp-win, .pr-item) {
-      animation: fx-art ease-out both;
-      animation-timeline: --sec;
-      animation-range: entry 8% entry 70%;
-    }
-    :is(.sp-piece, .pr-item):nth-child(2) { animation-range: entry 14% entry 76%; }
-    :is(.sp-piece, .pr-item):nth-child(3) { animation-range: entry 20% entry 82%; }
-    :is(.sp-piece, .pr-item):nth-child(n + 4) { animation-range: entry 26% entry 88%; }
   }
+}
+
+html.fx-on [data-fx] {
+  opacity: 0;
+  translate: 0 40px;
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms),
+    translate 900ms cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms),
+    scale 900ms cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms),
+    clip-path 1000ms cubic-bezier(0.65, 0, 0.35, 1) var(--d, 0ms);
+}
+html.fx-on [data-fx="head"] {
+  translate: 0 0.55em;
+  clip-path: inset(0 -0.4em 100% -0.4em);
+}
+html.fx-on [data-fx="art"] {
+  translate: 0 72px;
+  scale: 0.92;
+}
+html.fx-on [data-fx][data-fx-in] {
+  opacity: 1;
+  translate: 0 0;
+  scale: 1;
+}
+html.fx-on [data-fx="head"][data-fx-in] {
+  clip-path: inset(-0.6em -0.6em -0.6em -0.6em);
+}
+/* one block after another */
+html.fx-on [data-fx]:nth-child(2) { --d: 90ms; }
+html.fx-on [data-fx]:nth-child(3) { --d: 180ms; }
+html.fx-on [data-fx]:nth-child(4) { --d: 270ms; }
+html.fx-on [data-fx]:nth-child(5) { --d: 360ms; }
+html.fx-on [data-fx]:nth-child(n + 6) { --d: 440ms; }
+
+/* ==== Phones: lighter by design ==============================================
+   Under 768px the page keeps its look but not its weight:
+   - the hero garden is one still picture (.hero-still) instead of the live
+     band of some 400 pieces;
+   - the end card keeps its dusk sky but not the flower bed spilling over it
+     or the lights drifting in it;
+   - the portrait keeps its lotus and butterfly, not the rest of its bed.
+   display:none takes them out of style, layout and paint entirely. */
+@media (min-width: 768px) {
+  .hero-still { display: none; }
+}
+@media (max-width: 767px) {
+  .hero-bloom > :not(.hero-still),
+  .end-garden,
+  .end-card .sheet-fade-top > *,
+  .portrait-decor > :not(:first-child):not(:last-child) { display: none; }
 }
