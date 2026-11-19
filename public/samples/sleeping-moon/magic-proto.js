@@ -22,7 +22,9 @@
     const word = $(".veil-word", veil), moon = $(".veil-moon", veil);
     word.innerHTML = [...word.textContent].map((c) => `<span>${c === " " ? "&nbsp;" : c}</span>`).join("");
     const letters = $$("span", word), jobs = [document.fonts?.ready || Promise.resolve()];
-    $$("#moon img").forEach((im) => jobs.push(im.complete ? Promise.resolve() : new Promise((r) => { im.addEventListener("load", r, { once: true }); im.addEventListener("error", r, { once: true }); })));
+    // the pictures on the first screen: the room's, when it opens the page, and the moon's stop's own (not those that
+    // wait to be scrolled near, which would hold the veil until its five seconds are up)
+    $$(".room-intro img, #moon img").filter((im) => im.loading !== "lazy").forEach((im) => jobs.push(im.complete ? Promise.resolve() : new Promise((r) => { im.addEventListener("load", r, { once: true }); im.addEventListener("error", r, { once: true }); })));
     let got = 0, shown = 0, t0 = performance.now(), gone = false, lastF = -1;
     jobs.forEach((j) => j.then(() => got++, () => got++));
     const step = (now) => {
@@ -56,12 +58,12 @@
   if (comet) comet.style.inset = "auto";
   let px = 0, py = 0, fx = 0, fy = 0, lean = 0;
   // the star field sways with the scroll and leans away from the pointer
-  const sway = () => { const U = SM.u(); if (field) field.style.transform = `translate3d(${(Math.cos(scrollY / 1300) * 1.4 * U - fx * 1.6 * U).toFixed(1)}px, ${(Math.sin(scrollY / 900) * 2 * U - fy * 1.2 * U).toFixed(1)}px, 0) scale(${(SM._fs || 1).toFixed(4)})`; };
+  const sway = () => { const U = SM.u(), y = SM.y; if (field) field.style.transform = `translate3d(${(Math.cos(y / 1300) * 1.4 * U - fx * 1.6 * U).toFixed(1)}px, ${(Math.sin(y / 900) * 2 * U - fy * 1.2 * U).toFixed(1)}px, 0) scale(${(SM._fs || 1).toFixed(4)})`; };
   const leanLoop = () => { fx += (px - fx) * 0.08; fy += (py - fy) * 0.08; sway(); lean = Math.abs(px - fx) + Math.abs(py - fy) > 0.002 ? requestAnimationFrame(leanLoop) : 0; };
-  if (SM.HOVER) addEventListener("pointermove", (e) => { if (e.pointerType === "touch" || still()) return; px = e.clientX / innerWidth - 0.5; py = e.clientY / innerHeight - 0.5; if (!lean) lean = requestAnimationFrame(leanLoop); }, { passive: true });
+  if (SM.HOVER) addEventListener("pointermove", (e) => { if (e.pointerType === "touch" || still()) return; px = e.clientX / SM.vw - 0.5; py = e.clientY / SM.vh - 0.5; if (!lean) lean = requestAnimationFrame(leanLoop); }, { passive: true });
   SM.scrub(() => {
     if (still()) { if (field) field.style.transform = ""; return; }
-    const U = SM.u(), y = scrollY, W = innerWidth, H = innerHeight;
+    const U = SM.u(), y = SM.y, W = SM.vw, H = SM.vh;
     sway();
     // one comet for every screen and a half of scroll; it moves only as far as the scroll does
     if (comet) {
@@ -71,7 +73,7 @@
     }
     // motes lift off the horizon while the moon rises
     if (motes.length && hero.classList.contains("rising")) {
-      const p = clamp(-hero.getBoundingClientRect().top / H - (+hero.dataset.riseAt || 0));
+      const p = clamp(-SM.where(hero).top / H - (+hero.dataset.riseAt || 0));
       motes.forEach((m) => {
         const q = clamp((p - m.d * 0.6) / 0.45);
         m.el.style.transform = `translate3d(${(Math.sin(q * 5 + m.sway) * 0.8 * U).toFixed(1)}px, ${(-q * m.h * U - p * 14 * U).toFixed(1)}px, 0)`;
@@ -131,12 +133,18 @@
 
   /* headings the scroll writes */
   const written = $$("#talk .end-h, #talk .t-big").map((h) => { SM.type(h); h.classList.add("wtype"); return h; });
-  SM.scrub(() => written.forEach((h) => {
-    const r = h.getBoundingClientRect(), H = innerHeight;
-    if (r.top > H * 1.2 || r.bottom < -H * 0.2) return;
-    const p = still() ? 1 : clamp((H * 0.96 - r.top) / (H * 0.42)), n = Math.round(p * h._ch.length);
-    if (h._n !== n) { h._n = n; h._ch.forEach((c, i) => c.classList.toggle("w", i < n)); }
-  }));
+  // read in the page's read pass, written in a scrub, so the headings cost no layout of their own while the page moves
+  const writtenAt = () => written.map((h) => {
+    const r = h.getBoundingClientRect(), H = SM.vh;
+    if (r.top > H * 1.2 || r.bottom < -H * 0.2) return -1;
+    return Math.round((still() ? 1 : clamp((H * 0.96 - r.top) / (H * 0.42))) * h._ch.length);
+  });
+  let writtenRead = null;
+  SM.measure(() => { writtenRead = writtenAt(); });
+  SM.scrub(() => {
+    const ns = writtenRead || writtenAt(); writtenRead = null;
+    written.forEach((h, i) => { const n = ns[i]; if (n >= 0 && h._n !== n) { h._n = n; h._ch.forEach((c, j) => c.classList.toggle("w", j < n)); } });
+  });
 
   /* ================================================================ the star chart: every work, one click away */
   const D = typeof DATA !== "undefined" ? DATA : { brands: [], posters: [], films: [], products: [] };

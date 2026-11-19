@@ -36,10 +36,12 @@
 
 /* ---------- the sky moves: stars twinkle, the field sways with the scroll and the pointer, a comet crosses as you scroll ---------- */
 .sky .field { will-change: transform; }
-.sky .field b:nth-child(4n), .stars i:nth-child(3n) { animation: tw 2600ms steps(2, jump-none) infinite; }
-.sky .field b:nth-child(4n + 2), .stars i:nth-child(3n + 1) { animation: tw 3700ms steps(2, jump-none) 900ms infinite; }
-.sky .field b:nth-child(8n + 1), .stars i:nth-child(6n + 2) { animation: tw 1900ms steps(2, jump-none) 400ms infinite; }
-@keyframes tw { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.2; } }
+/* the stars that twinkle in step share a layer, and the layer blinks: three animations for the whole sky */
+.tg { position: absolute; inset: 0; pointer-events: none; }
+.tg-0 { animation: tw 2600ms steps(2, jump-none) infinite; }
+.tg-1 { animation: tw 3700ms steps(2, jump-none) 900ms infinite; }
+.tg-2 { animation: tw 1900ms steps(2, jump-none) 400ms infinite; }
+@keyframes tw { 0%, 100% { opacity: 1; } 50% { opacity: 0.222; } }
 .comet { position: absolute; left: 0; top: 0; width: 4px; height: 4px; background: #fff1c9; opacity: 0; will-change: transform, opacity;
   box-shadow: 5px -3px 0 -0.5px #e9dcff, 10px -6px 0 -1px #b9a2ff, 16px -9px 0 -1px #b9a2ff, 23px -13px 0 -1.5px #8f7ad8, 31px -17px 0 -1.5px #6a58ad; }
 
@@ -109,7 +111,7 @@ dialog.atlas[open] { animation: at-in 200ms linear both; }
   .foot .nextstop { grid-column: 2; pointer-events: auto; font: italic 400 19px/1 "Redaction", Georgia, serif; color: var(--mark); }
   .foot:has(.nextstop[hidden]) { display: none; }
 }
-.quiet .sky .field b, .quiet .stars i, .quiet .pl-cue i { animation: none; }
+.quiet .tg, .quiet .pl-cue i { animation: none; }
 .quiet .spk-layer, .quiet .comet, .quiet .motes { display: none; }
 .quiet .wtype .ch { opacity: 1; }
 /* ---------- fit: the chrome never wraps, and nothing important sits under the bands ---------- */
@@ -147,7 +149,7 @@ body:has(#talk.current) .foot::before { opacity: 0; }
 .clip .c-t { text-overflow: ellipsis; }
 
 @media (prefers-reduced-motion: reduce) {
-  .sky .field b, .stars i, .pl-cue i, .pl-title.cast .ch, .pl-line.cast, dialog.atlas[open] { animation: none; }
+  .tg, .pl-cue i, .pl-title.cast .ch, .pl-line.cast, dialog.atlas[open] { animation: none; }
   .spk-layer, .comet, .motes { display: none; }
   .wtype .ch { opacity: 1; }
   :is(a, button):hover > .sw .sl, :is(a, button):focus-visible > .sw .sl { animation: none; }

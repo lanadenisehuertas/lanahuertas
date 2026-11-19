@@ -17,7 +17,7 @@
     const neb = $(".neb", sky), nearEl = $(".near", sky);
     let tx = 0, ty = 0, x = 0, y = 0, raf = 0;
     const place = () => {
-      const U = SM.u(), H = innerHeight, sy = scrollY / H;
+      const U = SM.u(), H = SM.vh, sy = SM.y / H;
       // far: barely moves; near: moves most, and drifts up faster than the page as it scrolls
       neb.style.transform = `translate3d(${(-x * 0.8 * U).toFixed(1)}px, ${(-y * 0.6 * U - Math.min(sy * 0.3, 8) * U).toFixed(1)}px, 0)`;
       nearEl.style.transform = `translate3d(${(-x * 4.2 * U).toFixed(1)}px, ${(-y * 3.2 * U - ((sy * 0.35) % 1) * H).toFixed(1)}px, 0)`;
@@ -30,7 +30,7 @@
     };
     if (SM.HOVER) addEventListener("pointermove", (e) => {
       if (e.pointerType === "touch" || still()) return;
-      tx = e.clientX / innerWidth - 0.5; ty = e.clientY / innerHeight - 0.5;
+      tx = e.clientX / SM.vw - 0.5; ty = e.clientY / SM.vh - 0.5;
       if (!raf) raf = requestAnimationFrame(ease);
     }, { passive: true });
     SM.scrub(() => { if (!still()) place(); });

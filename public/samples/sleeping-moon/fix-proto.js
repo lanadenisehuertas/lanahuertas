@@ -43,7 +43,7 @@
     const plate = t.closest(".reel-plate"), stop = stopOf(plate);
     if (!plate || !SM.rooms?.[stop?.id]) return;
     const r = t.getBoundingClientRect();
-    if (!plate.classList.contains("now") || seen(t) < 0.9 || r.top < 0 || r.bottom > innerHeight) SM.rooms[stop.id].jump(+plate.dataset.i, true);
+    if (!plate.classList.contains("now") || seen(t) < 0.9 || r.top < 0 || r.bottom > SM.vh) SM.rooms[stop.id].jump(+plate.dataset.i, true);
   });
 
   /* ---------------------------------------------------------------- the phone menu */
@@ -97,8 +97,8 @@
     const d = e.target.closest?.(".door"), hero = $(".stop.hero");
     if (!d || !hero || !d.matches(":focus-visible")) return;
     const top = hero.getBoundingClientRect().top, at = +hero.dataset.riseAt || 0;
-    if (-top / innerHeight - at >= 1) return;
-    SM.glide(top + scrollY + (at + 1.02) * innerHeight, true);
+    if (-top / SM.vh - at >= 1) return;
+    SM.glide(top + scrollY + (at + 1.02) * SM.vh, true);
   });
 
   /* ---------------------------------------------------------------- pictures, fetched as their room comes near

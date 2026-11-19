@@ -24,13 +24,43 @@ const SM = (() => {
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   if (RM) root.classList.add("quiet");
   const quiet = () => root.classList.contains("quiet");
+  /* the window's size, kept between resizes: reading innerWidth or innerHeight after a style has been written makes the
+     browser restyle and lay out the page on the spot, and the scroll asks for them many times a frame */
+  let VW = innerWidth, VH = innerHeight;
+  addEventListener("resize", () => { VW = innerWidth; VH = innerHeight; }, { capture: true });
   /** the layout unit in px */
-  const u = () => (COLUMN.matches ? innerWidth / 100 : Math.min(innerWidth / 100, (innerHeight * 1.6) / 100));
+  const u = () => (COLUMN.matches ? VW / 100 : Math.min(VW / 100, (VH * 1.6) / 100));
 
   const B8 = [0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22,
     3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21];
+  /* a scatter of stars, a few of which twinkle: those that twinkle in step share one of three layers (.tg-0 to .tg-2 in
+     magic-proto.css) and the layer's opacity is what changes, so the browser runs three animations however many stars
+     there are. group(i) gives the layer of the i-th star counting from 1, or -1 for a steady one; a twinkling star
+     stands at 0.9, as bright as the twinkle's peak, and its layer dims it */
+  const twinkle = (list, group, html) => {
+    const layers = [[], [], []], steady = [];
+    list.forEach((s, k) => { const g = group(k + 1); (g < 0 ? steady : layers[g]).push(html(s, g < 0 ? s.o.toFixed(2) : "0.9")); });
+    return steady.join("") + layers.map((l, g) => (l.length ? `<span class="tg tg-${g}">${l.join("")}</span>` : "")).join("");
+  };
   const rgb = (c) => { const m = c.trim().match(/^#?([0-9a-f]{6})$/i); if (m) return [0, 2, 4].map((i) => parseInt(m[1].slice(i, i + 2), 16)); const n = c.match(/[\d.]+/g); return n ? n.slice(0, 3).map(Number) : [185, 162, 255]; };
-  const loadImage = (src) => { const im = new Image(); im.src = src; return im.decode().then(() => im); };
+  /* a picture's image is decoded off the main thread (an ImageBitmap made from the file itself is decoded on a worker)
+     and kept decoded, at no more than 640px on its longest side, which is more than its canvas ever needs. An image
+     element would be decoded again on the main thread whenever its canvas was rebuilt or recoloured. Where that cannot
+     be done, the image element is the fallback. */
+  const viaElement = (src) => { const im = new Image(); im.src = src; return im.decode().then(() => im); };
+  /* el, if given, is the page's own image of the same file: it is let finish first, so the file is fetched once and the
+     copy here comes from the browser's cache */
+  // (a lazy image in a hidden box never loads, so the wait is cut off after a moment and the file fetched anyway)
+  const settled = (el) => (!el || el.complete ? Promise.resolve() : new Promise((r) => { el.addEventListener("load", r, { once: true }); el.addEventListener("error", r, { once: true }); setTimeout(r, 2500); }));
+  const loadImage = (src, el) => {
+    if (!window.createImageBitmap || !window.fetch) return viaElement(src);
+    return settled(el).then(() => fetch(src, { cache: "force-cache" })).then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); }).then((b) => createImageBitmap(b)).then((bmp) => {
+      const k = Math.min(1, 640 / Math.max(bmp.width, bmp.height));
+      if (k >= 1) return bmp;
+      return createImageBitmap(bmp, { resizeWidth: Math.round(bmp.width * k), resizeHeight: Math.round(bmp.height * k), resizeQuality: "high" })
+        .then((small) => { bmp.close(); return small; }, () => bmp);
+    }).catch(() => viaElement(src));
+  };
 
   /* ====================================================================== bitmap */
   const all = new Set(), near = new Set();
@@ -54,7 +84,7 @@ const SM = (() => {
       const srcs = [this.full.getAttribute("src")]; if (this.pic.dataset.alt) srcs.push(this.pic.dataset.alt);
       // a picture in a stop far down the page waits until that stop is within a screen of the window before it fetches
       // its image, so the first screens are not slowed by rooms nobody has reached yet
-      this.loading = nearOnce(this.pic).then(() => Promise.all(srcs.map(loadImage))).then((ims) => { this.imgs = ims; this.build(); });
+      this.loading = nearOnce(this.pic).then(() => Promise.all(srcs.map((s, k) => loadImage(s, k ? null : this.full)))).then((ims) => { this.imgs = ims; this.build(); });
       return this.loading;
     }
     /** read one image at canvas size into two layers: { sleep, wake }, each RGBA. Asleep is the duotone (or, for a
@@ -65,7 +95,8 @@ const SM = (() => {
       o.imageSmoothingQuality = "high";
       if (this.pic.classList.contains("box")) {  // cover the box, as object-fit does
         const pos = (getComputedStyle(this.pic).getPropertyValue("--pos") || "50% 50%").match(/[\d.]+/g) || [50, 50];
-        const s = Math.max(cols / img.naturalWidth, rows / img.naturalHeight), w = img.naturalWidth * s, h = img.naturalHeight * s;
+        const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+        const s = Math.max(cols / iw, rows / ih), w = iw * s, h = ih * s;
         o.drawImage(img, (cols - w) * (pos[0] / 100), (rows - h) * ((pos[1] ?? 50) / 100), w, h);
       } else o.drawImage(img, 0, 0, cols, rows);
       const d = o.getImageData(0, 0, cols, rows).data, n = cols * rows, k = this.kind, flat = this.pic.hasAttribute("data-flat");
@@ -265,9 +296,11 @@ const SM = (() => {
       if (this.image) this.draw();
     }
     /** read the colours again (after --ink or --ground changed) and redraw */
-    recolour() {
+    recolour(inkC, groundC) {
       if (!this.image) return;
-      const cs = getComputedStyle(this.pic), ink = rgb(cs.getPropertyValue("--ink") || "#b9a2ff"), paper = this.paper ? rgb(cs.getPropertyValue("--ground") || "#0c0620") : null;
+      // the caller may say what the colours now are, which spares the browser a restyle to work them out
+      const cs = inkC && (groundC || !this.paper) ? null : getComputedStyle(this.pic);
+      const ink = rgb(inkC || cs.getPropertyValue("--ink") || "#b9a2ff"), paper = this.paper ? rgb(groundC || cs.getPropertyValue("--ground") || "#0c0620") : null;
       if (ink.join() === this.ink.join() && (!paper || paper.join() === this.paper.join())) return;
       this.ink = ink; if (paper) this.paper = paper;
       this.a = this.cells(this.imgs[0], this.cols, this.rows);
@@ -323,27 +356,39 @@ const SM = (() => {
      A picture wakes whole when the pointer is on it (or its link is hovered, focused or tapped: see wakeable).
      Letters of a display heading take the smooth cut within a small circle around the pointer. */
   let px = -9999, py = -9999, pointerIn = false, raf = 0;
-  const frame = () => {
-    raf = 0;
+  const out = (el) => { if (el._lit) { for (const c of el._ch) c.classList.remove("lit"); el._lit = false; } };
+  /** which letters the pointer's circle reaches: only reads the page. null when there is no pointer on it (phones, or
+      the pointer gone), when nothing needs measuring and lit letters are only put out */
+  const lettersAt = () => {
     const active = !quiet() && HOVER && pointerIn, R = u() * 3.4;
+    if (!active) return null;
+    const hit = [];
     for (const el of typed) {
       const hr = el.getBoundingClientRect();
-      if (hr.bottom < -50 || hr.top > innerHeight + 50) continue;
-      // a heading the pointer's circle cannot reach only needs its letters put out, without measuring each one
-      if (!active || px < hr.left - R || px > hr.right + R || py < hr.top - R || py > hr.bottom + R) {
-        if (el._lit) { for (const c of el._ch) c.classList.remove("lit"); el._lit = false; }
-        continue;
-      }
+      // a heading off screen, or one the pointer's circle cannot reach, only needs its letters put out
+      if (hr.bottom < -50 || hr.top > VH + 50 || px < hr.left - R || px > hr.right + R || py < hr.top - R || py > hr.bottom + R) { hit.push([el, null]); continue; }
+      hit.push([el, el._ch.map((c) => { const r = c.getBoundingClientRect(); return (r.left + r.width / 2 - px) ** 2 + (r.top + r.height / 2 - py) ** 2 < R * R; })]);
+    }
+    return hit;
+  };
+  /** light the letters lettersAt found: only writes */
+  const light = (hit) => {
+    if (!hit) { typed.forEach(out); return; }
+    for (const [el, on] of hit) {
+      if (!on) { out(el); continue; }
       el._lit = true;
-      for (const c of el._ch) { const r = c.getBoundingClientRect(); c.classList.toggle("lit", active && (r.left + r.width / 2 - px) ** 2 + (r.top + r.height / 2 - py) ** 2 < R * R); }
+      el._ch.forEach((c, k) => c.classList.toggle("lit", on[k]));
     }
   };
+  // the pointer moving: a frame of its own, read then write. The page moving: the page's frame reads in its read pass
+  // and lights in a scrub (registered below, once scrub exists), so the letters cost no layout of their own
+  const frame = () => { raf = 0; light(lettersAt()); };
+  let lettersRead;
   const tick = () => { if (!raf) raf = requestAnimationFrame(frame); };
   if (HOVER) {
     addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; px = e.clientX; py = e.clientY; pointerIn = true; tick(); }, { passive: true });
     document.addEventListener("pointerleave", () => { pointerIn = false; tick(); });
   }
-  addEventListener("scroll", tick, { passive: true });
   let rz = 0;
   addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { all.forEach((b) => b.build()); tick(); }, 140); });
 
@@ -382,24 +427,34 @@ const SM = (() => {
   const scrubs = new Set();
   let travelling = false;
   let sy = scrollY, target = scrollY, gliding = false, lastT = 0, frameReq = 0;
-  const maxY = () => Math.max(0, document.documentElement.scrollHeight - innerHeight);
+  const maxY = () => Math.max(0, document.documentElement.scrollHeight - VH);
   const smoothOn = () => HOVER && !quiet();
-  /* the scroll position is read once a frame, before the scrubs run: reading scrollY after a scrub has written styles
-     makes the browser lay the page out again, so every later read in the same frame would pay for a fresh layout */
-  let frameY = null;
-  const runScrubs = () => {
-    frameY = scrollY;
-    scrubs.forEach((fn) => { try { fn(); } catch (e) { console.error(e); } });
-    frameY = null;
-  };
+  /* the scroll position is read from the browser only once after the page has moved, and kept until it moves again:
+     reading scrollY after a style has been written makes the browser restyle and lay out the page on the spot, so
+     every scrub that asked for it would pay for a fresh layout */
+  let lastY = scrollY, moved = false;
+  const readY = () => { if (moved) { moved = false; lastY = scrollY; } return lastY; };
+  const runScrubs = () => scrubs.forEach((fn) => { try { fn(); } catch (e) { console.error(e); } });
+  /* measures: functions that only read the page, run each frame the page moves before any scrub writes, so whatever
+     they read costs no extra layout; each gets the frame's time, which every other frame callback also gets */
+  const measures = new Set();
+  const runMeasures = (now) => measures.forEach((fn) => { try { fn(now); } catch (e) { console.error(e); } });
   const frameLoop = (now) => {
     frameReq = 0;
     if (gliding) {
-      const dt = Math.min(48, now - (lastT || now - 16)); lastT = now;
-      sy += (target - sy) * (1 - Math.exp(-dt / 105));
-      if (Math.abs(target - sy) < 0.4) { sy = target; gliding = false; lastT = 0; }
-      window.scrollTo(0, sy);
-    }
+      // while the page glides, its position is the one set here; the browser's is read once, first thing in the frame,
+      // only to notice that something else moved the page (keys, the scrollbar, a link), which ends the glide
+      const real = scrollY;
+      if (Math.abs(real - lastY) > 3) { gliding = false; lastT = 0; sy = target = lastY = real; moved = false; }
+      else {
+        const dt = Math.min(48, now - (lastT || now - 16)); lastT = now;
+        sy += (target - sy) * (1 - Math.exp(-dt / 105));
+        if (Math.abs(target - sy) < 0.4) { sy = target; gliding = false; lastT = 0; }
+        window.scrollTo(0, sy); lastY = sy; moved = false;
+      }
+    } else sy = target = readY();
+    readY();
+    runMeasures(now);
     runScrubs();
     if (gliding) frameReq = requestAnimationFrame(frameLoop);
   };
@@ -409,10 +464,10 @@ const SM = (() => {
     y = Math.max(0, Math.min(maxY(), y));
     if (instant || !smoothOn()) {
       gliding = false; sy = target = y;
-      window.scrollTo({ top: y, behavior: instant || quiet() ? "instant" : "smooth" });
+      window.scrollTo({ top: y, behavior: instant || quiet() ? "instant" : "smooth" }); moved = true;
       kick(); return;
     }
-    if (!gliding) sy = scrollY;
+    if (!gliding) sy = readY();
     target = y; gliding = true; kick();
   };
   // whether a box can scroll on its own, asked once per box: the wheel asks it of every box under the pointer
@@ -433,20 +488,26 @@ const SM = (() => {
       }
     }
     e.preventDefault();
-    const d = e.deltaMode === 1 ? e.deltaY * 36 : e.deltaMode === 2 ? e.deltaY * innerHeight * 0.9 : e.deltaY;
-    if (!gliding) sy = target = scrollY;
+    const d = e.deltaMode === 1 ? e.deltaY * 36 : e.deltaMode === 2 ? e.deltaY * VH * 0.9 : e.deltaY;
+    if (!gliding) sy = target = readY();
     target = Math.max(0, Math.min(maxY(), target + d));
     gliding = true; kick();
   }, { passive: false });
-  addEventListener("scroll", () => {
-    // the browser moved the page itself (keys, scrollbar, touch, a link): follow it
-    if (!gliding) sy = target = scrollY;
-    else if (Math.abs(scrollY - sy) > 3) { gliding = false; sy = target = scrollY; }
+  addEventListener("scroll", (e) => {
+    if (e.target !== document) return;   // a box inside the page scrolled, not the page
+    // while it glides the frame keeps the position (and notices if something else moved the page); otherwise the
+    // next question about the position reads it afresh
+    if (!gliding) moved = true;
     kick();
-  }, { passive: true });
-  addEventListener("resize", () => { target = Math.min(target, maxY()); kick(); });
+  }, { passive: true, capture: true });
+  addEventListener("resize", () => { moved = true; target = Math.min(target, maxY()); kick(); });
   /** register a function that runs every frame the page moves; returns a way to remove it */
   const scrub = (fn) => { scrubs.add(fn); kick(); return () => scrubs.delete(fn); };
+  // the letters' glow follows the page as it moves under a still pointer (see lettersAt)
+  if (HOVER) {
+    measures.add(() => { lettersRead = lettersAt(); });
+    scrub(() => { if (lettersRead !== undefined) { light(lettersRead); lettersRead = undefined; } });
+  }
   /** where an element is: its top and bottom in the window, and for a stop taller than the window how far through it
       the window has come (0 when its top reaches the top of the window, 1 when its bottom reaches the bottom) */
   /* a stop's place in the page is kept between frames and measured again only when something changes size, so the
@@ -458,16 +519,21 @@ const SM = (() => {
   const rectOf = (el) => {
     if (el.parentElement?.tagName !== "MAIN") return el.getBoundingClientRect();
     let c = placed.get(el);
-    if (!c || c.gen !== gen || c.w !== innerWidth) {
-      if (!c) { resized.observe(el); if (!rectOf.body) { rectOf.body = 1; resized.observe(document.body); } }
-      const r = el.getBoundingClientRect();
-      c = { gen, w: innerWidth, top: r.top + scrollY, h: r.height }; placed.set(el, c);
+    if (!c || c.gen !== gen || c.w !== VW) {
+      // measure every stop at once while the page is laid out, rather than one at a time between scrubs that write
+      const y = (lastY = scrollY); moved = false;
+      for (const st of el.parentElement.children) {
+        if (!placed.has(st)) { resized.observe(st); if (!rectOf.body) { rectOf.body = 1; resized.observe(document.body); } }
+        const r = st.getBoundingClientRect();
+        placed.set(st, { gen, w: VW, top: r.top + y, h: r.height });
+      }
+      c = placed.get(el);
     }
-    const top = c.top - (frameY ?? scrollY);
+    const top = c.top - readY();
     return { top, bottom: top + c.h, height: c.h };
   };
   const where = (el) => {
-    const r = rectOf(el), vh = innerHeight;
+    const r = rectOf(el), vh = VH;
     return { top: r.top, bottom: r.bottom, h: r.height, vh, near: r.bottom > -vh && r.top < vh * 2,
       p: Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - vh))),
       arrive: Math.min(1, Math.max(0, (vh - r.top) / vh)),       // 0 while below the window, 1 once its top is at the top
@@ -567,7 +633,7 @@ const SM = (() => {
   const so = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && setStop(e.target)), { rootMargin: "-45% 0px -50% 0px" });
   // the six stops replace the resting line in the masthead once the first screen has gone by (or always, on pages that say so)
   const always = document.body.dataset.route === "always";
-  const past = () => document.body.classList.toggle("past", always || scrollY > (stops[0]?.offsetHeight || innerHeight) - innerHeight * 0.5);
+  const past = () => document.body.classList.toggle("past", always || scrollY > (stops[0]?.offsetHeight || VH) - VH * 0.5);
   // a page with the room intro decides this itself (room-proto.js), so the scroll is not read twice
   if (document.body.dataset.route !== "room") addEventListener("scroll", past, { passive: true });
   /** find the page's stops and headings; called once the page is ready, and again by pages that build themselves */
@@ -575,7 +641,9 @@ const SM = (() => {
   const sky = () => {
     if ($(".sky")) return;
     let seed = 41; const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-    const field = Array.from({ length: 110 }, (_, k) => `<b class="${k % 9 ? "" : "big"}" style="left:${(rnd() * 100).toFixed(2)}%;top:${(rnd() * 100).toFixed(2)}%;opacity:${(0.25 + rnd() * 0.5).toFixed(2)}"></b>`).join("");
+    // the stars that twinkle together share a layer (twinkle()), so the sky runs three animations, not one per star
+    const field = twinkle(Array.from({ length: 110 }, (_, k) => ({ x: rnd() * 100, y: rnd() * 100, o: 0.25 + rnd() * 0.5, big: !(k % 9) })),
+      (i) => (i % 4 === 0 ? 0 : i % 4 === 2 ? 1 : i % 8 === 1 ? 2 : -1), (s, o) => `<b class="${s.big ? "big" : ""}" style="left:${s.x.toFixed(2)}%;top:${s.y.toFixed(2)}%;opacity:${o}"></b>`);
     document.body.insertAdjacentHTML("afterbegin", `<div class="sky" aria-hidden="true"><i class="night"></i><i class="field">${field}</i><i class="dawn"></i></div>`);
   };
 
@@ -618,7 +686,7 @@ const SM = (() => {
   /** where the bands are: their lines (the masthead's bottom, the foot's top) and how far their soft fall reaches */
   const bandAt = () => {
     if (!bandBox) {
-      const m = bands.mast?.getBoundingClientRect(), f = bands.foot?.getBoundingClientRect(), vh = innerHeight;
+      const m = bands.mast?.getBoundingClientRect(), f = bands.foot?.getBoundingClientRect(), vh = VH;
       bandBox = { ml: m ? m.bottom : 0, fl: f ? f.top : vh, mb: m ? m.bottom + m.height * 0.6 : 1, ft: f ? f.top - f.height * 0.6 : vh - 1 };
     }
     return bandBox;
@@ -627,7 +695,7 @@ const SM = (() => {
     const layer = $(".sky .dawn"), s = stops.find((x) => x.dataset.sky === "dawn");
     dawnT.mast = dawnT.foot = 0;
     if (!layer || !s) return;
-    const vh = innerHeight, top = s.getBoundingClientRect().top;
+    const vh = VH, top = rectOf(s).top;
     const cell = Math.max(8, Math.round(u() * 0.9)), H = cell * 10;
     if (layer._cell !== cell) {
       /* the edge: a ridge of solid square cells, stepped like a far hill line (a sum of waves that repeats every 64
@@ -663,7 +731,7 @@ const SM = (() => {
      the scroll has blended it, s._tone(y)) or else the page's own colours, and the dawn as its edge comes up past it */
   scrub(() => {
     const b = bandAt();
-    const at = (y) => { for (const st of stops) { const r = st.getBoundingClientRect(); if (r.top <= y && r.bottom > y) return st._tone ? st._tone(y) : null; } return null; };
+    const at = (y) => { for (const st of stops) { const r = rectOf(st); if (r.top <= y && r.bottom > y) return st._tone ? st._tone(y) : null; } return null; };
     const m = at(b.ml), f = at(b.fl);
     band(dawnT.mast > 0 ? blend(m || NIGHT, DAWN_MAST, dawnT.mast) : m, "mast");
     band(dawnT.foot > 0 ? blend(f || NIGHT, DAWN_FOOT, dawnT.foot) : f, "foot");
@@ -677,7 +745,7 @@ const SM = (() => {
   document.readyState === "loading" ? addEventListener("DOMContentLoaded", start) : start();
   /** travel to a stop */
   /** where a stop is arrived at: its top, or for data-land="end" its last screen */
-  const landing = (el) => el.getBoundingClientRect().top + scrollY + (el.dataset.land === "end" ? Math.max(0, el.offsetHeight - innerHeight) : 0);
+  const landing = (el) => el.getBoundingClientRect().top + scrollY + (el.dataset.land === "end" ? Math.max(0, el.offsetHeight - VH) : 0);
   const go = (id) => { const el = document.getElementById(id); if (el) glide(landing(el)); };
   /* ====================================================================== travel
      A jump between stops: a soft-edged iris in the next stop's own ground colour closes from the point you chose,
@@ -695,7 +763,7 @@ const SM = (() => {
     if (quiet() || travelling) { if (!travelling) jump(); return Promise.resolve(); }
     travelling = true;
     if (!iris) { iris = document.createElement("canvas"); iris.className = "iris"; iris.setAttribute("aria-hidden", "true"); document.body.append(iris); }
-    const dpr = Math.min(2, devicePixelRatio || 1), W = innerWidth, H = innerHeight;
+    const dpr = Math.min(2, devicePixelRatio || 1), W = VW, H = VH;
     iris.width = Math.round(W * dpr); iris.height = Math.round(H * dpr);
     const c = iris.getContext("2d");
     const ground = colourOf(el, "ground"), ink = colourOf(el, "ink");
@@ -808,20 +876,23 @@ const SM = (() => {
   /* stars: a fixed scatter per plate, the same on every load; keep them off the boxes given as [x0, y0, x1, y1] in percent */
   const stars = (el, count = 40, avoid = [], seed = 7) => {
     const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-    el.innerHTML = Array.from({ length: count }, (_, k) => {
-      const x = 3 + rnd() * 94, y = 10 + rnd() * 80, o = (0.35 + rnd() * 0.55).toFixed(2);
-      return avoid.some(([a, b, c, d]) => x > a && x < c && y > b && y < d) ? "" : `<i class="${k % 7 === 0 ? "b" : ""}" style="left:${x.toFixed(2)}%;top:${y.toFixed(2)}%;opacity:${o}"></i>`;
-    }).join("");
+    const list = [];
+    for (let k = 0; k < count; k++) {
+      const x = 3 + rnd() * 94, y = 10 + rnd() * 80, o = 0.35 + rnd() * 0.55;
+      if (!avoid.some(([a, b, c, d]) => x > a && x < c && y > b && y < d)) list.push({ x, y, o, big: k % 7 === 0 });
+    }
+    el.innerHTML = twinkle(list, (i) => (i % 3 === 0 ? 0 : i % 3 === 1 ? 1 : i % 6 === 2 ? 2 : -1),
+      (s, o) => `<i class="${s.big ? "b" : ""}" style="left:${s.x.toFixed(2)}%;top:${s.y.toFixed(2)}%;opacity:${o}"></i>`);
   };
 
   /** the first screen's corner ornaments (a moth and a lily in opposite corners), on a room's board */
   const corners = (el) => {
     if (!el || $(".corners", el)) return;
     el.insertAdjacentHTML("afterbegin", `<div class="corners" aria-hidden="true">
-      <span class="pic orn o-tl" data-kind="line" data-still><img class="full" src="art/e_moth.webp" width="744" height="396" alt=""></span>
-      <span class="pic orn o-tr" data-kind="line" data-still><img class="full" src="art/e_lily.webp" width="457" height="904" alt=""></span>
-      <span class="pic orn o-bl" data-kind="line" data-still><img class="full" src="art/e_lily.webp" width="457" height="904" alt=""></span>
-      <span class="pic orn o-br" data-kind="line" data-still><img class="full" src="art/e_moth.webp" width="744" height="396" alt=""></span></div>`);
+      <span class="pic orn o-tl" data-kind="line" data-still><img class="full" src="art/e_moth.webp" width="744" height="396" alt="" loading="lazy"></span>
+      <span class="pic orn o-tr" data-kind="line" data-still><img class="full" src="art/e_lily.webp" width="457" height="904" alt="" loading="lazy"></span>
+      <span class="pic orn o-bl" data-kind="line" data-still><img class="full" src="art/e_lily.webp" width="457" height="904" alt="" loading="lazy"></span>
+      <span class="pic orn o-br" data-kind="line" data-still><img class="full" src="art/e_moth.webp" width="744" height="396" alt="" loading="lazy"></span></div>`);
     pictures($(".corners", el));
   };
   /** where you are in a room, as a row of small stars (one per piece: those passed lit, the one in front larger and
@@ -839,5 +910,5 @@ const SM = (() => {
   /** a thin drawn arrow, for .arw buttons */
   const arrow = (dir) => `<svg viewBox="0 0 26 14" aria-hidden="true"><path d="${dir < 0 ? "M25 7H2M7.5 1.5L2 7l5.5 5.5" : "M1 7h23M18.5 1.5L24 7l-5.5 5.5"}"/></svg>`;
   addEventListener("pageshow", () => tick());
-  return { $, $$, u, quiet, HOVER, COLUMN, Bitmap, pictures, bitmap, type, swap, say, go, glide, scrub, where, whenNear, smooth, mask, applyMask, band, tone, blend, travel, view, wakeable, stars, tick, moonSvg, start, arrow, corners, steps, setSteps, landing, onStop: (fn) => listeners.push(fn), get stop() { return current; }, get placedGen() { return gen; }, get y() { return frameY ?? scrollY; } };
+  return { $, $$, u, quiet, HOVER, COLUMN, Bitmap, pictures, bitmap, type, swap, say, go, glide, scrub, where, whenNear, smooth, mask, applyMask, band, tone, blend, travel, view, wakeable, stars, tick, moonSvg, start, arrow, corners, steps, setSteps, landing, onStop: (fn) => listeners.push(fn), get stop() { return current; }, get placedGen() { return gen; }, get moving() { return !!frameReq; }, measure: (fn) => { measures.add(fn); return () => measures.delete(fn); }, get y() { return readY(); }, get vw() { return VW; }, get vh() { return VH; } };
 })();

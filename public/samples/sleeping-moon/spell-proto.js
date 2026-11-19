@@ -211,7 +211,7 @@
       else { tWords.forEach((w) => (w.style.transform = w.style.opacity = "")); SM._fs = 1; }
     }
     if (!on) return;
-    const t = -hero.getBoundingClientRect().top / innerHeight;
+    const t = -SM.where(hero).top / SM.vh;   // the moon's stop's place as the scroll keeps it: no layout each frame
     const CT = cast0();
     if (t < -1 || t > CT + 1.5) return;
     const st = studied(), s = st ? 1 : clamp(t / CT), p = clamp(t - CT), U = SM.u();
@@ -270,11 +270,13 @@
     plast = "";
   };
   const prun = () => {
-    if (!ph.offsetHeight || still()) return;
+    // the section's place and height as the scroll keeps them (SM.where), so the scrub reads no layout each frame
+    const at = SM.where(ph);
+    if (!at.h || still()) return;
     if (!pw) psize();
-    const span = (ph.offsetHeight - innerHeight) / innerHeight, t = -ph.getBoundingClientRect().top / innerHeight;
+    const span = (at.h - SM.vh) / SM.vh, t = -at.top / SM.vh;
     if (t < -1 || t > span + 1) return;
-    const s = clamp(t / (span * 0.7)), p = clamp((t - span * 0.7) / (span * 0.3)), V = innerWidth / 100;
+    const s = clamp(t / (span * 0.7)), p = clamp((t - span * 0.7) / (span * 0.3)), V = SM.vw / 100;
     pWords.forEach((w, i) => { const q = sm(i * 0.03, 0.12 + i * 0.03, s); w.style.transform = `translate3d(0, ${(-q * 8 * V).toFixed(1)}px, 0)`; w.style.opacity = (1 - q).toFixed(3); });
     pcue.style.opacity = (1 - sm(0, 0.08, s)).toFixed(3);
     if (pby) pby.style.opacity = (1 - sm(0.02, 0.16, s)).toFixed(3);

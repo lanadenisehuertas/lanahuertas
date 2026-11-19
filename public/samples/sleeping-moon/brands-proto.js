@@ -82,14 +82,17 @@
   };
   arts.forEach((a, k) => $$(".b-stop", a).forEach((s) => Object.entries(worldOf(B[k])).forEach(([p, v]) => s.style.setProperty(p, v))));
   const pick = () => {
-    const mid = innerHeight * 0.45;
+    const mid = SM.vh * 0.45;
     let k = 0;
     arts.forEach((a, j) => { if (a.getBoundingClientRect().top <= mid) k = j; });
     take(k);
   };
+  // the page's height is measured again only when something changes size (SM.placedGen), not every frame
+  let tall = 0, tallGen = -1;
   SM.scrub(() => {
     pick();
-    const max = Math.max(1, document.documentElement.scrollHeight - innerHeight), F = ((scrollY / max) * 2 - 1).toFixed(3);
+    if (tallGen !== SM.placedGen) { tallGen = SM.placedGen; tall = document.documentElement.scrollHeight; }
+    const max = Math.max(1, tall - SM.vh), F = ((SM.y / max) * 2 - 1).toFixed(3);
     const bw = $(".b-world");
     if (bw._f !== F) { bw._f = F; bw.style.setProperty("--f", F); }
   });

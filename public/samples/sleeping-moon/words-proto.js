@@ -178,8 +178,9 @@
     }
     return null;
   };
-  const write = () => {
-    const H = innerHeight, calm = still();
+  /** where each heading is, and where the pen is in those that move on: only reads the page */
+  const penAt = () => {
+    const H = SM.vh, calm = still(), todo = [];
     for (const h of written) {
       const r = h.getBoundingClientRect();
       if (r.bottom < -H || r.top > H * 2) continue;
@@ -187,18 +188,27 @@
       // (the About statement) the lines are written one after another while the hold keeps them on screen
       const p = calm ? 1 : held(h, H) ?? clamp((H * 0.96 - r.top) / (H * 0.3), 0, 1), n = h._ch.length, k = Math.round(p * n);
       if (h._k === k) continue;
-      const grew = k > (h._k || 0);
+      const grew = k > (h._k || 0), pen = grew && k > 0 && k < n + 1 && !calm ? h._ch[k - 1] : null;
+      todo.push([h, k, n, pen, pen && pen.getBoundingClientRect()]);
+    }
+    return todo;
+  };
+  /** ink the letters penAt found: only changes the page */
+  const ink = (todo) => {
+    for (const [h, k, n, pen, cr] of todo) {
       h._k = k;
       h._ch.forEach((c, i) => { c.classList.toggle("w", i < k); c.classList.toggle("wn", i < k && i >= k - 3 && k < n); });
       // the pen throws a little stardust as it writes forward, more on the words that matter
-      if (grew && k > 0 && k < n + 1 && !calm) {
-        const c = h._ch[k - 1], cr = c.getBoundingClientRect();
-        SM.sparkle?.(cr.right, cr.top + cr.height * 0.6, c.closest(".em") ? 5 : 2);
-      }
+      if (pen) SM.sparkle?.(cr.right, cr.top + cr.height * 0.6, pen.closest(".em") ? 5 : 2);
     }
   };
+  const write = () => ink(penAt());
   write();
-  SM.scrub(write);
+  // while the page moves, the reading happens in the page's own read pass (before any scrub writes), so it costs no
+  // layout of its own
+  let penRead = null;
+  SM.measure(() => { penRead = penAt(); });
+  SM.scrub(() => { if (penRead) { ink(penRead); penRead = null; } else write(); });
 
   /* the first words spell themselves out of runes once the veil lifts */
   const intro = document.querySelector(".pl-title");

@@ -144,7 +144,9 @@
     b.type = "button"; b.className = "vs-star" + (v.seed ? " seed" : "") + (v.mine ? " mine" : "");
     b.setAttribute("aria-label", `${KINDS[v.kind]} from ${v.name}${v.note ? ": " + v.note : ""}`);
     b.style.cssText = `--x:${local(v.x).toFixed(4)};--y:${v.y};--c:${COLS[v.color]}`;
-    b.innerHTML = sprite(v.kind); b._v = v;
+    // the star drifts on a plain box around its picture: the browser hands a box's drift to the compositor, but not
+    // an svg's, which would otherwise be restyled every frame
+    b.innerHTML = `<span class="sp-w">${sprite(v.kind)}</span>`; b._v = v;
     return b;
   };
   // how many visitors have left one, or an invitation while there are none yet
@@ -184,13 +186,23 @@
   /* the scroll brings them out in the order they were left, and turns their twinkle */
   let making = false;
   count();
+  // the board's place in the page is measured once and again only when the page changes size (SM.placedGen), so the
+  // scrub reads no layout each frame
+  const boardAt = () => {
+    if (board._gen !== SM.placedGen || board._w !== SM.vw) {
+      const b = board.getBoundingClientRect();
+      board._gen = SM.placedGen; board._w = SM.vw; board._top = b.top + SM.y; board._h = b.height;
+    }
+    const top = board._top - SM.y;
+    return { top, bottom: top + board._h };
+  };
   SM.scrub(() => {
-    const r = board.getBoundingClientRect(), vh = innerHeight, q = SM.quiet();
+    const r = boardAt(), vh = SM.vh, q = SM.quiet();
     if (r.bottom < -vh || r.top > vh * 2) return;
     const p = q ? 2 : (vh * 0.9 - r.top) / (vh * 0.8), stars = $$(".vs-star", boxEl), n = stars.length;
     stars.forEach((s, i) => {
       const k = list.indexOf(s._v), o = clamp((p * 1.15 - (k / n) * 0.95) / 0.1);
-      const tw = q || o < 1 ? 1 : 0.8 + 0.2 * Math.sin(scrollY / 70 + i * 1.7);
+      const tw = q || o < 1 ? 1 : 0.8 + 0.2 * Math.sin(SM.y / 70 + i * 1.7);
       s.style.setProperty("--o", (o * tw).toFixed(3));
     });
   });

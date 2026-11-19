@@ -94,12 +94,15 @@
 .rm-glass > * { position: absolute; }
 .rm-st { width: var(--d); height: var(--d); margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2); border-radius: 50%;
   background: radial-gradient(closest-side, #f4efff, rgb(185 162 255 / 0.55) 45%, rgb(185 162 255 / 0));
-  animation: rm-twinkle var(--t) ease-in-out var(--w) infinite alternate; }
+  position: absolute; }
+.rm-tw { inset: 0; animation: rm-twinkle 3.4s ease-in-out infinite alternate; }
+.rm-tw-1 { animation-duration: 4.6s; animation-delay: -2.1s; }
+.rm-tw-2 { animation-duration: 5.9s; animation-delay: -4.4s; }
 .rm-st.rm-gold { background: radial-gradient(closest-side, #fff1c9, rgb(255 241 201 / 0.5) 45%, rgb(255 241 201 / 0)); }
 /* the board's bitmap, kept small: a cross of five square pixels */
 .rm-st.rm-px { width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 0; background:
   linear-gradient(#fff1c9, #fff1c9) 50% 0 / 2.33px 100% no-repeat, linear-gradient(#fff1c9, #fff1c9) 0 50% / 100% 2.33px no-repeat; image-rendering: pixelated; }
-@keyframes rm-twinkle { from { opacity: 0.25; transform: scale(0.75); } to { opacity: 1; transform: scale(1); } }
+@keyframes rm-twinkle { from { opacity: 0.25; } to { opacity: 1; } }
 .rm-cloud { left: 0; width: var(--cw); height: 13%; border-radius: 50%;
   background: radial-gradient(closest-side, rgb(185 162 255 / 0.2), rgb(185 162 255 / 0.07) 60%, rgb(185 162 255 / 0));
   animation: rm-drift var(--t) linear var(--w) infinite; }

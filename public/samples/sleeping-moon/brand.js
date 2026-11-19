@@ -73,8 +73,11 @@
   const bw = $(".b-world");
   SM.pictures(bw).forEach((bm) => bm.load().then(() => { bm.show = 1; bm.draw(); }).catch(() => {}));
   // the backdrop drifts a little with the scroll, slower than the page
+  // the page's height is measured again only when something changes size (SM.placedGen), not every frame
+  let tall = 0, tallGen = -1;
   SM.scrub(() => {
-    const max = Math.max(1, document.documentElement.scrollHeight - innerHeight), f = (scrollY / max) * 2 - 1;
+    if (tallGen !== SM.placedGen) { tallGen = SM.placedGen; tall = document.documentElement.scrollHeight; }
+    const max = Math.max(1, tall - SM.vh), f = (SM.y / max) * 2 - 1;
     const F = f.toFixed(3);
     if (bw._f !== F) { bw._f = F; bw.style.setProperty("--f", F); }
   });

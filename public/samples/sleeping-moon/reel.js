@@ -94,7 +94,7 @@
         plates.forEach((el, k) => {
           el.style.visibility = ""; el.style.maskImage = el.style.webkitMaskImage = "none"; el._ml = null;
           el.classList.add("now"); el.inert = false;
-          const r = el.getBoundingClientRect(), a = quiet ? 1 : easeOut(clamp((innerHeight - r.top) / (innerHeight * 0.7)));
+          const r = el.getBoundingClientRect(), a = quiet ? 1 : easeOut(clamp((SM.vh - r.top) / (SM.vh * 0.7)));
           pose(el, a, 0, a);
         });
         return;
@@ -138,7 +138,7 @@
     const jump = (i, instant) => {
       i = Math.min(n - 1, Math.max(0, i));
       if (opts.stack?.matches) { make(i); plates[i].scrollIntoView({ block: "start", behavior: instant || SM.quiet() ? "auto" : "smooth" }); return; }
-      SM.glide(stop.getBoundingClientRect().top + scrollY + i * STEP * innerHeight + (i ? 2 : 0), instant);
+      SM.glide(stop.getBoundingClientRect().top + scrollY + i * STEP * SM.vh + (i ? 2 : 0), instant);
     };
     addEventListener("keydown", (e) => {
       if (SM.stop !== stop || document.querySelector("dialog[open]") || e.altKey || e.ctrlKey || e.metaKey) return;
@@ -214,12 +214,23 @@
           pieces.forEach((p) => p.addEventListener("click", () => SM.view(list, +p.dataset.k)));
           /* only whole pubmats: a piece or a column that would be cut by the edge of the plate is left out */
           const units = $$(":scope > .s-piece, :scope > .s-col", strip);
-          const fit = () => { units.forEach((p) => (p.hidden = false)); const R = strip.getBoundingClientRect().right + 1; units.forEach((p) => (p.hidden = p.getBoundingClientRect().right > R)); };
-          pieces.forEach((p) => $("img", p).addEventListener("load", fit, { once: true }));
-          new ResizeObserver(fit).observe(strip);
+          /* on phones the row scrolls sideways and shows every piece, so there is nothing to fit. Elsewhere: show all,
+             measure all, then hide; once per frame at most, and only when the row's width has changed or a picture
+             has come in */
+          let fitW = -1, fitReq = 0;
+          const fit = () => {
+            fitReq = 0;
+            if (SM.COLUMN.matches) return;
+            units.forEach((p) => (p.hidden = false));
+            const R = strip.getBoundingClientRect().right + 1, cut = units.map((p) => p.getBoundingClientRect().right > R);
+            units.forEach((p, k) => (p.hidden = cut[k]));
+          };
+          const refit = () => { if (!fitReq) fitReq = requestAnimationFrame(fit); };
+          pieces.forEach((p) => $("img", p).addEventListener("load", refit, { once: true }));
+          new ResizeObserver((es) => { const w = Math.round(es[0].contentRect.width); if (w !== fitW) { fitW = w; refit(); } }).observe(strip);
         },
       };
-    }), { step: 0.65, onMake: () => aim(), onScrub: (q) => lift(q), onChange: (i) => tint(i) });
+    }), { step: 0.65, onMake: () => aimSoon(), onScrub: (q) => lift(q), onChange: (i) => tint(i) });
 
     /* the holder: one packet per brand standing behind a carved rail, on the ground under the work; it stays while
        the worlds change */
@@ -235,16 +246,26 @@
     /* the holder takes the colours of the world it stands in; each packet sleeps in its own brand's ink */
     function tint(i) {
       stage.style.setProperty("--ground", B[i].ground); stage.style.setProperty("--ink", B[i].ink);
-      holderBms.forEach((bm) => { if (!bm.pic.closest(".h-pk")) bm.recolour(); else if (bm.paper) bm.recolour(); });
+      holderBms.forEach((bm) => {
+        const own = bm.pic.style.getPropertyValue("--ink");   // a packet sleeps in its own brand's ink
+        if (!bm.pic.closest(".h-pk")) bm.recolour(own || B[i].ink, B[i].ground); else if (bm.paper) bm.recolour(own || B[i].ink, B[i].ground);
+      });
     }
     /* each brand's key visual rises out of its own packet: measure, once per layout, how far the packet is from where
        the picture stands, so the picture can start there (small, at the packet's mouth) and grow into place */
+    // plates are made several at a time: measure once for all of them, at the next frame
+    function aimSoon() { if (!aimSoon.req) aimSoon.req = requestAnimationFrame(() => { aimSoon.req = 0; aim(); }); }
     function aim() {
-      $$(".reel-plate", brands).forEach((pl) => {
+      // every plate is measured first and written after, so the page is laid out once rather than once a plate
+      const got = $$(".reel-plate", brands).map((pl) => {
         const card = $(".pk-in", pl), pk = pks[+pl.dataset.i];
-        if (!card || !pk) return;
+        if (!card || !pk) return null;
         const c = $(".pk-card", pl).getBoundingClientRect(), p = pk.getBoundingClientRect();
-        if (!c.width) return;
+        return c.width ? [card, c, p] : null;
+      });
+      got.forEach((g) => {
+        if (!g) return;
+        const [card, c, p] = g;
         card.style.setProperty("--fx", (p.left + p.width / 2 - (c.left + c.width / 2)).toFixed(0) + "px");
         card.style.setProperty("--fy", (p.top + p.height * 0.25 - c.bottom).toFixed(0) + "px");
       });

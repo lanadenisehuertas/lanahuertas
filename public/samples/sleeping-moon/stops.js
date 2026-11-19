@@ -103,11 +103,11 @@
     /* the statement and the index come up as they reach the window, as far as the scroll has brought them */
     const rise = [...$$(".me-say > p", mount), $(".idx-h", mount), ...$$(".idx-text p", mount)];
     SM.scrub(() => {
-      const vh = innerHeight, quiet = SM.quiet();
+      const vh = SM.vh, quiet = SM.quiet();
       // each line's place in the page is measured once and again only when the page changes size (SM.placedGen),
       // so this does not lay the page out every frame
       rise.forEach((el) => {
-        if (el._gen !== SM.placedGen || el._w !== innerWidth) { el._gen = SM.placedGen; el._w = innerWidth; el._top = el.getBoundingClientRect().top + scrollY; }
+        if (el._gen !== SM.placedGen || el._w !== SM.vw) { el._gen = SM.placedGen; el._w = SM.vw; el._top = el.getBoundingClientRect().top + scrollY; }
         const r = { top: el._top - SM.y };
         if (r.top > vh * 1.6 && el._v === "0.000") return;
         const v = quiet ? 1 : SM.smooth(Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.42)))), V = v.toFixed(3);
@@ -123,27 +123,27 @@
     if (moon) SM.whenNear(mount, () => moon.load().then(() => moon.setShow(1)).catch(() => {}));
     smalls.forEach((m, k) => {
       SM.wakeable(m, { line: `Go to ${Y[k][0]}` });
-      m.addEventListener("click", (e) => { e.preventDefault(); SM.glide(yrs[k].getBoundingClientRect().top + scrollY - innerHeight * 0.32); });
+      m.addEventListener("click", (e) => { e.preventDefault(); SM.glide(yrs[k].getBoundingClientRect().top + scrollY - SM.vh * 0.32); });
     });
     let yi = -1;
     // each year's place in the page is measured once and again only when the page changes size (SM.placedGen), so
     // the scrub reads no layout while it writes, and costs nothing while the calendar is far from the window
     const at0 = (el) => {
-      if (el._gen !== SM.placedGen || el._w !== innerWidth) {
+      if (el._gen !== SM.placedGen || el._w !== SM.vw) {
         const r = el.getBoundingClientRect();
-        el._gen = SM.placedGen; el._w = innerWidth; el._top = r.top + SM.y; el._h = r.height;
+        el._gen = SM.placedGen; el._w = SM.vw; el._top = r.top + SM.y; el._h = r.height;
       }
       return el._top - SM.y;
     };
     SM.scrub(() => {
       const top = at0(yrs[0]);
-      if (top > innerHeight * 2 || at0(yrs[n - 1]) + yrs[n - 1]._h < -innerHeight) return;
+      if (top > SM.vh * 2 || at0(yrs[n - 1]) + yrs[n - 1]._h < -SM.vh) return;
       // the reading line, a third of the way down the window
-      const line = innerHeight * 0.36;
+      const line = SM.vh * 0.36;
       // the moon and the year hold while a year is read, and turn over to the next across the same stretch of scroll
       // (a fifth of a screen, a little less on phones) as the next year's heading comes up to the reading line, so a
       // short year and a long one roll at the same pace and the roll never rushes or drags
-      const W = innerHeight * (SM.COLUMN.matches ? 0.16 : 0.2), lead = innerHeight * 0.06;
+      const W = SM.vh * (SM.COLUMN.matches ? 0.16 : 0.2), lead = SM.vh * 0.06;
       let at = 0;
       for (let j = 1; j < n; j++) at += SM.smooth(Math.min(1, Math.max(0, (line + lead - at0(yrs[j])) / W)));
       at = Math.min(n - 1, at);
@@ -154,7 +154,7 @@
       const now = Math.round(at);
       if (now !== yi) { yi = now; smalls.forEach((m, j) => (j === now ? m.setAttribute("aria-current", "true") : m.removeAttribute("aria-current"))); }
       yrs.forEach((el) => {
-        const v = SM.quiet() ? 1 : SM.smooth(Math.min(1, Math.max(0, (innerHeight - at0(el)) / (innerHeight * 0.5))));
+        const v = SM.quiet() ? 1 : SM.smooth(Math.min(1, Math.max(0, (SM.vh - at0(el)) / (SM.vh * 0.5))));
         const V = v.toFixed(3);
         if (el._v !== V) { el._v = V; el.style.setProperty("--in", V); }
       });

@@ -23,7 +23,7 @@
     return set;
   };
   /** the top of a stop in page coordinates, plus how far into it step k is */
-  const at = (stop, k, step) => stop.getBoundingClientRect().top + scrollY + k * step * innerHeight + 2;
+  const at = (stop, k, step) => stop.getBoundingClientRect().top + scrollY + k * step * SM.vh + 2;
 
   /* ================================================================ II Posters: the line
      The eight posters hang large, one after another, on a dotted line, each held by a painted clothespin. The stop
@@ -64,7 +64,7 @@
     SM.corners(room);
     // half a screen more than the line needs, so the last poster rests in place before the room moves on
     const reheight = pin(posters, () => (n - 1) * STEP + 1.5);
-    let cur = -1, cx = [];
+    let cur = -1, cx = [], focusX = 0;
     const caption = (i) => {
       cur = i;
       const p = P[i];
@@ -79,6 +79,7 @@
     /* the line: from before the first pin to after the last, sagging a little between pins */
     const layout = () => {
       cx = hangs.map((h) => h.offsetLeft + h.offsetWidth / 2);
+      focusX = focus.offsetLeft;   // kept with the posters' places, so each frame reads nothing back from the page
       if (!cx.length || !hangs[0].offsetWidth) return;
       const U = SM.u(), y = $(".po-pin", hangs[0]).offsetTop + $(".po-pin", hangs[0]).offsetHeight * 0.3, pad = 60 * U, sag = 1.6 * U;
       const W = track.scrollWidth + pad * 2, xs = [-pad, ...cx, cx[n - 1] + pad].map((x) => x + pad);
@@ -100,7 +101,7 @@
       // stops on a whole poster with its words
       const e = quiet ? Math.round(frac) : SM.smooth(clamp((frac - 0.3) / 0.4)), qe = base + e;
       const nx = base < n - 1 ? cx[base + 1] : cx[base];
-      track.style.transform = `translate3d(${(focus.offsetLeft - (cx[base] + (nx - cx[base]) * e)).toFixed(1)}px, 0, 0)`;
+      track.style.transform = `translate3d(${(focusX - (cx[base] + (nx - cx[base]) * e)).toFixed(1)}px, 0, 0)`;
       hangs.forEach((h, k) => {
         const d = k - qe, ad = Math.abs(d);
         if (ad > 2.6 && h._far) return;
@@ -136,7 +137,7 @@
       hangs[j].focus({ preventScroll: true }); jump(j);
     });
     // a poster reached by Tab while its room is off the screen brings the room to it, so the focus ring is always seen
-    const seen = (el) => { const r = el.getBoundingClientRect(); return r.right > 0 && r.left < innerWidth && r.bottom > 0 && r.top < innerHeight; };
+    const seen = (el) => { const r = el.getBoundingClientRect(); return r.right > 0 && r.left < SM.vw && r.bottom > 0 && r.top < SM.vh; };
     hangs.forEach((h) => h.addEventListener("focus", () => { win.scrollLeft = 0; if (!seen(h)) jump(+h.dataset.i, true); }));
     $(".prev", pm).addEventListener("click", () => jump(cur - 1));
     $(".next", pm).addEventListener("click", () => jump(cur + 1));
@@ -253,7 +254,7 @@
       if (base !== cur) caption(base);
     };
     SM.scrub(update);
-    const jump = (k, instant) => SM.glide(films.getBoundingClientRect().top + scrollY + (Math.max(0, Math.min(n - 1, k)) + 0.3) * STEP * innerHeight, instant);
+    const jump = (k, instant) => SM.glide(films.getBoundingClientRect().top + scrollY + (Math.max(0, Math.min(n - 1, k)) + 0.3) * STEP * SM.vh, instant);
     (SM.rooms ||= {}).films = { jump };
     clips.forEach((c, k) => {
       c.addEventListener("click", () => jump(k));
@@ -267,7 +268,7 @@
       clips[j].focus({ preventScroll: true }); jump(j);
     });
     // a clip reached by Tab while the timeline is off the screen brings the room to it
-    clips.forEach((c) => c.addEventListener("focus", () => { const r = c.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) jump(+c.dataset.i, true); }));
+    clips.forEach((c) => c.addEventListener("focus", () => { const r = c.getBoundingClientRect(); if (r.bottom < 0 || r.top > SM.vh) jump(+c.dataset.i, true); }));
     $(".steps .prev", fm).addEventListener("click", () => jump(cur - 1));
     $(".steps .next", fm).addEventListener("click", () => jump(cur + 1));
     keys(films, (d) => jump(cur + d));
@@ -473,7 +474,7 @@
         if (!box) return;
         if (!box._measured) { box._measured = true; measure(); }
         let p;
-        if (narrow.matches) { const r = box.getBoundingClientRect(); p = clamp((innerHeight * 0.9 - r.top) / (innerHeight * 0.9)); }
+        if (narrow.matches) { const r = box.getBoundingClientRect(); p = clamp((SM.vh * 0.9 - r.top) / (SM.vh * 0.9)); }
         // the first plate is whole from the start, so its strip waits there; a later one starts as it comes in over the last
         else { const k = pl._k ?? 0; p = k ? clamp((atQ - k + 0.25) / 1.2) : clamp((atQ - 0.1) / 0.85); }
         if (SM.quiet()) p = 0;

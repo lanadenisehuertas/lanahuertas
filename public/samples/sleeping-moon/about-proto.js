@@ -75,9 +75,11 @@
     idx.append(pin);
     idx.classList.add("hold");
     const items = $$(".idx-text p", idx), N = items.length;
-    let lastNow = -1;
+    let lastNow = -1, idxRead = null;
+    // while the page moves, where the section is gets read in the page's read pass, before any scrub writes
+    SM.measure(() => { idxRead = idx.getBoundingClientRect(); });
     const hold = () => {
-      const r = idx.getBoundingClientRect(), H = innerHeight;
+      const r = idxRead || idx.getBoundingClientRect(), H = SM.vh; idxRead = null;
       if (r.bottom < -H || r.top > 2 * H) return;
       // the entries begin once the section's top reaches the middle of the window, and are all in by three quarters
       // of the hold; the rest of the hold lets them be read
@@ -136,14 +138,22 @@
     const order = tiles.map((el) => TOOLS.findIndex((t) => t[0] === $(".tool-n", el).textContent));
     const at = (k) => { const t = TOOLS[k]; return SM.COLUMN.matches ? [t[8], t[9]] : [t[5], t[6]]; };
     const svg = $(".tb-lines", tb), ls = $$("line", svg), sparks = $$(".tw", tb), grps = $$(".grp", tb);
+    // where the board is and, with no pointer, where each icon is: only reads the page. While the page moves this runs
+    // in the page's read pass, before any scrub writes, so the board costs no layout of its own
+    const boardAt = () => {
+      const w = SM.where(tb);
+      return { w, pics: w.near && !SM.HOVER ? bms.map((b) => b.pic.getBoundingClientRect()) : null };
+    };
+    let boardRead = null;
+    SM.measure(() => { boardRead = boardAt(); });
     const board = () => {
-      const w = SM.where(tb), q = still();
+      const { w, pics } = boardRead || boardAt(), q = still(); boardRead = null;
       if (!w.near) return;
       const vb = SM.COLUMN.matches ? "0 0 100 196" : "0 0 100 62.5";
       if (svg.getAttribute("viewBox") !== vb) svg.setAttribute("viewBox", vb);
       // no pointer to wake them: each icon wakes into its colours as the scroll carries it across the middle of the screen
       if (!SM.HOVER) bms.forEach((b, i) => {
-        const r = b.pic.getBoundingClientRect(), f = q ? 0 : SM.smooth(clamp(1 - Math.abs((r.top + r.height / 2) / w.vh - 0.5) / 0.16));
+        const r = pics[i], f = q ? 0 : SM.smooth(clamp(1 - Math.abs((r.top + r.height / 2) / w.vh - 0.5) / 0.16));
         b.setFloor(f); tiles[i].classList.toggle("lit", f > 0.5);
       });
       const t = q ? 1 : clamp((w.vh - w.top) / (w.vh * 1.1));   // 0 as the board comes in, 1 a little after its top reaches the top

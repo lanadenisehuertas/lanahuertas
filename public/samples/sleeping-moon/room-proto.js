@@ -153,11 +153,16 @@
     const gw = hx1 - hx0, gh = hy1 - ya, gx = hx0, gy = ya;
     let gs = 3, glass = "";
     const grnd = () => ((gs = (gs * 16807) % 2147483647) - 1) / 2147483646;
+    // the stars twinkle in three groups, each group one layer that breathes at its own pace, rather than each star an
+    // animation of its own, which the browser would have to restyle on every frame the page moves
+    const tw = ["", "", ""];
     for (let i = 0; i < 26; i++) {
       const x = (8 + grnd() * 84).toFixed(1), y = (4 + grnd() * 80).toFixed(1), d = (2.5 + grnd() * 3).toFixed(1);
       const px = i === 7 || i === 18 ? " rm-px" : "", gold = grnd() < 0.2 ? " rm-gold" : "";
-      glass += `<i class="rm-st${px}${gold}" style="left:${x}%;top:${y}%;--d:${d}px;--t:${(2.6 + grnd() * 4).toFixed(2)}s;--w:${(-grnd() * 6).toFixed(2)}s"></i>`;
+      grnd(); grnd();   // the twinkle's pace and phase, once per star: kept so the clouds after keep their places
+      tw[i % 3] += `<i class="rm-st${px}${gold}" style="left:${x}%;top:${y}%;--d:${d}px"></i>`;
     }
+    glass += tw.map((g, k) => `<span class="rm-tw rm-tw-${k}">${g}</span>`).join("");
     glass += [[18, 46, 0.62], [42, 61, 0.8], [66, 38, 0.5]].map(([top, dur, sc], k) =>
       `<b class="rm-cloud" style="top:${top}%;--cw:${(gw * sc).toFixed(0)}px;--gw:${gw.toFixed(0)}px;--t:${dur}s;--w:${(-dur * (0.2 + k * 0.3)).toFixed(1)}s"></b>`).join("");
     glass += `<b class="rm-fall"></b><b class="rm-haze"></b>`;
@@ -287,7 +292,7 @@
   let kv = 1;
   const fit = () => {
     const { w: vw, h: vh } = set.view;
-    kv = Math.min(innerWidth / vw, innerHeight / vh);
+    kv = Math.min(SM.vw / vw, SM.vh / vh);
     view.style.transform = `translate(-50%,-50%) scale(${kv.toFixed(4)})`;
     // every bitmap's cells come out one size on screen, as coarse as the board's at the nearest the camera brings it
     const U = SM.u();
@@ -352,38 +357,65 @@
     const Ld = Math.log(P - r.out + c1.z), Lend = Math.log(P - r.out + e.z), g = SM.smooth(clamp((L - Ld) / (Lend - Ld)));
     return { x: mix(d.x, e.x, g), y: mix(d.y, e.y, g), z, yaw: d.yaw * (1 - g), pitch: d.pitch * (1 - g) };
   };
+  /* within one frame of the camera, each of the few things it measures is measured once, before anything is written,
+     so the page is laid out at most once a frame for it; outside the frame (a resize, a first fit) they are measured
+     fresh */
+  /* what the camera aims at moves only with the scroll, a resize or a change of the page's size, so the measures are
+     kept until one of those changes (the room's own idle motion does not move them) */
+  let inFrame = false, memoAt = "";
+  const memoKey = () => `${SM.y}|${SM.placedGen}|${SM.vw}|${SM.vh}`;
+  const memo = new Map();
+  // while the page moves, the measures are taken in the page's own read pass (SM.measure), before anything is written
+  const premeasure = () => { const m = $("#moonpic"); rectNow(board); rectNow(hero); if (m) { rectNow(m); moonTy(m); moonW(m); } };
+  const rectNow = (el) => {
+    if (!inFrame) return el.getBoundingClientRect();
+    let r = memo.get(el);
+    if (!r) { r = el.getBoundingClientRect(); memo.set(el, r); }
+    return r;
+  };
+  const moonW = (m) => {
+    if (!inFrame) return m.offsetWidth;
+    if (!memo.has("w")) memo.set("w", m.offsetWidth);
+    return memo.get("w");
+  };
+  const moonTy = (m) => {
+    const read = () => new DOMMatrixReadOnly(getComputedStyle(m).transform).m42 || 0;
+    if (!inFrame) return read();
+    if (!memo.has("ty")) memo.set("ty", read());
+    return memo.get("ty");
+  };
   // where the board's circle is on screen
   const target = () => {
     const U = SM.u();
     // on wide screens: where the board's circle will rest once the moon's stop is pinned, not where it is while it is
     // still coming up under the room, so the camera flies one straight line to it instead of rising and sinking with it
-    if (!SM.COLUMN.matches) { const bd = board.getBoundingClientRect(), up = Math.max(0, hero.getBoundingClientRect().top); return { cx: bd.left + 50 * U, cy: bd.top - up + 28.8 * U, R: 28 * U }; }
+    if (!SM.COLUMN.matches) { const bd = rectNow(board), up = Math.max(0, rectNow(hero).top); return { cx: bd.left + 50 * U, cy: bd.top - up + 28.8 * U, R: 28 * U }; }
     // on phones the moon's stop is still below the fold while the circle flies: aim at where its moon will rest once the
     // stop has come up to the top, and move with the stop over the last moments as the night opens onto it
-    const m = $("#moonpic").getBoundingClientRect(), top = hero.getBoundingClientRect().top;
+    const m = rectNow($("#moonpic")), top = rectNow(hero).top;
     return { cx: m.left + m.width / 2, cy: m.top - top * (1 - sm(B.night[0], B.night[1], p)) + m.height / 2, R: m.width * 0.62 };
   };
   /* where the board's moon sits once risen, and so where the room's moon must be in the room, at the circle's depth, to
      land on it: its centre and diameter in room units, and the scale things at that depth have at the end */
   const land = () => {
-    const tg = target(), r = set.ring, sc = tg.R / (r.r * kv), m = $("#moonpic"), mr = m.getBoundingClientRect();
-    const ty = new DOMMatrixReadOnly(getComputedStyle(m).transform).m42 || 0;
+    const tg = target(), r = set.ring, sc = tg.R / (r.r * kv), m = $("#moonpic"), mr = rectNow(m);
+    const ty = moonTy(m);
     let cx = mr.left + mr.width / 2, cy = mr.top + mr.height / 2 - ty;
-    if (SM.COLUMN.matches) cy -= hero.getBoundingClientRect().top * (1 - sm(B.night[0], B.night[1], p));
-    else cy -= Math.max(0, hero.getBoundingClientRect().top);
-    return { sc, d: m.offsetWidth / (kv * sc), x: r.x + (cx - tg.cx) / (kv * sc), y: r.y + (cy - tg.cy) / (kv * sc) };
+    if (SM.COLUMN.matches) cy -= rectNow(hero).top * (1 - sm(B.night[0], B.night[1], p));
+    else cy -= Math.max(0, rectNow(hero).top);
+    return { sc, d: moonW(m) / (kv * sc), x: r.x + (cx - tg.cx) / (kv * sc), y: r.y + (cy - tg.cy) / (kv * sc) };
   };
   // where the camera must stand at the end, so the flown-out circle lands exactly on the board's circle
   const endCam = (tg) => {
     const r = set.ring, sc = tg.R / (r.r * kv);
-    return { x: r.x - (tg.cx - innerWidth / 2) / (kv * sc), y: r.y - (tg.cy - innerHeight / 2) / (kv * sc), z: r.out - P + P / sc };
+    return { x: r.x - (tg.cx - SM.vw / 2) / (kv * sc), y: r.y - (tg.cy - SM.vh / 2) / (kv * sc), z: r.out - P + P / sc };
   };
 
   /* the pointer looks a little around; the scroll is followed on a spring */
   let lx = 0, ly = 0, tlx = 0, tly = 0, p = 0, v = 0, raf = 0, lastT = 0, inView = false;
   if (SM.HOVER) addEventListener("pointermove", (e) => {
     if (e.pointerType === "touch" || still()) return;
-    tlx = e.clientX / innerWidth - 0.5; tly = e.clientY / innerHeight - 0.5; kick();
+    tlx = e.clientX / SM.vw - 0.5; tly = e.clientY / SM.vh - 0.5; kick();
   }, { passive: true });
   /* the scroll, in screens, mapped onto the beats: the opening (beats 0 to 1.2) takes the first 0.8 of a screen,
      so the room moves as much for a turn of the wheel at the start as the page does everywhere else; the rest is spread
@@ -395,11 +427,17 @@
     const x = s / WARP_L;
     return s + WARP_A * s * (1 - x) * (1 - x);
   };
-  const scrollT = () => warp(-sec.getBoundingClientRect().top / innerHeight);
+  // the room's section sits in the page's flow, so its place comes from the scroll and a measure kept between resizes
+  const scrollT = () => warp(-SM.where(sec).top / SM.vh);
   const kick = () => { if (!raf && inView) { lastT = performance.now(); raf = requestAnimationFrame(loop); } };
   const loop = (now) => {
     raf = 0;
     const dt = Math.min(0.05, Math.max(0.001, (now - lastT) / 1000)); lastT = now;
+    // measure first, then write: what the camera aims at is read before the frame changes anything (already done in
+    // the page's read pass when the page moved this frame)
+    inFrame = true;
+    const key = memoKey();
+    if (memoAt !== key) { memo.clear(); memoAt = key; if (p < SPAN) premeasure(); }
     const t = scrollT();
     if (Math.abs(t - p) > 1.5) { p = t; v = 0; }
     // a critically damped spring: the camera has a little weight behind the scroll but never overshoots and swings back,
@@ -408,9 +446,16 @@
     v += ((t - p) * K - v * C) * dt; p += v * dt;
     if (Math.abs(t - p) < 0.0003 && Math.abs(v) < 0.0003) { p = t; v = 0; }
     lx += (tlx - lx) * Math.min(1, dt * 5); ly += (tly - ly) * Math.min(1, dt * 5);
-    draw();
+    try { draw(); } finally { inFrame = false; }
     if (inView && (p !== t || Math.abs(tlx - lx) + Math.abs(tly - ly) > 0.001)) raf = requestAnimationFrame(loop);
   };
+  SM.measure((now) => {
+    if (!inView || p >= SPAN) return;
+    const key = memoKey();
+    if (memoAt === key) return;
+    memo.clear(); memoAt = key; inFrame = true;
+    try { premeasure(); } finally { inFrame = false; }
+  });
 
   /* ------------------------------------------------------------------ one frame */
   let spoke = false;
@@ -523,7 +568,7 @@
 
   /* ------------------------------------------------------------------ the scroll */
   const run = () => {
-    if (still() || !sec.offsetHeight) {
+    if (still() || !SM.where(sec).h) {   // the section's height as the scroll keeps it, so no layout each frame
       if (spoke) { spoke = false; hero.dataset.hint = REST; SM.say(); document.body.classList.remove("in-room"); }
       inView = false; return;
     }
@@ -543,15 +588,18 @@
   host.addEventListener("click", (e) => {
     if (!e.target.closest(".rm-skip")) return;
     e.preventDefault();
-    const at = hero.offsetTop + (SM.COLUMN.matches ? 0 : (+hero.dataset.riseAt || 0.65) + 0.95) * innerHeight;
+    const at = hero.offsetTop + (SM.COLUMN.matches ? 0 : (+hero.dataset.riseAt || 0.65) + 0.95) * SM.vh;
     scrollTo({ top: at, behavior: "instant" });
     requestAnimationFrame(() => $(".door", board)?.focus({ preventScroll: true }));
   });
 
   /* the masthead shows the six stops once the moon has woken its doors (wide screens), or once the moon's stop has gone
      by; the room sits before it, so measure from the moon */
-  const past = () => document.body.classList.toggle("past", scrollY > hero.offsetTop + hero.offsetHeight - innerHeight * 0.5 ||
-    (!SM.COLUMN.matches && hero.classList.contains("risen") && scrollY > hero.offsetTop));
+  // (from the moon's stop's place as the scroll keeps it, so a scroll event never makes the browser lay the page out)
+  const past = () => {
+    const w = SM.where(hero);
+    document.body.classList.toggle("past", w.bottom < SM.vh * 0.5 || (!SM.COLUMN.matches && hero.classList.contains("risen") && w.top < 0));
+  };
   addEventListener("scroll", past, { passive: true });
   // the moon's stop marks itself risen a moment after the scroll that raised it, so look again when it does
   new MutationObserver(past).observe(hero, { attributes: true, attributeFilter: ["class"] });

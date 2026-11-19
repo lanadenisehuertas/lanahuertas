@@ -53,13 +53,13 @@
     if (SM.quiet()) { SM.travel(id); return; }
     leaving = true;
     const r = d.getBoundingClientRect(), b = board.getBoundingClientRect();
-    const cx = r.left + r.width / 2, cy = r.top + r.height / 2, vx = innerWidth / 2, vy = innerHeight / 2;
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2, vx = SM.vw / 2, vy = SM.vh / 2;
     const bx = b.left + b.width / 2, by = b.top + b.height / 2, U = SM.u();
     board.classList.add("leave");
     SM.bitmap(d).wakeUp(180);
     moon.setFace(1, 120); moon.wakeUp(420, 80);
     d.style.zIndex = 9;
-    d.style.transform = `translate(${vx - cx}px, ${vy - cy}px) scale(${Math.min(3.2, (innerHeight * 0.42) / r.height).toFixed(2)})`;
+    d.style.transform = `translate(${vx - cx}px, ${vy - cy}px) scale(${Math.min(3.2, (SM.vh * 0.42) / r.height).toFixed(2)})`;
     d.classList.add("chosen");
     doors.filter((x) => x !== d).forEach((x, i) => {
       const q = x.getBoundingClientRect(), dx = q.left + q.width / 2 - bx, dy = q.top + q.height / 2 - by, l = Math.hypot(dx, dy) || 1;
@@ -116,7 +116,8 @@
     // with the room before it (room-proto.js), the moon has already risen in the room's window and arrives in place,
     // so here it stays up and only the horizon, the lines, the name and the doors are drawn in
     const studied = document.documentElement.classList.contains("has-study");
-    const p = Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / innerHeight - (+hero.dataset.riseAt || 0))), m = studied ? 1 : 1 - (1 - p) * (1 - p), U = SM.u();
+    // the moon's stop sits in the page's flow, so its place comes from the scroll and a measure kept between resizes
+    const p = Math.min(1, Math.max(0, -SM.where(hero).top / SM.vh - (+hero.dataset.riseAt || 0))), m = studied ? 1 : 1 - (1 - p) * (1 - p), U = SM.u();
     moonEl.style.transform = `translateY(${((1 - m) * 34 * U).toFixed(1)}px)`;
     horizon.style.transform = `translateY(${(p * 14 * U).toFixed(1)}px)`;
     prelude.style.transform = `translateY(${(-p * 9 * U).toFixed(1)}px)`;

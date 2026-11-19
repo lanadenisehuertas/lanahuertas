@@ -22,7 +22,7 @@
     { sel: ".pic.moon", how: () => "breathe", r: [0.8, 0.8], t: [9, 9], depth: 0.5 },
     { sel: ".a-phone", how: () => "bob", a: [4, 6], t: [5, 7], depth: 1 },
     { sel: "#talk .env", how: () => "sway", r: [0.5, 0.7], t: [7, 9], depth: 0.5 },
-    { sel: ".vs-star svg", how: () => "moth-lite", a: [1.5, 2.5], t: [5, 9], depth: 0.4 },
+    { sel: ".vs-star .sp-w", how: () => "moth-lite", a: [1.5, 2.5], t: [5, 9], depth: 0.4 },
   ];
   const range = (r, d) => (r ? r[0] + rnd() * (r[1] - r[0]) : d);
   const items = [];
@@ -58,21 +58,40 @@
   /* the wind and the pull */
   let lastY = scrollY, vel = 0, px = -1e4, py = -1e4, raf = 0;
   const kick = () => { if (!raf && !still()) raf = requestAnimationFrame(frame); };
-  SM.scrub(() => { const y = scrollY; vel += (y - lastY - vel) * 0.35; lastY = y; kick(); });
+  /* while the page moves, its own frame measures (SM.measure, before anything is written) and a scrub moves things; the
+     frame here runs only to let things settle once the page is still, or to follow the pointer */
+  let read = null;
+  SM.measure(() => { read = nearNow(); });
+  SM.scrub(() => {
+    const y = SM.y; vel += (y - lastY - vel) * 0.35; lastY = y;
+    if (read) { const r = read; read = null; if (step(r)) kick(); } else kick();
+  });
   if (SM.HOVER) addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; px = e.clientX; py = e.clientY; kick(); }, { passive: true });
   document.addEventListener("pointerleave", () => { px = py = -1e4; kick(); });
   const R = 280;
   function frame() {
     raf = 0;
-    vel *= 0.9;
-    const H = innerHeight, near = [], pull = SM.HOVER && !SM.COLUMN.matches;
-    // read everything first, then write, so the page is laid out once a frame
+    if (SM.moving) return;   // the page's own frame is coming, and moves things from its scrub
+    if (step(nearNow())) kick();
+  }
+  /** what is showing and, for the pointer's pull, where it is: only reads the page */
+  function nearNow() {
+    const H = SM.vh, near = [], pull = SM.HOVER && !SM.COLUMN.matches && px > -1e3;
+    // read everything first, then write, so the page is laid out once a frame. Only the pointer's pull needs to know
+    // where things are; without it (phones, or the pointer gone) what is showing comes from the observer alone, and
+    // nothing is measured
     for (const it of vis) {
       if (!it.el.isConnected) { vis.delete(it); continue; }
+      if (!pull) { near.push([it, null]); continue; }
       const r = it.el.getBoundingClientRect();
       if (r.bottom < -100 || r.top > H + 100 || !r.width) continue;
       near.push([it, r]);
     }
+    return { near, pull };
+  }
+  /** move what nearNow found by the wind and the pull: only writes. Says whether anything is still settling */
+  function step({ near, pull }) {
+    vel *= 0.9;
     let busy = Math.abs(vel) > 0.05;
     for (const [it, r] of near) {
       // wind: while the page scrolls down, things trail behind it and lean back; deeper things more
@@ -94,6 +113,6 @@
         if (it._y !== Y) { it._y = Y; s.setProperty("--ly", Y + "px"); }
       }
     }
-    if (busy) kick();
+    return busy;
   }
 })();

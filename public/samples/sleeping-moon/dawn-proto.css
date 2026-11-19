@@ -81,6 +81,7 @@
 .vs-star { position: absolute; left: calc(var(--x) * 100%); top: calc(var(--y) * 100%); width: 44px; height: 44px; translate: -50% -50%;
   display: grid; place-items: center; padding: 0; border: 0; background: none; color: var(--c); cursor: pointer; opacity: calc(var(--o, 0) * var(--dim, 1)); }
 .vs-star svg, .vs-new svg, .opt svg { display: block; }
+.vs-star .sp-w { display: block; }
 .vs-star svg { width: var(--sz, 22px); height: var(--sz, 22px); transition: scale 180ms var(--pop); }
 .vs-star.seed { --sz: 30px; z-index: 1; }
 .vs-star.mine { z-index: 2; }
@@ -111,13 +112,16 @@
 .hint { margin: 0; font: italic 400 19px/1.3 "Redaction", Georgia, serif; color: var(--ink); }
 .opts { display: flex; flex-wrap: wrap; gap: 2px; }
 .opt { position: relative; display: grid; place-items: center; width: 46px; height: 46px; cursor: pointer; color: var(--ink); }
-.opt input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+/* the radio itself covers the whole option and draws nothing (no opacity, so its focus ring still shows); the picked
+   and focused looks follow it with sibling selectors, never :has(), which would make the browser re-check the form's
+   option on every frame the page moves */
+.opt input { position: absolute; inset: 0; margin: 0; appearance: none; background: none; border: 0; border-radius: 50%; cursor: pointer; }
 .opt svg { width: 26px; height: 26px; opacity: 0.45; transition: scale 160ms var(--pop); }
 .opt:hover svg { opacity: 0.75; }
-.opt:has(input:checked) svg { opacity: 1; scale: 1.2; color: var(--pick); }
-.opt:has(input:focus-visible) { outline: 2px dotted var(--ink); outline-offset: -2px; border-radius: 50%; }
+.opt input:checked ~ svg { opacity: 1; scale: 1.2; color: var(--pick); }
+.opt input:focus-visible { outline: 2px dotted var(--ink); outline-offset: -2px; }
 .sw i { width: 22px; height: 22px; background: var(--c); }
-.sw:has(input:checked) i { box-shadow: 0 0 0 3px var(--halo), 0 0 0 5px var(--ink); }
+.sw input:checked ~ i { box-shadow: 0 0 0 3px var(--halo), 0 0 0 5px var(--ink); }
 
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
   /* the letter is as tall as its form; its foot tucks into the envelope's pocket */
