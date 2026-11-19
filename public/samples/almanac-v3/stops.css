@@ -1,0 +1,291 @@
+/* Stops 3 to 7: posters, films, products, about, contact; written on the system in v3.css.
+
+   Every stop keeps the system's plain section (104px above and below) and the common
+   left edge (the .wrap margin, 64px at 1440). Compositions at 1440 x 900, 12 columns:
+   - Posters  (1 screen): head top left; one full-width sideways row, the chosen poster
+                centred and full size, its neighbours at 78% under a dark veil; the caption
+                between previous and next under it, like the brand corridor's controls.
+   - Films    (1 screen): head and lantern on columns 1-4; picture, caption and the ten
+                thumbnails on columns 5-12, so the choice and its result share one view.
+   - Products (about 1.2 screens): head, then the tabs; the screen on columns 1-7 and
+                the words on 8-12 (the brand rooms' word column); the pond low behind.
+   - About    (1 screen): the portrait in its painted frame on columns 1-4; the words on 6-12.
+   - Contact  (1 screen with the footer): one letter in the centre on the dawn. */
+
+/* the stops' headings break into even lines */
+.posters .h2, .films .h2, .products .h2, .about .h2 { text-wrap: balance; }
+
+/* ================= 3. Posters ================= */
+.posters {
+  /* the centre poster's height: 62% of the screen where it fits, less on short screens */
+  --ph: clamp(280px, min(62svh, 100svh - 420px), 600px);
+  --pg: var(--s5); /* the gap between posters, before the neighbours shrink */
+}
+.pr { margin-top: var(--s4); }
+.pr-track {
+  position: relative;
+  display: flex; align-items: center; gap: var(--pg);
+  overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  /* room for the shadow and the focus ring inside the scroller, given back outside it */
+  padding: var(--s3) calc(50% - var(--ph) * var(--r0) / 2) var(--s5) calc(50% - var(--ph) * var(--r0) / 2);
+  padding-right: calc(50% - var(--ph) * var(--rn) / 2);
+  margin-block: calc(-1 * var(--s3)) calc(-1 * var(--s5));
+  cursor: grab;
+}
+.pr-track::-webkit-scrollbar { display: none; }
+.pr-track.drag { scroll-snap-type: none; cursor: grabbing; user-select: none; }
+.pr-track.drag .pr-btn { cursor: grabbing; }
+.pr-item {
+  flex: none; width: calc(var(--ph) * var(--r)); height: var(--ph);
+  scroll-snap-align: center;
+  transform: scale(0.78);
+  transition: transform 320ms var(--move);
+}
+.pr-item.on { transform: none; }
+.pr-btn { width: 100%; height: 100%; }
+.pr-btn .frame { position: relative; width: 100%; height: 100%; }
+.pr-btn img { -webkit-user-drag: none; user-select: none; }
+/* the neighbours are dimmed by a dark veil (not a filter): the nearest by .55, the rest by .75 */
+.pr-btn .frame::after { content: ""; position: absolute; inset: 0; background: var(--sky-0); opacity: var(--dim, 0.6); pointer-events: none; transition: opacity 320ms var(--move); }
+.pr-item.on .frame::after { opacity: 0; }
+.pr-item:not(.on) .pr-btn:hover .frame::after { opacity: 0.35; }
+
+/* the caption between previous and next, centred under the poster */
+.pr-ctl { position: relative; z-index: 1; display: flex; justify-content: center; align-items: center; gap: var(--s3); margin-top: var(--s3); } /* above the row's shadow padding */
+.pr-cap { display: grid; justify-items: center; gap: 2px; width: 440px; max-width: none; text-align: center; }
+.pr-title { max-width: 100%; font: 400 24px/1.25 var(--display); color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pr-cap .label { justify-content: center; color: var(--mist); }
+
+/* ================= 4. Films ================= */
+.fl {
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: auto 1fr;
+  column-gap: var(--gutter);
+}
+.fl-head { grid-column: 1 / span 4; grid-row: 1; align-self: start; }
+.fl-head .h2 { text-wrap: balance; }
+.fl-mount {
+  grid-column: 5 / span 8; grid-row: 1 / span 2; justify-self: end;
+  /* the picture's width: the whole column span, or less so picture, caption and thumbnails fit one screen */
+  width: min(100%, (100svh - 430px) * 16 / 9);
+  position: relative; z-index: 1;
+}
+/* the painted lantern, lower left, throwing a faint static beam up toward the picture */
+.fl-lamp { grid-column: 1 / span 4; grid-row: 2; align-self: end; position: relative; width: min(100%, 22vw); margin-top: var(--s4); }
+.fl-lamp img { position: relative; width: 100%; }
+.fl-beam {
+  position: absolute; left: 88%; bottom: 22%; width: 90%; height: 150%;
+  background: radial-gradient(130% 70% at 0% 100%, rgb(255 241 201 / 0.2), rgb(255 228 160 / 0.07) 55%, transparent 80%);
+  clip-path: polygon(0 calc(100% - 46px), 0 calc(100% - 12px), 100% 62%, 100% 0);
+  pointer-events: none;
+}
+.fl-pic { position: relative; aspect-ratio: 16 / 9; background: var(--sky-0); }
+.fl-pic img { position: absolute; inset: 0; opacity: 0; transition: opacity 220ms linear; }
+.fl-pic img.on { opacity: 1; }
+.fl-cap { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s3); margin-top: var(--s3); }
+.fl-words { min-width: 0; }
+.fl-title { text-wrap: balance; }
+.fl-words .label { margin-top: var(--s1); color: var(--mist); }
+.fl-go { flex: none; }
+.fl-thumbs { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: var(--s1); margin-top: var(--s4); }
+.fl-th { display: grid; gap: 6px; justify-items: start; min-width: 0; }
+.fl-th .frame { width: 100%; aspect-ratio: 16 / 9; box-shadow: none; }
+.fl-th[aria-pressed="true"] .frame { outline: 2px solid var(--cream); outline-offset: 3px; }
+.fl-th .label { color: var(--mist); }
+.fl-th[aria-pressed="true"] .label { color: var(--cream); }
+.fl-th:focus-visible { outline-offset: 7px; }
+
+/* ================= 5. Products ================= */
+.products { --sh: clamp(300px, 100svh - 420px, 487px); /* the screen's height cap */ }
+.products > .wrap { position: relative; }
+/* the night pond: a low strip along the bottom, faded at its top edge and tinted; nothing important sits on it */
+.pd-pond {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 22%;
+  -webkit-mask-image: linear-gradient(transparent, #000 70%);
+  mask-image: linear-gradient(transparent, #000 70%);
+  pointer-events: none;
+}
+.pd-pond img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 78%; }
+.pd-pond::after { content: ""; position: absolute; inset: 0; background: #241248; opacity: 0.62; }
+
+/* the tabs head the word column, level with the top of the screen, so tabs, screen and
+   thumbnails fit one view under the stop's head */
+.pd { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); margin-top: var(--s4); }
+.pd-tabs { display: none; flex-wrap: wrap; gap: var(--s1); }
+.js .pd-tabs { display: flex; grid-column: 8 / span 5; grid-row: 1; align-self: start; position: relative; z-index: 1; }
+.pd-tab {
+  display: inline-flex; align-items: center; height: 44px; padding: 0 18px;
+  border-radius: var(--r-pill); font: 500 16px/1 var(--body); color: var(--mist);
+  box-shadow: inset 0 0 0 1px rgb(185 162 255 / 0.4);
+  touch-action: manipulation; transition: transform var(--fast) var(--enter);
+}
+.pd-tab:hover { background: rgb(185 162 255 / 0.16); color: var(--card); transform: translateY(-2px); }
+.pd-tab:active { transform: scale(0.98); }
+.pd-tab[aria-selected="true"] { background: var(--cream); color: var(--ink); box-shadow: none; }
+
+.pd-panels { grid-column: 1 / -1; grid-row: 1; }
+.js .pd-panels { display: grid; }
+.pd-panel { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: start; }
+.pd-panel + .pd-panel { margin-top: var(--s5); } /* without JavaScript the four apps stack */
+/* with JavaScript the four panels share one cell, so switching never moves the page; 200ms cross-fade */
+.js .pd-panel { grid-area: 1 / 1; margin: 0; transition: opacity 200ms linear, visibility 0s linear 200ms; }
+.js .pd-panel:not(.on) { opacity: 0; visibility: hidden; }
+.js .pd-panel.on { transition: opacity 200ms linear; }
+
+.pd-stage { grid-column: 1 / span 7; display: grid; justify-items: center; min-width: 0; }
+.pd-shot { width: min(100%, var(--sh) * var(--r)); }
+.pd-shot .frame { aspect-ratio: var(--r); }
+/* a phone screen sits in a plain rounded phone outline: 14px outside, 6px screen, 8px between */
+[data-kind="phone"] .pd-shot { width: calc((var(--sh) - 18px) * var(--r) + 18px); padding: 8px; border-radius: var(--r-ctl); box-shadow: inset 0 0 0 1.5px rgb(255 241 201 / 0.5), var(--lift); }
+[data-kind="phone"] .pd-shot .frame { box-shadow: none; }
+[data-kind="phone"] .pd-shot:focus-visible { outline-offset: 3px; }
+.pd-thumbs { display: flex; justify-content: center; gap: var(--s2); min-height: 60px; margin-top: var(--s3); }
+.pd-thumb { width: 96px; height: 60px; }
+[data-kind="phone"] .pd-thumb { width: 60px; }
+.pd-thumb .frame { width: 100%; height: 100%; box-shadow: none; }
+.pd-thumb .frame img { object-position: 50% 0; }
+.pd-thumb[aria-pressed="true"] .frame { outline: 2px solid var(--cream); outline-offset: 3px; }
+.pd-thumb:focus-visible { outline-offset: 7px; }
+
+.pd-text { grid-column: 8 / span 5; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.js .pd-text { padding-top: calc(var(--tabs-h, 44px) + var(--s4)); } /* stops.js measures the tab row */
+.pd-text .label { color: var(--mist); }
+.pd-tag { margin-top: var(--s1); font: italic 400 22px/1.3 var(--display); color: var(--mist); }
+.pd-desc { margin-top: var(--s3); text-wrap: pretty; }
+.pd-meta { display: block; margin-top: var(--s2); }
+.pd-desc + .pd-meta { margin-top: var(--s3); }
+.pd-meta + .pd-meta { margin-top: var(--s1); }
+.pd-go { margin-top: var(--s4); }
+
+/* ================= 6. About ================= */
+.about { display: grid; align-content: center; min-height: 100svh; } /* one full screen, the composition centred in it */
+.ab { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: center; }
+.ab-portrait { grid-column: 1 / span 4; position: relative; width: 88%; aspect-ratio: 760 / 997; }
+/* the portrait sits behind the frame's oval opening (x 17-83%, y 15-84% of the frame) */
+.ab-face { position: absolute; left: 15.5%; top: 14%; width: 69%; height: 72%; border-radius: 50%; overflow: hidden; background: var(--sky-0); }
+.ab-face img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transform: scale(1.28); transform-origin: 48% 18%; }
+.ab-frame { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ab-text { grid-column: 6 / span 7; min-width: 0; }
+.ab-statement { margin-top: var(--s3); max-width: none; font: 400 28px/1.3 var(--display); color: var(--cream); text-wrap: pretty; }
+
+/* the four roles: a ruled list; a role opens its line of detail under it, one at a time */
+.ab-roles { list-style: none; margin-top: var(--s4); }
+.ab-roles li { border-top: 1px solid rgb(185 162 255 / 0.3); }
+.ab-roles li:last-child { border-bottom: 1px solid rgb(185 162 255 / 0.3); }
+.ab-roles h3 { font: inherit; color: inherit; letter-spacing: 0; }
+.ab-roles button { display: flex; align-items: center; gap: var(--s3); width: 100%; min-height: 56px; padding: var(--s1) 0; text-align: left; touch-action: manipulation; }
+.ab-roles button > span { transition: transform var(--fast) var(--enter); }
+.ab-roles button:hover > span { transform: translateY(-2px); }
+.ab-roles button:active > span { transform: scale(0.98); }
+.ab-roles button:focus-visible { outline-offset: 2px; border-radius: var(--r-ctl); }
+.ab-role { flex: 1; min-width: 0; font: 400 18px/1.35 var(--body); color: var(--cream); }
+.ab-when { flex: none; }
+.ab-chev { flex: none; width: 16px; height: 16px; position: relative; }
+.ab-chev::before, .ab-chev::after { content: ""; position: absolute; left: 1px; top: 7px; width: 14px; height: 2px; border-radius: 1px; background: var(--lilac); }
+.ab-chev::after { transform: rotate(90deg); transition: transform 220ms var(--move); }
+.open .ab-chev::after { transform: rotate(0deg); }
+.ab-detail { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 220ms var(--move); }
+.ab-detail > p { min-height: 0; overflow: hidden; visibility: hidden; transition: visibility 0s linear 220ms; }
+.open .ab-detail { grid-template-rows: 1fr; }
+.open .ab-detail > p { visibility: visible; transition: none; padding-bottom: var(--s2); }
+.ab-line { display: block; max-width: none; margin-top: var(--s3); }
+.ab-line + .ab-line { margin-top: var(--s1); }
+
+/* ================= 7. Contact at first light ================= */
+.talk {
+  display: grid; align-content: center;
+  /* with the footer under it, the last stop fills the last screen exactly */
+  min-height: calc(100svh - var(--foot-h, 88px));
+  padding-block: var(--s6) var(--s5);
+}
+.talk > .wrap { position: relative; z-index: 1; }
+/* the dawn painting fills the lower 45%, faded at its top edge and again where the footer begins */
+.tk-dawn {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 45%;
+  -webkit-mask-image: linear-gradient(transparent, rgb(0 0 0 / 0.5) 30%, #000 62%, #000 82%, transparent);
+  mask-image: linear-gradient(transparent, rgb(0 0 0 / 0.5) 30%, #000 62%, #000 82%, transparent);
+  pointer-events: none;
+}
+.tk-dawn img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 82%; }
+.tk-dawn::after { content: ""; position: absolute; inset: 0; background: var(--dawn-1); opacity: 0.42; }
+/* the painted balloon: small, still, upper right of the sky */
+.tk-balloon { position: absolute; top: calc(var(--bar-zone) + var(--s5)); right: calc(var(--margin) + 6%); width: clamp(64px, 7vw, 112px); height: auto; pointer-events: none; }
+.letter { width: min(100%, 560px); margin-inline: auto; padding: var(--s5) var(--s5) var(--s4); background: var(--card); border-radius: var(--r-ctl); box-shadow: var(--lift); }
+.letter .head { max-width: none; }
+/* the moon icon on the card: ink and pale lilac, since cream disappears on the card (added to the system's .on-card) */
+.on-card .moon .lit { fill: var(--ink-label); }
+.on-card .moon .dark { fill: #e4dcff; }
+.letter .h2 { margin-top: 0; }
+.tk-acts { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s4); }
+.tk-copy { display: inline-grid; place-items: center; }
+.tk-copy > span { grid-area: 1 / 1; }
+.tk-copy-b, .tk-copy.done .tk-copy-a { visibility: hidden; }
+.tk-copy.done .tk-copy-b { visibility: visible; }
+.tk-links { display: flex; gap: var(--s4); margin-top: var(--s3); }
+.tk-links a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; color: var(--ink); text-underline-offset: 4px; transition: transform var(--fast) var(--enter); }
+.tk-links a:hover { transform: translateY(-2px); text-decoration-thickness: 2px; }
+.tk-links a:active { transform: scale(0.98); }
+
+/* ================= quiet mode: nothing glides or fades ================= */
+.quiet .pr-item, .quiet .pr-btn .frame::after, .quiet .fl-pic img, .quiet .pd-panel, .quiet .ab-detail, .quiet .ab-chev::after { transition: none !important; }
+
+/* ================= smaller screens ================= */
+@media (max-width: 1100px) {
+  .ab-statement { font-size: 24px; }
+  .pd-tag { font-size: 20px; }
+}
+
+/* phone: every stop is one column */
+@media (max-width: 860px) {
+  .posters, .films, .products, .about { padding-block: var(--s6) var(--s4); }
+
+  .posters { --ph: clamp(240px, min(46svh, 76vw), 420px); --pg: var(--s2); }
+  .pr { margin-top: var(--s3); }
+  /* the caption takes the full width; previous and next sit together under it */
+  .pr-ctl { display: grid; grid-template-columns: 1fr 52px 52px 1fr; gap: var(--s2) var(--s3); padding-inline: var(--margin); }
+  .pr-prev { grid-column: 2; }
+  .pr-next { grid-column: 3; }
+  .pr-cap { grid-column: 1 / -1; grid-row: 1; width: auto; min-width: 0; }
+  .pr-title { font-size: 22px; white-space: normal; text-wrap: balance; }
+  .pr-cap .label { display: block; }
+
+  .fl { display: block; }
+  .fl-lamp { display: none; }
+  .fl-mount { width: auto; justify-self: auto; margin-top: var(--s4); }
+  .fl-cap { display: block; }
+  .fl-go { margin-top: var(--s3); }
+  .fl-thumbs {
+    display: flex; gap: var(--s2); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    margin-inline: calc(-1 * var(--margin)); padding: 6px var(--margin) var(--s1); scroll-padding-inline: var(--margin);
+  }
+  .fl-thumbs::-webkit-scrollbar { display: none; }
+  .fl-th { flex: none; width: 120px; scroll-snap-align: start; }
+
+  .products { --sh: min(62svh, 520px); }
+  .pd { display: block; }
+  .js .pd-tabs { margin-bottom: var(--s3); }
+  .js .pd-panels { grid-template-columns: minmax(0, 1fr); }
+  .pd-panel { display: block; min-width: 0; }
+  .js .pd-text { padding-top: 0; }
+  .pd-thumbs { gap: var(--s1); }
+  .pd-thumb { width: 72px; height: 45px; }
+  [data-kind="phone"] .pd-thumb { width: 45px; }
+  .pd-shot { width: min(100%, var(--sh) * var(--r)); }
+  .pd-text { margin-top: var(--s4); }
+  .pd-pond { height: 14%; }
+
+  .ab { display: block; }
+  .ab-portrait { width: min(72%, 300px); margin-inline: auto; }
+  .ab-text { margin-top: var(--s4); }
+  .ab-statement { font-size: 22px; }
+  .ab-roles button { flex-wrap: wrap; column-gap: var(--s2); row-gap: 2px; }
+  .ab-role { flex: 1 1 100%; order: 0; }
+  .ab-when { order: 1; flex: 1; }
+  .ab-chev { order: 2; }
+
+  .talk { padding-block: var(--s6) var(--s5); }
+  .letter { padding: var(--s4) var(--s3) var(--s3); }
+  .tk-dawn { height: 40%; }
+  .tk-balloon { top: calc(var(--bar-zone) + var(--s2)); right: var(--margin); width: 56px; }
+}

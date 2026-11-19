@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lana Huertas · UI/UX and graphic designer in Manila</title>
+<meta name="description" content="Lana Huertas designs brands, posters, films and product screens in Manila, and builds some of them in code.">
+<meta name="theme-color" content="#0c0620">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Pixelify+Sans:wght@400;500&display=swap">
+<link rel="preload" href="../brand/fonts/Redaction35-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="art/moon.webp" as="image">
+<link rel="stylesheet" href="plate.css">
+<script>document.documentElement.classList.add("js"); try { if (localStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
+</head>
+<body>
+<a class="skip" href="#doors">Skip to the work</a>
+
+<main class="plate" id="top">
+  <div class="board" id="board">
+    <div class="stars" aria-hidden="true"></div>
+    <div class="frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+    <header class="mast">
+      <p class="issue">The night almanac <span>no. 01</span></p>
+      <p class="sub" id="sub" aria-live="polite">UI/UX and graphic designer in Manila</p>
+      <button class="switch" type="button" role="switch" aria-checked="false" id="quiet"><span>Quiet mode</span><i></i></button>
+    </header>
+
+    <!-- one 1-bit group: the moon and the name are the same ink -->
+    <div class="xor">
+      <div class="moon pic" id="moon">
+        <img class="full" src="art/moon.webp" width="535" height="535" alt="">
+        <canvas class="bm" data-src="art/moon.webp" data-kind="moon" aria-hidden="true"></canvas>
+      </div>
+      <h1 class="name" id="name"><span class="n-rest">Lana <span>Huertas</span></span><span class="n-door" id="door" aria-hidden="true"></span></h1>
+    </div>
+
+    <nav class="doors" id="doors" aria-label="Lana's work">
+      <a class="door" href="../almanac-v3/index.html#brands" data-door="Brands" data-line="Ten brands, each with its own room." style="--dx: -34.8; --cy: 12.2">
+        <span class="pic"><img class="full" src="art/c_brands.webp" width="520" height="336" alt=""><canvas class="bm" data-src="art/c_brands.webp" aria-hidden="true"></canvas></span>
+        <span class="lab"><i>I</i>Brands</span>
+      </a>
+      <a class="door" href="../almanac-v3/index.html#posters" data-door="Posters" data-line="Twelve one-off posters." style="--dx: -34.8; --cy: 25.4">
+        <span class="pic"><img class="full" src="art/c_posters.webp" width="267" height="520" alt=""><canvas class="bm" data-src="art/c_posters.webp" aria-hidden="true"></canvas></span>
+        <span class="lab"><i>II</i>Posters</span>
+      </a>
+      <a class="door" href="../almanac-v3/index.html#films" data-door="Films" data-line="Ten films and edits." style="--dx: -34.8; --cy: 38.6">
+        <span class="pic"><img class="full" src="art/c_films.webp" width="520" height="473" alt=""><canvas class="bm" data-src="art/c_films.webp" aria-hidden="true"></canvas></span>
+        <span class="lab"><i>III</i>Films</span>
+      </a>
+      <a class="door" href="../almanac-v3/index.html#products" data-door="Products" data-line="Four apps I designed and built." style="--dx: 34.8; --cy: 12.2">
+        <span class="pic"><img class="full" src="art/c_products.webp" width="264" height="520" alt=""><canvas class="bm" data-src="art/c_products.webp" aria-hidden="true"></canvas></span>
+        <span class="lab"><i>IV</i>Products</span>
+      </a>
+      <a class="door" href="../almanac-v3/index.html#about" data-door="About" data-line="Who I am and where I have worked." style="--dx: 34.8; --cy: 25.4">
+        <span class="pic"><img class="full" src="art/c_about.webp" width="396" height="520" alt=""><canvas class="bm" data-src="art/c_about.webp" aria-hidden="true"></canvas></span>
+        <span class="lab"><i>V</i>About</span>
+      </a>
+      <a class="door" href="../almanac-v3/index.html#talk" data-door="Contact" data-line="Write to me. I reply within two days." style="--dx: 34.8; --cy: 38.6">
+        <span class="pic"><img class="full" src="art/c_contact.webp" width="520" height="434" alt=""><canvas class="bm" data-src="art/c_contact.webp" aria-hidden="true"></canvas></span>
+        <span class="lab"><i>VI</i>Contact</span>
+      </a>
+    </nav>
+
+    <footer class="foot">
+      <p>Everything here is asleep. Touch it to wake it.</p>
+      <p>Manila, 2026</p>
+    </footer>
+  </div>
+</main>
+
+<script src="plate.js"></script>
+</body>
+</html>

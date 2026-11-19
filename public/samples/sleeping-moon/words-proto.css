@@ -1,0 +1,38 @@
+/* Prototype: words that answer the pointer (words-proto.js).
+   --wg is the light a word catches: the world's gold on the night, deep ink on the pink dawn. */
+main { --wg: var(--mark, #fff1c9); }
+#talk { --wg: #5b3fc4; }
+
+/* headings and titles, split into letters: near the pointer they lift, catch the light and wake into the smooth cut */
+.wl .ch { display: inline-block; position: relative; transition: color 140ms linear; }
+.wl .ch.wk { font-family: var(--display-awake); color: var(--wg); }
+.wl.focus-lit .ch { font-family: var(--display-awake); color: var(--wg); }
+
+/* the decode: a letter shows a rune on top of itself while it is still being spelled; its own width never changes */
+.wl .ch.rn { color: transparent; }
+.wl .ch.rn::after { content: attr(data-g); position: absolute; left: 50%; top: 0; translate: -50% 0; color: var(--wg); font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "Apple Symbols", var(--body); font-style: normal; }
+
+/* headings written by the scroll: unwritten letters wait low and faint; each one rises into place as the pen passes,
+   and the newest letters are still wet gold */
+.wscr .ch { opacity: 0.12; translate: 0 0.32em; transition: opacity 260ms linear, translate 520ms var(--rise), color 700ms linear; }
+.wscr .ch.w { opacity: 1; translate: 0 0; }
+.wscr .ch.wn { color: var(--wg); font-family: var(--display-awake); transition-duration: 120ms; }
+
+/* short lines written word by word */
+.wscw .wv { display: inline-block; opacity: 0.12; translate: 0 0.5em; transition: opacity 300ms linear, translate 560ms var(--rise), color 800ms linear; }
+.wscw .wv.w { opacity: 1; translate: 0 0; }
+.wscw .wv.wn { color: var(--wg); transition-duration: 120ms; }
+
+/* body lines: the word under the pointer glows and its neighbours a little */
+.wd { display: inline-block; transition: color 420ms linear, text-shadow 420ms linear, translate 420ms var(--enter); }
+.wd.w1 { color: color-mix(in srgb, var(--wg) 55%, currentColor); transition-duration: 120ms; }
+.wd.w2 { color: var(--wg); translate: 0 -2px; text-shadow: 0 0 10px color-mix(in srgb, var(--wg) 45%, transparent); transition-duration: 120ms; }
+#talk .wd.w2 { text-shadow: none; }
+
+/* quiet mode and reduced motion keep only the colour */
+.quiet .wd.w2, .quiet .wl .ch { translate: none !important; }
+.quiet .wscr .ch, .quiet .wscw .wv { opacity: 1; translate: none; }
+@media (prefers-reduced-motion: reduce) {
+  .wd.w2, .wl .ch { translate: none !important; }
+  .wscr .ch, .wscw .wv { opacity: 1; translate: none; }
+}

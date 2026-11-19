@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample 2: Gate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter+Tight:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* GATE. The page opens on a closed garden gate and nothing else. Scrolling is
+   walking: the two doors swing open, you pass through, and each part of the
+   site stands further down the path and comes to meet you. Native scroll
+   drives one number (how far you have walked); everything is placed in depth. */
+body { height: 760vh; }
+.scene { position: fixed; inset: 0; overflow: hidden; perspective: 1100px; perspective-origin: 50% 46%; }
+.deco { position: absolute; pointer-events: none; }
+.hang { left: 50%; top: -16vh; width: min(96vw, 1200px); margin-left: calc(min(96vw, 1200px) / -2); opacity: calc(0.42 - var(--p) * 5); transform: scale(calc(1 + var(--p) * 5)); transform-origin: 50% 0; }
+.ground { left: 0; bottom: -16vh; width: 100vw; height: auto; min-width: 1100px; opacity: calc(1 - var(--p) * 5); transform: translateY(calc(var(--p) * 60vh)) scale(calc(1 + var(--p) * 3)); transform-origin: 50% 100%; }
+.top { position: absolute; left: 0; right: 0; top: clamp(64px, 9vh, 96px); z-index: 4; text-align: center; padding: 0 16px; opacity: calc(1 - var(--p) * 9); transform: translateY(calc(var(--p) * -160px)); }
+.top .role { margin-inline: auto; }
+.hint { position: absolute; left: 50%; bottom: 84px; z-index: 4; transform: translateX(-50%); opacity: calc(1 - var(--p) * 14); }
+
+/* the world moves toward you as you scroll */
+.world { position: absolute; left: 50%; top: 64%; width: 0; height: 0; transform-style: preserve-3d; transform: translateZ(calc(var(--p) * 6400px)); will-change: transform; }
+.gate { position: absolute; left: calc(var(--gw) / -2); top: calc(var(--gw) * -0.9); --gw: min(50vh, 440px); width: var(--gw); height: calc(var(--gw) * 1.5); transform-style: preserve-3d; }
+/* the gate picture is cut into two doors, each hinged on its outer edge */
+.door { position: absolute; top: 0; width: 50%; height: 100%; background: url(art/gate.webp) 0 0 / 200% 100% no-repeat; transition: transform 0.2s linear; }
+.door.l { left: 0; transform-origin: 0 50%; transform: rotateY(calc(var(--open) * -104deg)); }
+.door.r { left: 50%; background-position: 100% 0; transform-origin: 100% 50%; transform: rotateY(calc(var(--open) * 104deg)); }
+.glow { position: absolute; left: -30vh; top: -34vh; width: 60vh; height: 60vh; border-radius: 50%; background: radial-gradient(closest-side, rgb(255 246 220 / 0.9), rgb(238 139 228 / 0.5) 40%, transparent); transform: translateZ(-300px); opacity: var(--open); }
+
+/* a stop on the path: a title, a line, and work on either side */
+.stop { position: absolute; left: -46vw; top: -40vh; width: 92vw; max-width: 1200px; margin-left: calc((92vw - min(92vw, 1200px)) / 2); transform: translateZ(calc(var(--z) * -1px)); display: grid; grid-template-columns: 1fr minmax(0, 1.1fr) 1fr; gap: 3vw; align-items: center; opacity: var(--o, 0); }
+.stop h2 { font: 500 clamp(2.2rem, 5.6vw, 5.4rem)/0.9 "Cormorant Garamond", serif; text-align: center; text-shadow: 0 0 40px rgb(185 162 255 / 0.7); }
+.stop h2 em { color: var(--orchid); }
+.stop p { margin-top: 12px; text-align: center; color: var(--lilac); }
+.stop .card { aspect-ratio: 4 / 5; }
+.stop .card:nth-of-type(1) { transform: rotateY(24deg); }
+.stop .card:nth-of-type(2) { transform: rotateY(-24deg); }
+.side { position: absolute; width: 26vh; opacity: 0.85; }
+.prog { position: fixed; right: 18px; top: 50%; z-index: 20; transform: translateY(-50%); display: grid; gap: 10px; }
+.prog i { width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--lilac); }
+.prog i[data-on] { background: var(--moon); box-shadow: 0 0 14px var(--moon); }
+@media (max-width: 720px) { .stop { grid-template-columns: 1fr 1fr; } .stop > div { grid-column: 1 / -1; grid-row: 1; } }
+</style>
+</head>
+<body>
+<main class="scene" style="--p:0;--open:0">
+  <div class="sky"></div><div class="stars"></div>
+  <img class="deco px twinkle" style="--d:-12;right:12%;top:8%;width:clamp(90px,11vw,170px)" src="art/moon.webp" alt="">
+  <img class="deco hang" src="art/wisteria.webp" alt="">
+  <header class="top">
+    <h1 class="name">Lana Denise <em>Huertas</em></h1>
+    <p class="role">UI/UX and visual designer. The garden is behind this gate.</p>
+  </header>
+  <div class="world" id="world">
+    <div class="glow"></div>
+    <div class="gate"><span class="door l"></span><span class="door r"></span></div>
+  </div>
+  <img class="deco ground" src="art/border.webp" alt="">
+  <p class="cta hint">Scroll to walk in ↓</p>
+</main>
+<div class="prog" aria-hidden="true" id="prog"></div>
+<script src="base.js"></script>
+<script>
+const scene = document.querySelector(".scene"), world = document.getElementById("world"), prog = document.getElementById("prog");
+const SIDE = ["shrooms", "lily", "peony", "lotus", "butterfly", "bud"];
+const stops = PARTS.slice(0, 6).map((p, i) => {
+  const z = 900 + i * 1000;
+  const [a, b] = p.t.split(/ (?=[^ ]+$)/);
+  world.insertAdjacentHTML(
+    "beforeend",
+    `<section class="stop" style="--z:${z}">${card(PARTS[(i + 6) % 8])}<div><h2>${a} <em>${b}</em></h2><p>${p.s}</p></div>${card(p)}
+     <img class="side" style="left:${i % 2 ? "auto" : "-12vw"};right:${i % 2 ? "-12vw" : "auto"};top:22vh" src="art/${SIDE[i]}.webp" alt=""></section>`
+  );
+  prog.insertAdjacentHTML("beforeend", "<i></i>");
+  return z;
+});
+const els = [...world.querySelectorAll(".stop")], dots = [...prog.children];
+parallax(scene);
+let f = 0;
+const read = () => {
+  f = 0;
+  const p = scrollY / (document.documentElement.scrollHeight - innerHeight);
+  scene.style.setProperty("--p", p.toFixed(4));
+  scene.style.setProperty("--open", Math.min(1, p * 9).toFixed(3));
+  const cam = p * 6400;
+  els.forEach((el, i) => {
+    const d = stops[i] - cam; // how far ahead of you this stop is
+    el.style.setProperty("--o", (Math.min(1, p * 9) * (d < -150 ? 0 : d < 150 ? 1 - Math.abs(d) / 600 : Math.max(0, 1 - (d - 150) / 800))).toFixed(3));
+    dots[i].toggleAttribute("data-on", Math.abs(d) < 500);
+  });
+};
+addEventListener("scroll", () => { if (!f) f = requestAnimationFrame(read); }, { passive: true });
+read();
+</script>
+</body>
+</html>

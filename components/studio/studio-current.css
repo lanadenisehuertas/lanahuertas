@@ -1,0 +1,46 @@
+/* Keep the editor's familiar layout while matching the site's dark light system. */
+.ps {
+  --ps-0: #0c0a17;
+  --ps-1: #151122;
+  --ps-2: #181428;
+  --ps-3: #292240;
+  --ps-4: #322a51;
+  --ps-field: #100d1d;
+  --ps-line: #302941;
+  --ps-edge: #5f5875;
+  --ps-tx: #f5f2fa;
+  --ps-mut: #c8c3d7;
+  --ps-cream: #f5f2fa;
+  --ps-ink: #0c0a17;
+  --ps-acc: #80dcf1;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.ps :is(button, input, select, textarea, label, small, output, kbd) { font-size: 14px; }
+.ps :is(.ps-mhead, .ps-cats button, .ps-share-pv figcaption, .ps-sizes small, .ps-temps small, .ps-share-form .ps-field small) { font-size: 14px; text-transform: none; letter-spacing: 0; }
+.ps :is(.ps-newsub, .ps-err, .ps-share-done .ps-newsub) { font-size: 16px; }
+.ps :is(.ps-ptitle, .ps-fxb, .ps-field output, .ps-status, .ps-num i, .ps-ptabs button, .ps-num input, .ps-grid .ps-num input, .ps-cats button span) { font-size: 14px; }
+.ps :is(.ps-mhead, .ps-sizes small, .ps-temps small, .ps-share-pv figcaption, .ps-status, .ps-sel, .ps-field, .ps-lab) { color: var(--ps-mut); }
+.ps .ps-new h2 { font: 400 clamp(28px, 3vw, 40px)/1.1 var(--font-wide); }
+.ps .ps-x:hover { background: var(--ps-4); color: var(--ps-acc); }
+.ps .ps-share-form [aria-invalid="true"] { border-color: var(--color-amber) !important; }
+.ps .ps-err { border-color: var(--color-amber); background: rgb(255 188 128 / .12); color: var(--color-amber); }
+.ps .ps-btn:not(:disabled):hover, .ps .ps-share:not(:disabled):hover { background: var(--ps-4) !important; }
+.ps .ps-btn--blue:not(:disabled):hover, .ps .ps-export:not(:disabled):hover { background: var(--ps-acc) !important; border-color: var(--ps-acc) !important; color: var(--ps-ink); }
+.ps .ps-share-form .ps-field input, .ps .ps-share-form .ps-field textarea { font-size: 16px; min-height: 42px; }
+.ps .ps-field input, .ps .ps-field textarea, .ps .ps-sel, .ps .ps-num input { min-height: 34px; }
+.ps .ps-new, .ps .ps-share-dlg { border-color: var(--ps-edge); background: var(--ps-2); }
+.ps .ps-scrim { background: rgb(5 4 12 / .8); }
+.ps .ps-share-pv { background: var(--ps-0); }
+.ps .ps-libgrid button { background-color: var(--ps-field); }
+.ps .ps-art { box-shadow: 0 0 0 1px var(--ps-edge), 0 22px 44px -20px #000; }
+.ps .ps-btn, .ps .ps-share, .ps .ps-menu button, .ps .ps-tool, .ps .ps-ib { transition: background-color 220ms ease-out, border-color 220ms ease-out, color 220ms ease-out; }
+.ps :focus-visible { outline: 2px solid var(--ps-acc); outline-offset: 2px; }
+.ps .ps-menu button:focus-visible { outline: 2px solid var(--ps-acc); outline-offset: -2px; }
+@media (hover: none) {
+  .ps button:active:not(:disabled) { background-color: var(--ps-4); }
+  .ps .ps-btn--blue:active:not(:disabled), .ps .ps-export:active:not(:disabled) { background-color: var(--ps-acc) !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ps, .ps .ps-menu, .ps .ps-new, .ps .ps-btn, .ps .ps-share, .ps .ps-tool { animation: none; transition-duration: 0ms; }
+}

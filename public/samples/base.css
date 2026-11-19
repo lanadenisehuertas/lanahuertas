@@ -1,0 +1,130 @@
+/* Shared by the five hero samples: the violet night palette, type, the sky, and the bar that switches samples. */
+:root {
+  --ink: #0f0822;
+  --night: #1a0d3d;
+  --violet: #3a1f85;
+  --iris: #6b46e0;
+  --lilac: #b9a2ff;
+  --mist: #efe8ff;
+  --orchid: #ee8be4;
+  --moon: #fff6dc;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --pop: cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { min-height: 100%; }
+body {
+  background: var(--ink);
+  color: var(--mist);
+  font: 17px/1.5 "Inter Tight", system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: none; user-select: none; -webkit-user-drag: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--moon); outline-offset: 4px; }
+.serif { font-family: "Cormorant Garamond", Georgia, serif; }
+
+/* the sky: deep violet falling to an orchid glow on the horizon, and a field of still stars */
+.sky {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 72% at 50% 110%, #c06ad8 0, #7a47d0 24%, #2c1570 56%, #120a2e 100%);
+}
+.stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.6px 1.6px at 8% 14%, #fff 50%, transparent 52%), radial-gradient(1.2px 1.2px at 19% 31%, #e9e0ff 50%, transparent 52%),
+    radial-gradient(1.8px 1.8px at 31% 9%, #fff 50%, transparent 52%), radial-gradient(1.2px 1.2px at 44% 22%, #ffd9f6 50%, transparent 52%),
+    radial-gradient(1.6px 1.6px at 58% 12%, #fff 50%, transparent 52%), radial-gradient(1.2px 1.2px at 67% 29%, #e9e0ff 50%, transparent 52%),
+    radial-gradient(1.8px 1.8px at 79% 8%, #fff 50%, transparent 52%), radial-gradient(1.3px 1.3px at 91% 24%, #ffd9f6 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 13% 47%, #fff 50%, transparent 52%), radial-gradient(1.4px 1.4px at 86% 43%, #fff 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 37% 40%, #e9e0ff 50%, transparent 52%), radial-gradient(1.2px 1.2px at 72% 52%, #fff 50%, transparent 52%);
+}
+/* a layer that leans with the pointer: --d is its depth (base.js writes --mx/--my on the scene) */
+.px { transform: translate3d(calc(var(--mx, 0) * var(--d, 0) * 1px), calc(var(--my, 0) * var(--d, 0) * 1px), 0); }
+
+.name {
+  font: 500 clamp(3rem, 9.4vw, 9rem) / 0.84 "Cormorant Garamond", Georgia, serif;
+  letter-spacing: -0.02em;
+  color: var(--mist);
+  text-shadow: 0 0 40px rgb(185 162 255 / 0.55);
+}
+.name em { font-style: italic; color: var(--orchid); }
+.role { max-width: 34ch; margin-top: 14px; font-size: clamp(1rem, 1.4vw, 1.25rem); color: var(--mist); }
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 26px;
+  border: 1px solid var(--lilac);
+  border-radius: 999px;
+  background: rgb(26 13 61 / 0.7);
+  font-weight: 600;
+  transition: transform 0.25s var(--ease), background-color 0.25s, box-shadow 0.25s;
+}
+.cta:hover { transform: translateY(-2px); background: var(--iris); box-shadow: 0 0 34px rgb(185 162 255 / 0.6); }
+.twinkle { animation: twinkle 4.6s ease-in-out infinite; animation-delay: var(--td, 0s); }
+@keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(0.7); } 50% { opacity: 1; transform: scale(1); } }
+.float { animation: float 9s ease-in-out infinite alternate; animation-delay: var(--td, 0s); }
+@keyframes float { from { transform: translate3d(0, -8px, 0) rotate(-1.5deg); } to { transform: translate3d(0, 10px, 0) rotate(1.5deg); } }
+
+/* work card shared look */
+.card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--night);
+  color: var(--mist);
+  text-decoration: none;
+  box-shadow: 0 0 0 1px rgb(185 162 255 / 0.45), 0 24px 50px -20px rgb(0 0 0 / 0.8);
+}
+.card img { width: 100%; height: 100%; object-fit: cover; }
+.card b {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 26px 14px 12px;
+  background: linear-gradient(transparent, rgb(15 8 34 / 0.92));
+  font: 600 1.25rem/1.1 "Cormorant Garamond", Georgia, serif;
+}
+.card b small { display: block; margin-top: 3px; font: 400 14px/1.3 "Inter Tight", sans-serif; color: var(--lilac); }
+
+/* the bar that switches between the five samples */
+.bar {
+  position: fixed;
+  left: 50%;
+  bottom: 14px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  transform: translateX(-50%);
+  border: 1px solid rgb(185 162 255 / 0.4);
+  border-radius: 999px;
+  background: rgb(15 8 34 / 0.92);
+  font-size: 14px;
+  white-space: nowrap;
+}
+.bar a, .bar button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--mist);
+  text-decoration: none;
+}
+.bar a[aria-current] { background: var(--iris); font-weight: 600; }
+.bar a:hover, .bar button:hover { background: rgb(185 162 255 / 0.22); }
+.bar button { border-left: 1px solid rgb(185 162 255 / 0.3); border-radius: 0 999px 999px 0; }
+@media (max-width: 720px) { .bar a span { display: none; } .bar a, .bar button { padding: 0 11px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .twinkle, .float { animation: none; }
+}

@@ -2,7 +2,6 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import { profile } from "@/lib/content";
-import { Sparkle4 } from "./Botanicals";
 import { oops, sent } from "@/lib/dusk/sound";
 
 /*
@@ -26,8 +25,8 @@ function check(f: Fields): Errors {
   const e: Errors = {};
   if (!f.name.trim()) e.name = "Add your name so I know who's writing.";
   if (!f.email.trim()) e.email = "Add your email so I can reply.";
-  else if (!EMAIL_RE.test(f.email.trim())) e.email = "That email looks incomplete — check for a typo.";
-  if (f.message.trim().length < 10) e.message = "Write a little more — at least 10 characters.";
+  else if (!EMAIL_RE.test(f.email.trim())) e.email = "That email looks incomplete. Check for a typo.";
+  if (f.message.trim().length < 10) e.message = "Write a little more, at least 10 characters.";
   return e;
 }
 
@@ -89,8 +88,6 @@ export default function ContactForm() {
       if (!res.ok || String(data.success) !== "true") throw new Error("not sent");
       setStatus("sent");
       sent();
-      // The guide butterfly flies off with a burst (Butterfly.tsx listens).
-      window.dispatchEvent(new Event("butterfly:send"));
     } catch {
       setStatus("failed");
       oops();
@@ -101,17 +98,11 @@ export default function ContactForm() {
 
   if (status === "sent") {
     return (
-      <div role="status" className="notepaper dusk-panel relative mx-auto max-w-xl px-6 py-10 text-center">
-          <span aria-hidden className="relative mx-auto block h-10 w-10">
-          {[0, 1, 2, 3, 4].map((k) => (
-            <Sparkle4 key={k} className="burst absolute h-3 w-3 text-lavender" />
-          ))}
-          <Sparkle4 className="spin-slow h-10 w-10 text-lavender" />
-        </span>
-        <p className="type-display mt-4 text-3xl text-iris italic">Message sent</p>
-        <p className="mx-auto mt-2 max-w-sm text-base leading-relaxed text-ink/80">
-          Thank you{fields.name.trim() ? `, ${fields.name.trim().split(" ")[0]}` : ""}. I&apos;ll reply to{" "}
-          {fields.email.trim() || "your email"} within a few days.
+      <div role="status" className="form-done">
+        <span aria-hidden className="px-mark" />
+        <p className="form-done-title">Message sent</p>
+        <p className="form-done-text">
+          Thank you{fields.name.trim() ? `, ${fields.name.trim().split(" ")[0]}` : ""}. I&apos;ll reply to {fields.email.trim() || "your email"} within a few days.
         </p>
         <button
           type="button"
@@ -119,7 +110,7 @@ export default function ContactForm() {
             setFields({ name: "", email: "", message: "" });
             setStatus("idle");
           }}
-          className="link mt-6 inline-flex min-h-[44px] items-center text-base"
+          className="link"
         >
           Send another message
         </button>
@@ -135,14 +126,14 @@ export default function ContactForm() {
       onSubmit={submit}
       noValidate
       aria-labelledby="form-heading"
-      className="notepaper dusk-panel relative mx-auto w-full max-w-xl p-6 text-left sm:p-8"
+      className="form backing"
     >
-      <h3 id="form-heading" className="type-display text-3xl text-iris italic">
+      <h3 id="form-heading" className="form-title">
         Send a message
       </h3>
-      <p className="mt-1 text-base text-ink/80">It goes straight to my inbox. I reply within a few days.</p>
+      <p className="form-note">It goes straight to my inbox.</p>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+      <div className="form-pair">
         <Field id="cf-name" label="Name" error={errors.name}>
           <input
             id="cf-name"
@@ -178,7 +169,7 @@ export default function ContactForm() {
         </Field>
       </div>
 
-      <div className="mt-4">
+      <div className="form-row">
         <Field id="cf-message" label="Message" error={errors.message}>
           <textarea
             id="cf-message"
@@ -190,7 +181,7 @@ export default function ContactForm() {
             onBlur={blur("message")}
             aria-invalid={!!errors.message}
             aria-describedby={errors.message ? "cf-message-err" : undefined}
-            className="field resize-y"
+            className="field form-area"
             placeholder="A role, a project, a brand or event you need designed…"
           />
         </Field>
@@ -200,38 +191,20 @@ export default function ContactForm() {
       <input ref={honey} type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
 
       {status === "failed" && (
-        <p role="alert" className="mt-4 border-l-2 border-[#b42318] bg-[#fdecea]/70 px-3.5 py-2.5 text-[15px] text-[#7a1a12]">
-          Your message didn&apos;t send — the connection dropped or the mail service didn&apos;t answer. Everything you typed
-          is still here: try again, or email{" "}
-          <a href={`mailto:${profile.email}`} className="font-semibold underline underline-offset-2">
+        <p role="alert" className="form-alert">
+          Your message didn&apos;t send. The connection dropped or the mail service didn&apos;t answer. Everything you typed is still here: try again,
+          or email{" "}
+          <a href={`mailto:${profile.email}`} className="link">
             {profile.email}
           </a>
           .
         </p>
       )}
 
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-        <a
-          href={`mailto:${profile.email}`}
-          className="link inline-flex min-h-[44px] items-center text-[15px]"
-        >
-          or email {profile.email}
-        </a>
-        <button
-          type="submit"
-          disabled={sending}
-          aria-busy={sending}
-          className="btn inline-flex min-h-[48px] items-center gap-2 px-6 disabled:cursor-wait disabled:opacity-70"
-        >
-          {sending ? (
-            <>
-              <Sparkle4 className="spin-fast h-4 w-4" /> Sending…
-            </>
-          ) : (
-            <>
-              Send message <span aria-hidden>↗</span>
-            </>
-          )}
+      <div className="form-acts">
+        <button type="submit" disabled={sending} aria-busy={sending} className="btn">
+          {sending ? "Sending…" : "Send message"}
+          {!sending && <span aria-hidden>↗</span>}
         </button>
       </div>
     </form>
@@ -246,7 +219,7 @@ function Field({ id, label, error, children }: { id: string; label: string; erro
       </label>
       {children}
       {error && (
-        <p id={`${id}-err`} className="mt-1.5 text-[15px] text-[#a1251a]">
+        <p id={`${id}-err`} className="field-err">
           {error}
         </p>
       )}

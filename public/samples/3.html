@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample 3: Pop-up book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter+Tight:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* POP-UP BOOK. The site is a book lying shut in the garden. Open the cover and
+   the garden stands up off the page, layer behind layer, with the six parts of
+   the site standing among the flowers like cut-out cards. Real 3D: a cover on
+   a hinge, and paper pieces hinged where they meet the page. */
+body { overflow: hidden; }
+.scene { position: fixed; inset: 0; overflow: hidden; perspective: 1700px; perspective-origin: 50% 20%; }
+.deco { position: absolute; pointer-events: none; }
+.book {
+  --W: min(92vw, 1180px);
+  --H: calc(var(--W) * 0.4);
+  position: absolute; left: 50%; top: 58%;
+  width: var(--W); height: var(--H);
+  margin: calc(var(--H) / -2) 0 0 calc(var(--W) / -2);
+  transform-style: preserve-3d;
+  transform: rotateX(38deg) translateX(-25%) scale(1.18);
+  transition: transform 1.3s var(--ease);
+}
+[data-state="open"] .book { transform: rotateX(56deg) translateX(0) scale(1); }
+.page, .cover { position: absolute; top: 0; width: 50%; height: 100%; transform-style: preserve-3d; }
+.page { left: 50%; border-radius: 4px 14px 14px 4px; background: #241257; box-shadow: inset 30px 0 40px -20px rgb(0 0 0 / 0.6), 0 40px 80px -20px rgb(0 0 0 / 0.9); }
+.cover { left: 50%; transform-origin: 0 50%; transform: translateZ(3px) rotateY(0deg); transition: transform 1.5s var(--ease); }
+[data-state="open"] .cover { transform: translateZ(3px) rotateY(-180deg); }
+.face { position: absolute; inset: 0; backface-visibility: hidden; transform-style: preserve-3d; border-radius: 4px 14px 14px 4px; }
+.front { background: radial-gradient(90% 70% at 50% 100%, #b55fd6, #5a31c4 45%, #25125e 100%); box-shadow: inset 0 0 0 2px rgb(255 246 220 / 0.6), inset 0 0 0 10px rgb(185 162 255 / 0.18); display: grid; place-content: center; text-align: center; padding: 6%; cursor: pointer; overflow: hidden; }
+.front .name { font-size: clamp(1.9rem, 4.6vw, 4.6rem); }
+.front p { margin-top: 10px; color: var(--mist); font-size: clamp(14px, 1.2vw, 17px); }
+.front img { position: absolute; pointer-events: none; }
+.back { transform: rotateY(180deg); background: #2c1670; box-shadow: inset -30px 0 40px -20px rgb(0 0 0 / 0.6); border-radius: 14px 4px 4px 14px; }
+.back * { backface-visibility: hidden; }
+.back h2 { position: absolute; left: 7%; top: 8%; font: italic 500 clamp(1.4rem, 2.6vw, 2.6rem)/1 "Cormorant Garamond", serif; color: var(--orchid); }
+
+/* a paper piece: hinged along its foot, flat when the book is shut */
+.pop { position: absolute; transform-origin: 50% 100%; transform: rotateX(0deg); transition: transform 1.1s var(--pop); transition-delay: calc(var(--i) * 110ms + 700ms); }
+[data-state="open"] .pop { transform: rotateX(var(--up, -78deg)); }
+.pop img { width: 100%; height: auto; }
+.pop.card { width: 27%; aspect-ratio: 4 / 5; --up: -70deg; }
+.pop.card:hover { box-shadow: 0 0 0 2px var(--moon), 0 0 40px rgb(255 246 220 / 0.6); }
+.open-btn { position: absolute; left: 50%; bottom: 84px; z-index: 6; transform: translateX(-50%); transition: opacity 0.4s; }
+[data-state="open"] .open-btn { opacity: 0; pointer-events: none; }
+@media (max-width: 720px) { .book { --W: 150vw; top: 52%; } [data-state="open"] .book { transform: rotateX(50deg) scale(0.66); } }
+@media (prefers-reduced-motion: reduce) { .book, .cover, .pop { transition: none; } }
+</style>
+</head>
+<body>
+<main class="scene" data-state="closed">
+  <div class="sky"></div><div class="stars"></div>
+  <img class="deco px twinkle" style="--d:-12;left:9%;top:9%;width:clamp(70px,8vw,120px)" src="art/orb.svg" alt="">
+  <img class="deco px twinkle" style="--d:12;right:16%;top:18%;width:30px;--td:-2s" src="art/spark.svg" alt="">
+  <div class="book">
+    <div class="page" id="right"></div>
+    <div class="cover">
+      <div class="face front" id="front">
+        <img src="art/fern.svg" alt="" style="left:-6%;bottom:-8%;height:70%">
+        <img src="art/bell.svg" alt="" style="right:4%;bottom:-6%;height:52%">
+        <img src="art/blossom-deep.svg" alt="" style="right:-8%;top:-10%;width:34%">
+        <h1 class="name">Lana Denise <em>Huertas</em></h1>
+        <p>A portfolio, in one pop-up garden</p>
+      </div>
+      <div class="face back" id="left"><h2>Open at any page</h2></div>
+    </div>
+  </div>
+  <button class="cta open-btn" id="open">Open the book</button>
+</main>
+<script src="base.js"></script>
+<script>
+const scene = document.querySelector(".scene");
+// right page: the garden, back row to front row, then three cards along the front
+const R = [
+  ["wisteria.webp", 4, 62, 92, -84], ["gate.webp", 34, 52, 34, -80], ["lily.webp", 2, 40, 22, -78], ["shrooms.webp", 70, 38, 28, -78],
+  ["bell.svg", 22, 30, 11, -74], ["blossom.svg", 80, 24, 14, -72], ["bud-deep.svg", 58, 28, 9, -74],
+];
+document.getElementById("right").innerHTML =
+  R.map(([f, l, b, w, up], i) => `<span class="pop" style="left:${l}%;bottom:${b}%;width:${w}%;--up:${up}deg;--i:${i}"><img src="art/${f}" alt=""></span>`).join("") +
+  PARTS.slice(3, 6).map((p, i) => card(p, `style="left:${5 + i * 32}%;bottom:5%;--i:${8 + i}"`).replace('class="card"', 'class="card pop"')).join("");
+// left page (the inside of the cover): a moon, flowers, and the first three cards
+const L = [["moon.webp", 56, 56, 36, -82], ["lotus.webp", 4, 42, 52, -78], ["fern.svg", 78, 34, 14, -76], ["bell-deep.svg", 46, 30, 11, -74]];
+document.getElementById("left").insertAdjacentHTML(
+  "beforeend",
+  L.map(([f, l, b, w, up], i) => `<span class="pop" style="left:${l}%;bottom:${b}%;width:${w}%;--up:${up}deg;--i:${i + 2}"><img src="art/${f}" alt=""></span>`).join("") +
+    PARTS.slice(0, 3).map((p, i) => card(p, `style="left:${5 + i * 32}%;bottom:5%;--i:${6 + i}"`).replace('class="card"', 'class="card pop"')).join("")
+);
+parallax(scene);
+const open = () => (scene.dataset.state = "open");
+document.getElementById("open").onclick = open;
+document.getElementById("front").onclick = open;
+addEventListener("wheel", (e) => e.deltaY > 0 && open(), { passive: true });
+addEventListener("keydown", (e) => (e.key === "ArrowDown" || e.key === " ") && open());
+</script>
+</body>
+</html>

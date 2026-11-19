@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample 5: Moon spell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter+Tight:wght@400;600&family=Pixelify+Sans:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* MOON SPELL. The garden is asleep: a one-colour bitmap, dots on black. Touch
+   the moon and a ring of light spreads from it, and everything it passes
+   wakes into colour. Then the page unlocks, and the site grows down a vine:
+   each part of it buds off the stem and opens as you reach it. */
+body { background: #0a0618; }
+body:not(.awake) { overflow: hidden; }
+.hero { position: relative; height: 100svh; min-height: 560px; overflow: hidden; }
+.layer { position: absolute; inset: 0; overflow: hidden; }
+.layer img { position: absolute; }
+.bit { background: #0a0618; }
+.bit img { image-rendering: pixelated; }
+.bit::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(#d6c6ff 1px, transparent 1.4px); background-size: 9px 9px; opacity: 0.14; }
+/* the colour garden is there all along, seen through a circle that starts closed on the moon */
+.col { clip-path: circle(0 at 50% 36%); transition: clip-path 1.9s cubic-bezier(0.6, 0, 0.2, 1); }
+.awake .col { clip-path: circle(160vmax at 50% 36%); }
+.ring { position: absolute; left: 50%; top: 36%; width: 320vmax; height: 320vmax; margin: -160vmax; border-radius: 50%; background: radial-gradient(closest-side, transparent 98.8%, #fff6dc 99.3%, transparent 100%); opacity: 0; transform: scale(0); pointer-events: none; }
+.awake .ring { animation: ring 1.9s cubic-bezier(0.6, 0, 0.2, 1) forwards; }
+@keyframes ring { 0% { opacity: 1; transform: scale(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: scale(1); } }
+.words { position: absolute; left: clamp(16px, 5vw, 80px); top: clamp(28px, 7vh, 70px); z-index: 3; max-width: 60vw; }
+.words .name.pix { font: 500 clamp(2.2rem, 7.2vw, 6.8rem)/0.92 "Pixelify Sans", monospace; letter-spacing: 0; color: #d6c6ff; text-shadow: none; }
+.words .role.pix { font-family: "Pixelify Sans", monospace; color: #d6c6ff; }
+.moon-btn { position: absolute; left: 50%; top: 36%; z-index: 5; width: clamp(110px, 15vw, 220px); aspect-ratio: 1; transform: translate(-50%, -50%); border: 0; border-radius: 50%; background: none; }
+.moon-btn::after { content: "Touch the moon"; position: absolute; left: 50%; top: 104%; transform: translateX(-50%); white-space: nowrap; font: 500 16px "Pixelify Sans", monospace; color: #d6c6ff; }
+.awake .moon-btn { pointer-events: none; }
+.awake .moon-btn::after { content: "Scroll: the garden grows ↓"; font: 600 16px "Inter Tight", sans-serif; color: var(--moon); top: 112%; }
+.moon-btn:hover::after { text-decoration: underline; }
+
+/* the vine: a stem down the middle, a bud at each stop, a card opening from the bud */
+.vine { position: relative; padding: 8vh 5vw 26vh; background: linear-gradient(#3b1d8f, #1c0e4a 30%, #120a2e); }
+.vine::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 18vh; width: 3px; margin-left: -1.5px; background: linear-gradient(var(--orchid), var(--lilac) 40%, #6b46e0); border-radius: 3px; }
+.stop { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: clamp(60px, 9vw, 150px); align-items: center; max-width: 1150px; margin: 0 auto clamp(40px, 9vh, 100px); }
+.stop > img.bud { position: absolute; left: 50%; top: 50%; width: clamp(54px, 6vw, 86px); margin: calc(clamp(54px, 6vw, 86px) / -2); transform: scale(0) rotate(-120deg); transition: transform 0.8s var(--pop); }
+.stop .card { aspect-ratio: 5 / 4; transform-origin: var(--o) 50%; transform: scale(0.1) rotate(var(--r)); opacity: 0; transition: transform 0.9s var(--pop) 0.18s, opacity 0.4s 0.18s; }
+.stop .say { transform: translateY(24px); opacity: 0; transition: transform 0.7s var(--ease) 0.35s, opacity 0.6s 0.35s; }
+.stop h2 { font: 500 clamp(2.2rem, 4.8vw, 4.6rem)/0.92 "Cormorant Garamond", serif; }
+.stop h2 em { color: var(--orchid); }
+.stop p { margin-top: 10px; color: var(--lilac); }
+.stop:nth-child(odd) { --o: 100%; --r: 14deg; }
+.stop:nth-child(even) { --o: 0%; --r: -14deg; }
+.stop:nth-child(even) .card { order: 2; }
+.stop:nth-child(even) .say { text-align: right; }
+.stop.in > img.bud { transform: scale(1) rotate(0deg); }
+.stop.in .card { transform: none; opacity: 1; }
+.stop.in .say { transform: none; opacity: 1; }
+@media (max-width: 720px) { .vine::before { left: 26px; } .stop { grid-template-columns: 1fr; gap: 14px; padding-left: 56px; } .stop > img.bud { left: 26px; top: 40px; } .stop:nth-child(even) .card { order: 0; } .stop:nth-child(even) .say { text-align: left; } .stop { --o: 0% !important; } }
+@media (prefers-reduced-motion: reduce) { .col, .stop .card, .stop .say, .stop > img.bud { transition: none; } .awake .ring { animation: none; } }
+</style>
+</head>
+<body>
+<main>
+  <section class="hero" id="hero">
+    <div class="layer bit" id="bit"></div>
+    <div class="layer col" id="col"><div class="sky"></div><div class="stars"></div></div>
+    <span class="ring"></span>
+    <div class="words">
+      <h1 class="name pix" id="nm">Lana Denise Huertas</h1>
+      <p class="role pix" id="rl">UI/UX and visual designer. The garden is asleep.</p>
+    </div>
+    <button class="moon-btn" id="open" aria-label="Touch the moon to wake the garden"></button>
+  </section>
+  <section class="vine" id="vine" hidden></section>
+</main>
+<script src="base.js"></script>
+<script>
+// one garden, drawn twice: as a bitmap, and in colour underneath
+const G = [["moon", "left:50%;top:36%;width:clamp(120px,15vw,220px);translate:-50% -50%"], ["wisteria", "right:-6%;top:-7%;width:min(48vw,640px)"], ["gate", "left:50%;bottom:11%;height:40vh;translate:-50% 0"], ["lily", "right:4%;bottom:4%;height:56vh"], ["shrooms", "left:5%;bottom:5%;height:44vh"], ["border", "left:0;bottom:-7vh;width:100vw;min-width:1000px"]];
+document.getElementById("bit").innerHTML = G.map(([n, s]) => `<img src="art/${n}-bit.png" alt="" style="${s}">`).join("");
+document.getElementById("col").insertAdjacentHTML("beforeend", G.map(([n, s]) => `<img src="art/${n}.webp" alt="" style="${s}">`).join(""));
+const vine = document.getElementById("vine");
+vine.innerHTML = PARTS.slice(0, 6).map((p, i) => {
+  const [a, b] = p.t.split(/ (?=[^ ]+$)/);
+  return `<article class="stop">${card(p)}<div class="say"><h2>${a} <em>${b}</em></h2><p>${p.s}</p></div><img class="bud" src="art/${i % 2 ? "blossom" : "blossom-deep"}.svg" alt=""></article>`;
+}).join("");
+const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && e.target.classList.add("in")), { threshold: 0.35 });
+function wake() {
+  if (document.body.classList.contains("awake")) return;
+  document.body.classList.add("awake");
+  vine.hidden = false;
+  setTimeout(() => {
+    // the words change voice as the light passes over them
+    nm.className = "name"; nm.innerHTML = "Lana Denise <em>Huertas</em>";
+    rl.className = "role"; rl.textContent = "UI/UX and visual designer. The garden is awake.";
+  }, RM ? 0 : 900);
+  vine.querySelectorAll(".stop").forEach((s) => io.observe(s));
+}
+const nm = document.getElementById("nm"), rl = document.getElementById("rl");
+document.getElementById("open").onclick = wake;
+addEventListener("wheel", (e) => e.deltaY > 0 && wake(), { passive: true });
+addEventListener("touchmove", wake, { passive: true });
+addEventListener("keydown", (e) => (e.key === "ArrowDown" || e.key === " ") && wake());
+</script>
+</body>
+</html>

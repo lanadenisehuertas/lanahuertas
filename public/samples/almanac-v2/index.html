@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lana Huertas · UI/UX and graphic designer in Manila</title>
+<meta name="description" content="Lana Denise Huertas designs brands, posters, films and product screens in Manila, and builds some of them in code.">
+<meta name="theme-color" content="#140a2c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&family=Pinyon+Script&display=swap">
+<link rel="preload" href="../brand/fonts/Redaction-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../almanac/art/s_hero.webp" as="image">
+<link rel="stylesheet" href="../almanac/almanac.css">
+<link rel="stylesheet" href="v2.css">
+<link rel="stylesheet" href="ch-gate.css">
+<link rel="stylesheet" href="ch-brands.css">
+<link rel="stylesheet" href="ch-wall.css">
+<link rel="stylesheet" href="ch-pond.css">
+<script>try { if (localStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
+</head>
+<body>
+<a class="skip" href="#brands">Skip to the work</a>
+
+<div class="loader" aria-hidden="true">
+  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" class="phase-dark"/><path class="phase-lit" id="loadMoon"/></svg>
+  <p>Waking the garden</p>
+  <small id="loadPct">0%</small>
+</div>
+
+<header class="phases" aria-label="Route">
+  <a class="mark" href="#gate"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12.5" fill="#3a1290" stroke="#b9a2ff"/><path d="M17.5 6.5a8 8 0 1 0 0 15 6.4 6.4 0 0 1 0-15z" fill="#fff1c9"/></svg><span>Lana Huertas</span></a>
+  <nav aria-label="Chapters"><ol id="phaseNav"></ol></nav>
+  <button class="tour" type="button" id="tour" aria-pressed="false"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9-5.5z" fill="currentColor"/></svg><span>Guided tour</span></button>
+  <button class="switch" type="button" role="switch" aria-checked="false" id="quiet"><i></i><b>Quiet mode</b></button>
+</header>
+
+<!-- Every chapter: a .stage holding the far plane (the painted scene) and a mount that its ch-*.js fills.
+     See BUILD.md for the contract. -->
+<main id="main">
+  <section class="chapter" id="gate" style="--len: 2.2" aria-label="The gate">
+    <div class="stage">
+      <div class="plane far"><picture><source media="(max-width: 860px)" srcset="../almanac/art/s_hero-sm.webp"><img src="../almanac/art/s_hero.webp" width="1672" height="941" alt="" fetchpriority="high"></picture></div>
+      <div class="mount" id="m-gate"></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="cabinet" style="--len: 1.8" aria-labelledby="cab-h">
+    <div class="curtain"><img src="art/f_wisteria.webp" width="1600" height="671" alt="" loading="lazy"></div>
+    <div class="stage">
+      <div class="plane far"><picture><source media="(max-width: 860px)" srcset="../almanac/art/s_path-sm.webp"><img src="../almanac/art/s_path.webp" width="1672" height="941" alt="" loading="lazy"></picture></div>
+      <div class="mount" id="m-cabinet"></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="brands" style="--len: 11" aria-labelledby="brands-h">
+    <div class="curtain"><img src="art/f_wisteria.webp" width="1600" height="671" alt="" loading="lazy"></div>
+    <div class="stage">
+      <div class="plane far"><picture><source media="(max-width: 860px)" srcset="../almanac/art/s_glass-sm.webp"><img src="../almanac/art/s_glass.webp" width="1672" height="941" alt="" loading="lazy"></picture></div>
+      <div class="mount" id="m-brands"></div>
+    </div>
+  </section>
+
+  <section class="chapter flow" id="posters" aria-labelledby="posters-h">
+    <div class="curtain"><img src="art/f_wisteria.webp" width="1600" height="671" alt="" loading="lazy"></div>
+    <div class="stage">
+      <div class="plane far"><picture><source media="(max-width: 860px)" srcset="../almanac/art/s_pond-sm.webp"><img src="../almanac/art/s_pond.webp" width="1672" height="941" alt="" loading="lazy"></picture></div>
+      <div class="mount" id="m-posters"></div>
+    </div>
+  </section>
+
+  <section class="chapter flow" id="films" aria-labelledby="films-h">
+    <div class="curtain"><img src="art/f_wisteria.webp" width="1600" height="671" alt="" loading="lazy"></div>
+    <div class="stage">
+      <div class="plane far"><picture><source media="(max-width: 860px)" srcset="../almanac/art/s_clear-sm.webp"><img src="../almanac/art/s_clear.webp" width="1672" height="941" alt="" loading="lazy"></picture></div>
+      <div class="mount" id="m-films"></div>
+    </div>
+  </section>
+
+  <section class="chapter flow" id="products" aria-labelledby="products-h">
+    <div class="curtain"><img src="art/f_wisteria.webp" width="1600" height="671" alt="" loading="lazy"></div>
+    <div class="stage">
+      <div class="plane far"><picture><source media="(max-width: 860px)" srcset="../almanac/art/s_pond-sm.webp"><img src="../almanac/art/s_pond.webp" width="1672" height="941" alt="" loading="lazy" style="transform: scaleX(-1)"></picture></div>
+      <div class="mount" id="m-products"></div>
+    </div>
+  </section>
+
+  <section class="chapter flow" id="about" aria-labelledby="about-h">
+    <div class="curtain"><img src="art/f_wisteria.webp" width="1600" height="671" alt="" loading="lazy"></div>
+    <div class="stage">
+      <div class="plane far"><picture><source media="(max-width: 860px)" srcset="../almanac/art/s_study-sm.webp"><img src="../almanac/art/s_study.webp" width="1672" height="941" alt="" loading="lazy" style="transform: scaleX(-1)"></picture></div>
+      <div class="mount" id="m-about"></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="talk" style="--len: 1.7" aria-labelledby="talk-h">
+    <div class="curtain"><img src="art/f_wisteria.webp" width="1600" height="671" alt="" loading="lazy"></div>
+    <div class="stage">
+      <div class="plane far"><picture><source media="(max-width: 860px)" srcset="../almanac/art/s_dawn-sm.webp"><img src="../almanac/art/s_dawn.webp" width="1672" height="941" alt="" loading="lazy"></picture></div>
+      <div class="mount" id="m-talk"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>Made in Manila by Lana Huertas, 2026</span>
+  <span class="moons" aria-hidden="true" id="footMoons"></span>
+  <a href="../almanac/system.html">The design system behind this page</a>
+</footer>
+
+<script src="data.js"></script>
+<script src="v2.js"></script>
+<script src="ch-gate.js"></script>
+<script src="ch-brands.js"></script>
+<script src="ch-wall.js"></script>
+<script src="ch-pond.js"></script>
+</body>
+</html>

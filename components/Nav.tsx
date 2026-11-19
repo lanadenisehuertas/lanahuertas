@@ -2,180 +2,246 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import NavEmblem from "./NavEmblem";
 import SoundToggle from "./SoundToggle";
+import { brands, posters, videos } from "@/lib/brands";
+import { engineeringProjects } from "@/lib/content";
 
-const LINKS = [
-  { id: "branding", label: "branding" },
-  { id: "posters", label: "posters" },
-  { id: "videos", label: "videos" },
-  { id: "code", label: "ui/ux" },
-  { id: "about", label: "about" },
-  { id: "contact", label: "contact" },
+/** The four kinds of work: a homepage section each, and a line of what is in it. */
+const WORK = [
+  { id: "branding", label: "Branding and pubmats", note: `${brands.length} brands` },
+  { id: "posters", label: "Posters", note: `${posters.length} one-offs` },
+  { id: "videos", label: "Motion", note: `${videos.length} edits` },
+  { id: "code", label: "UI/UX and code", note: `${engineeringProjects.length} products` },
 ];
+const WORK_IDS = WORK.map((w) => w.id);
+const SPY = [...WORK_IDS, "about", "contact"];
 
-/** The section each sub-page belongs to, so the nav can mark it. */
+/** The section each archive page belongs to, so the nav can mark it. */
 const PAGE_SECTION: Record<string, string> = { "/design": "branding", "/videos": "videos", "/ui-ux": "code" };
 
-/** Height of the bar; the tone check samples the page just under its middle. */
-const BAR = 64;
-
 /**
- * A slim bar that fades into whatever is under it — no solid band. It slips
- * away while you read downwards and comes back when you scroll up or reach
- * for the top edge. Over a dark artboard (any section marked
- * `data-tone="dark"` under the bar) its words turn light. The section in view
- * is underlined. On phones the links fold into a full-screen sheet.
+ * The bar: a wordmark, Work (a menu of the four categories), About, Contact
+ * and the sound switch. Over the top of a page it sits on the light with no
+ * ground of its own; once the page has moved it becomes a dark surface. On
+ * phones the links open as a full sheet set in the page's own type, with
+ * focus held inside it until it closes.
  */
 export default function Nav() {
   const pathname = usePathname();
   const home = pathname === "/";
   const href = (id: string) => (home ? `#${id}` : `/#${id}`);
-  const [hidden, setHidden] = useState(false);
-  const [dark, setDark] = useState(false);
+  const [solid, setSolid] = useState(false);
   const [active, setActive] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
-  const [onHero, setOnHero] = useState(home);
-  const menuBtn = useRef<HTMLButtonElement>(null);
+  const [menu, setMenu] = useState(false);
+  const [sheet, setSheet] = useState(false);
+  const header = useRef<HTMLElement>(null);
+  const workBtn = useRef<HTMLButtonElement>(null);
+  const workItem = useRef<HTMLLIElement>(null);
+  const burger = useRef<HTMLButtonElement>(null);
 
+  // the bar takes its dark surface once the page has moved
   useEffect(() => {
-    let lastY = window.scrollY;
     let frame = 0;
-    const update = () => {
+    const read = () => {
       frame = 0;
-      const y = window.scrollY;
-      setOnHero(home && y < window.innerHeight * 0.6);
-      if (Math.abs(y - lastY) > 6) {
-        setHidden(y > lastY && y > 240);
-        lastY = y;
-      }
-      // Tone: the toned section that sits under the bar right now.
-      let tone = false;
-      for (const el of document.querySelectorAll<HTMLElement>("[data-tone]")) {
-        const r = el.getBoundingClientRect();
-        if (r.top <= BAR / 2 && r.bottom > BAR / 2) {
-          // Pastel theme: every section is light now, so the bar keeps its dark words.
-          tone = false && el.dataset.tone === "dark";
-          break;
-        }
-      }
-      setDark(tone);
+      setSolid(window.scrollY > 24);
     };
     const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update);
+      if (!frame) frame = requestAnimationFrame(read);
     };
-    const onPointer = (e: PointerEvent) => {
-      if (e.clientY < BAR + 16) setHidden(false);
-    };
-    update();
+    read();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("pointermove", onPointer, { passive: true });
-    // Carousels change tone without a scroll.
-    const tones = new MutationObserver(onScroll);
-    tones.observe(document.body, { subtree: true, attributes: true, attributeFilter: ["data-tone"] });
-
-    // The section crossing the middle of the screen is the current one.
-    const spy = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
-      { rootMargin: "-45% 0px -50% 0px" }
-    );
-    LINKS.forEach((l) => {
-      const el = document.getElementById(l.id);
-      if (el) spy.observe(el);
-    });
-    // The hero clears it on the same middle line. (A top band would still
-    // touch the hero while the first section is current, so jumping back
-    // home would never register and the old link would stay lit.)
-    const top = new IntersectionObserver(([e]) => e.isIntersecting && setActive(null), { rootMargin: "-45% 0px -50% 0px" });
-    const hero = home ? document.getElementById("top")?.querySelector("section") : null;
-    if (hero) top.observe(hero);
-
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("pointermove", onPointer);
-      tones.disconnect();
-      spy.disconnect();
-      top.disconnect();
     };
-  }, [home]);
+  }, []);
 
-  // The sheet: Esc closes it and hands focus back to the button.
+  // the section crossing the middle of the screen is the current one
   useEffect(() => {
-    if (!open) return;
+    const spy = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id === "hero" ? null : e.target.id)),
+      { rootMargin: "-45% 0px -50% 0px" }
+    );
+    [...SPY, "hero"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) spy.observe(el);
+    });
+    return () => spy.disconnect();
+  }, [pathname]);
+
+  // the work menu: Esc, a click elsewhere or focus moving on closes it
+  useEffect(() => {
+    if (!menu) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setMenu(false);
+      workBtn.current?.focus();
+    };
+    const onDown = (e: PointerEvent) => {
+      if (!workItem.current?.contains(e.target as Node)) setMenu(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+    };
+  }, [menu]);
+
+  // the phone sheet: the page behind it holds still, Esc closes it and hands
+  // focus back to the button, and Tab stays inside the bar and the sheet
+  useEffect(() => {
+    if (!sheet) return;
+    const root = document.documentElement;
+    const overflow = root.style.overflow;
+    root.style.overflow = "hidden";
+    // the page behind the sheet is out of reach while it is open, and focus starts inside it
+    const main = document.querySelector("main");
+    main?.setAttribute("inert", "");
+    header.current?.querySelector<HTMLElement>("#nav-sheet a")?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setOpen(false);
-        menuBtn.current?.focus();
+        setSheet(false);
+        burger.current?.focus();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const items = [...(header.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])") ?? [])].filter((el) => el.offsetParent !== null);
+      if (!items.length) return;
+      const first = items[0],
+        last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
       }
     };
     document.addEventListener("keydown", onKey);
-    document.documentElement.style.overflow = "hidden";
+    // a wider window has the full bar: the sheet has nothing left to do
+    const mq = window.matchMedia("(min-width: 860px)");
+    const onWide = () => mq.matches && setSheet(false);
+    mq.addEventListener("change", onWide);
     return () => {
+      main?.removeAttribute("inert");
+      root.style.overflow = overflow;
       document.removeEventListener("keydown", onKey);
-      document.documentElement.style.overflow = "";
+      mq.removeEventListener("change", onWide);
     };
-  }, [open]);
+  }, [sheet]);
 
   const page = PAGE_SECTION[pathname];
   const current = (id: string) => (page === id ? "page" : active === id ? "location" : undefined);
+  const inWork = WORK_IDS.includes(page ?? active ?? "");
+  const closeAll = () => {
+    setMenu(false);
+    setSheet(false);
+  };
 
   return (
-    <header
-      className={`masthead fixed inset-x-0 top-0 z-50 ${hidden && !open ? "is-hidden" : ""} ${dark && !open ? "is-dark" : ""}`}
-    >
-      <nav aria-label="Main" className="relative mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-10">
-        {/* Over the hero the name is already on screen: only the mark. */}
-        <a href={home ? "#top" : "/"} aria-label="Lana Denise Huertas, home" className="masthead-home flex min-h-[44px] items-center gap-3">
-          <NavEmblem />
-          <span aria-hidden className={`masthead-name ${onHero ? "is-tucked" : ""}`}>
-            Lana Denise Huertas
+    <header ref={header} className="nav" data-solid={solid || sheet || menu ? "" : undefined}>
+      <nav aria-label="Main" className="nav-bar">
+        <a href={home ? "#top" : "/"} aria-label="Lana Denise Huertas, home" className="nav-mark" onClick={closeAll}>
+          <span aria-hidden className="px-mark" />
+          <span aria-hidden>
+            Lana Denise
           </span>
         </a>
 
-        <ul className="hidden items-center gap-7 md:flex">
-          {LINKS.map((l) => (
-            <li key={l.id}>
-              <a href={href(l.id)} aria-current={current(l.id)} className="nav-link">
-                {l.label}
-              </a>
-            </li>
-          ))}
+        <ul className="nav-links">
+          <li
+            ref={workItem}
+            className="nav-work"
+            onBlur={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setMenu(false);
+            }}
+          >
+            <button
+              ref={workBtn}
+              type="button"
+              className="nav-link"
+              aria-expanded={menu}
+              aria-controls="nav-work-menu"
+              aria-current={inWork ? "true" : undefined}
+              onClick={() => setMenu((m) => !m)}
+              data-t="Work"
+            >
+              <span>Work</span> <span aria-hidden className="nav-caret" />
+            </button>
+            {menu && (
+              <ul id="nav-work-menu" className="nav-menu">
+                {WORK.map((w) => (
+                  <li key={w.id}>
+                    <a href={href(w.id)} aria-current={current(w.id)} onClick={() => setMenu(false)}>
+                      <b>{w.label}</b>
+                      <span>{w.note}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+          <li>
+            <a href={href("about")} aria-current={current("about")} className="nav-link" data-t="About">
+              <span>About</span>
+            </a>
+          </li>
+          <li>
+            <a href={href("contact")} aria-current={current("contact")} className="nav-link" data-t="Contact">
+              <span>Contact</span>
+            </a>
+          </li>
         </ul>
 
-        <div className="flex items-center gap-3">
+        <div className="nav-tools">
           <SoundToggle />
-          <a href={href("contact")} className="btn btn-sm hidden sm:inline-flex">
-            Hire me <span aria-hidden>↗</span>
+          <a href={href("contact")} className="btn-ghost btn-sm nav-cta">
+            Hire me
           </a>
-          <div className="md:hidden">
           <button
-            ref={menuBtn}
+            ref={burger}
             type="button"
-            aria-expanded={open}
+            className="nav-burger"
+            aria-expanded={sheet}
             aria-controls="nav-sheet"
-            onClick={() => setOpen((o) => !o)}
-            className="nav-link"
+            aria-label={sheet ? "Close the menu" : "Open the menu"}
+            onClick={() => setSheet((o) => !o)}
           >
-            {open ? "close" : "menu"}
+            <i />
+            <i />
           </button>
-          </div>
         </div>
       </nav>
 
-      {open && (
-        <div id="nav-sheet" className="nav-sheet md:hidden">
+      {sheet && (
+        <div id="nav-sheet" className="nav-sheet" role="dialog" aria-modal="true" aria-label="Menu">
+          <h2>Work</h2>
           <ul>
-            {LINKS.map((l) => (
-              <li key={l.id}>
-                <a href={href(l.id)} aria-current={current(l.id)} onClick={() => setOpen(false)}>
+            {WORK.map((w, i) => (
+              <li key={w.id} style={{ "--i": i } as React.CSSProperties}>
+                <a href={href(w.id)} aria-current={current(w.id)} onClick={closeAll}>
+                  {w.label} <span>{w.note}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <h2>Lana</h2>
+          <ul>
+            {[
+              { id: "about", label: "About" },
+              { id: "contact", label: "Contact" },
+            ].map((l, i) => (
+              <li key={l.id} style={{ "--i": WORK.length + i } as React.CSSProperties}>
+                <a href={href(l.id)} aria-current={current(l.id)} onClick={closeAll}>
                   {l.label}
                 </a>
               </li>
             ))}
           </ul>
-          <a href={href("contact")} onClick={() => setOpen(false)} className="btn mt-10">
-            Hire me <span aria-hidden>↗</span>
+          <a href={href("contact")} onClick={closeAll} className="btn">
+            Hire me
           </a>
         </div>
       )}

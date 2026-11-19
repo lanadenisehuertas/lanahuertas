@@ -1,0 +1,49 @@
+/* Prototype: the study (study-proto.js), a room and a fall before the moon's board. */
+
+/* the stage holds for SPAN screens (3.4) and its last screen lies over the moon's first: on wide screens the moon's
+   board is already pinned under it by then (two screens of overlap), on phones it comes up from below (one) */
+.study { position: relative; z-index: 10; height: 440svh; margin-bottom: -200svh; pointer-events: none; }
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .study { margin-bottom: -100svh; } }
+.quiet .study { display: none; }
+@media (prefers-reduced-motion: reduce) { .study { display: none !important; } }
+/* the moon's board no longer opens with its own title, and the phone's separate spell stage is not needed */
+.has-study .hero.rising .prelude { display: none; }
+.has-study:not(.quiet) .cast-ph { display: none !important; }
+
+.st-stage { position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 900px; perspective-origin: 50% 40%; }
+.st-stage > * { position: absolute; }
+.st-night { inset: 0; background: #000; will-change: opacity; }
+.st-world { inset: 0; transform-style: preserve-3d; }
+
+/* 1. the room: the whole screen, lilac 1-bit where it sleeps */
+.st-wall { position: absolute; inset: 0; will-change: transform; transform-origin: 50% 30%; }
+.st-room { position: absolute; inset: 0; --ink: #b9a2ff; --ground: #000; --pos: 50% 30%; }
+.st-room .full { height: 100%; }
+.st-vig { position: absolute; inset: 0 0 -2px; pointer-events: none; background: radial-gradient(ellipse 70% 60% at 50% 40%, transparent 50%, rgb(0 0 0 / 0.7)), linear-gradient(transparent 55%, rgb(0 0 0 / 0.8) 88%, #000); }
+.st-words { position: absolute; left: 0; right: 0; bottom: 13svh; display: grid; justify-items: center; gap: calc(1.2 * var(--u)); padding: 0 6vw; text-align: center; will-change: transform, opacity; }
+.st-name { margin: 0; font-size: clamp(56px, calc(8.4 * var(--u)), 128px); line-height: 0.9; letter-spacing: -0.01em; color: var(--ink); text-shadow: 0 0 calc(3 * var(--u)) #000, 0 0 8px #000; }
+.st-role { margin: 0; font: italic 400 clamp(19px, calc(1.9 * var(--u)), 28px) / 1.3 "Redaction", Georgia, serif; color: var(--mark); text-shadow: 0 0 12px #000, 0 0 4px #000; }
+
+/* 2, 3. the floor: a square plane, the spell drawn on it, the light of the circle under the spell */
+.st-floor { position: absolute; left: 50%; top: 50%; opacity: 0; transform-origin: 50% 50%; will-change: transform, opacity; }
+.st-floor img, .st-floor canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+/* the candlelight ends in the dark: the plane's edges go to night, so it never shows as a board with corners */
+.st-floor::after { content: ""; position: absolute; inset: -1px; pointer-events: none; background: radial-gradient(closest-side, transparent 72%, #000 99%); }
+.st-glow { position: absolute; inset: 12%; border-radius: 50%; opacity: 0; background: radial-gradient(closest-side, rgb(160 130 255 / 0.42), rgb(120 90 220 / 0.16) 60%, transparent); }
+
+/* 4. the fall: the rings at their depths, and the streaks of the stars */
+.st-tunnel { inset: 0; }
+.st-tunnel canvas { position: absolute; left: 50%; top: 50%; opacity: 0; image-rendering: pixelated; will-change: transform, opacity; }
+.st-streak { left: 0; top: 0; image-rendering: pixelated; will-change: opacity; }
+
+/* the spell's words, written under the circle while it is drawn */
+/* wide screens: in the dark beside the circle; phones: under it */
+.study .st-incant { display: block; left: calc(4 * var(--u)); top: 50%; width: calc(19 * var(--u)); translate: 0 -50%; margin: 0; opacity: 0; text-align: left; text-shadow: 0 0 12px #000, 0 0 4px #000, 0 0 2px #000; }
+
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .st-words { bottom: 16svh; }
+  .st-name { font-size: 15vw; }
+  .study .st-incant { left: 0; right: 0; top: auto; bottom: 9svh; width: auto; translate: none; margin: 0 auto; max-width: 34ch; padding: 0 6vw; text-align: center; }
+}
+/* while the room shows the name and the role, the masthead does not repeat the role */
+.in-room #sub { visibility: hidden; }

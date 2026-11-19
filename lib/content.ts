@@ -153,7 +153,7 @@ export const education = [
     detail: "B.S. Computer Science — Software Engineering (Expected July 2027)",
     coursework:
       "Digital Image Processing · Discrete Mathematics & Number Theory · Logic & Critical Thinking",
-    honors: ["Elite Scholar — FEU Tech", "DOST Scholar — Dept. of Science and Technology"],
+    honors: [],
   },
   {
     school: "Regional Science High School III",
@@ -163,6 +163,13 @@ export const education = [
     coursework: "",
     honors: [],
   },
+];
+
+// Shown in the About section's "education & certs" tab only.
+export const awards = [
+  { title: "1st runner-up", from: "ImaGnation: GCash Innovation Challenge", year: "2026" },
+  { title: "Elite Scholar", from: "FEU Institute of Technology", year: "" },
+  { title: "DOST Scholar", from: "Department of Science and Technology", year: "" },
 ];
 
 export const certifications = [

@@ -7,9 +7,9 @@
  * It is a tool, so the pubmat in the middle is where the colour lives.
  */
 .ps {
-  --ps-0: #1b1a1d; /* pasteboard */
-  --ps-1: #242226; /* bars */
-  --ps-2: #2d2b30; /* panels */
+  --ps-0: #0c0a17; /* pasteboard */
+  --ps-1: #15122a; /* bars */
+  --ps-2: #1c1833; /* panels */
   --ps-3: #3a373d; /* fields, hover */
   --ps-4: #463f4d; /* selected row */
   --ps-field: #1f1d21;
@@ -17,9 +17,9 @@
   --ps-edge: #47434c;
   --ps-tx: #ebe6dc;
   --ps-mut: #ada6b2; /* 6.1:1 on --ps-2 */
-  --ps-cream: #ece3cf; /* the primary action */
+  --ps-cream: #f5f2fa; /* the primary action */
   --ps-ink: #1d1a20; /* text on cream */
-  --ps-acc: #8fd8c2; /* selection, focus, the on state */
+  --ps-acc: #80dcf1; /* selection, focus, the on state */
   --ps-mono: var(--font-pixel), ui-monospace, monospace;
   position: fixed;
   inset: 0;

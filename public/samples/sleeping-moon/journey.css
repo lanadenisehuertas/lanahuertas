@@ -1,0 +1,98 @@
+/* The journey: the moon stop and the brands stop. Everything here is placed in u
+   on the plate, on the centre axis or mirrored about it. */
+
+/* ---------- the moon: a board of 100u x 62.5u ---------- */
+.stop.hero { padding: 0; display: block; }
+.hero-pin { display: grid; place-items: center; min-height: 100svh; }
+/* the moonrise (journey.js): one extra screen while the plate stays and the moon comes up over the horizon */
+.stop.hero.rising { height: 200svh; }
+.hero.rising .hero-pin { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.prelude, .horizon { display: none; }
+.hero.rising .prelude { position: absolute; z-index: 5; left: 0; right: 0; top: calc(12.5 * var(--u)); display: grid; justify-items: center; gap: calc(2.4 * var(--u)); text-align: center; pointer-events: none; }
+.pl-title { font-size: calc(7.6 * var(--u)); line-height: 0.9; letter-spacing: -0.01em; white-space: nowrap; color: var(--ink); }
+.pl-line { max-width: 40ch; font: 400 clamp(18px, calc(1.5 * var(--u)), 22px) / 1.45 var(--body); color: var(--text); text-wrap: balance; }
+/* the ground the moon rises from: night-black, so the moon below it is hidden, with a dotted horizon like the chart lines */
+.hero.rising .horizon { display: block; position: absolute; z-index: 3; top: calc(52 * var(--u)); left: calc(50% - 50vw); width: 100vw; height: calc(40 * var(--u)); background: #000; pointer-events: none; }
+.horizon svg { position: absolute; left: calc(50% - 41 * var(--u)); top: -1px; width: calc(82 * var(--u)); height: 2px; overflow: visible; }
+.horizon line { stroke: var(--rule); stroke-width: 2; stroke-dasharray: 2 7; vector-effect: non-scaling-stroke; }
+.moon { will-change: transform; }
+/* while the moon rises, the scroll draws in the chart lines, then the name, then the doors (--rp, 0 to 1, journey.js);
+   the doors can be chosen once the moon is up */
+.hero.rising .chart { opacity: clamp(0, calc((var(--rp, 1) - 0.5) * 5), 1); }
+.hero.rising .board.in .name { opacity: clamp(0, calc((var(--rp, 1) - 0.56) * 4), 1); transition: none; }
+.hero.rising .door .label { opacity: clamp(0, calc((var(--rp, 1) - 0.7) * 5), 1); }
+.hero.rising:not(.risen) .door { pointer-events: none; }
+.board { position: relative; width: calc(100 * var(--u)); height: calc(62.5 * var(--u)); }
+/* leaving through a door (journey.js): the chosen door flies to the middle, the rest fall away, the name breaks up */
+.door.chosen { transition: transform 520ms var(--move); }
+.door.chosen .label { opacity: 0; transition: opacity 120ms linear; }
+.door.away { opacity: 0; transition: transform 380ms var(--enter), opacity 260ms linear; }
+.n-rest .ch { display: inline-block; transition: transform 360ms var(--enter), opacity 240ms linear; }
+.leave .n-rest .ch { opacity: 0; }
+.leave .chart, .leave .orn, .leave .stars { opacity: 0; transition: opacity 220ms linear; }
+.leave .door:not(.chosen):not(.away) { opacity: 0; }
+.still, .still * { transition: none !important; }
+
+/* one 1-bit group: black is nothing, lilac is ink; the name sits in front of the moon */
+.xor { position: absolute; inset: 0; background: #000; mix-blend-mode: screen; }
+.moon { position: absolute; left: 50%; top: calc(7.8 * var(--u)); width: calc(42 * var(--u)); translate: -50% 0; }
+.name {
+  position: absolute; left: 0; right: 0; bottom: calc(6.1 * var(--u));
+  display: grid; justify-items: center;
+  font-size: calc(13.4 * var(--u)); line-height: 0.84; letter-spacing: -0.01em; white-space: nowrap; color: var(--ink);
+  /* a halo of night around each letter, so the name cuts into the moon and stays readable */
+  -webkit-text-stroke: calc(0.9 * var(--u)) #000; paint-order: stroke fill;
+}
+.name > span { grid-area: 1 / 1; }
+.name .n-door { font-family: var(--display-awake); visibility: hidden; align-self: center; }
+.name .n-door.shown { visibility: visible; }
+.name .n-rest.gone { visibility: hidden; }
+.js .name { opacity: 0; }
+.js .in .name { opacity: 1; transition: opacity 400ms linear 260ms; }
+
+/* corner ornaments: a moth and a lily in opposite corners */
+
+/* the six doors: two mirrored columns */
+.doors { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.door {
+  --box: calc(10.4 * var(--u));
+  position: absolute; left: calc(50% + var(--dx) * var(--u)); top: calc(var(--cy) * var(--u)); translate: -50% -50%;
+  display: grid; justify-items: center; gap: 10px; pointer-events: auto;
+  transition: transform 160ms var(--enter), opacity 160ms linear;
+}
+.door .pic { display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: end center; width: var(--box); height: var(--box); }
+.door .pic .full { grid-area: 1 / 1; width: auto; height: auto; max-width: 100%; max-height: 100%; }
+.door .label { white-space: nowrap; }
+.door .label i { display: inline-block; min-width: 1.6em; text-align: right; }
+.door.on { transform: translateY(-6px); }
+.door.on .label { color: var(--mark); }
+.touch .door:not(.on) { opacity: 0.5; }
+
+/* ---------- I Brands: ten tiles, each in its own brand's two colours ---------- */
+.brand-grid { display: grid; grid-template-columns: repeat(5, calc(11.6 * var(--u))); gap: calc(1.8 * var(--u)) calc(4.2 * var(--u)); justify-content: center; }
+.tile { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: calc(0.8 * var(--u)); transition: transform 160ms var(--enter); }
+.tile .pic { width: 100%; aspect-ratio: 1; --pos: 50% 30%; }
+.tile .label { text-align: center; white-space: nowrap; }
+.tile:hover, .tile.on { transform: translateY(-6px); }
+.tile.on .label { color: var(--mark); }
+
+.quiet .board, .quiet .door, .quiet .tile { transition: none; }
+
+/* ---------- phones and upright tablets ---------- */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .stop.hero { padding: calc(var(--edge) + var(--band)) 0 24px; display: block; }
+  .hero-pin { display: block; min-height: 0; }
+  .board { width: 100%; height: auto; }
+  .orn, .chart { display: none; }
+  .xor { position: relative; inset: auto; padding-top: 40px; }
+  .hero .sub-phone { display: block; }
+  .moon { position: relative; left: auto; top: auto; translate: none; width: min(76vw, 52svh); margin: 0 auto; }
+  .name { position: relative; bottom: auto; margin-top: max(-12vw, -70px); -webkit-text-stroke-width: min(2vw, 12px); font-size: min(25vw, 150px); line-height: 0.82; white-space: normal; text-align: center; }
+  .name .n-rest > span { display: block; }
+  .doors { position: relative; inset: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px 0; padding: 30px 12px 8px; }
+  .door { --box: min(25vw, 170px); position: relative; left: auto; top: auto; translate: none; }
+  .door .label { font-size: 16px; }
+  .door .label i { min-width: 0; }
+  .brand-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
+  .tile .label { white-space: normal; }
+}

@@ -1,18 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { posters } from "@/lib/brands";
 import Lightbox from "./Lightbox";
 import SkyNotes from "../dusk/SkyNotes";
 import Pic from "./Pic";
+import { Heading } from "../current/Ornaments";
 
 const still = () =>
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.hasAttribute("data-lite");
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+  document.documentElement.hasAttribute("data-lite") ||
+  document.documentElement.hasAttribute("data-still");
 
 /**
- * One-off posters: one row on the site's sky. Mouse drag flings it (with
- * momentum); wheel, trackpad and touch scroll it natively; Tab walks the
- * posters. The poster under the pointer lifts and tilts toward it; a click
+ * One-off posters, hung as a rail: mouse drag flings it (with momentum);
+ * wheel, trackpad and touch scroll it natively; Tab walks the posters. The
+ * poster under the pointer steps forward a little and stays whole; a click
  * (not a drag) opens the lightbox.
  */
 export default function PosterRow({ id = "posters" }: { id?: string }) {
@@ -66,32 +69,18 @@ export default function PosterRow({ id = "posters" }: { id?: string }) {
     coast.current = requestAnimationFrame(glide);
   };
 
-  const tilt = (e: ReactPointerEvent<HTMLButtonElement>) => {
-    if (e.pointerType !== "mouse" || drag.current?.moved || still()) return;
-    const fig = e.currentTarget.firstElementChild as HTMLElement | null;
-    if (!fig) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    fig.style.transform = `perspective(900px) translateY(-10px) rotateY(${px * 14}deg) rotateX(${-py * 10}deg) scale(1.03)`;
-  };
-  const untilt = (e: ReactPointerEvent<HTMLButtonElement>) => {
-    const fig = e.currentTarget.firstElementChild as HTMLElement | null;
-    if (fig) fig.style.transform = "";
-  };
-
   return (
-    <section id={id} data-tone="dark" aria-labelledby={`${id}-h`} className="pr dk-pr">
-      <SkyNotes skip="[class*=pr-row],[class*=pr-track],[class*=pr-rail],[class*=pr-card]" />
-      <div className="pr-head">
-        <h2 id={`${id}-h`} data-perch data-rv="mist" className="pr-title">
-          One-off <em>posters</em>
-        </h2>
-        <p className="pr-hint">
-          {/* each phrase stays whole when the line wraps on a phone */}
-          <span>{posters.length} posters</span> · <span>drag the row</span> · <span>click to open</span>
-        </p>
-      </div>
+    <section id={id} data-scene="posters" aria-labelledby={`${id}-h`} className="pr">
+      <SkyNotes skip="[class*=pr-row],[class*=pr-item]" />
+      <header className="sec-head pr-head">
+        <div data-rv>
+          <p className="t-meta">{posters.length} posters, made in Photoshop</p>
+          <Heading id={`${id}-h`} lead="One-off" accent="posters" n="02" script="print" />
+        </div>
+        <div className="sec-note" data-rv style={{ "--d": "90ms" } as CSSProperties}>
+          <p className="t-lede">Single pieces for events, greetings and announcements, each designed to stand on its own.</p>
+        </div>
+      </header>
       <ul
         ref={row}
         className="pr-row"
@@ -114,8 +103,6 @@ export default function PosterRow({ id = "posters" }: { id?: string }) {
             <button
               type="button"
               className="pr-btn"
-              onPointerMove={tilt}
-              onPointerLeave={untilt}
               onClick={() => setOpen(i)}
             >
               {/* named by its own caption plus a hidden "Open", so the name
@@ -123,7 +110,9 @@ export default function PosterRow({ id = "posters" }: { id?: string }) {
                   what they see */}
               <span className="sr-only">Open </span>
               <figure className="pr-fig">
-                <Pic img={p.img} sizes="(min-width: 768px) 420px, 70vw" />
+                <span className="pr-shot">
+                  <Pic img={p.img} sizes="(min-width: 768px) 420px, 70vw" />
+                </span>
                 <figcaption>
                   <span className="pr-cap">{p.title}</span>
                   <span className="pr-meta">{p.meta}</span>
@@ -133,6 +122,7 @@ export default function PosterRow({ id = "posters" }: { id?: string }) {
           </li>
         ))}
       </ul>
+      <p className="pr-hint">Select a poster to see it whole.</p>
       {open !== null && (
         <Lightbox
           label="One-off posters"

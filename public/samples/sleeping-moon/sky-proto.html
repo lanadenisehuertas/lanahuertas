@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype: the visitors' sky</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500&display=swap">
+<link rel="stylesheet" href="moon.css">
+<script>document.documentElement.classList.add("js");</script>
+<style>
+  /* The visitors' sky: the last night before dawn. Everyone who passed by left a pixel star or moon; the scroll brings
+     them out in the order they were left, and anyone can add their own: pick a shape and a colour, sign it, place it. */
+  .pad { min-height: 70svh; display: grid; place-items: center; color: var(--ink); font: 400 16px/1.4 var(--lab); }
+  .vsky { position: relative; display: block; height: 210svh; padding: 0; }
+  .vs-pin { position: sticky; top: 0; width: 100%; height: 100svh; overflow: hidden; }
+  .vs-pin > .stars { z-index: 0; }
+  /* the visitors' part of the sky, to the right of the words, so nothing anyone leaves sits under them */
+  .vs-skybox { position: absolute; inset: 0; z-index: 1; }
+  .vs-sky { position: absolute; left: 40%; right: 3%; top: 9%; bottom: 7%; z-index: 1; }
+  .vs-star { position: absolute; left: calc(var(--x) * 100%); top: calc(var(--y) * 100%); width: 44px; height: 44px; translate: -50% -50%;
+    display: grid; place-items: center; padding: 0; border: 0; background: none; color: var(--c); cursor: pointer;
+    opacity: calc(var(--o, 0) * var(--dim, 1)); }
+  .vs-star svg, .vs-new svg, .opt svg { display: block; }
+  .vs-star svg { width: var(--sz, 22px); height: var(--sz, 22px); transition: scale 180ms var(--pop); }
+  .vs-star.seed { --sz: 30px; z-index: 1; }
+  .vs-star.mine { z-index: 2; }
+  .vs-star:hover svg, .vs-star.on svg, .vs-star:focus-visible svg { scale: 1.5; }
+  .vs-star:focus-visible, .vs-new:focus-visible { outline: 2px dotted var(--mark); outline-offset: 2px; border-radius: 50%; }
+  .sp path { fill: currentColor; }
+  .sp path.dim { opacity: 0.32; }
+  .making .vs-star { --dim: 0.42; }
+  /* whose star it is: words beside it, no box; a dark halo keeps them readable over the stars */
+  .vs-note { position: absolute; z-index: 4; max-width: 26ch; pointer-events: none; translate: 18px -50%; opacity: 0; transition: opacity 160ms linear; text-shadow: 0 0 8px #000, 0 0 18px #000; }
+  .vs-note.left { translate: calc(-100% - 18px) -50%; text-align: right; }
+  .vs-note.on { opacity: 1; }
+  .vs-note b { display: block; font: 400 22px/1.1 var(--display-awake); color: var(--mark); }
+  .vs-note span { display: block; margin-top: 4px; font: 400 17px/1.45 var(--body); color: var(--text); }
+  .vs-note span:empty { display: none; }
+  /* the words and the maker share the left column */
+  .vs-say, .vs-make { position: absolute; z-index: 3; left: calc(8 * var(--u)); width: min(380px, 30vw); }
+  .vs-say { bottom: calc(9 * var(--u)); }
+  .vs-h { margin: 0 0 14px; font: 400 clamp(34px, calc(3.6 * var(--u)), 56px) / 1 var(--display-awake); color: var(--ink); }
+  .vs-line { margin: 0 0 10px; font: 400 18px/1.45 var(--body); color: var(--text); }
+  .vs-count { color: var(--mark); font-variant-numeric: tabular-nums; }
+  .vs-make { top: 50%; translate: 0 -50%; display: grid; gap: 16px; }
+  .vs-make[hidden], .vs-say[hidden] { display: none; }
+  .vs-make fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+  .vs-make legend, .fld .l { display: block; padding: 0; margin: 0 0 4px; font: 400 17px/1.3 var(--lab); color: var(--ink); }
+  .opts { display: flex; flex-wrap: wrap; gap: 4px; }
+  .opt { position: relative; display: grid; place-items: center; width: 48px; height: 48px; cursor: pointer; color: var(--ink); }
+  .opt input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+  .opt svg { width: 26px; height: 26px; opacity: 0.5; transition: scale 160ms var(--pop); }
+  .opt:hover svg { opacity: 0.8; }
+  .opt:has(input:checked) svg { opacity: 1; scale: 1.2; color: var(--pick); }
+  .opt:has(input:focus-visible) { outline: 2px dotted var(--mark); outline-offset: -2px; border-radius: 50%; }
+  .sw i { width: 22px; height: 22px; background: var(--c); }
+  .sw:has(input:checked) i { box-shadow: 0 0 0 3px #000, 0 0 0 5px var(--mark); }
+  .fld { display: block; }
+  .fld input, .fld textarea { display: block; width: 100%; padding: 8px 0; border: 0; border-bottom: 2px solid var(--rule); border-radius: 0; background: transparent; color: var(--text); font: 400 18px/1.4 var(--body); resize: none; }
+  .fld input:focus, .fld textarea:focus { outline: none; border-bottom-color: var(--mark); }
+  .fld .more { display: block; margin-top: 4px; font: 400 16px/1.3 var(--body); color: var(--ink); }
+  .fld .err { display: block; margin-top: 4px; font: 400 16px/1.3 var(--body); color: var(--mark); }
+  .fld .err:empty { display: none; }
+  .hint { margin: 0; font: italic 400 19px/1.3 "Redaction", Georgia, serif; color: var(--mark); }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 24px; }
+  .vs-make button, .vs-say button { border: 0; background-color: transparent; cursor: pointer; }
+  .btn.quiet { color: var(--ink); }
+  /* the one being made: its own shape and colour inside the lantern's dotted ring */
+  .vs-new { position: absolute; left: 0; top: 0; z-index: 2; width: 64px; height: 64px; margin: -32px 0 0 -32px; display: grid; place-items: center; padding: 0;
+    border: 2px dotted var(--rule); border-radius: 50%; background: none; color: var(--c); cursor: pointer; transition: transform 220ms var(--enter); }
+  .vs-new[hidden] { display: none; }
+  .vs-new svg { width: 30px; height: 30px; }
+  .vs-star.mine::after { content: ""; position: absolute; right: 4px; top: 4px; width: 3px; height: 3px; background: var(--mark); box-shadow: -3px 0 var(--mark), 3px 0 var(--mark), 0 -3px var(--mark), 0 3px var(--mark); }
+  /* phones and upright screens: the sky on top, pinned while the words and the maker scroll beneath it */
+  @media (max-width: 760px), (max-aspect-ratio: 1/1) {
+    .vsky { height: auto; padding: 0; }
+    .vs-pin { position: relative; height: auto; overflow: visible; }
+    .vs-skybox { position: relative; inset: auto; z-index: 2; height: 100vw; background: #000; }
+    .making .vs-skybox { position: sticky; top: 0; }   /* while making one, the sky stays in reach above the form */
+    .vs-sky { left: 6%; right: 6%; top: 8%; bottom: 8%; }
+    .vs-say, .vs-make { position: relative; z-index: 1; left: auto; bottom: auto; top: auto; translate: none; width: auto; padding: 28px 6vw 56px; }
+    .vs-pin > .stars { position: absolute; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <section class="pad" aria-hidden="true">Scroll down to the visitors' sky</section>
+  <section class="stop vsky" id="visitors" aria-labelledby="vs-h">
+    <div class="vs-pin">
+      <div class="stars" aria-hidden="true"></div>
+      <div class="vs-skybox">
+        <div class="vs-sky" role="group" aria-label="Stars and moons left by visitors"></div>
+        <p class="vs-note" aria-hidden="true"><b></b><span></span></p>
+      </div>
+      <div class="vs-say">
+        <h2 class="vs-h" id="vs-h">The visitors' sky</h2>
+        <p class="vs-line" aria-live="polite"><span class="vs-count">0</span> stars and moons so far, left by people passing through.</p>
+        <button class="btn vs-open" type="button">Leave yours <svg viewBox="0 0 26 14" aria-hidden="true"><path d="M1 7h23M18.5 1.5L24 7l-5.5 5.5"/></svg></button>
+      </div>
+      <form class="vs-make" hidden novalidate aria-label="Leave a star or a moon">
+        <fieldset><legend>Star or moon</legend><div class="opts shapes"></div></fieldset>
+        <fieldset><legend>Colour</legend><div class="opts swatches"></div></fieldset>
+        <label class="fld"><span class="l">Your name</span><input name="name" maxlength="24" autocomplete="given-name" required aria-describedby="err-name"><span class="err" id="err-name"></span></label>
+        <label class="fld"><span class="l">A note for Lana (if you like)</span><textarea name="note" maxlength="90" rows="2" aria-describedby="more-note"></textarea><span class="more" id="more-note">90 letters left</span></label>
+        <p class="hint">Now click the sky where it goes.</p>
+        <div class="row">
+          <button class="btn" type="submit">Leave it in the sky</button>
+          <button class="btn quiet vs-cancel" type="button">Not now</button>
+        </div>
+      </form>
+    </div>
+  </section>
+  <section class="pad" aria-hidden="true">Dawn comes after this</section>
+</main>
+<script src="moon.js"></script>
+<script>
+(() => {
+  const { $, $$ } = SM, stop = $("#visitors"), pin = $(".vs-pin", stop), sky = $(".vs-sky", stop), note = $(".vs-note", stop);
+  const say = $(".vs-say", stop), make = $(".vs-make", stop), line = $(".vs-line", stop), openBtn = $(".vs-open", stop);
+  const KINDS = { star: "A star", crescent: "A crescent moon", half: "A half moon", full: "A full moon" };
+  const COLS = { lilac: "#b9a2ff", gold: "#fff1c9", pink: "#ffb6d5", sky: "#a8d8ff", peach: "#ffc8a2", mint: "#b8f0d2" };
+  const NAMES = { lilac: "Lilac", gold: "Gold", pink: "Pink", sky: "Sky blue", peach: "Peach", mint: "Mint" };
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+
+  /* each shape is an 11 by 11 pixel sprite: lit cells, plus the dark side of a moon as a faint rim */
+  const sprite = (kind) => {
+    const on = [], dim = [];
+    for (let y = 0; y < 11; y++) for (let x = 0; x < 11; x++) {
+      const dx = x - 5, dy = y - 5, d = Math.hypot(dx, dy), disc = d <= 5.2;
+      let lit = false, faint = false;
+      if (kind === "star") lit = Math.abs(dx) + Math.abs(dy) <= 2 || (dx === 0 && Math.abs(dy) <= 5) || (dy === 0 && Math.abs(dx) <= 5);
+      else if (kind === "full") lit = disc;
+      else if (kind === "half") { lit = disc && dx <= 0; faint = disc && !lit && d > 4.2; }
+      else { lit = disc && Math.hypot(dx - 3.2, dy + 0.6) > 4.6; faint = disc && !lit && d > 4.2; }
+      if (lit) on.push([x, y]); else if (faint) dim.push([x, y]);
+    }
+    const d = (cells) => cells.map(([x, y]) => `M${x} ${y}h1v1h-1z`).join("");
+    return `<svg class="sp" viewBox="0 0 11 11" shape-rendering="crispEdges" aria-hidden="true"><path d="${d(on)}"/>${dim.length ? `<path class="dim" d="${d(dim)}"/>` : ""}</svg>`;
+  };
+
+  /* sample visitors, for the prototype only (the real ones come from /api/garden) */
+  let seed = 11;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+  const who = ["Mika", "Jo", "Ren", "Bea", "Carlo", "Dani", "Elle", "Gab", "Hana", "Iya", "Jules", "Kat", "Lio", "Mae", "Nico", "Pia", "Ria", "Sam", "Tala", "Vee",
+    "Wen", "Yuri", "Zia", "Ash", "Bo", "Dev", "Em", "Faye", "Gio", "Ivy", "Jas", "Kit", "Lou", "Noor", "Pat", "Rae"];
+  const says = ["the moon page is so pretty", "hi from Cebu!", "loved the posters", "", "the brand worlds are so fun", "hello from a fellow designer", "keep making things",
+    "the hover magic got me", "", "came for the moon, stayed for the films", "this is the most fun portfolio", "rooting for you!", "", "pixel moons forever", "hi Lana and Peanut"];
+  const kinds = Object.keys(KINDS), cols = Object.keys(COLS);
+  const list = [
+    { name: "Lana", note: "Welcome to my night sky. Thank you for staying to the end.", kind: "full", color: "gold", x: 0.52, y: 0.22, seed: true },
+    { name: "Peanut", note: "meow (she says hi)", kind: "crescent", color: "peach", x: 0.6, y: 0.3, seed: true },
+  ];
+  // sample spots keep a little room around each other
+  who.forEach((name, i) => {
+    let x, y, k = 0;
+    do { x = 0.03 + rnd() * 0.94; y = 0.04 + rnd() * 0.92; } while (k++ < 40 && list.some((v) => Math.hypot(v.x - x, (v.y - y) * 0.6) < 0.07));
+    list.push({ name, note: says[i % says.length], kind: kinds[Math.floor(rnd() * 4)], color: cols[Math.floor(rnd() * 6)], x, y });
+  });
+
+  const starEl = (v) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "vs-star" + (v.seed ? " seed" : "") + (v.mine ? " mine" : "");
+    b.setAttribute("aria-label", `${KINDS[v.kind]} from ${v.name}${v.note ? ": " + v.note : ""}`);
+    b.style.cssText = `--x:${v.x};--y:${v.y};--c:${COLS[v.color]}`;
+    b.innerHTML = sprite(v.kind); b._v = v;
+    return b;
+  };
+  list.forEach((v) => sky.append(starEl(v)));
+  SM.stars($(".stars", pin), 90, SM.COLUMN.matches ? [] : [[6, 16, 37, 86]], 31);   // none behind the words
+
+  /* pointing at a star (or tapping it, or tabbing to it) says whose it is; the last one read stays up */
+  let lit = null;
+  const show = (b) => {
+    if (lit) lit.classList.remove("on");
+    lit = b; b.classList.add("on");
+    const box = note.parentElement.getBoundingClientRect(), r = b.getBoundingClientRect();
+    const x = r.left + r.width / 2 - box.left, y = r.top + r.height / 2 - box.top;
+    $("b", note).textContent = b._v.name; $("span", note).textContent = b._v.note;
+    // beside the star, on whichever side has room for the words
+    note.style.maxWidth = "";
+    const nw = Math.min(note.offsetWidth, box.width * 0.6), right = x + 18 + nw < box.width - 8;
+    note.style.maxWidth = `min(26ch, ${Math.round(Math.max(right ? box.width - x - 26 : x - 26, 120))}px)`;
+    note.classList.toggle("left", !right);
+    note.style.left = x + "px"; note.style.top = clamp(y, 40, box.height - 40) + "px";
+    note.classList.add("on");
+  };
+  sky.addEventListener("pointerover", (e) => { const b = e.target.closest(".vs-star"); if (b && e.pointerType !== "touch") show(b); });
+  sky.addEventListener("focusin", (e) => { const b = e.target.closest(".vs-star"); if (b) show(b); });
+  sky.addEventListener("click", (e) => { const b = e.target.closest(".vs-star"); if (b) show(b); });
+
+  /* the scroll brings the stars out in the order they were left, and turns their twinkle */
+  let done = false;   // once a visitor has left theirs, the line speaks to them instead of counting
+  SM.scrub(() => {
+    const w = SM.where(stop), q = SM.quiet();
+    if (!w.near) return;
+    const p = q ? 2 : (w.vh * 0.9 - w.top) / (w.vh * 1.3), stars = $$(".vs-star", sky), n = stars.length;
+    let shown = 0;
+    stars.forEach((s, i) => {
+      const o = clamp((p * 1.15 - (i / n) * 0.95) / 0.1);
+      if (o > 0.5) shown++;
+      const tw = q || o < 1 ? 1 : 0.78 + 0.22 * Math.sin(scrollY / 70 + i * 1.7);
+      s.style.setProperty("--o", (o * tw).toFixed(3));
+    });
+    if (!making && !done) $(".vs-count", stop).textContent = shown;
+  });
+
+  /* the maker */
+  const shapes = $(".shapes", make), swatches = $(".swatches", make);
+  shapes.innerHTML = kinds.map((k, i) => `<label class="opt"><input type="radio" name="kind" value="${k}"${i === 0 ? " checked" : ""}><span class="vh">${KINDS[k]}</span>${sprite(k)}</label>`).join("");
+  swatches.innerHTML = cols.map((c, i) => `<label class="opt sw" style="--c:${COLS[c]}"><input type="radio" name="color" value="${c}"${i === 1 ? " checked" : ""}><span class="vh">${NAMES[c]}</span><i></i></label>`).join("");
+  const newEl = Object.assign(document.createElement("button"), { type: "button", className: "vs-new", hidden: true });
+  sky.append(newEl);
+  let making = false, pos = { x: 0.5, y: 0.5 };
+  const pick = () => ({ kind: make.kind.value, color: make.color.value });
+  const paint = () => {
+    const { kind, color } = pick();
+    make.style.setProperty("--pick", COLS[color]);
+    newEl.style.setProperty("--c", COLS[color]); newEl.innerHTML = sprite(kind);
+    newEl.setAttribute("aria-label", `Your ${KINDS[kind].toLowerCase().replace(/^a /, "")}. Use the arrow keys to move it.`);
+  };
+  const place = (x, y) => {
+    pos = { x: clamp(x, 0.02, 0.98), y: clamp(y, 0.03, 0.97) };
+    const r = sky.getBoundingClientRect();
+    newEl.style.transform = `translate3d(${(pos.x * r.width).toFixed(1)}px, ${(pos.y * r.height).toFixed(1)}px, 0)`;
+  };
+  make.addEventListener("change", paint);
+  const open = () => {
+    making = true; stop.classList.add("making"); say.hidden = true; make.hidden = false; newEl.hidden = false;
+    note.classList.remove("on"); paint();
+    // somewhere free to start from: the emptiest of a few tries
+    let best = null, far = -1;
+    for (let k = 0; k < 24; k++) {
+      const x = 0.1 + rnd() * 0.8, y = 0.12 + rnd() * 0.76;
+      const d = Math.min(...list.map((v) => Math.hypot(v.x - x, v.y - y)));
+      if (d > far) { far = d; best = { x, y }; }
+    }
+    place(best.x, best.y);
+    $("input", shapes).focus();
+  };
+  const close = () => { making = false; stop.classList.remove("making"); say.hidden = false; make.hidden = true; newEl.hidden = true; openBtn.focus(); };
+  openBtn.addEventListener("click", open);
+  $(".vs-cancel", make).addEventListener("click", close);
+  make.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  // clicking empty sky puts it there
+  $(".vs-skybox", stop).addEventListener("pointerdown", (e) => {
+    if (!making || e.target.closest(".vs-star")) return;
+    const r = sky.getBoundingClientRect();
+    place((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+  });
+  newEl.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") return close();
+    const s = e.shiftKey ? 0.06 : 0.02, m = { ArrowLeft: [-s, 0], ArrowRight: [s, 0], ArrowUp: [0, -s], ArrowDown: [0, s] }[e.key];
+    if (m) { e.preventDefault(); place(pos.x + m[0], pos.y + m[1]); }
+  });
+  addEventListener("resize", () => making && place(pos.x, pos.y));
+  const left = $(".more", make);
+  make.note.addEventListener("input", () => { const n = 90 - make.note.value.length; left.textContent = n === 1 ? "1 letter left" : `${n} letters left`; });
+  const nameIn = make.elements.name;   // not make.name: that is the form's own name
+  nameIn.addEventListener("input", () => { if (nameIn.value.trim()) { $("#err-name").textContent = ""; nameIn.removeAttribute("aria-invalid"); } });
+  make.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = nameIn.value.trim();
+    if (!name) { $("#err-name").textContent = "Add your name, so Lana knows who it is from."; nameIn.setAttribute("aria-invalid", "true"); nameIn.focus(); return; }
+    const sub = $("[type=submit]", make); sub.disabled = true; sub.firstChild.textContent = "Leaving it ";
+    setTimeout(() => {   // the prototype stands in for the POST to /api/garden
+      const v = { name, note: make.note.value.trim(), ...pick(), ...pos, mine: true };
+      list.push(v); const b = starEl(v); b.style.setProperty("--o", 1); sky.insertBefore(b, newEl);
+      sub.disabled = false; sub.firstChild.textContent = "Leave it in the sky ";
+      make.reset(); left.textContent = "90 letters left";
+      close();
+      line.innerHTML = `Your ${KINDS[v.kind].toLowerCase().replace(/^a /, "")} is up, with ${$$(".vs-star", sky).length - 1} others. Thank you for passing through.`;
+      openBtn.firstChild.textContent = "Leave another "; done = true;
+      show(b);
+    }, 450);
+  });
+})();
+</script>
+</body>
+</html>

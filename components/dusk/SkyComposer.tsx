@@ -294,7 +294,7 @@ export default function SkyComposer({
               </button>
             </div>
             <a className="sc-more" href="/made-here#songs">
-              More songs people wrote here <span aria-hidden>→</span>
+              More songs people wrote here
             </a>
           </>
         ) : save ? (
@@ -322,7 +322,7 @@ export default function SkyComposer({
                 </p>
                 <div className="sc-row">
                   <a className="btn btn-sm" href={pieceUrl(save.done.piece)}>
-                    See it in the gallery <span aria-hidden>→</span>
+                    See it in the gallery
                   </a>
                   <button type="button" className="sc-ghostbtn" onClick={share}>
                     Copy its link

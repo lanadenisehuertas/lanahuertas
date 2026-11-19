@@ -127,14 +127,11 @@ export default function Guestbook() {
 
   return (
     <div ref={root} id="garden" className="gb" aria-labelledby="gb-h">
-      <div className="gb-head dusk-panel">
+      <div className="gb-head backing">
         <p className="gb-k">
           {/* each half kept whole, so a narrow card breaks between them and
               not inside "2 flowers planted" */}
-          <span className="whitespace-nowrap">The guestbook garden</span> ·{" "}
-          <span className="whitespace-nowrap">
-            {all.length} flower{all.length === 1 ? "" : "s"} planted
-          </span>
+          The guestbook garden, {all.length} flower{all.length === 1 ? "" : "s"} planted
         </p>
         <h3 id="gb-h" className="gb-title">
           Leave a <em>flower</em>
@@ -150,7 +147,7 @@ export default function Guestbook() {
             </button>
           )}
           <a href="/made-here" className="link gb-more">
-            Everything visitors made <span aria-hidden>→</span>
+            Everything visitors made
           </a>
         </div>
       </div>

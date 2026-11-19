@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample 4: Swarm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter+Tight:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* SWARM. A lotus on still water, and butterflies asleep on it. Wake them and
+   they burst out across the screen; where each one lands, a piece of the site
+   unfolds under it. The butterflies stay: each sits on its card and beats its
+   wings when you come near. */
+body { overflow: hidden; }
+.scene { position: fixed; inset: 0; overflow: hidden; }
+.deco { position: absolute; pointer-events: none; }
+.lotus { left: 50%; bottom: 6vh; width: min(84vw, 900px); margin-left: calc(min(84vw, 900px) / -2); transition: transform 1.4s var(--ease), opacity 1.2s; }
+[data-state="open"] .lotus { transform: translateY(8vh) scale(1.5); opacity: 0.28; }
+.water { position: absolute; left: 0; right: 0; bottom: 0; height: 20vh; background: linear-gradient(transparent, rgb(15 8 34 / 0.85)); }
+.top { position: absolute; left: 0; right: 0; top: clamp(60px, 12vh, 120px); z-index: 5; text-align: center; padding: 0 16px; transition: transform 1s var(--ease); transform-origin: 50% 0; }
+.top .role { margin-inline: auto; transition: opacity 0.4s; }
+[data-state="open"] .top { transform: translateY(calc(clamp(60px, 12vh, 120px) * -1 + 18px)) scale(0.5); }
+[data-state="open"] .top .role { opacity: 0; }
+
+.grid { position: absolute; inset: 15vh 5vw 11vh; z-index: 4; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: clamp(12px, 2vw, 30px); }
+.grid .card { opacity: 0; transform: scale(0.2) rotate(-8deg); transition: transform 0.7s var(--pop), opacity 0.4s, box-shadow 0.3s; }
+.grid .card:nth-child(odd) { margin-top: 3vh; margin-bottom: -3vh; }
+.grid .card.in { opacity: 1; transform: none; }
+.grid .card.in:hover { transform: translateY(-6px) rotate(-1deg); box-shadow: 0 0 0 2px var(--moon), 0 0 50px rgb(185 162 255 / 0.7); }
+
+/* a butterfly: the outer box flies (JS), the picture inside beats its wings */
+.fly { position: absolute; left: 0; top: 0; z-index: 6; width: clamp(54px, 6vw, 96px); pointer-events: none; will-change: transform; }
+.fly img { width: 100%; animation: flap var(--f, 2.6s) ease-in-out infinite; animation-delay: var(--td, 0s); }
+@keyframes flap { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0.34); } }
+[data-state="burst"] .fly img { --f: 0.22s; }
+.fly.fast img { --f: 0.3s; }
+.open-btn { position: absolute; left: 50%; bottom: 84px; z-index: 7; transform: translateX(-50%); transition: opacity 0.4s; }
+:is([data-state="burst"], [data-state="open"]) .open-btn { opacity: 0; pointer-events: none; }
+@media (max-width: 720px) { .grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); inset: 11vh 4vw 10vh; } .grid .card b { font-size: 1rem; padding: 18px 10px 8px; } .grid .card b small { display: none; } }
+@media (prefers-reduced-motion: reduce) { .fly img { animation: none; } .lotus, .top, .grid .card { transition: none; } }
+</style>
+</head>
+<body>
+<main class="scene" data-state="closed">
+  <div class="sky"></div><div class="stars"></div>
+  <img class="deco px twinkle" style="--d:-12;left:9%;top:30%;width:clamp(80px,10vw,150px)" src="art/moon.webp" alt="">
+  <img class="deco lotus" src="art/lotus.webp" alt="">
+  <div class="water"></div>
+  <header class="top">
+    <h1 class="name">Lana Denise <em>Huertas</em></h1>
+    <p class="role">UI/UX and visual designer. Eight butterflies are asleep on the lotus.</p>
+  </header>
+  <div class="grid" id="grid"></div>
+  <button class="cta open-btn" id="open">Wake the garden</button>
+</main>
+<script src="base.js"></script>
+<script>
+const scene = document.querySelector(".scene"), grid = document.getElementById("grid");
+grid.innerHTML = PARTS.map((p) => card(p)).join("");
+const cards = [...grid.children];
+// where each butterfly sleeps, as a fraction of the screen (they sit on the lotus)
+const REST = [[0.36, 0.7], [0.44, 0.62], [0.5, 0.57], [0.57, 0.63], [0.64, 0.71], [0.41, 0.78], [0.53, 0.74], [0.6, 0.8]];
+const flies = cards.map((c, i) => {
+  const el = document.createElement("div");
+  el.className = "fly";
+  el.innerHTML = `<img src="art/butterfly.webp" alt="" style="--td:${-i * 0.37}s">`;
+  scene.appendChild(el);
+  const [x, y] = REST[i];
+  el.style.transform = `translate(${x * innerWidth - 40}px, ${y * innerHeight - 40}px) rotate(${(i % 2 ? 1 : -1) * (10 + i * 4)}deg) scale(0.7)`;
+  c.addEventListener("pointerenter", () => el.classList.add("fast"));
+  c.addEventListener("pointerleave", () => el.classList.remove("fast"));
+  return el;
+});
+parallax(scene);
+let done = false;
+function open() {
+  if (done) return;
+  done = true;
+  scene.dataset.state = "burst";
+  cards.forEach((c, i) => {
+    const el = flies[i], from = el.style.transform;
+    const r = c.getBoundingClientRect();
+    // the card is still shrunk to a fifth: work out where its full-size corner will be
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2, w = r.width * 5, h = r.height * 5;
+    const tx = cx + w / 2 - el.offsetWidth * 0.75, ty = cy - h / 2 - el.offsetHeight * 0.35;
+    const mx = innerWidth * (0.1 + Math.random() * 0.8), my = innerHeight * (0.05 + Math.random() * 0.3);
+    const to = `translate(${tx}px, ${ty}px) rotate(${18 - i * 5}deg) scale(1)`;
+    const dur = RM ? 1 : 1500 + Math.random() * 700;
+    el.animate([{ transform: from }, { transform: `translate(${mx}px, ${my}px) rotate(${(Math.random() - 0.5) * 80}deg) scale(1.25)`, offset: 0.45 }, { transform: to }], { duration: dur, delay: i * 80, easing: "cubic-bezier(.4,.05,.3,1)", fill: "forwards" });
+    setTimeout(() => c.classList.add("in"), RM ? 0 : dur * 0.82 + i * 80);
+  });
+  setTimeout(() => (scene.dataset.state = "open"), RM ? 0 : 2400);
+}
+document.getElementById("open").onclick = open;
+addEventListener("wheel", (e) => e.deltaY > 0 && open(), { passive: true });
+addEventListener("keydown", (e) => (e.key === "ArrowDown" || e.key === " ") && open());
+</script>
+</body>
+</html>

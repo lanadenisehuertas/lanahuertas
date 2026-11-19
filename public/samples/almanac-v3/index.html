@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lana Huertas · UI/UX and graphic designer in Manila</title>
+<meta name="description" content="Lana Denise Huertas designs brands, posters, films and product screens in Manila, and builds some of them in code.">
+<meta name="theme-color" content="#0c0620">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- the UI faces load without blocking the first paint (system fallback for a moment, then swap) -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap"></noscript>
+<link rel="preload" href="../brand/fonts/Redaction-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../brand/fonts/Redaction-Italic.woff2" as="font" type="font/woff2" crossorigin>
+<!-- the garden is served at 960px on purpose: upscaled it goes soft, which reads as distance behind the sharp gate -->
+<link rel="preload" href="../almanac/art/s_hero-sm.webp" as="image" fetchpriority="high">
+<link rel="preload" href="../almanac-v2/art/gate-l.webp" as="image">
+<link rel="preload" href="../almanac-v2/art/gate-r.webp" as="image">
+<link rel="preload" href="../almanac-v2/art/f_corner.webp" as="image">
+<link rel="stylesheet" href="v3.css">
+<link rel="stylesheet" href="gate.css">
+<link rel="stylesheet" href="brands.css">
+<link rel="stylesheet" href="stops.css">
+<script>
+  /* before first paint: mark JS, and switch to quiet mode if it was chosen before or motion is reduced */
+  (function () {
+    var r = document.documentElement, q = null;
+    r.classList.add("js");
+    try { q = localStorage.getItem("v3-quiet"); } catch (e) {}
+    if (q === "1" || (q === null && matchMedia("(prefers-reduced-motion: reduce)").matches)) r.classList.add("quiet");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#brands">Skip to the work</a>
+
+<!-- Route bar: mark, six stops, quiet switch. Under 860px: mark, Menu, switch. -->
+<header class="route" aria-label="Site">
+  <a class="route-mark" href="#gate" aria-label="Lana Huertas, back to the top">
+    <svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><circle cx="14" cy="14" r="12.5" fill="#2b1550" stroke="#b9a2ff"/><path d="M17.5 6.5a8 8 0 1 0 0 15 6.4 6.4 0 0 1 0-15z" fill="#fff1c9"/></svg>
+    <span>Lana Huertas</span>
+  </a>
+  <nav class="route-stops" aria-label="Stops">
+    <ol>
+      <li><a href="#brands"><span class="moon" data-phase="0.15"></span>Brands</a></li>
+      <li><a href="#posters"><span class="moon" data-phase="0.32"></span>Posters</a></li>
+      <li><a href="#films"><span class="moon" data-phase="0.5"></span>Films</a></li>
+      <li><a href="#products"><span class="moon" data-phase="0.66"></span>Products</a></li>
+      <li><a href="#about"><span class="moon" data-phase="0.84"></span>About</a></li>
+      <li><a href="#talk"><span class="moon" data-phase="1"></span>Contact</a></li>
+    </ol>
+  </nav>
+  <button class="route-menu" type="button" aria-haspopup="dialog" aria-controls="menu">Menu</button>
+  <button class="switch" type="button" role="switch" aria-checked="false" id="quiet"><span class="switch-text">Quiet mode</span><i aria-hidden="true"></i></button>
+</header>
+
+<dialog class="menu" id="menu" aria-label="Stops">
+  <button class="btn secondary icon menu-close" type="button" aria-label="Close the menu"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  <ol>
+    <li><a href="#brands"><span class="moon" data-phase="0.15"></span>Brands</a></li>
+    <li><a href="#posters"><span class="moon" data-phase="0.32"></span>Posters</a></li>
+    <li><a href="#films"><span class="moon" data-phase="0.5"></span>Films</a></li>
+    <li><a href="#products"><span class="moon" data-phase="0.66"></span>Products</a></li>
+    <li><a href="#about"><span class="moon" data-phase="0.84"></span>About</a></li>
+    <li><a href="#talk"><span class="moon" data-phase="1"></span>Contact</a></li>
+  </ol>
+</dialog>
+
+<main id="main">
+
+  <!-- 1. The gate (pinned 1.5 screens; gate.css, gate.js) -->
+  <section class="pin gate" id="gate" aria-labelledby="gate-name">
+    <div class="stage">
+      <div class="g-garden" aria-hidden="true">
+        <img src="../almanac/art/s_hero-sm.webp" width="960" height="540" alt="" fetchpriority="high" decoding="async">
+      </div>
+      <div class="g-gate" aria-hidden="true">
+        <img class="g-half l" src="../almanac-v2/art/gate-l.webp" width="706" height="920" alt="">
+        <img class="g-half r" src="../almanac-v2/art/gate-r.webp" width="707" height="920" alt="">
+      </div>
+      <div class="g-lilies" aria-hidden="true">
+        <img class="g-lily l" src="../almanac-v2/art/f_corner.webp" width="900" height="962" alt="">
+        <img class="g-lily r" src="../almanac-v2/art/f_corner.webp" width="900" height="962" alt="">
+      </div>
+      <div class="g-text">
+        <h1 class="g-name" id="gate-name"><span class="g-l1 wear">Lana Denise</span> <span class="g-l2 wear">Huertas</span></h1>
+        <p class="lead g-line">UI/UX and graphic designer in Manila. I design brands, posters, films and product screens, and build some of them in code.</p>
+        <div class="g-acts">
+          <a class="btn primary" href="#brands" data-go="brands">See the work</a>
+          <a class="btn secondary" href="#talk" data-go="talk">Email Lana</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. The brand corridor (pinned about 5.5 screens; brands.css, brands.js renders the ten rooms from DATA.brands) -->
+  <section class="pin brands" id="brands" aria-labelledby="brands-h">
+    <div class="stage">
+      <h2 class="label b-head" id="brands-h"><span class="moon" data-phase="0.15"></span>Brands <span class="b-total">· ten brand sheets</span></h2>
+      <div class="b-mount" id="brands-mount"></div>
+    </div>
+  </section>
+
+  <!-- 3. Posters (stops.css, stops.js renders the row from DATA.posters into #posters-mount).
+       One screen: the head, then one sideways row with the chosen poster in the centre and its caption under it. -->
+  <section class="stop posters" id="posters" aria-labelledby="posters-h">
+    <div class="wrap">
+      <header class="head" data-enter>
+        <p class="label"><span class="moon" data-phase="0.32"></span>Posters</p>
+        <h2 class="h2 wear" id="posters-h">Posters, one at a time</h2>
+        <p class="lead">Twelve one-off pieces for chapters, councils and causes, 2024 to 2026.</p>
+      </header>
+    </div>
+    <div class="mount" id="posters-mount"></div>
+  </section>
+
+  <!-- 4. Films (stops.css, stops.js). One screen: the head and the lantern on the left (columns 1-4),
+       the picture, its caption and the ten thumbnails on the right (columns 5-12), all in one view. -->
+  <section class="stop films" id="films" aria-labelledby="films-h">
+    <div class="wrap fl">
+      <header class="head fl-head" data-enter>
+        <p class="label"><span class="moon" data-phase="0.5"></span>Films</p>
+        <h2 class="h2 wear" id="films-h">Films and motion</h2>
+        <p class="lead">Ten edits, from trailers to a song interpretation. Choose one to see it large.</p>
+      </header>
+      <div class="fl-lamp" aria-hidden="true">
+        <i class="fl-beam"></i>
+        <img src="art/lantern.webp" width="760" height="691" alt="" loading="lazy" decoding="async">
+      </div>
+      <div class="mount fl-mount" id="films-mount"></div>
+    </div>
+  </section>
+
+  <!-- 5. Products (stops.css, stops.js). The words are static; stops.js turns the four panels into tabs. -->
+  <section class="stop products" id="products" aria-labelledby="products-h">
+    <div class="pd-pond" aria-hidden="true">
+      <img src="../almanac/art/s_pond-sm.webp" width="960" height="540" alt="" loading="lazy" decoding="async">
+    </div>
+    <div class="wrap">
+      <header class="head" data-enter>
+        <p class="label"><span class="moon" data-phase="0.66"></span>Products</p>
+        <h2 class="h2 wear" id="products-h">Product screens</h2>
+        <p class="lead">Four apps I designed, and built in code.</p>
+      </header>
+      <div class="mount pd" id="products-mount" data-enter>
+        <div class="pd-tabs" role="tablist" aria-label="Apps">
+          <button class="pd-tab" type="button" role="tab" id="pd-tab-psyclick" aria-controls="pd-psyclick" aria-selected="true">PsyClick</button>
+          <button class="pd-tab" type="button" role="tab" id="pd-tab-bloom" aria-controls="pd-bloom" aria-selected="false" tabindex="-1">Bloom</button>
+          <button class="pd-tab" type="button" role="tab" id="pd-tab-algebrawl" aria-controls="pd-algebrawl" aria-selected="false" tabindex="-1">Algebrawl</button>
+          <button class="pd-tab" type="button" role="tab" id="pd-tab-ledger" aria-controls="pd-ledger" aria-selected="false" tabindex="-1">Debt Payoff Ledger</button>
+        </div>
+        <div class="pd-panels">
+          <article class="pd-panel on" id="pd-psyclick" role="tabpanel" aria-labelledby="pd-tab-psyclick" data-kind="desk" style="--r:1.6">
+            <div class="pd-stage">
+              <button class="press pd-shot" type="button" data-open aria-label="Open PsyClick screens, large">
+                <span class="frame"><img src="/work/psyclick/app-dashboard-sm.webp" srcset="/work/psyclick/app-dashboard-sm.webp 960w, /work/psyclick/app-dashboard.webp 1600w" sizes="(max-width: 860px) 100vw, 780px" width="960" height="600" alt="PsyClick, the clinician dashboard" loading="lazy" decoding="async"></span>
+              </button>
+              <div class="pd-thumbs" role="group" aria-label="PsyClick screens">
+                <button class="press pd-thumb" type="button" aria-pressed="true" data-src="/work/psyclick/app-dashboard-sm.webp" data-big="/work/psyclick/app-dashboard.webp" data-w="960" data-h="600" data-alt="PsyClick, the clinician dashboard"><span class="frame"><img src="/work/psyclick/app-dashboard-sm.webp" width="960" height="600" alt="" loading="lazy" decoding="async"></span><span class="vh">Dashboard</span></button>
+                <button class="press pd-thumb" type="button" aria-pressed="false" data-src="/work/psyclick/app-intake-sm.webp" data-big="/work/psyclick/app-intake.webp" data-w="960" data-h="600" data-alt="PsyClick, the consent step of a new assessment"><span class="frame"><img src="/work/psyclick/app-intake-sm.webp" width="960" height="600" alt="" loading="lazy" decoding="async"></span><span class="vh">Consent step</span></button>
+                <button class="press pd-thumb" type="button" aria-pressed="false" data-src="/work/psyclick/app-typing-sm.webp" data-big="/work/psyclick/app-typing.webp" data-w="960" data-h="600" data-alt="PsyClick, the typing task"><span class="frame"><img src="/work/psyclick/app-typing-sm.webp" width="960" height="600" alt="" loading="lazy" decoding="async"></span><span class="vh">Typing task</span></button>
+                <button class="press pd-thumb" type="button" aria-pressed="false" data-src="/work/psyclick/app-report-sm.webp" data-big="/work/psyclick/app-report.webp" data-w="960" data-h="600" data-alt="PsyClick, a client report"><span class="frame"><img src="/work/psyclick/app-report-sm.webp" width="960" height="600" alt="" loading="lazy" decoding="async"></span><span class="vh">Client report</span></button>
+              </div>
+            </div>
+            <div class="pd-text">
+              <h3 class="h3 pd-name wear">PsyClick</h3>
+              <p class="pd-tag italic">Calmer clinical screening.</p>
+              <p class="pd-desc">A desktop app that reads typing rhythm and mouse movement to support clinician-guided mental health screening. It flags; it does not diagnose. I designed the whole experience and led a four-person team through our thesis defense.</p>
+              <p class="label pd-meta">2025 to 2026<span class="sep"> · </span>Project manager, backend developer and lead UI/UX designer</p>
+              <p class="label pd-meta">Electron<span class="sep"> · </span>Python<span class="sep"> · </span>React<span class="sep"> · </span>Supabase</p>
+              <a class="btn primary pd-go" href="https://psyclick-app.vercel.app/" target="_blank" rel="noopener">Visit the live site<span class="vh"> (opens in a new tab)</span></a>
+            </div>
+          </article>
+          <article class="pd-panel" id="pd-bloom" role="tabpanel" aria-labelledby="pd-tab-bloom" data-kind="phone" style="--r:0.4621">
+            <div class="pd-stage">
+              <button class="press pd-shot" type="button" data-open aria-label="Open Bloom screens, large">
+                <span class="frame"><img src="/work/bloom/today.webp" width="500" height="1082" alt="Bloom, the today screen" loading="lazy" decoding="async"></span>
+              </button>
+              <div class="pd-thumbs" role="group" aria-label="Bloom screens">
+                <button class="press pd-thumb" type="button" aria-pressed="true" data-src="/work/bloom/today.webp" data-w="500" data-h="1082" data-alt="Bloom, the today screen"><span class="frame"><img src="/work/bloom/today.webp" width="500" height="1082" alt="" loading="lazy" decoding="async"></span><span class="vh">Today</span></button>
+                <button class="press pd-thumb" type="button" aria-pressed="false" data-src="/work/bloom/cycle.webp" data-w="500" data-h="1082" data-alt="Bloom, the cycle calendar"><span class="frame"><img src="/work/bloom/cycle.webp" width="500" height="1082" alt="" loading="lazy" decoding="async"></span><span class="vh">Cycle</span></button>
+                <button class="press pd-thumb" type="button" aria-pressed="false" data-src="/work/bloom/food.webp" data-w="500" data-h="1082" data-alt="Bloom, the food log"><span class="frame"><img src="/work/bloom/food.webp" width="500" height="1082" alt="" loading="lazy" decoding="async"></span><span class="vh">Food</span></button>
+                <button class="press pd-thumb" type="button" aria-pressed="false" data-src="/work/bloom/progress.webp" data-w="500" data-h="1082" data-alt="Bloom, the progress screen"><span class="frame"><img src="/work/bloom/progress.webp" width="500" height="1082" alt="" loading="lazy" decoding="async"></span><span class="vh">Progress</span></button>
+              </div>
+            </div>
+            <div class="pd-text">
+              <h3 class="h3 pd-name wear">Bloom</h3>
+              <p class="pd-tag italic">A coach that follows your cycle.</p>
+              <p class="pd-desc">A mobile-first app that turns a strength and nutrition plan into a coach that adapts: workouts ease off during your period and push harder in your strongest week. It installs to the home screen, works offline and keeps every log on the phone.</p>
+              <p class="label pd-meta">2026<span class="sep"> · </span>Designer and full-stack developer</p>
+              <p class="label pd-meta">React<span class="sep"> · </span>TypeScript<span class="sep"> · </span>Dexie<span class="sep"> · </span>PWA</p>
+              <a class="btn primary pd-go" href="https://bloom-liart-delta.vercel.app" target="_blank" rel="noopener">Open the app<span class="vh"> (opens in a new tab)</span></a>
+            </div>
+          </article>
+          <article class="pd-panel" id="pd-algebrawl" role="tabpanel" aria-labelledby="pd-tab-algebrawl" data-kind="desk" style="--r:1.3333">
+            <div class="pd-stage">
+              <button class="press pd-shot" type="button" data-open aria-label="Open Algebrawl screens, large">
+                <span class="frame"><img src="/work/algebrawl/battle.webp" width="1040" height="780" alt="Algebrawl, a battle against Isaac Newton" loading="lazy" decoding="async"></span>
+              </button>
+              <div class="pd-thumbs" role="group" aria-label="Algebrawl screens">
+                <button class="press pd-thumb" type="button" aria-pressed="true" data-src="/work/algebrawl/battle.webp" data-w="1040" data-h="780" data-alt="Algebrawl, a battle against Isaac Newton"><span class="frame"><img src="/work/algebrawl/battle.webp" width="1040" height="780" alt="" loading="lazy" decoding="async"></span><span class="vh">Battle</span></button>
+                <button class="press pd-thumb" type="button" aria-pressed="false" data-src="/work/algebrawl/select.webp" data-w="1040" data-h="780" data-alt="Algebrawl, choosing an enemy"><span class="frame"><img src="/work/algebrawl/select.webp" width="1040" height="780" alt="" loading="lazy" decoding="async"></span><span class="vh">Choose an enemy</span></button>
+                <button class="press pd-thumb" type="button" aria-pressed="false" data-src="/work/algebrawl/story.webp" data-w="1040" data-h="780" data-alt="Algebrawl, a story screen"><span class="frame"><img src="/work/algebrawl/story.webp" width="1040" height="780" alt="" loading="lazy" decoding="async"></span><span class="vh">Story</span></button>
+                <button class="press pd-thumb" type="button" aria-pressed="false" data-src="/work/algebrawl/tutorial.webp" data-w="1040" data-h="780" data-alt="Algebrawl, the tutorial"><span class="frame"><img src="/work/algebrawl/tutorial.webp" width="1040" height="780" alt="" loading="lazy" decoding="async"></span><span class="vh">Tutorial</span></button>
+              </div>
+            </div>
+            <div class="pd-text">
+              <h3 class="h3 pd-name wear">Algebrawl</h3>
+              <p class="pd-tag italic">A pixel-art math battle arena.</p>
+              <p class="pd-desc">A turn-based math game where you duel Gauss, Newton and Fibonacci; right answers land hits. I designed the entire UI and hand-drew every sprite, from the title screen to the boss animations.</p>
+              <p class="label pd-meta">January 2025<span class="sep"> · </span>UI designer and pixel artist</p>
+              <p class="label pd-meta">Pixel art<span class="sep"> · </span>Java Swing<span class="sep"> · </span>React<span class="sep"> · </span>KaTeX</p>
+              <a class="btn primary pd-go" href="https://algebrawl.vercel.app" target="_blank" rel="noopener">Play the game<span class="vh"> (opens in a new tab)</span></a>
+            </div>
+          </article>
+          <article class="pd-panel" id="pd-ledger" role="tabpanel" aria-labelledby="pd-tab-ledger" data-kind="phone" style="--r:0.4386">
+            <div class="pd-stage">
+              <button class="press pd-shot" type="button" data-open aria-label="Open the Debt Payoff Ledger screen, large">
+                <span class="frame"><img src="/work/shot-debtledger.webp" width="500" height="1140" alt="Debt Payoff Ledger, the weekly allowance screen" loading="lazy" decoding="async"></span>
+              </button>
+              <div class="pd-thumbs" aria-hidden="true"></div>
+            </div>
+            <div class="pd-text">
+              <h3 class="h3 pd-name wear">Debt Payoff Ledger</h3>
+              <p class="pd-tag italic">A weekly allocator for students.</p>
+              <p class="pd-desc">A student budget app that sets aside food and school money from a weekly allowance, then puts the rest toward whichever debt is due soonest. Rebuilt from a one-file prototype into a tested Next.js app with a token-based design system.</p>
+              <p class="label pd-meta">2026<span class="sep"> · </span>Designer and full-stack developer</p>
+              <p class="label pd-meta">Next.js<span class="sep"> · </span>TypeScript<span class="sep"> · </span>Tailwind<span class="sep"> · </span>Vitest</p>
+              <a class="btn primary pd-go" href="https://debt-ledger-puce.vercel.app/" target="_blank" rel="noopener">Visit the live site<span class="vh"> (opens in a new tab)</span></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. About (stops.css, stops.js). The portrait in the painted frame on columns 1-4; the words on 6-12. -->
+  <section class="stop about" id="about" aria-labelledby="about-h">
+    <div class="wrap ab" id="about-mount">
+      <figure class="ab-portrait" data-enter>
+        <span class="ab-face"><img src="/work/lana-portrait.webp" width="1136" height="1200" alt="Lana Huertas" loading="lazy" decoding="async"></span>
+        <img class="ab-frame" src="art/frame.webp" width="760" height="997" alt="" loading="lazy" decoding="async">
+      </figure>
+      <div class="ab-text">
+        <header class="head" data-enter>
+          <p class="label"><span class="moon" data-phase="0.84"></span>About</p>
+          <h2 class="h2 wear" id="about-h">About Lana</h2>
+        </header>
+        <p class="ab-statement">I build visual content and adaptable designs for brands that want to stand out, and I can do it for you, too.</p>
+        <ol class="ab-roles">
+          <li class="open">
+            <h3><button type="button" aria-expanded="true" aria-controls="ab-r1" id="ab-b1"><span class="ab-role">UI/UX design intern</span><span class="label ab-when">Aug 2026 to now</span><span class="ab-chev" aria-hidden="true"></span></button></h3>
+            <div class="ab-detail" id="ab-r1" role="region" aria-labelledby="ab-b1"><p>Eden Holdings Philippines, Makati. Wireframes, flows, Figma prototypes and the design system.</p></div>
+          </li>
+          <li>
+            <h3><button type="button" aria-expanded="false" aria-controls="ab-r2" id="ab-b2"><span class="ab-role">Freelance graphic designer and video editor</span><span class="label ab-when">2023 to 2026</span><span class="ab-chev" aria-hidden="true"></span></button></h3>
+            <div class="ab-detail" id="ab-r2" role="region" aria-labelledby="ab-b2"><p>Brand assets, marketing material and edits for clients in several industries.</p></div>
+          </li>
+          <li>
+            <h3><button type="button" aria-expanded="false" aria-controls="ab-r3" id="ab-b3"><span class="ab-role">Creatives committee head</span><span class="label ab-when">2023 to 2025</span><span class="ab-chev" aria-hidden="true"></span></button></h3>
+            <div class="ab-detail" id="ab-r3" role="region" aria-labelledby="ab-b3"><p>Student council and ACM chapter, FEU Tech. Led two creative teams and every campaign.</p></div>
+          </li>
+          <li>
+            <h3><button type="button" aria-expanded="false" aria-controls="ab-r4" id="ab-b4"><span class="ab-role">Multimedia team editor</span><span class="label ab-when">2020 to 2025</span><span class="ab-chev" aria-hidden="true"></span></button></h3>
+            <div class="ab-detail" id="ab-r4" role="region" aria-labelledby="ab-b4"><p>Lord Jesus Fellowship Church, Bataan. Weekly video and graphics.</p></div>
+          </li>
+        </ol>
+        <p class="label ab-line"><span class="vh">Awards: </span>1st runner-up, GCash ImaGnation 2026<span class="sep"> · </span>Elite Scholar, FEU Tech<span class="sep"> · </span>DOST scholar</p>
+        <p class="label ab-line"><span class="vh">Education: </span>B.S. Computer Science, FEU Institute of Technology, 2027</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Contact at first light (stops.css, stops.js). The head sits on the letter, the one card surface. -->
+  <section class="stop talk" id="talk" aria-labelledby="talk-h">
+    <div class="tk-dawn" aria-hidden="true">
+      <img src="../almanac/art/s_dawn-sm.webp" width="960" height="540" alt="" loading="lazy" decoding="async">
+    </div>
+    <img class="tk-balloon" src="art/balloon.webp" width="477" height="666" alt="" loading="lazy" decoding="async">
+    <div class="wrap" id="talk-mount">
+      <div class="letter on-card" data-enter>
+        <header class="head">
+          <p class="label"><span class="moon" data-phase="1"></span>Contact</p>
+          <h2 class="h2 wear" id="talk-h">Let's talk</h2>
+          <p class="lead">Hiring for UI/UX, brand or motion work, or need publicity for your org? Write to me. I reply within two days.</p>
+        </header>
+        <div class="tk-acts">
+          <a class="btn primary" href="mailto:lanadenisehuertas@gmail.com">Email Lana</a>
+          <button class="btn secondary tk-copy" type="button" data-copy="lanadenisehuertas@gmail.com"><span class="tk-copy-a">Copy the address</span><span class="tk-copy-b" aria-hidden="true">Copied</span></button>
+          <p class="vh" role="status" aria-live="polite" id="tk-said"></p>
+        </div>
+        <p class="tk-links">
+          <a href="https://www.linkedin.com/in/lana-denise-huertas/" target="_blank" rel="noopener">LinkedIn<span class="vh"> (opens in a new tab)</span></a>
+          <a href="https://github.com/lanadenisehuertas/" target="_blank" rel="noopener">GitHub<span class="vh"> (opens in a new tab)</span></a>
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Made in Manila by Lana Huertas, 2026</p>
+  <a href="../almanac/system.html">The design system behind this page</a>
+</footer>
+
+<script src="data.js"></script>
+<script src="v3.js"></script>
+<script src="gate.js"></script>
+<script src="brands.js"></script>
+<script src="stops.js"></script>
+</body>
+</html>

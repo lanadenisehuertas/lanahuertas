@@ -12,8 +12,8 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
-import type { Tone } from "@/lib/palettes";
 import { pad } from "./tone";
+import { Heading } from "../current/Ornaments";
 
 export type SlideInfo = {
   /** Anchor id in stack mode (e.g. /design#neostalgia). */
@@ -22,9 +22,15 @@ export type SlideInfo = {
   name: string;
   /** Shorter name for the project index, when the full one is long. */
   short?: string;
-  tone: Tone;
-  /** Wash colour "r g b", or none for slides on the site's own sky. */
-  wash?: string;
+};
+
+export type SpreadTitle = { lead: string; accent: string; n?: string; script?: string; spec?: string; world?: string };
+
+/** What stands above the projects: the chapter's facts, a line about it, and the way to (or back from) the archive. */
+export type SpreadHead = {
+  meta?: string;
+  lede?: ReactNode;
+  link?: { href: string; label: string };
 };
 
 type SlideState = {
@@ -44,14 +50,13 @@ export const useSlide = () => useContext(SlideCtx);
 const reduced = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /**
- * The spread: one project per screen. In "carousel" mode (homepage) the
- * slides sit side by side in a native scroll-snap track, so they swipe and
- * scroll before JS; once mounted, the track adds a project index along the
- * top, back/next edge zones with a cursor label, mouse drag and ←/→ while the
- * section is on screen. Off-screen slides are inert. In "stack" mode (the
- * /design, /videos and /ui-ux pages) the same slides run down the page.
- *
- * The section's `data-tone` follows the slide on screen, for the nav.
+ * The spread: one project at a time, words beside the art. In "carousel" mode
+ * (homepage) the slides sit side by side in a native scroll-snap track, so
+ * they swipe and scroll before JS; once mounted, the track adds a project
+ * index, back and next buttons, mouse drag and arrow keys while the section
+ * is on screen. Off-screen slides are inert. In "stack" mode (the /design,
+ * /videos and /ui-ux pages) the same slides run down the page under a page
+ * heading.
  */
 /**
  * A slow, eased glide between slides (the browser's own smooth scroll is short
@@ -92,15 +97,17 @@ export default function Spread({
   label,
   slides,
   mode = "carousel",
+  head = {},
   children,
 }: {
   id: string;
-  /** The small section name in the copy column ("Branding & pubmats"). */
-  title: ReactNode;
+  /** The chapter heading: its two halves, its catalogue number and the script word behind it. */
+  title: SpreadTitle;
   /** Accessible name for the carousel ("Brands"). */
   label: string;
   slides: SlideInfo[];
   mode?: "carousel" | "stack";
+  head?: SpreadHead;
   children: ReactNode;
 }) {
   const kids = Children.toArray(children);
@@ -108,34 +115,30 @@ export default function Spread({
 
   if (mode === "stack") {
     return (
-      <div id={id} className="sp sp--stack">
-        {kids.map((kid, i) => {
-          const s = slides[i];
-          return (
-            <div
-              key={s.key}
-              id={s.key}
-              data-tone={s.tone}
-              className="sp-cell"
-              style={s.wash ? ({ "--head": `rgb(${s.wash})` } as CSSProperties) : undefined}
-            >
-              {i === 0 ? (
-                <h1 className="sp-name">{title}</h1>
-              ) : (
-                <p className="sp-name" aria-hidden>
-                  {title}
-                </p>
-              )}
+      <>
+        <header className="page-head">
+          {head.link && (
+            <a href={head.link.href} className="link page-back">
+              <span aria-hidden>←</span> {head.link.label}
+            </a>
+          )}
+          {head.meta && <p className="t-meta">{head.meta}</p>}
+          <Heading as="h1" lead={title.lead} accent={title.accent} n={title.n} script={title.script} />
+          {head.lede && <p className="t-lede">{head.lede}</p>}
+        </header>
+        <div id={id} className="sp sp--stack">
+          {kids.map((kid, i) => (
+            <div key={slides[i].key} id={slides[i].key} className="sp-cell">
               <SlideCtx.Provider value={{ active: true, near: i < 2, heading: "h2" }}>{kid}</SlideCtx.Provider>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      </>
     );
   }
 
   return (
-    <Carousel id={id} title={title} label={label} slides={slides} count={count}>
+    <Carousel id={id} title={title} label={label} slides={slides} count={count} head={head}>
       {kids}
     </Carousel>
   );
@@ -147,25 +150,25 @@ function Carousel({
   label,
   slides,
   count,
+  head,
   children,
 }: {
   id: string;
-  title: ReactNode;
+  title: SpreadTitle;
   label: string;
   slides: SlideInfo[];
   count: number;
+  head: SpreadHead;
   children: ReactNode[];
 }) {
   const section = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const index = useRef<HTMLDivElement>(null);
-  const cursor = useRef<HTMLDivElement>(null);
   const drag = useRef<{ x: number; left: number; moved: number; id: number } | null>(null);
   const swallowClick = useRef(false);
   const [active, setActive] = useState(0);
   const [ready, setReady] = useState(false);
   const [inReach, setInReach] = useState(false);
-  const [edge, setEdge] = useState<-1 | 1 | null>(null);
 
   const wrap = useCallback((i: number) => ((i % count) + count) % count, [count]);
 
@@ -205,8 +208,8 @@ function Carousel({
       const pos = el.scrollLeft / (el.clientWidth || 1);
       setActive(Math.min(count - 1, Math.max(0, Math.round(pos))));
       // Each slide's offset from the middle (0 = in place, ±1 = a slide away)
-      // drives the layered swipe in showcase.css: art, words and backdrop
-      // travel at different speeds and tilt as they pass.
+      // drives the move between slides in work.css: the words and the art
+      // part and fade.
       for (const c of el.children) {
         const cell = c as HTMLElement;
         const o = Math.max(-1.5, Math.min(1.5, Number(cell.dataset.i) - pos)),
@@ -217,23 +220,21 @@ function Carousel({
         cell.style.setProperty("--o", v);
       }
     };
-    // data-moving is on only while the track moves: the melt masks in
-    // showcase.css apply then, and slides at rest carry none
-    let still = 0;
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(read);
-      if (!still) el.setAttribute("data-moving", "");
-      clearTimeout(still);
-      still = window.setTimeout(() => {
-        still = 0;
-        el.removeAttribute("data-moving");
-      }, 180);
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     read();
     // Keep the slide in place when the window resizes.
     let last = Math.round(el.scrollLeft / (el.clientWidth || 1));
-    const ro = new ResizeObserver(() => el.scrollTo({ left: last * el.clientWidth, behavior: "auto" }));
+    // only a change of width: the track's height follows the slide on phones,
+    // and reacting to that would pull a swipe back to the slide it left
+    let width = el.clientWidth;
+    const ro = new ResizeObserver(() => {
+      if (el.clientWidth === width) return;
+      width = el.clientWidth;
+      el.scrollTo({ left: last * width, behavior: "auto" });
+    });
     const keep = () => (last = Math.round(el.scrollLeft / (el.clientWidth || 1)));
     el.addEventListener("scrollend", keep);
     ro.observe(el);
@@ -242,7 +243,6 @@ function Carousel({
       el.removeEventListener("scrollend", keep);
       ro.disconnect();
       cancelAnimationFrame(frame);
-      clearTimeout(still);
     };
   }, [count]);
 
@@ -279,11 +279,18 @@ function Carousel({
     if (!el) return;
     const fit = () => {
       const cell = el.children[active] as HTMLElement | undefined;
-      el.style.height = window.innerWidth < 768 && cell ? `${cell.offsetHeight}px` : "";
+      el.style.height = window.innerWidth < 900 && cell ? `${cell.offsetHeight}px` : "";
     };
     fit();
     window.addEventListener("resize", fit);
-    return () => window.removeEventListener("resize", fit);
+    // a slide can grow after it is shown (an image loads, a device tab changes)
+    const cell = el.children[active];
+    const ro = new ResizeObserver(fit);
+    if (cell) ro.observe(cell);
+    return () => {
+      window.removeEventListener("resize", fit);
+      ro.disconnect();
+    };
   }, [active]);
 
   // Keep the current name in view in the index.
@@ -298,7 +305,7 @@ function Carousel({
   /* Mouse drag on the art. Touch and trackpads scroll the track natively. */
   const onDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (e.pointerType !== "mouse" || e.button !== 0) return;
-    if ((e.target as HTMLElement).closest("a, iframe, input, .sp-strip, .dev-screen, .dev-tabs, [data-nodrag]")) return;
+    if ((e.target as HTMLElement).closest("a, iframe, input, .sp-strip, .dev-screen, .dev-tabs, .dev-phone-tabs, [data-nodrag]")) return;
     drag.current = { x: e.clientX, left: e.currentTarget.scrollLeft, moved: 0, id: e.pointerId };
   };
   const onMove = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -322,38 +329,32 @@ function Carousel({
     el.classList.remove("is-drag");
     if (el.hasPointerCapture(d.id)) el.releasePointerCapture(d.id);
     swallowClick.current = true;
+    // a drag that ends with no click (released off the track) must not eat the next real one
+    window.setTimeout(() => (swallowClick.current = false), 0);
     const base = Math.round(d.left / el.clientWidth);
     const dx = e.clientX - d.x;
     goTo(Math.abs(dx) > 60 ? base + (dx < 0 ? 1 : -1) : base);
   };
 
-  /* The edge label follows the pointer; no React render per move. */
-  const follow = (dir: -1 | 1) => (e: ReactPointerEvent<HTMLDivElement>) => {
-    const box = section.current?.getBoundingClientRect();
-    const lab = cursor.current;
-    if (!box || !lab) return;
-    if (edge !== dir) setEdge(dir);
-    const x = e.clientX - box.left;
-    const y = e.clientY - box.top - 20;
-    lab.style.transform = `translate3d(${dir > 0 ? x - lab.offsetWidth - 14 : x + 14}px, ${y}px, 0)`;
-  };
-
   const cur = slides[active] ?? slides[0];
   const short = (s: SlideInfo) => s.short ?? s.name;
-  const target = edge ? slides[wrap(active + edge)] : null;
 
   return (
-    <section
-      ref={section}
-      id={id}
-      data-tone={cur.tone}
-      aria-labelledby={`${id}-name`}
-      className="sp sp--carousel"
-      style={{ "--head": cur.wash ? `rgb(${cur.wash})` : "transparent" } as CSSProperties}
-    >
-      <h2 id={`${id}-name`} data-rv="mist" className="sp-name">
-        {title}
-      </h2>
+    <section ref={section} id={id} data-scene={id} aria-labelledby={`${id}-name`} className="sp sp--carousel">
+      <header className="sec-head sp-head">
+        <div data-rv>
+          {head.meta && <p className="t-meta">{head.meta}</p>}
+          <Heading id={`${id}-name`} lead={title.lead} accent={title.accent} n={title.n} script={title.script} />
+        </div>
+        <div className="sec-note" data-rv style={{ "--d": "90ms" } as CSSProperties}>
+          {head.lede && <p className="t-lede">{head.lede}</p>}
+          {head.link && (
+            <a href={head.link.href} className="link">
+              {head.link.label}
+            </a>
+          )}
+        </div>
+      </header>
 
       <div className="sp-index">
         <div ref={index} className="sp-index-list" role="group" aria-label={`${label}: jump to`}>
@@ -376,6 +377,16 @@ function Carousel({
           {pad(active + 1)} / {pad(count)}
           <span className="sr-only">: {cur.name}</span>
         </span>
+        {count > 1 && (
+          <div className="sp-arrows">
+            <button type="button" className="sp-arrow" aria-label={`Previous: ${slides[wrap(active - 1)].name}`} onClick={() => step(-1)}>
+              <span aria-hidden>←</span>
+            </button>
+            <button type="button" className="sp-arrow" aria-label={`Next: ${slides[wrap(active + 1)].name}`} onClick={() => step(1)}>
+              <span aria-hidden>→</span>
+            </button>
+          </div>
+        )}
       </div>
 
       <div
@@ -410,7 +421,7 @@ function Carousel({
             role="group"
             aria-roledescription="slide"
             aria-label={`${i + 1} of ${count}: ${slides[i].name}`}
-            className={`sp-cell sp-${slides[i].tone}`}
+            className="sp-cell"
           >
             <SlideCtx.Provider
               value={{
@@ -424,34 +435,6 @@ function Carousel({
           </div>
         ))}
       </div>
-
-      {count > 1 && (
-        <>
-          {([-1, 1] as const).map((dir) => (
-            <div
-              key={dir}
-              aria-hidden
-              className={`sp-edge ${dir < 0 ? "sp-edge--l" : "sp-edge--r"}`}
-              onPointerMove={follow(dir)}
-              onPointerLeave={() => setEdge(null)}
-              onClick={() => step(dir)}
-            />
-          ))}
-          <div ref={cursor} aria-hidden className="sp-cursor" data-on={edge ? "" : undefined}>
-            {target && edge === 1 && (
-              <>
-                <small>next</small>
-                {short(target)} →
-              </>
-            )}
-            {target && edge === -1 && (
-              <>
-                <small>back</small>← {short(target)}
-              </>
-            )}
-          </div>
-        </>
-      )}
     </section>
   );
 }

@@ -1,0 +1,25 @@
+/* Prototype: every brand on one page (brands-proto.js). Built on brand.css. */
+/* the backdrops of all ten lie stacked; the brand being read shows its own, crossing over as the scroll changes brand */
+.b-world .backdrop { opacity: 0; transition: opacity 700ms linear; }
+.b-world .backdrop.on { opacity: 1; }
+.quiet .b-world .backdrop { transition: none; }
+body { transition: background-color 500ms linear; }
+
+/* the names of all ten at the top, a line of links to jump to any one of them */
+.b-index { width: calc(100 * var(--u)); margin: 0 auto; padding: calc(var(--band) + 6 * var(--u)) calc(10 * var(--u)) calc(2 * var(--u)); }
+.b-index-h { margin: 0 0 calc(2 * var(--u)); font: 400 clamp(40px, calc(5 * var(--u)), 76px) / 1 var(--display); color: var(--ink); }
+.b-index ul { display: flex; flex-wrap: wrap; gap: 6px calc(2.2 * var(--u)); margin: 0; padding: 0; list-style: none; }
+.b-index a { display: inline-block; padding: 10px 0; font: italic 400 clamp(19px, calc(1.6 * var(--u)), 24px) / 1.1 "Redaction", Georgia, serif; color: var(--mark); text-decoration: none; transition: transform 160ms var(--enter); }
+.b-index a:hover { transform: translateY(-3px); text-decoration: underline; text-underline-offset: 6px; }
+.b-one { scroll-margin-top: calc(var(--band) - 2 * var(--u)); }
+/* one brand runs into the next without a full screen of nothing between them */
+main > .b-stop.b-more { min-height: 0; }
+main .b-one > .b-stop { min-height: 0; }
+.b-end .b-text { display: flex; flex-wrap: wrap; gap: calc(3 * var(--u)); }
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .b-index { width: 100%; padding: calc(var(--band) + 24px) 16px 8px; }
+  .b-index-h { font-size: 40px; }
+  .b-index ul { gap: 0 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .b-world .backdrop, body, .b-index a { transition: none; } }
+.issue span { display: none; }

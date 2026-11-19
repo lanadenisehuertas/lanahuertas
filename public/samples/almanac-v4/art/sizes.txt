@@ -1,0 +1,7 @@
+art/table.webp 1288x476
+art/packets.webp 560x362
+art/easel.webp 560x1090
+art/phone.webp 460x906
+art/letter.webp 560x467
+../almanac-v3/art/lantern.webp 760x691
+../almanac-v3/art/frame.webp 760x997

@@ -6,11 +6,11 @@
  * panel; your own shelf; the tab bar with its order toggle; the wall; the foot.
  */
 .mh {
-  --mh-ink: #fdf3e1;
-  --mh-soft: rgb(253 243 225 / 0.78);
-  --mh-line: rgb(253 243 225 / 0.14);
-  --mh-pink: #ffcfe0;
-  --mh-gold: #ffd98a;
+  --mh-ink: #f5f2fa;
+  --mh-soft: #c8c3d7;
+  --mh-line: rgb(245 242 250 / 0.16);
+  --mh-pink: #ee8be4;
+  --mh-gold: #80dcf1;
   --mh-max: 1200px;
   position: relative;
   isolation: isolate;
@@ -18,7 +18,7 @@
   padding: 128px clamp(16px, 4vw, 56px) 0;
   overflow-x: clip;
   color: var(--mh-ink);
-  background: linear-gradient(180deg, #1f2468 0%, #2b3290 30%, #353a9e 62%, #4a3f9e 100%);
+  background: transparent;
 }
 .mh-sky {
   position: absolute;
@@ -41,7 +41,7 @@
 }
 .mh-head, .mh-off, .mh-yours, .mh-bar, .mh-panel, .mh-footin { max-width: var(--mh-max); margin-inline: auto; }
 
-.mh-k { margin: 0 0 10px; font: 500 12px/1.4 var(--font-pixel); letter-spacing: 0.18em; text-transform: uppercase; color: var(--mh-pink); }
+.mh-k { margin: 0 0 10px; font: 500 14px/1.4 var(--font-pixel);   color: var(--mh-pink); }
 .mh-h2 { margin: 0; font: italic 400 clamp(28px, 2.6vw, 36px)/1.05 var(--font-display); }
 
 /* 1. intro beside the ways in */
@@ -52,7 +52,7 @@
 .mh-stats { display: flex; flex-wrap: wrap; gap: 0; margin: 30px 0 0; padding: 0; }
 .mh-stats div { display: flex; flex-direction: column-reverse; gap: 4px; min-width: 96px; padding: 2px 22px 2px 0; margin-right: 22px; border-right: 1px solid var(--mh-line); }
 .mh-stats div:last-child { border-right: 0; margin-right: 0; }
-.mh-stats dt { font: 500 11px/1.3 var(--font-pixel); letter-spacing: 0.14em; text-transform: uppercase; color: var(--mh-soft); }
+.mh-stats dt { font: 500 14px/1.3 var(--font-pixel); letter-spacing: 0.14em;  color: var(--mh-soft); }
 .mh-stats dd { margin: 0; font: 400 clamp(34px, 3.2vw, 44px)/1 var(--font-display); font-variant-numeric: tabular-nums; }
 
 /* 2. three ways to make one */
@@ -113,10 +113,10 @@
 .mh-tabs button[aria-selected="true"]::after { transform: scaleX(1); }
 .mh-tabs button:hover { color: var(--mh-ink); }
 .mh-tabs button:focus-visible { outline: 2px dashed var(--mh-pink); outline-offset: 2px; }
-.mh-n { display: inline-block; min-width: 24px; margin-left: 6px; padding: 2px 7px; border-radius: 999px; background: rgb(253 243 225 / 0.1); font: 500 11px/1.4 var(--font-pixel); color: var(--mh-pink); text-align: center; vertical-align: 2px; }
+.mh-n { display: inline-block; min-width: 24px; margin-left: 6px; padding: 2px 7px; border-radius: 999px; background: rgb(253 243 225 / 0.1); font: 500 14px/1.4 var(--font-pixel); color: var(--mh-pink); text-align: center; vertical-align: 2px; }
 .mh-tabs button[aria-selected="true"] .mh-n { background: var(--mh-pink); color: #2a1650; }
 .mh-sort { display: flex; flex: none; gap: 2px; margin-bottom: 9px; padding: 3px; border-radius: 999px; background: rgb(20 18 70 / 0.4); box-shadow: inset 0 0 0 1px var(--mh-line); }
-.mh-sort button { min-height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: none; color: var(--mh-soft); font: 500 12px var(--font-pixel); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.mh-sort button { min-height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: none; color: var(--mh-soft); font: 500 14px var(--font-pixel); letter-spacing: 0.08em;  cursor: pointer; transition: background 0.2s, color 0.2s; }
 .mh-sort button[aria-pressed="true"] { background: var(--mh-ink); color: #2a1650; }
 .mh-sort button:not([aria-pressed="true"]):hover { color: var(--mh-ink); }
 .mh-sort button:focus-visible { outline: 2px dashed var(--mh-pink); outline-offset: 2px; }
@@ -130,7 +130,7 @@
 .mh-mat { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: zoom-in; }
 .mh-matimg { position: relative; display: block; overflow: hidden; border-radius: 6px; background: rgb(253 243 225 / 0.08); box-shadow: 0 0 0 1px rgb(253 243 225 / 0.1), 0 22px 40px -22px rgb(8 6 40 / 0.8); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s; }
 .mh-matimg img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.mh-open { position: absolute; right: 10px; bottom: 10px; padding: 6px 12px; border-radius: 999px; background: rgb(253 243 225 / 0.92); color: #2a1650; font: 500 11px/1.4 var(--font-pixel); letter-spacing: 0.1em; text-transform: uppercase; opacity: 0; translate: 0 6px; transition: opacity 0.2s, translate 0.2s ease-out; }
+.mh-open { position: absolute; right: 10px; bottom: 10px; padding: 6px 12px; border-radius: 999px; background: rgb(253 243 225 / 0.92); color: #2a1650; font: 500 14px/1.4 var(--font-pixel);   opacity: 0; translate: 0 6px; transition: opacity 0.2s, translate 0.2s ease-out; }
 .mh-mat:hover .mh-matimg, .mh-mat:focus-visible .mh-matimg { transform: translateY(-3px); box-shadow: 0 0 0 1px rgb(255 207 224 / 0.5), 0 28px 44px -22px rgb(8 6 40 / 0.85); }
 .mh-mat:hover .mh-open, .mh-mat:focus-visible .mh-open { opacity: 1; translate: 0 0; }
 .mh-mat:focus-visible { outline: none; }
@@ -146,7 +146,7 @@
 @keyframes mh-shine { to { background-position: -150% 0; } }
 
 /* status: waiting (gold), in the gallery (quiet) */
-.mh-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 3px 10px; border-radius: 999px; background: var(--mh-gold); color: #2a1650; font: 500 11px/1.4 var(--font-pixel); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.mh-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 3px 10px; border-radius: 999px; background: var(--mh-gold); color: #2a1650; font: 500 14px/1.4 var(--font-pixel); letter-spacing: 0.06em;  white-space: nowrap; }
 .mh-badge::before { content: ""; width: 5px; height: 5px; background: currentColor; }
 .mh-badge--ok { background: rgb(253 243 225 / 0.1); color: var(--mh-soft); box-shadow: inset 0 0 0 1px var(--mh-line); }
 .mh-badge--on { position: absolute; left: 10px; top: 10px; margin: 0; box-shadow: 0 6px 14px -6px rgb(10 8 50 / 0.6); }
@@ -157,7 +157,7 @@
 .mh-song[data-focus] { border-color: var(--mh-gold); box-shadow: 0 0 0 2px rgb(255 217 138 / 0.4), 0 22px 44px -30px rgb(10 8 50 / 0.8); }
 .mh-sky-mini { display: block; width: 100%; height: auto; border-radius: 10px; background: radial-gradient(120% 90% at 50% 0%, rgb(201 184 255 / 0.12), transparent 70%), linear-gradient(180deg, rgb(20 18 70 / 0.6), rgb(42 40 128 / 0.35)); box-shadow: inset 0 0 0 1px rgb(253 243 225 / 0.08); }
 .mh-stitle { margin: 0; font: italic 400 24px/1.15 var(--font-display); }
-.mh-smeta { margin: 6px 0 0; font: 500 12px/1.4 var(--font-pixel); letter-spacing: 0.06em; text-transform: uppercase; color: var(--mh-pink); }
+.mh-smeta { margin: 6px 0 0; font: 500 14px/1.4 var(--font-pixel); letter-spacing: 0.06em;  color: var(--mh-pink); }
 .mh-snote { margin: 10px 0 0; font-size: 15px; line-height: 1.5; color: rgb(253 243 225 / 0.9); overflow-wrap: anywhere; }
 .mh-sacts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--mh-line); }
 .mh-slink { min-height: 44px; display: inline-flex; align-items: center; gap: 5px; padding: 0; border: 0; background: none; color: var(--mh-ink); font: 500 15px var(--font-body); cursor: pointer; }
@@ -171,7 +171,7 @@
 .mh-fpx { position: relative; z-index: 1; flex: none; display: block; margin-bottom: 8px; }
 .mh-fpx svg { display: block; width: 100%; height: 100%; }
 .mh-fname { margin: 0; font: italic 400 22px/1.15 var(--font-display); }
-.mh-fmeta { margin: 4px 0 0; font: 500 11px/1.4 var(--font-pixel); letter-spacing: 0.08em; text-transform: uppercase; color: var(--mh-pink); }
+.mh-fmeta { margin: 4px 0 0; font: 500 14px/1.4 var(--font-pixel); letter-spacing: 0.08em;  color: var(--mh-pink); }
 .mh-fnote { margin: 8px 0 0; font-size: 15px; line-height: 1.5; color: rgb(253 243 225 / 0.9); overflow-wrap: anywhere; }
 
 /* nothing yet */
@@ -202,7 +202,7 @@ dialog.mh-box::backdrop { background: rgb(14 10 44 / 0.72); }
 .mh-bnote { margin: 14px 0 0; font-size: 16px; line-height: 1.5; color: rgb(253 243 225 / 0.92); overflow-wrap: anywhere; }
 .mh-bacts { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgb(253 243 225 / 0.14); }
 .mh-bacts a.btn { text-decoration: none; }
-.mh-fine { margin: 14px 0 0; font-size: 13px; line-height: 1.5; color: rgb(253 243 225 / 0.7); }
+.mh-fine { margin: 14px 0 0; font-size: 14px; line-height: 1.5; color: rgb(253 243 225 / 0.7); }
 
 .mh-toast { position: fixed; left: 50%; bottom: 24px; z-index: 90; margin: 0; padding: 10px 18px; transform: translateX(-50%); border-radius: 999px; background: #fdf3e1; color: #1b0730; font-size: 14px; font-weight: 500; box-shadow: 0 10px 24px -10px rgb(10 8 50 / 0.7); }
 
@@ -225,7 +225,7 @@ dialog.mh-box::backdrop { background: rgb(14 10 44 / 0.72); }
   .mh-mats li { margin-bottom: 18px; }
   .mh-skel li { height: 200px; }
   .mh-cap b { font-size: 17px; }
-  .mh-cap span { font-size: 13px; }
+  .mh-cap span { font-size: 14px; }
   .mh-open { display: none; }
   .mh-songs { grid-template-columns: 1fr; }
   .mh-flowers { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }

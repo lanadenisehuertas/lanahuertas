@@ -1,0 +1,241 @@
+/* Rooms II, III and IV. Each is a board of 100u x 62.5u like the first screen, with the moth and the lily in the
+   corners and the words in the left column (reel.css .pk-text). Posters and films are pinned on the night; products
+   is a reel of the apps' own worlds. The scroll drives every room (rooms.js). No boxes and no outlines. */
+
+.stop.room { overflow: visible; }
+
+/* posters and films are pinned stops: tall, with a stage that sticks to the window while the scroll plays them */
+main > .stop.pinned { display: block; padding: 0; min-height: 0; }
+
+/* ---------- II Posters: the line ---------- */
+.po { --ph: calc(43 * var(--u)); --glow: #b9a2ff; position: relative; width: calc(100 * var(--u)); height: calc(62.5 * var(--u)); }
+.po > * { position: absolute; }
+/* a soft light of the poster in the middle, in its own colour, never a box */
+.po-glow { left: calc(27 * var(--u)); top: calc(2 * var(--u)); width: calc(60 * var(--u)); height: calc(60 * var(--u)); pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--glow) 26%, transparent), transparent); }
+/* the window the line is drawn through: from the words' right edge to the right edge of the screen */
+.po-win { left: calc(31 * var(--u)); right: calc(50% - 50vw); top: 0; bottom: 0; overflow: hidden; z-index: 1; }
+.po-win::before { content: ""; position: absolute; z-index: 3; left: 0; top: 0; bottom: 0; width: calc(5 * var(--u)); pointer-events: none; background: linear-gradient(90deg, #000, transparent); }
+.po-focus { position: absolute; left: calc(26 * var(--u)); top: 0; width: 0; height: 0; }
+.po-track { position: absolute; left: 0; top: calc(8.4 * var(--u)); display: flex; align-items: flex-start; gap: calc(7 * var(--u)); will-change: transform; }
+.po-line { position: absolute; top: 0; z-index: 2; overflow: visible; pointer-events: none; }
+.po-line path { fill: none; stroke: var(--rule); stroke-width: 2; stroke-dasharray: 2 7; vector-effect: non-scaling-stroke; }
+/* each poster hangs from a clothespin at its top edge, and swings about it */
+.po-hang { position: relative; flex: none; padding-top: calc(3.4 * var(--u)); transform-origin: 50% calc(1.2 * var(--u)); cursor: pointer; }
+/* the poster in the middle opens large; another one is drawn to the middle */
+.po-hang[aria-current="true"] { cursor: zoom-in; }
+.po-pin { position: absolute; z-index: 3; left: 50%; top: 0; width: calc(1.5 * var(--u)); min-width: 10px; height: auto; translate: -50% 0; pointer-events: none; }
+/* asleep, a poster is drawn in a dimmer lilac than the doors: at this size full lilac would shout over the one awake */
+.po-sheet { --ink: #7f6bcf; display: block; height: var(--ph); width: auto; box-shadow: 0 calc(1.4 * var(--u)) calc(3 * var(--u)) rgb(0 0 0 / 0.55); transition: translate 180ms var(--pop); }
+.po-hang:hover .po-sheet, .po-hang.on .po-sheet { translate: 0 -4px; }
+.po-hang:focus-visible { outline: none; }
+/* the posters either side of the one on show sleep further back, so their flat silhouettes read as shapes on the
+   line and not as holes in the page; pointing at one brings it forward */
+.po-hang:not([aria-current="true"]) .po-sheet { opacity: 0.42; transition: opacity 200ms linear; }
+.po-hang:not([aria-current="true"]):is(:hover, .on, :focus-visible) .po-sheet { opacity: 1; }
+.quiet .po-hang .po-sheet { opacity: 1; }
+.po-hang:focus-visible .po-sheet { outline: 2px solid var(--mark); outline-offset: 6px; }
+.po-text { left: calc(10 * var(--u)); top: calc(20 * var(--u)); width: calc(19 * var(--u)); z-index: 2; }
+/* The poster's words are grouped by space instead of one even gap. Who it was for sits tight under the title, the
+   description stands a little apart from them, and the action and the counter each keep their own distance below. */
+#posters .pk-text { gap: 0; }
+#posters .po-m { margin-top: 6px; }
+#posters .po-d { margin-top: 20px; }
+#posters #po-big { margin-top: 28px; }
+#posters .steps { margin-top: 16px; }
+
+/* ---------- III Films: the monitor and the timeline ---------- */
+.fr { position: relative; width: calc(100 * var(--u)); height: calc(62.5 * var(--u)); }
+.fr > * { position: absolute; }
+.fr-text { left: calc(10 * var(--u)); top: calc(8 * var(--u)); width: calc(22 * var(--u)); }
+.fr-text .go svg { width: 14px; height: 14px; }
+.fr-mon { left: calc(36 * var(--u)); top: calc(6.4 * var(--u)); width: calc(54 * var(--u)); display: grid; gap: calc(0.8 * var(--u)); }
+/* the monitor: every film's frame in one cell; the current one shows, the next dissolves in at the cut */
+.fr-screen { position: relative; aspect-ratio: 16 / 9; display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); overflow: hidden; background: #000;
+  box-shadow: 0 0 calc(7 * var(--u)) calc(0.8 * var(--u)) rgb(255 241 201 / 0.09); }
+.fr-frame { grid-area: 1 / 1; display: block; width: 100%; height: 100%; visibility: hidden; transform-origin: 50% 45%;
+  -webkit-mask-repeat: repeat; mask-repeat: repeat; }
+.fr-frame img { width: 100%; height: 100%; object-fit: cover; }
+/* the timecode counts with the scroll; each digit keeps its own width so the line never jitters */
+.fr-tc { display: flex; justify-content: end; align-items: baseline; gap: 12px; font: 400 16px/1 var(--lab); color: var(--text); }
+.fr-tc .tc { font: 400 clamp(22px, calc(2 * var(--u)), 30px) / 1 "Redaction", Georgia, serif; color: var(--mark); font-variant-numeric: tabular-nums; min-width: 9.6ch; text-align: right; }
+.fr-tl { left: calc(10 * var(--u)); right: calc(10 * var(--u)); top: calc(42 * var(--u)); display: grid; grid-template-columns: calc(3 * var(--u)) minmax(0, 1fr); column-gap: calc(0.8 * var(--u)); }
+.tl-g, .lanes { display: grid; grid-template-rows: calc(2.4 * var(--u)) calc(6.4 * var(--u)) calc(3.2 * var(--u)); row-gap: calc(0.6 * var(--u)); }
+.tl-g { align-items: center; font: 400 16px/1 var(--lab); color: var(--ink); }
+.lanes { position: relative; min-width: 0; }
+.ruler { position: relative; border-bottom: 2px dotted var(--rule); }
+.ruler i { position: absolute; bottom: 0; width: 1px; height: calc(0.6 * var(--u)); background: var(--rule); }
+.ruler i.big { width: 2px; height: calc(1.2 * var(--u)); background: var(--ink); }
+.ruler b { position: absolute; top: 0; font: 400 16px/1 var(--lab); color: var(--ink); translate: -50% 0; white-space: nowrap; }
+.ruler b.start { translate: 0 0; }
+.ruler b.end { translate: -100% 0; }
+.track { display: flex; gap: 2px; min-width: 0; }
+.clip { position: relative; flex: 1 1 0; min-width: 44px; height: 100%; text-align: left; }
+.clip-pic { --ink: #7f6bcf; width: 100%; height: 100%; }   /* asleep, the clips step back behind the monitor */
+/* a long clip carries its name, on a fall of night at its foot so it reads over the frame */
+.clip .c-t { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 8px 6px; font: 400 16px/1 var(--lab); color: var(--mark); white-space: nowrap; overflow: hidden;
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.86) 45%, #000); text-shadow: 0 1px 2px #000; opacity: 0; pointer-events: none; }
+.clip.named .c-t { opacity: 1; }
+.clip:hover .clip-pic, .clip.on .clip-pic { translate: 0 -3px; }
+.clip-pic { transition: translate 160ms var(--pop); }
+.wave { display: block; width: 100%; height: 100%; }
+.wave path { fill: var(--ink); opacity: 0.85; }
+/* the playhead: a line in the mark colour with a flag on the ruler, moved by the scroll */
+.playhead { position: absolute; left: 0; top: -6px; bottom: -4px; width: 2px; background: var(--mark); pointer-events: none; z-index: 3; will-change: transform; }
+.playhead::before { content: ""; position: absolute; top: 0; left: -6px; width: 14px; height: 14px; background: var(--mark); clip-path: polygon(0 0, 100% 0, 100% 55%, 50% 100%, 0 55%); }
+
+/* ---------- IV Products: a reel (reel.js); the app's own interface leads each plate ---------- */
+main > .stop.products { --a-ink: #b9a2ff; }
+.app .pk-text { top: calc(8 * var(--u)); }
+.a-role { font-size: 16px; line-height: 1.5; color: var(--text); }
+/* The words are grouped by space, as under the posters: the year sits tight under the name, the line about the app
+   and what I did follow a little apart, and the two links and the counter keep their own distance below. */
+#products .pk-text { gap: 0; }
+#products .pk-meta { margin-top: 6px; }
+#products .pk-tag { margin-top: 16px; }
+#products .say { margin-top: 10px; }
+#products .a-role { margin-top: 12px; }
+#products .steps { margin-top: 14px; }
+/* The case study is the way in, so it comes first in the mark colour; the live app sits beside it, a step quieter in
+   the text colour, and wraps under it when the column is too narrow for both. Each keeps a reach of 44px. */
+.acts { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 26px; margin-top: 24px; }
+.acts .go { margin-top: 0; }
+.acts .live { font-size: 18px; color: var(--text); }
+.acts .live svg { width: 15px; height: 15px; }
+.a-film img { display: block; width: 100%; height: auto; box-shadow: 0 calc(1.6 * var(--u)) calc(4 * var(--u)) rgb(0 0 0 / 0.6); }
+.a-film figcaption { position: absolute; left: 0; top: calc(100% + 4px); }
+.a-pause { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font: 400 16px/1 var(--lab); color: var(--text); }
+.a-pause:hover { color: var(--mark); }
+.a-pause svg { width: 14px; height: 14px; }
+.a-pause path { fill: currentColor; stroke: currentColor; stroke-width: 1.6; }
+/* Per shape, the film fills the room to the right of the words, so the interface reads close to its own size. A wide
+   desktop app runs nearly to the right edge at the board's middle height, a game window takes most of the room, and a
+   phone stands nearly the full height of the board with its pause control beside its foot. */
+.wide .a-film { left: calc(35 * var(--u)); top: calc(17 * var(--u)); width: calc(61 * var(--u)); }
+.wide .a-film img { border-radius: calc(0.6 * var(--u)); }
+.desk .a-film { left: calc(35 * var(--u)); top: calc(8.4 * var(--u)); width: calc(55 * var(--u)); }
+.desk .a-film img { image-rendering: pixelated; border-radius: calc(0.4 * var(--u)); }
+.phone .a-film { left: calc(49 * var(--u)); top: calc(5.4 * var(--u)); }
+.phone .a-film img { width: auto; height: calc(51 * var(--u)); border-radius: calc(2.8 * var(--u)); }
+.phone .a-film figcaption { left: calc(100% + 1.6 * var(--u)); top: auto; bottom: 0; white-space: nowrap; }
+/* the app's own screens, in full colour beside the film (rooms.js). For a wide or desktop app they ride in one strip
+   under the film that the scroll carries to the left, from the film's edge out past the window's edge, so every screen
+   passes in view without a click; for a phone app they stand in two columns that drift against each other. An app's
+   landing page, where there is a recording of it, leads the strip at a larger size. Each screen lifts a little under
+   the pointer and opens large in the viewer. */
+.a-shots { overflow: clip; padding-bottom: calc(3 * var(--u)); pointer-events: none; }
+.a-track { list-style: none; margin: 0; padding: 0; display: flex; align-items: flex-start; gap: calc(1.6 * var(--u)); width: max-content;
+  translate: calc(var(--p, 0) * var(--travel, 0px) * -1) 0; will-change: translate; }
+.a-track li { flex: none; width: calc(22 * var(--u)); pointer-events: auto; }
+.a-shot { display: block; width: 100%; padding: 0; border-radius: calc(0.4 * var(--u)); overflow: hidden; cursor: zoom-in;
+  box-shadow: 0 calc(0.8 * var(--u)) calc(2.4 * var(--u)) rgb(0 0 0 / 0.55); transition: translate 160ms var(--pop); }
+.a-shot img { display: block; width: 100%; height: auto; }
+.a-shot:hover { translate: 0 -4px; }
+.a-shot:focus-visible { outline: 2px solid var(--mark); outline-offset: 4px; }
+.a-track .a-land { width: calc(32 * var(--u)); }
+.a-land figure { margin: 0; }
+.a-land video { display: block; width: 100%; height: auto; border-radius: calc(0.6 * var(--u)); box-shadow: 0 calc(0.8 * var(--u)) calc(2.4 * var(--u)) rgb(0 0 0 / 0.55); }
+.a-land figcaption { margin-top: 8px; font-size: 16px; line-height: 1.3; color: var(--text); }
+/* from the film's left edge to the window's right edge (the board is 100u wide and centred) */
+.wide .a-film { top: calc(10 * var(--u)); }
+.wide .a-shots { left: calc(35 * var(--u)); top: calc(33 * var(--u)); width: calc((100vw + 100 * var(--u)) / 2 - 35 * var(--u)); }
+.desk .a-film { width: calc(52 * var(--u)); }
+.desk .a-shots { left: calc(35 * var(--u)); top: calc(44.6 * var(--u)); width: calc((100vw + 100 * var(--u)) / 2 - 35 * var(--u)); }
+.desk .a-track li { width: calc(16 * var(--u)); }
+.phone .a-shots { left: calc(75 * var(--u)); top: calc(8 * var(--u)); width: calc(23 * var(--u)); overflow: visible; padding: 0; }
+.phone .a-track { display: grid; grid-template-columns: repeat(2, calc(10 * var(--u))); width: auto; translate: none; will-change: auto; }
+.phone .a-track li { width: auto; }
+.phone .a-track li:nth-child(odd) { translate: 0 calc((0.5 - var(--p, 0)) * 6 * var(--u)); }
+.phone .a-track li:nth-child(even) { translate: 0 calc((var(--p, 0) - 0.5) * 6 * var(--u) + 5 * var(--u)); }
+.phone .a-track:has(li:only-child) { grid-template-columns: calc(11 * var(--u)); }
+.phone .a-shot { border-radius: calc(1.2 * var(--u)); }
+.quiet .a-shot { transition: none; }
+
+/* the working pieces */
+.a-try { display: grid; gap: 12px; align-content: start; color: var(--text); }
+.a-try .label { color: var(--a-ink); }
+.t-read { font-size: 16px; line-height: 1.5; color: var(--text); max-width: 56ch; }
+.a-try input[type="text"] { width: 100%; min-height: 48px; padding: 0 2px; font: 400 20px/1.2 var(--body); color: var(--mark); background: none; border: 0;
+  background-image: linear-gradient(var(--rule), var(--rule)); background-size: 100% 1px; background-position: 0 100%; background-repeat: no-repeat; }
+.a-try input[type="text"]:focus-visible { outline: none; background-image: linear-gradient(var(--mark), var(--mark)); }
+.a-try input::placeholder { color: color-mix(in srgb, var(--text) 55%, transparent); }
+.psy-bars { display: flex; align-items: end; gap: 3px; height: 56px; }
+.psy-bars i { width: 6px; height: 100%; background: var(--a-ink); transform-origin: 50% 100%; transform: scaleY(max(0.06, var(--h))); }
+.psy-bars i.p { background: #ffc78a; }
+.bl-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.bl-grid button { aspect-ratio: 1; min-width: 28px; border-radius: 50%; background: color-mix(in srgb, var(--a-ink) 10%, transparent); font: 400 16px/1 var(--body); color: var(--text); transition: transform 200ms var(--pop); }
+.bl-grid button:hover { transform: scale(1.06); color: var(--mark); }
+.bl-grid button[aria-pressed="true"] { background: #f0a6c0; color: #3a0f26; }
+.al-hp { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px; font: 400 16px/1 var(--lab); color: var(--a-ink); }
+.al-hp b { display: block; height: 8px; background: color-mix(in srgb, var(--a-ink) 22%, transparent); }
+.al-hp i { display: block; height: 100%; background: var(--a-ink); transform-origin: 0 50%; transition: transform 300ms var(--enter); }
+.al-q { font: 400 clamp(24px, calc(2.4 * var(--u)), 34px) / 1.1 "Redaction", Georgia, serif; color: var(--mark); }
+.al-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.al-opts button:not(.go) { min-width: 56px; min-height: 48px; padding: 0 14px; border-radius: 24px; background: color-mix(in srgb, var(--a-ink) 12%, transparent); font: 400 22px/1 "Redaction", Georgia, serif; color: var(--text); transition: transform 200ms var(--pop); }
+.al-opts button:not(.go):hover { transform: translateY(-3px); color: var(--mark); }
+.al-opts button:disabled { opacity: 0.35; }
+.dl-keep { font-size: 16px; color: var(--text); }
+.a-try input[type="range"] { width: 100%; height: 44px; accent-color: var(--a-ink); }
+.a-try output { color: var(--mark); }
+.dl-debts { list-style: none; display: grid; gap: 14px; }
+.dl-debts li { display: grid; gap: 6px; font-size: 16px; }
+.dl-debts b { display: block; height: 8px; background: color-mix(in srgb, var(--a-ink) 22%, transparent); }
+.dl-debts i { display: block; height: 100%; background: var(--a-ink); transform-origin: 0 50%; transition: transform 200ms var(--enter); }
+.dl-debts em { font: italic 400 18px/1.2 "Redaction", Georgia, serif; color: var(--mark); }
+
+.quiet .po-sheet, .quiet .clip-pic { transition: none; }
+
+/* ---------- phones and upright tablets ---------- */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  /* posters: the line across the top of the window, the words under it */
+  .po { --ph: min(50svh, 96vw); width: 100%; height: 100svh; }
+  .po-sheet { height: min(var(--ph), calc((100vw - 40px) / var(--ar, 1))); }
+  .po-win { left: 0; right: 0; top: calc(var(--band) + 4px); bottom: auto; height: calc(var(--ph) + 13vw + 24px); }
+  .po-win::before { display: none; }
+  .po-focus { left: 50%; }
+  .po-track { top: 4px; gap: 8vw; }
+  .po-hang { padding-top: 11vw; transform-origin: 50% 4vw; }
+  .po-pin { width: 4.6vw; }
+  .po-glow { left: 0; right: 0; width: auto; top: var(--band); height: 70svh; }
+  .po-text { left: 16px; right: 16px; width: auto; top: calc(var(--band) + var(--ph) + 13vw + 36px); }
+  .po-text .pk-name { font-size: 28px; }
+  /* films: the monitor on top, the words under it, the timeline at the foot */
+  .fr { width: 100%; height: 100svh; }
+  .fr-mon { left: 16px; right: 16px; width: auto; top: calc(var(--band) + 12px); }
+  .fr-text { left: 16px; right: 16px; width: auto; top: calc(var(--band) + 12px + (100vw - 32px) * 0.5625 + 54px); }
+  .fr-text .pk-name { font-size: 28px; }
+  /* the timeline stands clear of the next-room link at the foot of the screen */
+  .fr-tl { left: 16px; right: 16px; top: auto; bottom: 68px; grid-template-columns: minmax(0, 1fr); }
+  .tl-g { display: none; }
+  .tl-g, .lanes { grid-template-rows: 22px 52px 22px; row-gap: 6px; }
+  .clip { min-width: 24px; }
+  .clip .c-t { display: none; }
+
+  /* products: the four apps one under another, no sticking */
+  main > .stop.products { height: auto !important; }
+  .products .stage { position: relative; height: auto; overflow: visible; display: block; }
+  .products .reel-plate { position: relative; inset: auto; opacity: 1; visibility: visible; }
+  .products .r-board { height: auto; padding-bottom: 40px; }
+  .products .r-glow { display: none; }
+  .r-board.app > * { position: relative; left: auto; top: auto; right: auto; width: auto; }
+  /* The interface comes first and large. A wide or desktop film runs edge to edge; the wide one is cut to the left of
+     its frame, where the typing happens, so it is tall enough to read. A phone film stands nearly the width of the
+     screen. */
+  .r-board.app .a-film { order: -1; justify-self: stretch; }
+  /* the film sits inside the page's margins with its corners kept, so it reads as a screen, not as the page running off the edge */
+  .r-board.app:is(.wide, .desk) .a-film img { border-radius: 10px; }
+  /* the wide films are shown whole: a crop would cut the app card in the recording in half */
+  .r-board.app.phone .a-film { justify-self: center; }
+  .a-film figcaption { position: static; }
+  .phone .a-film img { height: auto; width: min(80vw, 340px); border-radius: 28px; }
+  /* the screens follow the film as a strip that the scroll carries sideways as the plate passes up the screen */
+  .r-board.app .a-shots { order: -1; overflow: clip; padding-bottom: 8px; }
+  .r-board.app .a-track { display: flex; gap: 10px; width: max-content; translate: calc(var(--p, 0) * var(--travel, 0px) * -1) 0; will-change: translate; }
+  .r-board.app .a-track li { width: min(62vw, 420px); translate: none; }
+  .r-board.app.phone .a-track li { width: min(34vw, 200px); }
+  .r-board.app .a-track .a-land { width: min(80vw, 520px); }
+  .a-shot { border-radius: 10px; }
+  .phone .a-shot { border-radius: 18px; }
+  .app .pk-text .say { display: block; }
+  .acts { gap: 0 24px; }
+}

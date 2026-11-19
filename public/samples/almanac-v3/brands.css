@@ -1,0 +1,118 @@
+/* Stop 2, the brand corridor. Ten rooms, each one composed sheet in its brand's colours.
+
+   Composition of a room at 1440 x 900 (12 columns, 64px margins, 24px gutters):
+   - the key visual is the focal point: up to 68% of the room's height, centred
+     between the route bar (bottom at 72) and the controls (top at 824);
+   - tall and square key visuals take columns 1-6 (right edge on the column line),
+     the words take columns 8-12; wide key visuals take columns 1-7, words 9-12;
+     every other room mirrors this, words on columns 1-5 (or 1-4);
+   - the words share one left edge: label, name, tagline, brief, roles, strip;
+   - controls sit at the bottom centre of the stage, 24px from the edge. */
+
+.brands { --len: 5.5; --ctl-zone: 76px; }
+/* pinned: the corridor rises over the last quarter screen of the gate, while the garden sinks,
+   so there is no empty screen of sky between the gate and the first room */
+.brands.pinned { margin-top: -25svh; }
+
+/* the head travels inside the first room's words; until brands.js runs it sits top left */
+.b-head { position: absolute; z-index: 2; top: calc(var(--bar-zone) + var(--s4)); left: var(--margin); color: var(--cream); }
+.r-text .b-head { position: static; margin-bottom: var(--s4); }
+.b-total { color: var(--mist); }
+
+/* the rooms fade into the night sky at the top and bottom of the stage */
+.b-mount {
+  position: absolute; inset: 0;
+  -webkit-mask-image: linear-gradient(transparent 0, #000 var(--s6), #000 calc(100% - var(--s5)), rgb(0 0 0 / 0.6) 100%);
+  mask-image: linear-gradient(transparent 0, #000 var(--s6), #000 calc(100% - var(--s5)), rgb(0 0 0 / 0.6) 100%);
+}
+.b-track { display: flex; height: 100%; }
+.brands.pinned .b-track { transform: translate3d(calc(var(--room, 0) * -100%), 0, 0); transition: transform 720ms var(--move); }
+.b-track.now { transition: none !important; }
+
+/* ---------- a room ---------- */
+.room { position: relative; flex: 0 0 100%; height: 100%; overflow: hidden; color: var(--mist); }
+.r-ground { position: absolute; inset: 0; }
+.r-ground img { width: 100%; height: 100%; object-fit: cover; }
+.r-ground::after { content: ""; position: absolute; inset: 0; background: var(--tint); opacity: var(--a); }
+
+.r-grid {
+  --kh: min(60svh, 100svh - 252px); /* the key visual's height cap */
+  position: relative; height: 100%;
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter);
+  align-items: center;
+  padding: var(--bar-zone) max(var(--margin), (100% - 1312px) / 2) var(--ctl-zone);
+}
+
+/* the key visual: its shape decides its columns, its frame keeps its own proportions */
+.r-kv { grid-row: 1; grid-column: 1 / span 6; justify-self: end; width: min(100%, var(--kh) * var(--r)); }
+.r-key { width: 100%; }
+.r-key .frame { aspect-ratio: var(--r); }
+.r-text { grid-row: 1; grid-column: 8 / span 5; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.room.flip .r-kv { grid-column: 7 / span 6; justify-self: start; }
+.room.flip .r-text { grid-column: 1 / span 5; }
+/* a wide key visual is capped lower so it carries about the same weight as a tall one */
+.room[data-shape="wide"] .r-kv { grid-column: 1 / span 7; width: min(100%, var(--kh) * 0.8 * var(--r), 46vw); }
+.room[data-shape="wide"] .r-text { grid-column: 9 / span 4; }
+.room.flip[data-shape="wide"] .r-kv { grid-column: 6 / span 7; }
+.room.flip[data-shape="wide"] .r-text { grid-column: 1 / span 4; }
+
+/* the words: always cream or mist on the room's tint */
+.room .label { color: var(--mist); }
+.r-name { margin-top: var(--s2); color: var(--cream); text-wrap: balance; }
+.r-tag { margin-top: var(--s1); font: italic 400 22px/1.3 var(--display); color: var(--mist); text-wrap: balance; }
+.r-brief { margin-top: var(--s3); color: var(--mist); text-wrap: pretty; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.r-meta { margin-top: var(--s2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; }
+
+/* the strip: palette dots, then three thumbnails and +N */
+.r-strip { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); margin-top: var(--s4); }
+.r-dots { display: flex; }
+.r-dot { display: grid; place-items: center; width: 32px; height: 44px; border-radius: var(--r-pill); }
+.r-dot i { width: 24px; height: 24px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1.5px rgb(255 241 201 / 0.6); transition: transform var(--fast) var(--enter); }
+.r-dot:hover i { transform: translateY(-2px); }
+.r-dot:active i { transform: scale(0.92); }
+.r-dot:focus-visible { outline-offset: 0; }
+.r-thumbs { display: flex; gap: var(--s1); }
+.r-thumb, .r-more { width: 48px; height: 48px; }
+.r-thumb .frame { width: 100%; height: 100%; box-shadow: none; }
+.r-more { display: grid; place-items: center; border-radius: var(--r-img); background: rgb(255 241 201 / 0.12); box-shadow: inset 0 0 0 1px rgb(255 241 201 / 0.3); color: var(--cream); font: 500 var(--fs-label)/1 var(--mono); }
+.r-more:hover { background: rgb(255 241 201 / 0.2); }
+.r-copied { position: absolute; left: 0; bottom: calc(100% + 10px); max-width: none; font: 500 var(--fs-label)/20px var(--mono); color: var(--cream); white-space: nowrap; pointer-events: none; }
+
+/* ---------- controls: one row at the bottom centre of the stage ---------- */
+.b-ctl { position: absolute; z-index: 5; left: 50%; bottom: var(--s3); translate: -50% 0; display: flex; align-items: center; gap: var(--s2); }
+.b-count { display: flex; justify-content: center; align-items: baseline; gap: var(--s1); width: 260px; max-width: none; color: var(--cream); white-space: nowrap; }
+.b-count .label { flex: none; color: var(--mist); }
+.b-count b { font-weight: 600; font-size: 16px; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---------- strip mode: phone, quiet mode, reduced motion ---------- */
+.brands.strip { height: auto; }
+.brands.strip > .stage { position: relative; height: 100svh; min-height: 560px; }
+.brands.strip .b-track { overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+.brands.strip .b-track::-webkit-scrollbar { display: none; }
+.brands.strip .room { scroll-snap-align: start; scroll-snap-stop: always; }
+
+/* ---------- smaller screens ---------- */
+@media (max-width: 1100px) {
+  .r-tag { font-size: 20px; }
+}
+@media (max-width: 860px) {
+  .brands { --ctl-zone: 92px; }
+  .b-mount {
+    -webkit-mask-image: linear-gradient(transparent 0, #000 var(--s5), #000 calc(100% - var(--s4)), rgb(0 0 0 / 0.6) 100%);
+    mask-image: linear-gradient(transparent 0, #000 var(--s5), #000 calc(100% - var(--s4)), rgb(0 0 0 / 0.6) 100%);
+  }
+  .r-grid {
+    --kh: min(46svh, 100svh - 470px);
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    padding: calc(var(--bar-zone) + var(--s3)) var(--margin) var(--ctl-zone);
+  }
+  .r-kv, .room.flip .r-kv, .room[data-shape="wide"] .r-kv { width: min(100%, var(--kh) * var(--r)); }
+  .r-text { width: 100%; margin-top: var(--s3); }
+  .r-text .b-head { margin-bottom: var(--s2); }
+  .r-name { margin-top: var(--s1); }
+  .r-tag { font-size: 18px; }
+  .r-brief, .r-meta { display: none; }
+  .r-strip { margin-top: var(--s3); gap: var(--s1) var(--s2); }
+  .b-count { width: auto; flex: 1; min-width: 0; }
+  .b-ctl { left: var(--margin); right: var(--margin); translate: none; justify-content: space-between; }
+}

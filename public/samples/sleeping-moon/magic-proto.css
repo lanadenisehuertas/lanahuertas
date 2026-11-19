@@ -1,0 +1,164 @@
+/* Prototype: the magic layer. A loading veil, a livelier first screen, a sky that moves, sparkles under the pointer,
+   words that ripple when pointed at, and the star chart: every work one click away, so nobody has to scroll past
+   thirty-six things to reach the one they want. Nothing here changes the pages underneath; quiet mode and reduced
+   motion switch all of it off. */
+
+/* ---------- the veil: shown while the first screen's pictures and type arrive ---------- */
+@keyframes veil-failsafe { to { opacity: 0; visibility: hidden; } }
+.veil { animation: veil-failsafe 300ms linear 12s forwards; }
+.veil { position: fixed; inset: 0; z-index: 95; display: grid; place-content: center; justify-items: center; gap: calc(2.4 * var(--u)); background: #000; color: #b9a2ff; }
+/* the moon's place is held before its picture is drawn, so the word under it never moves */
+.veil-moon { width: max(96px, calc(9 * var(--u))); height: max(96px, calc(9 * var(--u))); }
+.veil-moon svg { width: max(96px, calc(9 * var(--u))); height: max(96px, calc(9 * var(--u))); shape-rendering: crispEdges; }
+.veil-moon .d { fill: none; stroke: #b9a2ff; stroke-width: 0.6; stroke-dasharray: 0.6 1.2; }
+.veil-moon .l { fill: #b9a2ff; }
+.veil-word { margin: 0; font-size: clamp(24px, calc(2.6 * var(--u)), 40px); line-height: 1; letter-spacing: 0.01em; white-space: nowrap; }
+.veil-word span { opacity: 0.35; }
+.veil-word span.lit { opacity: 1; color: #fff1c9; font-family: var(--display-awake); }
+.veil.out { animation: wipe-out 260ms steps(1) both; pointer-events: none; }
+.loading body { overflow: hidden; }
+.quiet .veil.out { animation: none; opacity: 0; }
+
+/* ---------- the first screen: the title is cast letter by letter once the veil lifts; a mote shows the way down ---------- */
+.loading .pl-title .ch, .loading .pl-line { opacity: 0; }
+.pl-title.cast .ch { animation: cast 520ms var(--rise) calc(var(--i) * 38ms) both; }
+.pl-line.cast { animation: cast 520ms var(--rise) 640ms both; }
+@keyframes cast { from { opacity: 0; transform: translate3d(0, 0.35em, 0); } to { opacity: 1; transform: none; } }
+.pl-title .ch { display: inline-block; }
+.pl-cue { display: block; width: 3px; height: calc(7 * var(--u)); margin: calc(2.2 * var(--u)) auto 0; background: linear-gradient(#b9a2ff 50%, transparent 0) 0 0 / 3px 9px repeat-y; opacity: 0.7; }
+.pl-cue i { display: block; width: 3px; height: 3px; margin-left: 0; background: #fff1c9; box-shadow: -3px 0 #fff1c9, 3px 0 #fff1c9, 0 -3px #fff1c9, 0 3px #fff1c9; animation: cue 1800ms steps(9) infinite; }
+@keyframes cue { from { transform: translate3d(0, 0, 0); opacity: 1; } to { transform: translate3d(0, calc(7 * var(--u)), 0); opacity: 0; } }
+/* motes that lift off the horizon as the scroll raises the moon */
+.motes { position: absolute; left: 0; right: 0; top: 0; height: 0; pointer-events: none; }
+.motes i { position: absolute; top: 0; width: 3px; height: 3px; background: #fff1c9; opacity: 0; will-change: transform, opacity; }
+.motes i.b { box-shadow: -3px 0 #fff1c9, 3px 0 #fff1c9, 0 -3px #fff1c9, 0 3px #fff1c9; }
+
+/* ---------- the sky moves: stars twinkle, the field sways with the scroll and the pointer, a comet crosses as you scroll ---------- */
+.sky .field { will-change: transform; }
+.sky .field b:nth-child(4n), .stars i:nth-child(3n) { animation: tw 2600ms steps(2, jump-none) infinite; }
+.sky .field b:nth-child(4n + 2), .stars i:nth-child(3n + 1) { animation: tw 3700ms steps(2, jump-none) 900ms infinite; }
+.sky .field b:nth-child(8n + 1), .stars i:nth-child(6n + 2) { animation: tw 1900ms steps(2, jump-none) 400ms infinite; }
+@keyframes tw { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.2; } }
+.comet { position: absolute; left: 0; top: 0; width: 4px; height: 4px; background: #fff1c9; opacity: 0; will-change: transform, opacity;
+  box-shadow: 5px -3px 0 -0.5px #e9dcff, 10px -6px 0 -1px #b9a2ff, 16px -9px 0 -1px #b9a2ff, 23px -13px 0 -1.5px #8f7ad8, 31px -17px 0 -1.5px #6a58ad; }
+
+/* ---------- sparkles: small ones, where the pointer goes and on whatever it wakes ---------- */
+.spk-layer { position: fixed; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; }
+.spk { position: absolute; left: 0; top: 0; width: 3px; height: 3px; margin: -1px 0 0 -1px; background: currentColor; opacity: 0;
+  box-shadow: -3px 0 currentColor, 3px 0 currentColor, 0 -3px currentColor, 0 3px currentColor; }
+.spk.s { box-shadow: none; }
+.spk.fly { animation: spk 620ms steps(7) both; }
+@keyframes spk { 0% { opacity: 1; transform: translate3d(var(--x), var(--y), 0) scale(0.6); } 35% { opacity: 1; transform: translate3d(calc(var(--x) + var(--dx) * 0.5), calc(var(--y) + var(--dy) * 0.5), 0) scale(1.2); }
+  100% { opacity: 0; transform: translate3d(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy)), 0) scale(0.5); } }
+
+/* ---------- words that ripple when pointed at: each letter lifts and catches the light, left to right ---------- */
+.sw { white-space: pre; }
+.sl { display: inline-block; }
+:is(a, button):hover > .sw .sl, :is(a, button):focus-visible > .sw .sl { animation: sl 340ms var(--enter) calc(var(--i) * 20ms) both; }
+@keyframes sl { 0% { transform: none; } 40% { transform: translate3d(0, -0.2em, 0); color: var(--mark); } 100% { transform: none; } }
+/* headings the scroll writes: letters come up as the page arrives */
+.wtype .ch { opacity: 0.18; transition: opacity 160ms linear; }
+.wtype .ch.w { opacity: 1; }
+
+/* ---------- the star chart ---------- */
+.chart-btn, .nextstop { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 6px; border: 0; background: none; color: var(--ink); font: inherit; cursor: pointer; white-space: nowrap; }
+.chart-btn:hover, .nextstop:hover { color: var(--mark); }
+.chart-btn i { width: 3px; height: 3px; margin: 0 4px; background: currentColor; box-shadow: -3px 0 currentColor, 3px 0 currentColor, 0 -3px currentColor, 0 3px currentColor; }
+.chart-btn kbd { font: inherit; color: var(--text); }
+.foot { grid-template-columns: 1fr auto auto; column-gap: calc(2 * var(--u)); }
+.nextstop[hidden] { display: none; }
+.nextstop svg { width: 18px; height: 18px; } .nextstop svg path { fill: none; stroke: currentColor; stroke-width: 1.4; }
+.route .chart-link { display: none; }
+
+dialog.atlas { position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; border: 0; overflow: auto;
+  padding: calc(var(--band) + 2 * var(--u)) calc(6 * var(--u)) calc(5 * var(--u)); background: #05030f; color: #ece6ff;
+  --ink: #b9a2ff; --mark: #fff1c9; --text: #ece6ff; --rule: rgb(185 162 255 / 0.4); }
+dialog.atlas::backdrop { background: #05030f; }
+dialog.atlas[open] { animation: at-in 200ms linear both; }
+@keyframes at-in { from { opacity: 0; } to { opacity: 1; } }
+.atlas .stars { z-index: 0; }
+.at-top { position: relative; display: flex; align-items: baseline; gap: 6px 28px; flex-wrap: wrap; margin-bottom: calc(2.4 * var(--u)); }
+.at-top h2 { margin: 0; font: 400 clamp(34px, calc(4 * var(--u)), 60px) / 1 var(--display-awake); color: var(--ink); }
+.at-top p { margin: 0; flex: 1; font-size: 18px; }
+.at-map { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 calc(3 * var(--u)); align-items: start; }
+.at-room { display: inline-flex; align-items: baseline; gap: 10px; min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer; color: var(--ink); font: 400 clamp(24px, calc(2.2 * var(--u)), 34px) / 1 var(--display-awake); }
+.at-room i { font: 400 16px/1 var(--lab); font-style: normal; color: var(--text); }
+.at-room:hover, .at-room[aria-current="true"] { color: var(--mark); }
+.at-map ul { list-style: none; margin: 2px 0 calc(2 * var(--u)); padding: 0; background: radial-gradient(circle, var(--rule) 1px, transparent 1.5px) 6px 0 / 3px 9px repeat-y; }
+.at-w { position: relative; display: flex; align-items: center; gap: 14px; width: 100%; min-height: 44px; padding: 0 0 0 2px; border: 0; background: none; color: var(--text); font: 400 17px/1.25 var(--body); text-align: left; cursor: pointer; }
+.at-w > i { flex: none; width: 3px; height: 3px; margin: 0 4px; background: var(--c, #b9a2ff); box-shadow: -3px 0 var(--c, #b9a2ff), 3px 0 var(--c, #b9a2ff), 0 -3px var(--c, #b9a2ff), 0 3px var(--c, #b9a2ff); transition: transform 180ms var(--pop); }
+.at-w:hover, .at-w:focus-visible { color: var(--mark); }
+.at-w:hover > i, .at-w:focus-visible > i { transform: scale(1.8) rotate(45deg); }
+.at-peek { position: fixed; right: calc(6 * var(--u)); bottom: calc(4 * var(--u)); width: calc(20 * var(--u)); height: calc(17 * var(--u)); pointer-events: none; opacity: 0; transition: opacity 160ms linear; }
+.at-peek.on { opacity: 1; }
+.at-peek img { width: 100%; height: 100%; object-fit: contain; object-position: 100% 100%; }
+
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .chart-btn { display: none; }
+  .route .chart-link { display: inline-flex; }
+  .at-map { grid-template-columns: 1fr 1fr; gap: 0 16px; }
+  .at-top p { flex-basis: 100%; order: 3; }
+  dialog.atlas { padding: calc(var(--band) + 16px) 20px 40px; }
+  .at-peek { display: none; }
+  .pl-cue { height: 56px; }
+  .nextstop span.long { display: none; }
+  /* the foot is hidden on phones; only the way on comes back, low on the right, and only while there is one */
+  .foot { display: grid; grid-template-columns: 1fr auto; pointer-events: none; }
+  .foot > p { display: none; }
+  .foot .nextstop { grid-column: 2; pointer-events: auto; font: italic 400 19px/1 "Redaction", Georgia, serif; color: var(--mark); }
+  .foot:has(.nextstop[hidden]) { display: none; }
+}
+.quiet .sky .field b, .quiet .stars i, .quiet .pl-cue i { animation: none; }
+.quiet .spk-layer, .quiet .comet, .quiet .motes { display: none; }
+.quiet .wtype .ch { opacity: 1; }
+/* ---------- fit: the chrome never wraps, and nothing important sits under the bands ---------- */
+.issue, .tools, .tools > * { white-space: nowrap; }
+/* the nav already marks the room, so the masthead's own room label goes; "Manila, 2026" is said in the first frame and
+   at dawn, so the foot drops it once the moon is behind */
+.issue span { display: none; }
+.past .foot > p:not(.live) { visibility: hidden; }
+/* the top-left moth sits a little higher and smaller, clear of each room's title */
+.orn.o-tl { left: calc(2 * var(--u)); top: calc(5.6 * var(--u)); width: calc(5.6 * var(--u)); }
+/* the chrome sits above the rooms' own raised pieces (the packet holder, the product phone) */
+.chrome { z-index: 41; }
+/* narrower desktops: the stop's name beside the title goes, the route tightens */
+@media (max-width: 1180px) and (min-width: 761px) and (min-aspect-ratio: 1/1) {
+  .issue span { display: none; }
+  .route a { padding: 0 7px; }
+  .route .home { padding: 0 8px 0 2px; }
+}
+/* short landscape screens (a phone on its side): the route keeps its numerals; the names stay for screen readers */
+@media (max-height: 520px) and (min-width: 761px) and (min-aspect-ratio: 1/1) {
+  .sub { display: none; }
+  .route a { gap: 0; padding: 0 8px; font-size: 0; }
+  .route a i { font-size: 16px; }
+  .route .home { font-size: 16px; }
+  /* at the dawn ending the foot's line goes, so the letter and its maker have the whole height */
+  body:has(#talk.current) .foot { display: none; }
+}
+/* at the dawn ending the foot's fade would wash out the links under the letter */
+body:has(#talk.current) .foot::before { opacity: 0; }
+/* the masthead's shade reaches the very top and sides of the window, so nothing scrolling under it is ever seen cut in
+   half in the gap above it */
+.mast::before { inset: calc(-1 * var(--edge)) calc(-1 * var(--edge)) -70% calc(-1 * var(--edge)); background: linear-gradient(var(--ground) 60%, transparent); }
+/* phones: the foot holds only the skip link, so it needs no fade over the room's own controls */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .foot::before { inset: -26px 0 calc(-1 * var(--edge)) 0; background: linear-gradient(transparent, var(--ground) 60%); } }
+.clip .c-t { text-overflow: ellipsis; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sky .field b, .stars i, .pl-cue i, .pl-title.cast .ch, .pl-line.cast, dialog.atlas[open] { animation: none; }
+  .spk-layer, .comet, .motes { display: none; }
+  .wtype .ch { opacity: 1; }
+  :is(a, button):hover > .sw .sl, :is(a, button):focus-visible > .sw .sl { animation: none; }
+  .veil.out { animation: none; opacity: 0; }
+}
+/* the description under each poster, film and app (desc-proto.js): body size, a short measure */
+.pk-text .w-desc { max-width: 40ch; font-size: 17px; line-height: 1.5; color: var(--text); text-wrap: pretty; }
+/* wide screens: the poster's words start higher, so a longer description still ends above the foot */
+@media (min-width: 761px) and (min-aspect-ratio: 1/1) { .po-text { top: calc(9 * var(--u)); width: calc(21 * var(--u)); } }
+/* phones: the descriptions show here too (reel.css hides the brands' summary lines on phones), a little smaller; under
+   a poster there is room for three lines */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .pk-text .w-desc { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden; font-size: 16px; max-width: none; }
+  #posters .pk-text .w-desc { -webkit-line-clamp: 3; }
+}

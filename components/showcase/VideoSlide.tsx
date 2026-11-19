@@ -6,7 +6,6 @@ import { toEmbed } from "@/lib/video";
 import Pic from "./Pic";
 import { useSlide } from "./Spread";
 import SpreadCopy from "./SpreadCopy";
-import { pad } from "./tone";
 
 /**
  * One video, one screen, on the site's own sky: the video is the big frame —
@@ -18,7 +17,7 @@ export default function VideoSlide({ p, n, total }: { p: Project; n: number; tot
   const [on, setOn] = useState(false);
   const src = p.videoUrl ? toEmbed(p.videoUrl) : null;
   const playing = on && active && !!src;
-  const meta = [`${pad(n)} / ${pad(total)}`, p.year, p.duration].filter(Boolean).join(" · ");
+  const meta = [`${n} of ${total}`, p.year, p.duration].filter(Boolean).join(", ");
 
   return (
     <article className="sp-slide sp-slide--sky" aria-label={p.title}>
@@ -34,11 +33,11 @@ export default function VideoSlide({ p, n, total }: { p: Project; n: number; tot
           <>
             {src && (
               <button type="button" className="btn" onClick={() => setOn(true)} aria-pressed={playing}>
-                Play here <span aria-hidden>▶</span>
+                Load the player <span aria-hidden>▶</span>
               </button>
             )}
             {p.videoUrl && (
-              <a href={p.videoUrl} target="_blank" rel="noopener noreferrer" className="link sp-link">
+              <a href={p.videoUrl} target="_blank" rel="noopener noreferrer" className="link">
                 Open in Drive <span aria-hidden>↗</span>
               </a>
             )}

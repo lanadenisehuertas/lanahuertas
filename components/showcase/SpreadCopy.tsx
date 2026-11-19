@@ -31,7 +31,7 @@ export default function SpreadCopy({
   actions?: ReactNode;
 }) {
   return (
-    <div className="sp-copy">
+    <div className="sp-copy backing">
       <p className="sp-meta">{meta}</p>
       <Heading data-perch className={`sp-title ${title.length > 13 ? "sp-title--long" : ""}`}>
         {title}

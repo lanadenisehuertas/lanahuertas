@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand sheet 2: Night bloom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/Redaction-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="sheet.css">
+<style>
+/* NIGHT BLOOM. Liquid orchid light moves behind everything. In front of it,
+   objects of glass: a bud that opens into a bloom, a moon. The type is Lana's
+   own Redaction, the same as the live site, and its letters wear down through
+   the degraded cuts when you touch them. Glass panels, one glow, no grain. */
+@font-face { font-family: "Redaction"; src: url(fonts/Redaction-Regular.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "Redaction"; font-style: italic; src: url(fonts/Redaction-Italic.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "Redaction 10"; src: url(fonts/Redaction10-Regular.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "Redaction 35"; src: url(fonts/Redaction35-Regular.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "Redaction 70"; src: url(fonts/Redaction70-Regular.woff2) format("woff2"); font-display: swap; }
+:root {
+  --ground: #0e0626;
+  --panel: rgb(26 12 66 / 0.72);
+  --velvet: #2a0f6b;
+  --uv: #6a2cf0;
+  --orchid: #c04bff;
+  --petal: #f3d9ff;
+  --pearl: #fff6ec;
+  --text: #f3ecff;
+  --muted: #c9b8f2;
+  --line: rgb(243 217 255 / 0.2);
+  --accent: #c04bff;
+  --focus: #fff6ec;
+  --display: "Redaction", Georgia, serif;
+  --body: "Inter Tight", system-ui, sans-serif;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --pop: cubic-bezier(0.3, 1.45, 0.5, 1);
+}
+
+/* ---------- hero ---------- */
+.hero { display: grid; place-items: center; background: var(--ground); }
+.hero canvas.sky { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(70% 60% at 50% 52%, rgb(14 6 38 / 0.15), rgb(14 6 38 / 0.82) 100%); }
+.hero h1 { position: relative; z-index: 1; width: 100%; padding: 0 3vw; font: 400 clamp(64px, 15.2vw, 250px)/0.8 var(--display); letter-spacing: -0.035em; color: var(--pearl); text-align: center; }
+.hero h1 .l1 { display: block; }
+.hero h1 .l2 { display: block; margin-top: clamp(150px, 21vw, 330px); font-style: italic; }
+.morph i { font-style: inherit; }
+.hero h1 { transition: opacity 0.8s 0.3s; }
+.hero.open h1 { opacity: 0.4; }
+.obj { position: absolute; left: 50%; top: 50%; z-index: 2; pointer-events: none; }
+.bud { width: auto; height: clamp(220px, 38vh, 380px); translate: -50% -52%; transition: transform 0.9s var(--ease), opacity 0.5s; }
+.flower { width: clamp(300px, 46vw, 700px); translate: -50% -50%; transform: scale(0.25) rotate(-40deg); opacity: 0; transition: transform 1.6s var(--pop) 0.15s, opacity 0.5s 0.15s; }
+.open .bud { transform: scale(0.4) translateY(30%); opacity: 0; }
+.open .flower { transform: none; opacity: 1; }
+.gmoon { position: absolute; right: 5vw; top: 6vh; z-index: 0; width: clamp(70px, 8vw, 130px); animation: drift 9s ease-in-out infinite alternate; }
+@keyframes drift { from { transform: translateY(-8px) rotate(-6deg); } to { transform: translateY(10px) rotate(4deg); } }
+.hero .role { position: absolute; left: 3vw; bottom: 6vh; z-index: 3; max-width: 30ch; font-size: clamp(16px, 1.25vw, 19px); color: var(--muted); }
+.hero .role b { display: block; font: italic 400 1.6em/1 var(--display); color: var(--pearl); }
+
+/* the six parts burst from the heart of the bloom and land on a ring */
+.petals { position: absolute; left: 50%; top: 50%; z-index: 3; width: 0; height: 0; }
+.petals a { position: absolute; left: 0; top: 0; translate: -50% -50%; transform: rotate(var(--a)) translateY(0) rotate(calc(var(--a) * -1)) scale(0.2); opacity: 0; pointer-events: none; transition: transform 1.1s var(--pop), opacity 0.3s; transition-delay: calc(var(--i) * 60ms + 0.7s); }
+.open .petals a { transform: rotate(var(--a)) translateY(calc(var(--R) * -1)) rotate(calc(var(--a) * -1)); opacity: 1; pointer-events: auto; }
+.petals { --R: clamp(170px, 27vw, 400px); }
+
+/* the signature button: a neon pill with a glass bud at its end, which opens when you come near */
+.lode {
+  position: relative; display: inline-flex; align-items: center; gap: 14px;
+  height: 66px; padding: 0 12px 0 30px; border-radius: 999px;
+  background: linear-gradient(90deg, #5b22e0, #9a3ef0);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4), inset 0 -6px 14px rgb(14 6 38 / 0.35), 0 0 0 1px rgb(243 217 255 / 0.4), 0 0 34px rgb(192 75 255 / 0.55);
+  font: 600 17px var(--body); color: var(--pearl);
+  transition: transform 0.3s var(--ease), box-shadow 0.3s;
+}
+.lode .g { position: relative; width: 48px; height: 48px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgb(255 255 255 / 0.3), rgb(14 6 38 / 0.6)); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.3); }
+.lode .g img { position: absolute; left: 50%; top: 50%; translate: -50% -50%; transition: transform 0.5s var(--pop), opacity 0.3s; }
+.lode .g .b1 { height: 38px; }
+.lode .g .b2 { width: 54px; transform: scale(0.3) rotate(-30deg); opacity: 0; }
+.lode:hover, .lode:focus-visible { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), inset 0 -6px 14px rgb(14 6 38 / 0.3), 0 0 0 1px var(--pearl), 0 0 60px rgb(192 75 255 / 0.85); }
+.lode:hover .b1, .lode:focus-visible .b1 { transform: scale(0.4); opacity: 0; }
+.lode:hover .b2, .lode:focus-visible .b2 { transform: none; opacity: 1; }
+.lode:active { transform: scale(0.97); }
+.hero .lode { position: absolute; left: 50%; bottom: 11vh; z-index: 4; translate: -50% 0; }
+.hero.open .lode { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+
+/* ---------- glass UI kit ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap;
+  min-height: 50px; padding: 0 24px; border-radius: 999px;
+  background: linear-gradient(90deg, #5b22e0, #9a3ef0); color: var(--pearl);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 0 0 1px rgb(243 217 255 / 0.35);
+  font: 600 16px var(--body); text-decoration: none;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s;
+}
+.btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+.btn svg .k { fill: currentColor; stroke: none; }
+.btn:hover, .btn.is-hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), 0 0 0 1px var(--pearl), 0 0 36px rgb(192 75 255 / 0.75); }
+.btn:active, .btn.is-press { transform: scale(0.96); box-shadow: inset 0 3px 8px rgb(14 6 38 / 0.5), 0 0 0 1px rgb(243 217 255 / 0.35); }
+.btn.is-focus { outline: 3px solid var(--pearl); outline-offset: 4px; }
+.btn.glass { background: rgb(255 255 255 / 0.06); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), 0 0 0 1px var(--line); }
+.btn.glass:hover, .btn.glass.is-hover { background: rgb(255 255 255 / 0.12); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), 0 0 0 1px var(--petal), 0 0 30px rgb(192 75 255 / 0.4); }
+.btn.is-off { background: #2a1d55; color: #9d92c4; box-shadow: none; transform: none; cursor: not-allowed; }
+.btn.round { width: 50px; padding: 0; }
+.link { font-weight: 600; color: var(--petal); text-decoration: none; background: linear-gradient(90deg, var(--orchid), var(--petal)) 0 100% / 0 2px no-repeat; padding-bottom: 3px; transition: background-size 0.35s var(--ease); }
+.link:hover { background-size: 100% 2px; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.states { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 18px; }
+.states small { display: block; margin-top: 8px; font-size: 14px; color: var(--muted); text-align: center; }
+
+/* ---------- board ---------- */
+body { background: radial-gradient(90% 50% at 50% 0, #1d0b4f, var(--ground) 70%) var(--ground); }
+.board { --gap: 16px; }
+.panel { border-radius: 26px; background: var(--panel); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 0 0 1px var(--line); }
+.cap b { font: 400 2.1rem/1 var(--display); color: var(--pearl); letter-spacing: -0.01em; margin-bottom: 6px; }
+.idea p.big { font: 400 clamp(2.1rem, 3.6vw, 3.4rem)/1 var(--display); letter-spacing: -0.02em; color: var(--pearl); }
+.idea p.big i { color: var(--petal); }
+.idea ul { margin-top: 22px; display: grid; gap: 10px; list-style: none; }
+.idea li { padding-left: 22px; background: radial-gradient(circle, var(--orchid) 3px, transparent 4px) 0 0.45em / 10px 10px no-repeat; }
+
+.logo .lock { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; }
+.mark { position: relative; display: grid; place-items: center; width: var(--s); height: var(--s); border-radius: 50%; background: radial-gradient(circle at 40% 30%, #3b1890, #12062f 70%); box-shadow: inset 0 0 0 1px rgb(243 217 255 / 0.35), 0 0 calc(var(--s) * 0.3) rgb(192 75 255 / 0.35); }
+.mark img { height: 78%; }
+.logo .word { font: 400 clamp(2.6rem, 5vw, 4.8rem)/0.86 var(--display); letter-spacing: -0.03em; color: var(--pearl); }
+.logo .word small { display: block; margin-top: 12px; font: 400 16px var(--body); letter-spacing: 0; color: var(--muted); }
+.sizes { display: flex; align-items: center; gap: 22px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); }
+.sizes .light { padding: 12px; border-radius: 16px; background: var(--pearl); }
+
+.sw { border-radius: 18px; background: rgb(14 6 38 / 0.6); box-shadow: 0 0 0 1px var(--line); }
+.sw i { font-family: var(--display); }
+
+.type .spec { display: grid; gap: 16px; }
+.type .spec > div { display: grid; grid-template-columns: 160px 1fr; gap: 18px; align-items: baseline; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.type .spec span { font-size: 14px; color: var(--muted); }
+.t-dis { font: 400 clamp(3.4rem, 7vw, 6.4rem)/0.84 var(--display); letter-spacing: -0.03em; color: var(--pearl); }
+.t-ita { font: italic 400 clamp(2rem, 3.2vw, 3rem)/1 var(--display); color: var(--petal); }
+.t-body { font-size: 17px; max-width: 52ch; }
+
+.parts .grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 26px; }
+.nav { display: flex; align-items: center; gap: 22px; padding: 8px 8px 8px 10px; border-radius: 999px; background: rgb(14 6 38 / 0.7); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 0 0 1px var(--line); }
+.nav .mark { --s: 44px; }
+.nav a:not(.btn) { font-size: 16px; color: var(--text); text-decoration: none; }
+.nav a:not(.btn):hover { color: var(--petal); }
+.nav .btn { margin-left: auto; min-height: 44px; }
+.tabs { position: relative; display: inline-flex; padding: 5px; border-radius: 999px; background: rgb(14 6 38 / 0.7); box-shadow: 0 0 0 1px var(--line); }
+.tabs button { position: relative; z-index: 1; min-height: 42px; padding: 0 18px; border-radius: 999px; font-size: 16px; color: var(--muted); transition: color 0.3s; }
+.tabs button[aria-selected="true"] { color: var(--pearl); }
+.tabs .glow { position: absolute; top: 5px; bottom: 5px; left: 0; border-radius: 999px; background: linear-gradient(90deg, #5b22e0, #9a3ef0); box-shadow: 0 0 22px rgb(192 75 255 / 0.6); transition: transform 0.45s var(--pop), width 0.45s var(--pop); }
+.chip { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 14px 0 10px; border-radius: 999px; background: rgb(255 255 255 / 0.06); box-shadow: 0 0 0 1px var(--line); font-size: 15px; }
+.chip svg { width: 18px; height: 18px; fill: none; stroke: var(--petal); stroke-width: 1.6; }
+.chip svg .k { fill: var(--orchid); stroke: none; }
+.field label { display: block; margin-bottom: 8px; font-size: 15px; font-weight: 600; }
+.field input { width: 100%; min-height: 52px; padding: 0 18px; border: 0; border-radius: 16px; background: rgb(14 6 38 / 0.7); box-shadow: inset 0 0 0 1px var(--line); font-size: 17px; }
+.field input:focus { outline: none; box-shadow: inset 0 0 0 1.5px var(--petal), 0 0 26px rgb(192 75 255 / 0.45); }
+.field p { margin-top: 8px; font-size: 14px; color: var(--muted); }
+.ticker { margin-top: 24px; padding: 16px 0; border-radius: 999px; background: linear-gradient(90deg, rgb(91 34 224 / 0.35), rgb(154 62 240 / 0.35)); box-shadow: 0 0 0 1px var(--line); font: italic 400 1.6rem/1 var(--display); color: var(--pearl); }
+.ticker svg { width: 18px; height: 18px; fill: var(--orchid); }
+.stack { display: grid; gap: 18px; align-content: start; }
+
+.card { position: relative; display: block; color: inherit; text-decoration: none; transform-style: preserve-3d; transition: transform 0.4s var(--ease); }
+.card .ph { position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 20px; box-shadow: 0 0 0 1px var(--line), 0 30px 60px -30px rgb(0 0 0 / 0.9); transition: box-shadow 0.3s; }
+.card img { width: 100%; height: 100%; object-fit: cover; }
+.card:hover .ph { box-shadow: 0 0 0 1.5px var(--petal), 0 0 50px rgb(192 75 255 / 0.55); }
+.card b { display: block; margin-top: 14px; font: 400 1.7rem/1 var(--display); letter-spacing: -0.01em; }
+.card small { font-size: 15px; color: var(--muted); }
+
+.icons figure { border-radius: 18px; background: rgb(14 6 38 / 0.6); box-shadow: 0 0 0 1px var(--line); color: var(--muted); }
+.icons svg { fill: none; stroke: var(--petal); stroke-width: 1.4; filter: drop-shadow(0 0 6px rgb(192 75 255 / 0.8)); }
+.icons svg .k { fill: var(--orchid); stroke: none; }
+
+.garden .set { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 14px; }
+.garden figure { position: relative; display: grid; place-items: center; min-height: 300px; overflow: hidden; border-radius: 22px; background: radial-gradient(circle at 50% 60%, #2a0f6b, #0e0626 70%); box-shadow: 0 0 0 1px var(--line); }
+.garden figure img { max-height: 240px; width: auto; transition: transform 0.6s var(--pop); }
+.garden figure:hover img { transform: scale(1.08) rotate(-4deg); }
+.garden figcaption { position: absolute; left: 16px; bottom: 12px; font-size: 14px; color: var(--muted); }
+.garden .back { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
+.garden .back figure { min-height: 170px; background: #07031a; }
+.garden .back img { max-height: 130px; opacity: 0.9; }
+
+.opener .strip { position: relative; display: grid; grid-template-columns: auto 1fr auto; gap: clamp(16px, 3vw, 44px); align-items: center; padding: clamp(22px, 3vw, 44px); overflow: hidden; border-radius: 22px; isolation: isolate; }
+.opener canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.75; }
+.opener .bulb { position: relative; width: clamp(90px, 10vw, 150px); aspect-ratio: 1; }
+.opener .bulb img { position: absolute; left: 50%; top: 50%; translate: -50% -50%; transition: transform 1s var(--pop), opacity 0.4s; }
+.opener .bulb .b1 { height: 100%; }
+.opener .bulb .b2 { width: 150%; transform: scale(0.3); opacity: 0; }
+.opener.in .bulb .b1 { transform: scale(0.4); opacity: 0; transition-delay: 0.5s; }
+.opener.in .bulb .b2 { transform: none; opacity: 1; transition-delay: 0.6s; }
+.opener h3 { font: 400 clamp(3rem, 7.4vw, 7rem)/0.84 var(--display); letter-spacing: -0.035em; color: var(--pearl); }
+.opener h3 + p { margin-top: 10px; font: italic 400 1.6rem/1 var(--display); color: var(--petal); }
+
+@media (max-width: 900px) {
+  .hero h1 .l2 { margin-top: 62vw; }
+  .bud { height: 54vw; }
+  .flower { width: 92vw; }
+  .hero .role { display: none; }
+  .petals { --R: 40vw; }
+  .petals a { font-size: 14px; min-height: 40px; padding: 0 14px; }
+  .parts .grid, .opener .strip, .garden .set { grid-template-columns: 1fr; }
+  .garden .back { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .type .spec > div { grid-template-columns: 1fr; gap: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { .gmoon { animation: none; } }
+</style>
+</head>
+<body>
+<header class="hero" id="hero">
+  <canvas class="sky" aria-hidden="true"></canvas>
+  <img class="gmoon" src="art/g_moon.webp" alt="" width="495" height="530">
+  <h1 class="morph"><span class="l1">Lana Denise</span><span class="l2">Huertas</span></h1>
+  <img class="obj bud" src="art/g_bud.webp" alt="" width="420" height="801">
+  <img class="obj flower" src="art/g_bloom.webp" alt="" width="868" height="700">
+  <nav class="petals" aria-label="Sections"></nav>
+  <p class="role"><b>A night garden.</b>UI/UX and visual design by Lana, in Manila. Open the bloom to go in.</p>
+  <button class="lode" type="button" id="open" data-moment>Open the bloom<span class="g" aria-hidden="true"><img class="b1" src="art/g_bud.webp" alt=""><img class="b2" src="art/g_bloom.webp" alt=""></span></button>
+</header>
+
+<main class="board">
+  <section class="panel s5 idea">
+    <span class="cap"><b>The idea</b>One sentence the whole site keeps.</span>
+    <p class="big">Glass flowers in moving <i>orchid light</i>. Everything opens like a bloom.</p>
+    <ul>
+      <li>Behind: one slow liquid light (a GPU shader), the only moving background on the site.</li>
+      <li>In front: objects of glass. A bud means closed, a bloom means open.</li>
+      <li>Lana's own Redaction carries every title. Touch a letter and it wears through the cuts.</li>
+      <li>Glow means you can press it. Nothing glows that is not a control or the bloom.</li>
+    </ul>
+  </section>
+
+  <section class="panel s7 logo">
+    <span class="cap"><b>Name and mark</b>The mark is the glass bud: closed until you arrive.</span>
+    <div class="lock"><span class="mark" style="--s:150px"><img src="art/g_bud.webp" alt=""></span><p class="word morph">Lana Denise Huertas<small>UI/UX and visual designer</small></p></div>
+    <div class="sizes">
+      <span class="mark" style="--s:96px"><img src="art/g_bud.webp" alt=""></span>
+      <span class="mark" style="--s:48px"><img src="art/g_bud.webp" alt=""></span>
+      <span class="mark" style="--s:24px"><img src="art/g_bud.webp" alt=""></span>
+      <span class="light"><span class="mark" style="--s:48px"><img src="art/g_bud.webp" alt=""></span></span>
+      <span class="note">96, 48 and 24 px, and on pearl.</span>
+    </div>
+  </section>
+
+  <section class="panel colour">
+    <span class="cap"><b>Colour</b>Night and velvet hold the ground; ultraviolet to orchid is the only gradient, and it means press here.</span>
+    <div class="swatches" id="sw"></div>
+  </section>
+
+  <section class="panel s7 type">
+    <span class="cap"><b>Type</b>Lana's Redaction, the same as the live site, with Inter Tight for reading.</span>
+    <div class="spec">
+      <div><span>Redaction<br>Names and titles, 40 px and up. Touch it.</span><p class="t-dis morph">Night bloom</p></div>
+      <div><span>Redaction italic<br>The second voice: counts, captions, the ticker</span><p class="t-ita">ten brands, twelve posters</p></div>
+      <div><span>Inter Tight<br>Reading, 17 px, line height 1.55</span><p class="t-body">I design brands, posters and interfaces for student organisations and start-ups in Manila, and I build some of them in code.</p></div>
+    </div>
+  </section>
+
+  <section class="panel s5 buttons">
+    <span class="cap"><b>Buttons</b>The gradient is a button. Glass is the quieter choice.</span>
+    <div class="states">
+      <div><a class="btn" href="#">See work</a><small>Rest</small></div>
+      <div><a class="btn is-hover" href="#">See work</a><small>Hover</small></div>
+      <div><a class="btn is-press" href="#">See work</a><small>Pressed</small></div>
+      <div><a class="btn is-focus" href="#">See work</a><small>Focus</small></div>
+      <div><span class="btn is-off">Sent</span><small>Disabled</small></div>
+      <div><a class="btn glass" href="#">About me</a><small>Glass</small></div>
+    </div>
+    <div class="row" style="margin-top:20px"><button class="btn round glass" type="button" aria-label="Play the reel" id="playbtn"></button><a class="link" href="#">Download CV</a></div>
+    <p class="note" style="margin:24px 0 12px">The signature button: hover and the bud opens.</p>
+    <button class="lode" type="button">Open the bloom<span class="g" aria-hidden="true"><img class="b1" src="art/g_bud.webp" alt=""><img class="b2" src="art/g_bloom.webp" alt=""></span></button>
+  </section>
+
+  <section class="panel parts">
+    <span class="cap"><b>Interface pieces</b>Navigation, tabs, tags, a form field and the ticker.</span>
+    <div class="grid">
+      <div class="stack">
+        <nav class="nav" aria-label="Example navigation"><span class="mark"><img src="art/g_bud.webp" alt=""></span><a href="#">Work</a><a href="#">Posters</a><a href="#">Motion</a><a href="#">About</a><a class="btn" href="#">Let's talk</a></nav>
+        <div class="tabs" role="tablist" aria-label="Example tabs"><span class="glow"></span><button role="tab" aria-selected="true">Branding</button><button role="tab" aria-selected="false">Posters</button><button role="tab" aria-selected="false">Motion</button><button role="tab" aria-selected="false">UI/UX</button></div>
+        <div class="row" id="chips"></div>
+      </div>
+      <div class="stack"><div class="field"><label for="em">Your email</label><input id="em" type="email" autocomplete="email" placeholder="you@studio.com"><p>I reply within two days.</p></div></div>
+    </div>
+    <div class="ticker" id="tk"></div>
+  </section>
+
+  <section class="panel s8 work">
+    <span class="cap"><b>Work cards</b>Glass frames that lean toward the pointer and glow when held.</span>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section class="panel s4">
+    <span class="cap"><b>Icons</b>Fine line, one lit part each.</span>
+    <div class="icons" id="icons"></div>
+  </section>
+
+  <section class="panel garden">
+    <span class="cap"><b>The garden</b>Two families: glass objects in front, x-ray light behind them.</span>
+    <div class="set">
+      <figure><img src="art/g_bloom.webp" alt=""><figcaption>Bloom, open</figcaption></figure>
+      <figure><img src="art/g_bud.webp" alt=""><figcaption>Bud, closed</figcaption></figure>
+      <figure><img src="art/g_moon.webp" alt=""><figcaption>Moon</figcaption></figure>
+    </div>
+    <div class="back" id="back"></div>
+  </section>
+
+  <section class="panel opener" id="opener">
+    <span class="cap"><b>How a section opens</b>Every section starts with a bud that opens as it comes into view, over a strip of the same light.</span>
+    <div class="strip">
+      <canvas aria-hidden="true"></canvas>
+      <div class="bulb"><img class="b1" src="art/g_bud.webp" alt=""><img class="b2" src="art/g_bloom.webp" alt=""></div>
+      <div><h3 class="morph">Branding &amp; pubmats</h3><p>ten brands, 2022 to now</p></div>
+      <a class="btn" href="#">Open the shelf</a>
+    </div>
+  </section>
+</main>
+
+<script src="sheet.js"></script>
+<script>
+const FLOW = ["#0e0626", "#3a1290", "#b245f5", "#ffd6f5"];
+shader($("#hero canvas"), { mode: 0, colors: FLOW, scale: 0.5, speed: 0.55 });
+shader($("#opener canvas"), { mode: 0, colors: FLOW, scale: 0.5, speed: 0.4 });
+
+// the six parts, waiting in the heart of the bloom
+$(".petals").innerHTML = PARTS.map((p, i) => `<a class="btn" href="#" style="--i:${i};--a:${i * 60}deg">${p.t}</a>`).join("");
+const hero = $("#hero");
+$("#open").onclick = () => hero.classList.add("open");
+
+// letters wear down through Redaction's degraded cuts when touched, then come back
+const CUTS = ["Redaction 70", "Redaction 35", "Redaction 10", "Redaction 35", "Redaction 70", ""];
+$$(".morph").forEach((el) => {
+  const walk = (node) => [...node.childNodes].forEach((c) => {
+    if (c.nodeType === 3) {
+      const frag = document.createDocumentFragment();
+      [...c.textContent].forEach((ch) => { const s = document.createElement("i"); s.textContent = ch; frag.append(s); });
+      c.replaceWith(frag);
+    } else if (c.nodeName !== "SMALL") walk(c);
+  });
+  walk(el);
+  el.setAttribute("aria-label", el.textContent);
+});
+document.addEventListener("pointerover", (e) => {
+  const i = e.target.closest(".morph i");
+  if (!i || i.dataset.busy || RM) return;
+  i.dataset.busy = 1;
+  CUTS.forEach((f, k) => setTimeout(() => { i.style.fontFamily = f ? `"${f}", var(--display)` : ""; if (k === CUTS.length - 1) delete i.dataset.busy; }, k * 70));
+});
+
+swatches($("#sw"), [
+  { name: "Night", hex: "#0e0626", on: "#fff6ec", role: "ground" },
+  { name: "Velvet", hex: "#2a0f6b", on: "#f3ecff", role: "panels, sky" },
+  { name: "Ultraviolet", hex: "#6a2cf0", on: "#fff6ec", role: "button start" },
+  { name: "Orchid", hex: "#c04bff", on: "#0e0626", role: "glow, lit parts" },
+  { name: "Petal", hex: "#f3d9ff", on: "#0e0626", role: "links, italics" },
+  { name: "Pearl", hex: "#fff6ec", on: "#0e0626", role: "titles, text" },
+]);
+icons($("#icons"));
+$("#playbtn").innerHTML = icon(2);
+$("#chips").innerHTML = ["Branding", "Posters", "Motion", "UI/UX"].map((t, i) => `<span class="chip">${icon(i)}${t}</span>`).join("");
+ticker($("#tk"), ["branding", "posters", "moving pictures", "UI/UX and code", "open to work"], ` ${icon(6)}`);
+cards($("#cards"), 3);
+$("#back").innerHTML = ["peony", "lily", "butterfly", "lotus", "shrooms"].map((n) => `<figure><img src="../art/${n}.webp" alt=""><figcaption>${n[0].toUpperCase() + n.slice(1)}</figcaption></figure>`).join("");
+
+// glass cards lean toward the pointer (transform only, one card at a time)
+if (!RM && matchMedia("(hover: hover)").matches)
+  $$(".card").forEach((c) => {
+    c.addEventListener("pointermove", (e) => { const r = c.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; c.style.transform = `perspective(700px) rotateY(${x * 14}deg) rotateX(${y * -14}deg)`; });
+    c.addEventListener("pointerleave", () => (c.style.transform = ""));
+  });
+
+// tabs: the glow slides to the chosen tab
+const tabs = $(".tabs"), glow = $(".tabs .glow");
+const sel = (b) => { $$("button", tabs).forEach((x) => x.setAttribute("aria-selected", x === b)); glow.style.width = b.offsetWidth + "px"; glow.style.transform = `translateX(${b.offsetLeft}px)`; };
+$$("button", tabs).forEach((b) => (b.onclick = () => sel(b)));
+addEventListener("load", () => sel($("[aria-selected=true]", tabs)));
+</script>
+</body>
+</html>

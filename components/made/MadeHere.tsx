@@ -7,7 +7,7 @@ import { createPortal } from "react-dom";
 import { KIND_LABEL, SEEDS, flowerSvg, type Flower } from "@/lib/garden/flowers";
 import { STEPS, STEP_MS, chime, decode } from "@/lib/dusk/skySong";
 import { forgetMine, imageUrl, pieceUrl, readMine, songUrl, when, type Mine, type Pubmat, type Song } from "@/lib/made/kinds";
-import "./made.css";
+import "./made-current.css";
 
 /*
  * /made-here: everything visitors made on the site, in one place.
@@ -158,7 +158,7 @@ export default function MadeHere() {
   const k = KINDS[tab];
 
   return (
-    <main id="top" className="mh" data-tone="dark">
+    <main id="top" className="mh" data-scene="made">
       <div aria-hidden className="mh-sky" />
 
       {/* 1. what this is */}
@@ -180,7 +180,7 @@ export default function MadeHere() {
         </div>
 
         {/* 2. three ways to make one */}
-        <nav className="mh-make dusk-panel" aria-label="Make something">
+        <nav className="mh-make" aria-label="Make something">
           <p className="mh-k">Make something</p>
           {ORDER.map((t) => (
             <a key={t} className="mh-mk" href={KINDS[t].make.href}>
@@ -211,7 +211,7 @@ export default function MadeHere() {
               y.kind === "pubmat" ? (
                 <li key={y.p.id}>
                   <button type="button" className="mh-yc" onClick={() => setOpen(y.p)}>
-                    <img src={srcOf(y.p)} alt="" style={{ aspectRatio: `${y.p.w} / ${y.p.h}` }} />
+                    <img src={srcOf(y.p)} width={y.p.w} height={y.p.h} alt="" style={{ aspectRatio: `${y.p.w} / ${y.p.h}` }} />
                     <span className="mh-yt">{y.p.title}</span>
                     <Status p={y.p} />
                   </button>
@@ -253,7 +253,7 @@ export default function MadeHere() {
         <div className="mh-rowhead">
           <p>{k.blurb}</p>
           <a className="mh-cta" href={k.make.href}>
-            {k.make.label} <span aria-hidden>→</span>
+            {k.make.label}
           </a>
         </div>
 
@@ -271,7 +271,7 @@ export default function MadeHere() {
               <li key={p.id}>
                 <button type="button" className="mh-mat" onClick={() => setOpen(p)} aria-label={`Open “${p.title}” by ${p.name}`}>
                   <span className="mh-matimg" style={{ aspectRatio: `${p.w} / ${p.h}` }}>
-                    <img src={srcOf(p)} alt="" loading="lazy" decoding="async" />
+                    <img src={srcOf(p)} width={p.w} height={p.h} alt="" loading="lazy" decoding="async" />
                     <span className="mh-open" aria-hidden>
                       Open
                     </span>
@@ -317,7 +317,7 @@ export default function MadeHere() {
             <span aria-hidden>←</span> Back to the portfolio
           </a>
           <a className="link" href="/#contact">
-            Work with me <span aria-hidden>→</span>
+            Work with me
           </a>
         </div>
       </footer>
@@ -339,12 +339,12 @@ function Status({ p, on }: { p: { pending?: boolean; local?: boolean }; on?: boo
 
 function Empty({ icon, title, text, href, cta }: { icon: string; title: string; text: string; href: string; cta: string }) {
   return (
-    <div className="mh-empty dusk-panel">
+    <div className="mh-empty">
       <img src={icon} alt="" width={56} height={56} className="mh-eic" />
       <p className="mh-etitle">{title}</p>
       <p>{text}</p>
       <a className="btn" href={href}>
-        {cta} <span aria-hidden>→</span>
+        {cta}
       </a>
     </div>
   );
@@ -362,17 +362,17 @@ function MiniSky({ code, step = -1 }: { code: string; step?: number }) {
   return (
     <svg className="mh-sky-mini" viewBox="0 0 320 96" role="img" aria-label={`${stars.length} stars`}>
       {[1, 2, 3].map((b) => (
-        <line key={b} x1={b * 80} x2={b * 80} y1="6" y2="90" stroke="rgb(253 243 225 / .08)" strokeWidth="1" />
+        <line key={b} x1={b * 80} x2={b * 80} y1="6" y2="90" stroke="rgb(245 242 250 / .12)" strokeWidth="1" />
       ))}
-      <polyline points={pts.map((p) => p.join(",")).join(" ")} fill="none" stroke="rgb(255 207 224 / .5)" strokeWidth="1" />
-      {step >= 0 && <line x1={((step + 0.5) / STEPS) * 320} x2={((step + 0.5) / STEPS) * 320} y1="0" y2="96" stroke="rgb(255 217 138 / .7)" strokeWidth="1.5" />}
+      <polyline points={pts.map((p) => p.join(",")).join(" ")} fill="none" stroke="rgb(128 220 241 / .55)" strokeWidth="1" />
+      {step >= 0 && <line x1={((step + 0.5) / STEPS) * 320} x2={((step + 0.5) / STEPS) * 320} y1="0" y2="96" stroke="rgb(255 188 128 / .75)" strokeWidth="1.5" />}
       {stars.map((x, i) => {
         const lit = x.c === step;
         return (
           <g key={i} transform={`translate(${pts[i][0]} ${pts[i][1]})`}>
-            {lit && <circle r="7" fill="rgb(255 217 138 / .35)" />}
-            <rect x="-1.5" y="-4.5" width="3" height="9" fill={lit ? "#ffd98a" : "#fdf3e1"} />
-            <rect x="-4.5" y="-1.5" width="9" height="3" fill={lit ? "#ffd98a" : "#fdf3e1"} />
+            {lit && <circle r="7" fill="rgb(255 188 128 / .35)" />}
+            <rect x="-1.5" y="-4.5" width="3" height="9" fill={lit ? "#ffbc80" : "#f5f2fa"} />
+            <rect x="-4.5" y="-1.5" width="9" height="3" fill={lit ? "#ffbc80" : "#f5f2fa"} />
           </g>
         );
       })}
@@ -404,7 +404,7 @@ function SongCard({ s, focus, onCopy, onForget }: { s: Piece<Song>; focus: boole
     timer.current = window.setInterval(tickOnce, STEP_MS);
   };
   return (
-    <li id={`song-${s.id}`} className="mh-song dusk-panel" data-focus={focus ? "" : undefined}>
+    <li id={`song-${s.id}`} className="mh-song" data-focus={focus ? "" : undefined}>
       <MiniSky code={s.code} step={step} />
       <div className="mh-stxt">
         <p className="mh-stitle">“{s.title}”</p>
@@ -465,13 +465,13 @@ function Lightbox({ p, onClose, onCopy, onForget }: { p: Piece<Pubmat>; onClose:
       </button>
     );
   return createPortal(
-    <dialog ref={d} className="mh-box dusk-panel" aria-label={`“${p.title}” by ${p.name}`} onClose={onClose} onClick={(e) => e.target === e.currentTarget && d.current?.close()}>
+    <dialog ref={d} className="mh-box" aria-label={`“${p.title}” by ${p.name}`} onClose={onClose} onClick={(e) => e.target === e.currentTarget && d.current?.close()}>
       <button type="button" className="mh-x" aria-label="Close" onClick={() => d.current?.close()}>
         ×
       </button>
       <div className="mh-boxin">
         <div className="mh-bigwrap">
-          <img className="mh-big" src={src} alt={`“${p.title}”, a pubmat by ${p.name}`} style={{ aspectRatio: `${p.w} / ${p.h}` }} />
+          <img className="mh-big" src={src} width={p.w} height={p.h} alt={`“${p.title}”, a pubmat by ${p.name}`} style={{ aspectRatio: `${p.w} / ${p.h}` }} />
         </div>
         <div className="mh-boxtxt">
           <p className="mh-k">

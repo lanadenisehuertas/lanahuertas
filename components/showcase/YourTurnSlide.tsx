@@ -1,24 +1,30 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import { palettes } from "@/lib/palettes";
 import { useSlide } from "./Spread";
 import SpreadCopy from "./SpreadCopy";
-import { pad } from "./tone";
 import { tone } from "@/lib/dusk/sound";
-import { Lotus } from "../Botanicals";
+import PixelBloom from "../current/PixelBloom";
 
 // The studio is its own chunk: nothing of it loads until someone opens it.
 const Studio = dynamic(() => import("@/components/studio/Studio"), { ssr: false });
 
-const KIT = ["#2d3b97", "#e3a0c0", "#fdf3e1", "#ffcfe0", "#76389b", "#f99e30", "#189aa6", "#924050"];
+const KIT = ["#9f8deb", "#80dcf1", "#ee8be4", "#ffbc80", "#f5f2fa", "#231d3a", "#5b4bb5", "#0c0a17"];
+const LAYERS: [string, boolean][] = [
+  ["Bloom fest", true],
+  ["a night of pixel flowers", false],
+  ["Halftone", false],
+  ["Bloom, drawn in code", false],
+  ["Background", false],
+];
 
 /**
  * The carousel's last slide, after every brand: your turn. The words invite
- * you in, the stage shows the studio waiting (a small Photoshop window with
- * a pubmat open and its title selected), and clicking either opens the real
- * one with my palettes and art loaded.
+ * you in; the stage shows a pubmat waiting with its title selected, beside
+ * the swatches and the layers it is built from. Clicking either opens the
+ * real studio with my palettes and art loaded.
  */
 export default function YourTurnSlide({ n, total }: { n: number; total: number }) {
   const { heading } = useSlide();
@@ -43,26 +49,23 @@ export default function YourTurnSlide({ n, total }: { n: number; total: number }
   };
 
   return (
-    <article className="sp-slide sp-slide--brand sp-slide--studio" data-board="dark" style={{ "--wash": "40 38 120" } as CSSProperties} aria-label="Your turn: make a pubmat with me">
-      <div aria-hidden className="sp-bg yt-bg" />
-      <div aria-hidden className="sp-wash" />
-
+    <article className="sp-slide sp-slide--studio" aria-label="Your turn: make a pubmat with me">
       <SpreadCopy
-        meta={`${pad(n)} / ${pad(total)} · Your turn · Studio`}
+        meta={`${n} of ${total}. The studio`}
         title="Your turn"
         heading={heading}
         tagline="Make a pubmat with me, in a studio laid out like Photoshop."
-        body="Photoshop is where every pubmat on this page was made, so this studio works the same way: tools down the left, layers on the right, my shortcuts. Start from one of my layouts, recolour it with any brand's palette, drop in the art from this garden, and export a PNG, or share it to the visitors’ gallery."
+        body="Photoshop is where every pubmat on this page was made, so this studio works the same way: tools down the left, layers on the right, my shortcuts. Start from one of my layouts, recolour it with any brand's palette, drop in the art, and export a PNG, or share it to the visitors’ gallery."
         palette={palettes["elysium"]}
         partsLabel="In the studio"
         parts={["Every brand palette, as swatch groups", "Type in Redaction, Inter Tight and DM Mono", "Grain, halftone and dither filters", "Layers, history, export to PNG"]}
         actions={
           <>
             <button type="button" className="btn" onClick={go}>
-              Open the studio <span aria-hidden>→</span>
+              Open the studio
             </button>
-            <a href="/made-here#pubmats" className="link sp-link">
-              See what visitors made <span aria-hidden>→</span>
+            <a href="/made-here#pubmats" className="link">
+              See what visitors made
             </a>
           </>
         }
@@ -70,72 +73,36 @@ export default function YourTurnSlide({ n, total }: { n: number; total: number }
 
       <div className="sp-stage sp-stage--frame">
         <button type="button" className="yt-win" onClick={go} aria-label="Open the studio">
-          <span className="yt-menu" aria-hidden>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/art/pixel-butterfly.svg" alt="" className="yt-logo" />
-            {["File", "Edit", "Image", "Layer", "Filter", "View"].map((m) => (
-              <i key={m}>{m}</i>
+          <span className="yt-art" aria-hidden>
+            <PixelBloom size={30} petals={7} turn={0.1} className="yt-bloom" />
+            <span className="yt-title">
+              Bloom
+              <br />
+              fest
+              <span className="yt-box">
+                <i />
+                <i />
+                <i />
+                <i />
+              </span>
+            </span>
+            <span className="yt-sub">a night of pixel flowers</span>
+            <span className="yt-date">Nov 28, 6 pm, Manila</span>
+          </span>
+          <span className="yt-side" aria-hidden>
+            <span className="yt-ph">Swatches</span>
+            <span className="yt-sw">
+              {KIT.map((c) => (
+                <i key={c} style={{ background: c }} />
+              ))}
+            </span>
+            <span className="yt-ph">Layers</span>
+            {LAYERS.map(([l, on]) => (
+              <span key={l} className="yt-layer" data-on={on ? "" : undefined}>
+                {l}
+              </span>
             ))}
-            <b>Export PNG</b>
-          </span>
-          <span className="yt-opts" aria-hidden>
-            <i className="yt-sel">Redaction Bold</i>
-            <i className="yt-sel yt-sel--s">230 px</i>
-            <i className="yt-swatch" />
-          </span>
-          <span className="yt-body" aria-hidden>
-            <span className="yt-tools">
-              {Array.from({ length: 6 }, (_, i) => (
-                <i key={i} data-on={i === 0 ? "" : undefined} />
-              ))}
-              <i className="yt-fg" />
-            </span>
-            <span className="yt-doc">
-              <span className="yt-art">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/art/pixel-moon.svg" alt="" className="yt-moon" />
-                <span className="yt-title">
-                  Dusk
-                  <br />
-                  Fest
-                  <span className="yt-box">
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                </span>
-                <span className="yt-sub">a night in the garden</span>
-                <span className="yt-date">NOV 28 · 6 PM · THE GARDEN</span>
-                <Lotus className="yt-lotus" deep />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/art/pixel-butterfly.svg" alt="" className="yt-bfly" />
-              </span>
-            </span>
-            <span className="yt-panels">
-              <span className="yt-ph">Swatches</span>
-              <span className="yt-sw">
-                {KIT.map((c) => (
-                  <i key={c} style={{ background: c }} />
-                ))}
-              </span>
-              <span className="yt-ph">Layers</span>
-              {[
-                ["T", "Dusk Fest", true],
-                ["T", "a night in the garden", false],
-                ["◐", "Grain", false],
-                ["▣", "Lotus bed", false],
-                ["", "Background", false],
-              ].map(([g, l, on]) => (
-                <span key={String(l)} className="yt-layer" data-on={on ? "" : undefined}>
-                  <i>{g}</i>
-                  {l}
-                </span>
-              ))}
-            </span>
-          </span>
-          <span className="yt-cta">
-            Open the studio <span aria-hidden>↗</span>
+            <span className="yt-cta">Open the studio</span>
           </span>
         </button>
       </div>

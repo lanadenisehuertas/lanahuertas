@@ -33,6 +33,7 @@ import * as Ic from "./icons";
 import { MADE_LIMITS, docUrl, pieceUrl, type Made } from "@/lib/made/kinds";
 import { localId, packImage, sendPiece, thumbOf } from "@/lib/made/client";
 import "./studio.css";
+import "./studio-current.css";
 
 /*
  * "Make a pubmat with me": a small studio laid out like Photoshop, the tool

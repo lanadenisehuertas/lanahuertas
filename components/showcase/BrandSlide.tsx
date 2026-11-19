@@ -3,17 +3,14 @@
 import { useState } from "react";
 import type { Brand } from "@/lib/brands";
 import { palettes } from "@/lib/palettes";
-import Backdrop from "./Backdrop";
 import Lightbox from "./Lightbox";
 import Pic from "./Pic";
 import { useSlide } from "./Spread";
 import SpreadCopy from "./SpreadCopy";
-import { pad, washVar, toneOf } from "./tone";
 
 /**
- * One brand, one screen: its artboard edge to edge, the words on the wash,
- * the key visual large with two supporting pieces, and a filmstrip of the
- * whole set. Hovering a thumb previews it in the big frame, clicking pins it
+ * One brand: the words on the left, the key visual large with two
+ * supporting pieces beside it, and a strip of the whole set underneath. Hovering a thumb previews it in the big frame, clicking pins it
  * (clicking the pinned one opens it); clicking a piece opens the lightbox.
  */
 export default function BrandSlide({ brand, n, total, link = true }: { brand: Brand; n: number; total: number; link?: boolean }) {
@@ -28,11 +25,10 @@ export default function BrandSlide({ brand, n, total, link = true }: { brand: Br
   const name = (i: number) => `${brand.name}, piece ${i + 1} of ${set.length}`;
 
   return (
-    <article className="sp-slide sp-slide--brand" data-board={toneOf(brand.slug)} style={washVar(brand.slug)} aria-label={brand.name}>
-      <Backdrop slug={brand.slug} eager={near} />
+    <article className="sp-slide sp-slide--brand" aria-label={brand.name}>
 
       <SpreadCopy
-        meta={`${pad(n)} / ${pad(total)} · ${brand.org} · ${brand.date}`}
+        meta={`${n} of ${total}. ${brand.org}, ${brand.date}`}
         title={brand.name}
         heading={heading}
         tagline={brand.tagline}
@@ -43,16 +39,16 @@ export default function BrandSlide({ brand, n, total, link = true }: { brand: Br
           <>
             {link && (
               <a href={`/design#${brand.slug}`} className="btn">
-                View the full set <span aria-hidden>→</span>
+                View the full set
               </a>
             )}
             {brand.href &&
               (link ? (
-                <a href={brand.href} target="_blank" rel="noopener noreferrer" className="link sp-link">
+                <a href={brand.href} target="_blank" rel="noopener noreferrer" className="link">
                   See the post <span aria-hidden>↗</span>
                 </a>
               ) : (
-                <a href={brand.href} target="_blank" rel="noopener noreferrer" className="btn">
+                <a href={brand.href} target="_blank" rel="noopener noreferrer" className="btn-ghost">
                   See the post <span aria-hidden>↗</span>
                 </a>
               ))}

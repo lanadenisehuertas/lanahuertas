@@ -13,9 +13,10 @@ export type Screen = {
 };
 
 /**
- * A thin outline around real screenshots: a browser (2px ink border, a small
- * bar whose tabs switch pages) for desktop screens, a phone for genuinely
- * mobile ones. The screen scrolls inside the outline.
+ * Real screenshots in a minimal optical frame: for desktop screens a row of
+ * page names (they switch the screen) and the address above a hairline
+ * rectangle; for genuinely mobile ones a phone-shaped rectangle. No window
+ * chrome. The screen scrolls inside its frame.
  */
 export default function Device({
   kind,
@@ -89,11 +90,6 @@ export default function Device({
   return (
     <div className="dev-browser">
       <div className="dev-bar">
-        <span aria-hidden className="dev-dots">
-          <i />
-          <i />
-          <i />
-        </span>
         {screens.length > 1 ? (
           <div className="dev-tabs" role="group" aria-label={`${title} pages`}>
             {tabs}

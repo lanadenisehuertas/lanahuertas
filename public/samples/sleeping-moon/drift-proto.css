@@ -1,0 +1,34 @@
+/* Prototype: everything alive (drift-proto.js). Idle motion runs as CSS animations on the individual transform
+   properties (translate, rotate, scale), which compose with the transform other scripts already own. The scroll's
+   wind and the pointer's pull reach the animations through three properties on each element: --lx and --ly (px) and
+   --w (deg). Each element gets its own amplitude (--a, --r), period and phase, so nothing moves in step. */
+
+@keyframes dr-bob { 0%, 100% { translate: var(--lx, 0px) calc(var(--ly, 0px) - var(--a, 4px)); } 50% { translate: var(--lx, 0px) calc(var(--ly, 0px) + var(--a, 4px)); } }
+@keyframes dr-sway { 0%, 100% { rotate: calc(var(--w, 0deg) - var(--r, 2deg)); } 50% { rotate: calc(var(--w, 0deg) + var(--r, 2deg)); } }
+@keyframes dr-breathe { 0%, 100% { scale: 1; rotate: calc(var(--w, 0deg) - var(--r, 1deg)); } 50% { scale: 1.02; rotate: calc(var(--w, 0deg) + var(--r, 1deg)); } }
+/* a moth's wings: two states, open and folded */
+@keyframes dr-flap { 0%, 100% { scale: 1 1; } 50% { scale: 0.78 1; } }
+/* a moth's wander: a slow loop with a dip in it */
+@keyframes dr-wander {
+  0%, 100% { translate: var(--lx, 0px) var(--ly, 0px); }
+  25% { translate: calc(var(--lx, 0px) + var(--a, 6px)) calc(var(--ly, 0px) - var(--a, 6px)); }
+  50% { translate: calc(var(--lx, 0px) + var(--a, 6px) * 0.4) calc(var(--ly, 0px) + var(--a, 6px) * 0.6); }
+  75% { translate: calc(var(--lx, 0px) - var(--a, 6px) * 0.8) calc(var(--ly, 0px) - var(--a, 6px) * 0.3); }
+}
+
+.dr-bob { animation: dr-bob var(--t, 5s) ease-in-out var(--d, 0s) infinite; }
+.dr-sway { animation: dr-sway var(--t, 6s) ease-in-out var(--d, 0s) infinite; }
+.dr-breathe { animation: dr-breathe var(--t, 8s) ease-in-out var(--d, 0s) infinite; }
+.dr-moth { animation: dr-flap var(--f, 900ms) steps(1, end) var(--d, 0s) infinite, dr-wander var(--t, 8s) ease-in-out var(--d, 0s) infinite; }
+.dr-float { animation: dr-wander var(--t, 8s) ease-in-out var(--d, 0s) infinite; }
+.dr-sway.lily, .dr-sway.t-lily { transform-origin: 50% 100%; }
+.dr-sway.env { transform-origin: 50% 100%; }
+
+/* off screen: the loop holds where it is until it comes back into view (drift-proto.js watches) */
+.dr-off { animation-play-state: paused !important; }
+
+.quiet .dr-bob, .quiet .dr-sway, .quiet .dr-breathe, .quiet .dr-moth, .quiet .dr-float { animation: none; }
+@media (prefers-reduced-motion: reduce) { .dr-bob, .dr-sway, .dr-breathe, .dr-moth, .dr-float { animation: none; } }
+
+/* the letter holds still while someone writes in it or reaches for its button */
+#talk .env.dr-sway:hover, #talk .env.dr-sway:focus-within { animation-play-state: paused; }

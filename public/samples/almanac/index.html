@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lana Huertas · UI/UX and graphic designer in Manila</title>
+<meta name="description" content="Lana Denise Huertas designs brands, posters, films and product screens in Manila, and builds some of them in code.">
+<meta name="theme-color" content="#140a2c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&family=Pinyon+Script&display=swap">
+<link rel="preload" href="../brand/fonts/Redaction-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="art/s_hero.webp" as="image">
+<link rel="stylesheet" href="almanac.css">
+<script>try { if (localStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the work</a>
+
+<div class="loader" aria-hidden="true">
+  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" class="phase-dark"/><path class="phase-lit" id="loadMoon"/></svg>
+  <p>Waking the garden</p>
+  <small id="loadPct">0%</small>
+</div>
+
+<header class="phases" aria-label="Contents">
+  <a class="mark" href="#top"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12.5" fill="#3a1290" stroke="#b9a2ff"/><path d="M17.5 6.5a8 8 0 1 0 0 15 6.4 6.4 0 0 1 0-15z" fill="#fff1c9"/></svg><span>Lana Huertas</span></a>
+  <nav aria-label="Sections"><ol id="phaseNav"></ol></nav>
+  <button class="switch" type="button" role="switch" aria-checked="false" id="quiet"><i></i><b>Quiet mode</b></button>
+</header>
+
+<main id="main">
+
+  <!-- 1. The garden gate -->
+  <section class="hero" id="top" aria-labelledby="name">
+    <div class="scene"><picture><source media="(max-width: 860px)" srcset="art/s_hero-sm.webp"><img src="art/s_hero.webp" width="1672" height="941" alt="" fetchpriority="high"></picture></div>
+    <div class="motes" aria-hidden="true"></div>
+    <div class="garden" aria-hidden="true"></div>
+    <p class="hud l">Almanac no. 01<br>The night garden issue</p>
+    <p class="hud r">Manila, Philippines<br>Open to work</p>
+    <h1 class="name display" id="name"><span class="l1 wear">Lana Denise</span><img class="bud" src="../brand/art/g_bloom.webp" width="520" height="520" alt=""><span class="l2 wear">Huertas</span></h1>
+    <p class="lede">UI/UX and graphic designer in Manila. I design brands, posters, films and real product screens, and I build some of them in code.</p>
+    <div class="cta">
+      <a class="btn glass" href="#cabinet"><img class="gem" src="../brand/art/g_bud.webp" width="60" height="60" alt="">Open the garden</a>
+      <a class="btn line" href="#talk">Email Lana</a>
+    </div>
+    <button class="plant" type="button" id="plant">Click the sky to plant a flower</button>
+  </section>
+
+  <!-- 2. The seed cabinet: the contents as an object -->
+  <section class="cabinet stop" id="cabinet" aria-labelledby="cab-h">
+    <div class="scene dim"><picture><source media="(max-width: 860px)" srcset="art/s_path-sm.webp"><img src="art/s_path.webp" width="1672" height="941" alt="" loading="lazy"></picture></div>
+    <div class="wrap grid">
+      <div>
+        <div class="stop-head">
+          <img class="bud-mark" src="../brand/art/p_bud.webp" width="80" height="120" alt="">
+          <h2 class="display wear" id="cab-h">Six drawers of work</h2>
+          <span class="sig">pick one, or keep walking</span>
+          <p class="lede">Four years of brands, posters, films and apps, sorted the way a gardener sorts seeds. Every drawer opens a part of the garden below.</p>
+        </div>
+        <div class="peek paper" aria-live="polite" id="peek"><img src="/work/sm/acm-revival.webp" width="720" height="855" alt=""><div><b>Branding</b><p>10 brands, each with its pubmats.</p></div></div>
+      </div>
+      <div class="cab" id="cab"><img src="art/o_cabinet.webp" width="821" height="900" alt="An antique seed cabinet with six labelled drawers"></div>
+    </div>
+  </section>
+
+  <!-- 3. Branding: collectible cards in the glasshouse -->
+  <section class="glasshouse stop" id="brands" aria-labelledby="brands-h">
+    <div class="scene dim"><picture><source media="(max-width: 860px)" srcset="art/s_glass-sm.webp"><img src="art/s_glass.webp" width="1672" height="941" alt="" loading="lazy"></picture></div>
+    <div class="wrap">
+      <div class="stop-head">
+        <img class="bud-mark" src="../brand/art/p_bud.webp" width="80" height="120" alt="">
+        <p class="hud"><svg viewBox="0 0 24 24" aria-hidden="true" data-phase="0.12"></svg>Drawer one</p>
+        <h2 class="display wear" id="brands-h">Branding and pubmats</h2>
+        <p class="lede">Ten identities for student councils, chapters and conventions. Open a card to see the publicity it grew into.</p>
+      </div>
+      <div class="deck" id="deck"></div>
+    </div>
+  </section>
+
+  <!-- 4. Posters: the herbarium wall -->
+  <section class="herbarium on-paper stop" id="posters" aria-labelledby="posters-h">
+    <div class="wrap">
+      <div class="stop-head">
+        <img class="bud-mark" src="../brand/art/p_bloom.webp" width="120" height="120" alt="">
+        <p class="hud"><svg viewBox="0 0 24 24" aria-hidden="true" data-phase="0.28"></svg>Drawer two</p>
+        <h2 class="display wear" id="posters-h">One-off posters</h2>
+        <span class="sig">pressed and pinned</span>
+      </div>
+      <div class="wall" id="wall"></div>
+    </div>
+  </section>
+
+  <!-- 5. Films: the magic lantern -->
+  <section class="films stop" id="films" aria-labelledby="films-h">
+    <div class="scene"><picture><source media="(max-width: 860px)" srcset="art/s_clear-sm.webp"><img src="art/s_clear.webp" width="1672" height="941" alt="" loading="lazy"></picture></div>
+    <div class="wrap">
+      <div class="stop-head">
+        <img class="bud-mark" src="../brand/art/p_moon.webp" width="120" height="120" alt="">
+        <p class="hud"><svg viewBox="0 0 24 24" aria-hidden="true" data-phase="0.45"></svg>Drawer three</p>
+        <h2 class="display wear" id="films-h">Moving pictures</h2>
+        <p class="lede">Documentaries, trailers, music videos and a song about the planets. Pick a slide and the lantern shows it.</p>
+      </div>
+      <div class="lantern-row">
+        <div class="lamp"><img src="art/o_lantern.webp" width="850" height="1079" alt="A brass magic lantern projector"><div class="beam" aria-hidden="true"></div></div>
+        <div class="screen paper" id="screen" aria-live="polite"></div>
+      </div>
+      <div class="slides" id="slides" role="group" aria-label="Choose a film"></div>
+    </div>
+  </section>
+
+  <!-- 6. Products: almanac spreads -->
+  <section class="products stop" id="products" aria-labelledby="products-h">
+    <div class="scene dim"><picture><source media="(max-width: 860px)" srcset="art/s_pond-sm.webp"><img src="art/s_pond.webp" width="1672" height="941" alt="" loading="lazy"></picture></div>
+    <div class="wrap">
+      <div class="stop-head">
+        <img class="bud-mark" src="../brand/art/p_fly.webp" width="120" height="120" alt="">
+        <p class="hud"><svg viewBox="0 0 24 24" aria-hidden="true" data-phase="0.62"></svg>Drawer four</p>
+        <h2 class="display wear" id="products-h">Products I designed and built</h2>
+        <p class="lede">Four working apps. I designed each one end to end and wrote most of the code.</p>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Products" id="tabs"></div>
+      <div id="spreads"></div>
+    </div>
+  </section>
+
+  <!-- 7. About -->
+  <section class="about stop" id="about" aria-labelledby="about-h">
+    <div class="scene flip"><picture><source media="(max-width: 860px)" srcset="art/s_study-sm.webp"><img src="art/s_study.webp" width="1672" height="941" alt="" loading="lazy"></picture></div>
+    <div class="wrap grid">
+      <div>
+        <div class="cameo">
+          <div class="face"><img src="/work/lana-portrait.webp" width="1136" height="1200" alt="Lana Huertas" loading="lazy"></div>
+          <img class="frame" src="art/o_frame.webp" width="760" height="1052" alt="" loading="lazy">
+        </div>
+        <div class="book paper">
+          <img src="art/o_book.webp" width="760" height="789" alt="" loading="lazy">
+          <div><b>B.S. Computer Science</b><p>Software engineering at FEU Institute of Technology, graduating July 2027.</p></div>
+        </div>
+      </div>
+      <div>
+        <div class="stop-head">
+          <img class="bud-mark" src="../brand/art/p_bud.webp" width="80" height="120" alt="">
+          <p class="hud"><svg viewBox="0 0 24 24" aria-hidden="true" data-phase="0.8"></svg>Drawer five</p>
+          <h2 class="display wear" id="about-h">About Lana</h2>
+        </div>
+        <p class="bio">I build visual content and adaptable designs for brands that want to stand out, and I can do it for you, too.</p>
+        <ol class="ledger">
+          <li><b>UI/UX design intern</b><time>Aug 2026 to now</time><span>Eden Holdings Philippines, Makati. Wireframes, flows, Figma prototypes and the design system.</span></li>
+          <li><b>Freelance graphic designer and video editor</b><time>2023 to 2026</time><span>Brand assets, marketing material and edits for clients in several industries.</span></li>
+          <li><b>Creatives committee head</b><time>2023 to 2025</time><span>Student council and ACM chapter, FEU Tech. Led two creative teams and every campaign.</span></li>
+          <li><b>Multimedia team editor</b><time>2020 to 2025</time><span>Lord Jesus Fellowship Church, Bataan. Weekly video and graphics.</span></li>
+        </ol>
+        <div class="stamps">
+          <span class="stamp">1st runner-up, GCash ImaGnation 2026</span>
+          <span class="stamp">Elite Scholar, FEU Tech</span>
+          <span class="stamp">DOST scholar</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Let's talk, at first light -->
+  <section class="talk" id="talk" aria-labelledby="talk-h">
+    <div class="scene"><picture><source media="(max-width: 860px)" srcset="art/s_dawn-sm.webp"><img src="art/s_dawn.webp" width="1672" height="941" alt="" loading="lazy"></picture></div>
+    <div class="letter paper on-paper">
+      <h2 class="display wear" id="talk-h">Let's talk</h2>
+      <span class="sig">from Manila, open to work</span>
+      <p class="lede">Hiring for UI/UX, brand or motion work, or need publicity for your org? Write to me. I reply within two days.</p>
+      <div class="row">
+        <a class="btn glass" href="mailto:lanadenisehuertas@gmail.com"><img class="gem" src="../brand/art/g_bud.webp" width="60" height="60" alt="">Email Lana</a>
+        <button class="btn paper" type="button" id="copy"><span class="copied"><span class="a">Copy the address</span><span class="b">Copied</span></span></button>
+      </div>
+      <div class="links">
+        <a href="https://www.linkedin.com/in/lana-denise-huertas/">LinkedIn</a>
+        <a href="https://github.com/lanadenisehuertas/">GitHub</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>Made in Manila by Lana Huertas, 2026</span>
+  <span class="moons" aria-hidden="true" id="footMoons"></span>
+  <a href="system.html">The design system behind this page</a>
+</footer>
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheet-h">
+  <div class="in">
+    <header><div><h3 id="sheet-h"></h3><p id="sheet-t"></p></div><button class="close" type="button" id="sheetClose" aria-label="Close"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3L3 15" stroke="#2b1470" stroke-width="2.2" stroke-linecap="round"/></svg></button></header>
+    <div class="grid" id="sheet-g"></div>
+  </div>
+</dialog>
+
+<script src="data.js"></script>
+<script src="almanac.js"></script>
+</body>
+</html>

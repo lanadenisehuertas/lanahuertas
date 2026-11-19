@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rooms behind the doors: mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,500;1,400&family=Pixelify+Sans&family=Inter+Tight:wght@400;500&display=swap">
+<style>
+/* Mockups for the round 6 design: one still per room at 1440 x 900. Static; not the site. */
+@font-face { font-family: "Redaction"; src: url("../brand/fonts/Redaction-Regular.woff2") format("woff2"); }
+@font-face { font-family: "Redaction"; font-style: italic; src: url("../brand/fonts/Redaction-Italic.woff2") format("woff2"); }
+@font-face { font-family: "Redaction 10"; src: url("../brand/fonts/Redaction10-Regular.woff2") format("woff2"); }
+@font-face { font-family: "Redaction 35"; src: url("../brand/fonts/Redaction35-Regular.woff2") format("woff2"); }
+@font-face { font-family: "Redaction 70"; src: url("../brand/fonts/Redaction70-Regular.woff2") format("woff2"); }
+@font-face { font-family: "Redaction 100"; src: url("../brand/fonts/Redaction100-Regular.woff2") format("woff2"); }
+:root {
+  --night: #0c0a22; --night-2: #17123a; --ink: #b9a6ff; --text: #ece6ff; --dim: #a59cc8; --moon: #f1e4c3;
+  --body: "Atkinson Hyperlegible Next", system-ui, sans-serif; --serif: "Redaction", Georgia, serif;
+  --asleep: "Redaction 70", "Redaction", serif; --drowsy: "Redaction 35", "Redaction", serif;
+  --pop: cubic-bezier(0.34, 1.56, 0.64, 1); --out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #050410; color: var(--text); font: 400 17px/1.55 var(--body); display: grid; gap: 40px; justify-content: center; padding: 40px 0; }
+img { display: block; }
+.frame { position: relative; width: 1440px; height: 900px; overflow: hidden; background: var(--night); isolation: isolate; }
+.cap { width: 1440px; font: 400 16px/1.4 var(--body); color: #8f88ad; margin-bottom: -28px; }
+
+/* shared chrome: the almanac bar */
+.bar { position: absolute; z-index: 20; left: 0; right: 0; top: 0; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
+.bar .home { font: 400 17px/1 var(--drowsy); color: var(--text); }
+.nav { display: flex; gap: 30px; }
+.nav a { position: relative; font: 400 17px/1 var(--asleep); color: var(--dim); text-decoration: none; letter-spacing: 0.01em; }
+.nav a.now { font-family: var(--serif); color: var(--text); }
+.nav a.now::after { content: ""; position: absolute; left: 50%; top: calc(100% + 7px); width: 9px; height: 9px; translate: -50% 0; border-radius: 50%; background: var(--moon); box-shadow: inset -3px 0 0 0 var(--night); }
+.bar .quiet { font: 400 16px/1 var(--drowsy); color: var(--dim); }
+.foot { position: absolute; z-index: 20; left: 40px; right: 40px; bottom: 26px; display: flex; justify-content: space-between; font: 400 15px/1 var(--drowsy); color: var(--dim); }
+
+/* shared bits */
+.stars { position: absolute; inset: 0; z-index: -1; background-image:
+  radial-gradient(1.4px 1.4px at 12% 18%, #fff8 50%, transparent 51%), radial-gradient(1px 1px at 27% 9%, #fff6 50%, transparent 51%),
+  radial-gradient(1.6px 1.6px at 44% 22%, #fff9 50%, transparent 51%), radial-gradient(1px 1px at 63% 12%, #fff5 50%, transparent 51%),
+  radial-gradient(1.3px 1.3px at 81% 26%, #fff8 50%, transparent 51%), radial-gradient(1px 1px at 92% 8%, #fff6 50%, transparent 51%),
+  radial-gradient(1.2px 1.2px at 6% 44%, #fff5 50%, transparent 51%), radial-gradient(1px 1px at 72% 40%, #fff5 50%, transparent 51%),
+  radial-gradient(1.4px 1.4px at 36% 52%, #fff6 50%, transparent 51%), radial-gradient(1px 1px at 55% 36%, #fff4 50%, transparent 51%); }
+.lbl { font: 400 16px/1.3 var(--drowsy); color: var(--dim); }
+.lbl b { font-weight: 400; color: var(--text); font-family: var(--serif); }
+.go { display: inline-flex; align-items: center; gap: 10px; font: italic 400 22px/1 var(--serif); color: var(--text); text-decoration: none; padding: 10px 0; background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat; }
+.go.half { background-size: 45% 1px; }
+.arw { display: inline-grid; place-items: center; width: 44px; height: 44px; color: var(--text); }
+.arw svg { width: 30px; height: 14px; overflow: visible; }
+.arw.off { opacity: 0.35; }
+.note { position: absolute; z-index: 30; font: 400 15px/1.35 var(--body); color: #1b1640; background: #f6efd9; padding: 7px 11px; rotate: -2deg; max-width: 230px; box-shadow: 0 6px 18px #0006; }
+.note::before { content: ""; position: absolute; left: 50%; top: -7px; width: 38px; height: 13px; translate: -50% 0; rotate: 3deg; background: #d9c9f3cc; }
+.anno { position: absolute; z-index: 40; font: italic 400 17px/1.3 var(--serif); color: #ffd88a; max-width: 240px; }
+.anno::before { content: "\2192\00a0"; font-style: normal; }
+
+/* ---------- 0 system ---------- */
+.f0 { background: #0c0a22; padding: 96px 64px 40px; display: grid; grid-template-columns: 1fr 1.5fr; gap: 72px; }
+.f0 h2 { font: 400 15px/1 var(--drowsy); color: var(--dim); margin-bottom: 26px; }
+.old { opacity: 0.85; }
+.old .o-lab { font: 400 15px/1 "Pixelify Sans"; color: #b9a6ff; }
+.old .o-body { font: 400 17px/1.5 "Inter Tight"; margin: 18px 0; max-width: 34ch; }
+.old .o-btn { display: inline-block; background: #9785f1; color: #0c0a22; font: 500 15px/1 "Pixelify Sans"; padding: 16px 22px; }
+.old .o-arw { display: inline-grid; place-items: center; width: 52px; height: 52px; background: #b9a6ff24; color: #b9a6ff; margin-left: 10px; vertical-align: middle; }
+.old .o-nav { display: flex; gap: 18px; margin-top: 30px; font: 400 15px/1 "Pixelify Sans"; color: #b9a6ff; }
+.old .o-nav span:first-child { box-shadow: inset 0 -2px #fff1c9; color: #fff1c9; padding-bottom: 6px; }
+.new .n-name { font: 400 128px/0.9 var(--serif); letter-spacing: -0.02em; }
+.new .n-voice { font: italic 400 30px/1.2 var(--serif); color: var(--ink); margin: 18px 0 28px; }
+.wake { display: flex; gap: 26px; align-items: baseline; margin-bottom: 24px; }
+.wake span { font-size: 34px; }
+.wake .s100 { font-family: "Redaction 100"; color: var(--dim); } .wake .s70 { font-family: "Redaction 70"; color: #c7bfe6; } .wake .s35 { font-family: "Redaction 35"; color: #ddd6f5; } .wake .s0 { font-family: var(--serif); color: var(--text); }
+.wake i { font: 400 15px/1 var(--body); font-style: normal; color: var(--dim); }
+.new .n-body { max-width: 52ch; color: #d9d2f2; margin-bottom: 26px; }
+.ctl { display: flex; gap: 36px; align-items: center; }
+
+/* ---------- 1 brands ---------- */
+.f1 { background: #03060e; }
+.f1 .bd { position: absolute; inset: 0; z-index: -1; opacity: 0.55; background-size: cover; background-position: center; }
+.f1 .kv { position: absolute; left: 72px; top: 118px; width: 330px; rotate: -1.5deg; box-shadow: 0 30px 60px #0009; }
+.f1 .txt { position: absolute; left: 470px; top: 112px; right: 64px; }
+.f1 .t-line { display: flex; align-items: baseline; gap: 18px; }
+.f1 .t-name { font: 400 46px/1 var(--serif); color: var(--text); }
+.f1 .t-tag { font: italic 400 26px/1.2 var(--serif); color: #b9adf6; margin: 12px 0 10px; }
+.f1 .t-say { max-width: 62ch; color: #d9d2f2; }
+.f1 .t-row { display: flex; align-items: center; gap: 28px; margin-top: 8px; }
+.f1 .strip { position: absolute; left: 470px; top: 310px; right: -40px; height: 300px; display: flex; gap: 18px; }
+.f1 .strip img { height: 100%; width: auto; box-shadow: 0 18px 40px #0008; }
+.f1 .holder { position: absolute; left: 50%; bottom: 40px; translate: -50% 0; width: 640px; height: 166px; }
+.f1 .holder .hb, .f1 .holder .hr { position: absolute; inset: 0; width: 100%; height: 100%; }
+.f1 .holder .hr { z-index: 2; }
+.f1 .row { position: absolute; z-index: 1; left: 7%; right: 7%; bottom: 18%; display: flex; justify-content: center; align-items: end; }
+.f1 .row img { width: 70px; margin-left: -13px; }
+.f1 .row img:first-child { margin-left: 0; }
+.f1 .row img.up { translate: 0 -46px; rotate: -6deg; }
+.f1 .row img.out { translate: 0 -28px; }
+.f1 .hn { position: absolute; z-index: 3; left: 412px; bottom: 214px; font: italic 400 18px/1 var(--serif); color: var(--text); }
+
+/* ---------- 2 posters ---------- */
+.f2 { background: linear-gradient(#0d0a26, #1b1546 70%, #241a52); }
+.f2 .line { position: absolute; left: -20px; right: -20px; top: 70px; height: 150px; z-index: 1; }
+.f2 .hung { position: absolute; z-index: 2; width: 74px; transform-origin: 50% 0; box-shadow: 0 10px 20px #0007; }
+.f2 .peg { position: absolute; z-index: 3; width: 7px; height: 18px; background: #d6b98a; border-radius: 2px; }
+.f2 .easel { position: absolute; right: 150px; bottom: -6px; height: 780px; }
+.f2 .onit { position: absolute; z-index: 5; box-shadow: 0 20px 50px #000a; }
+.f2 .txt { position: absolute; left: 72px; top: 330px; width: 520px; }
+.f2 h3 { font: 400 64px/1 var(--serif); margin: 14px 0 12px; }
+.f2 .t-tag { font: italic 400 24px/1.25 var(--serif); color: #b9adf6; margin-bottom: 26px; }
+
+/* ---------- 3 films ---------- */
+.f3 { background: linear-gradient(#120d30, #1d1645 60%, #0c0a22); }
+.f3 .trees { position: absolute; left: 0; right: 0; bottom: 0; height: 200px; z-index: 0; }
+.f3 .proj { position: absolute; left: 30px; top: 300px; width: 360px; z-index: 3; }
+.f3 .beam { position: absolute; z-index: 2; left: 360px; top: 112px; width: 330px; height: 400px;
+  background: linear-gradient(90deg, #ffe9b855, #ffe9b812 92%, transparent); clip-path: polygon(0 68%, 100% 0, 100% 96%, 0 80%); filter: blur(2px); }
+.f3 .screen { position: absolute; z-index: 3; right: 72px; top: 112px; width: 680px; aspect-ratio: 16 / 9; box-shadow: 0 0 80px #ffe9b833, 0 20px 50px #0009; }
+.f3 .screen img { width: 100%; height: 100%; object-fit: cover; }
+.f3 .txt { position: absolute; z-index: 4; right: 72px; top: 520px; width: 680px; display: flex; justify-content: space-between; align-items: end; }
+.f3 h3 { font: 400 46px/1 var(--serif); margin-top: 8px; }
+.f3 .time { font: 400 34px/1 var(--drowsy); color: var(--moon); }
+.f3 .reel { position: absolute; z-index: 4; left: 72px; right: 72px; bottom: 80px; display: flex; gap: 12px; align-items: end; }
+.f3 .reel figure { flex: 1; }
+.f3 .reel img { width: 100%; aspect-ratio: 16/9; object-fit: cover; opacity: 0.55; }
+.f3 .reel figure.now img { opacity: 1; translate: 0 -10px; }
+.f3 .reel figcaption { font: 400 14px/1.2 var(--asleep); color: var(--dim); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.f3 .reel figure.now figcaption { font-family: var(--serif); color: var(--text); translate: 0 -10px; }
+
+/* ---------- 4 products ---------- */
+.f4 { background: #0b1d24; }
+.f4 .world { position: absolute; inset: 0; z-index: -1; background: radial-gradient(70% 80% at 72% 45%, #2d7e86 0%, #134049 45%, #0b1d24 80%); }
+.f4 .rail { position: absolute; left: 40px; top: 150px; display: grid; gap: 16px; }
+.f4 .rail span { font: 400 15px/1 var(--asleep); color: #8fb3b8; }
+.f4 .rail span.now { font-family: var(--serif); color: #fff; }
+.f4 .rail span.now::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--moon); margin: 0 10px 1px -18px; }
+.f4 .steps { position: absolute; left: 230px; top: 120px; width: 380px; }
+.f4 .steps h3 { font: 400 54px/1 var(--serif); margin: 10px 0 26px; }
+.f4 .step { margin-bottom: 26px; color: #9fc1c5; opacity: 0.45; }
+.f4 .step.now { opacity: 1; color: #f2fbfb; }
+.f4 .step strong { display: block; font: italic 400 24px/1.2 var(--serif); margin-bottom: 6px; color: inherit; }
+.f4 .film { position: absolute; left: 660px; top: 170px; width: 740px; box-shadow: 0 30px 70px #0009; overflow: hidden; }
+.f4 .film img { width: 100%; height: auto; }
+.f4 .pause { position: absolute; right: 10px; bottom: 10px; display: grid; place-items: center; width: 44px; height: 44px; color: #fff; }
+.f4 .try { position: absolute; left: 660px; top: 470px; width: 740px; }
+.f4 .try .lbl { color: #9fc1c5; }
+.f4 .try .field { margin-top: 12px; font: italic 400 30px/1.2 var(--serif); color: #fff; padding-bottom: 10px; background: linear-gradient(#ffffff66, #ffffff66) 0 100% / 100% 1px no-repeat; }
+.f4 .try .field i { display: inline-block; width: 2px; height: 30px; background: #fff; vertical-align: -4px; margin-left: 2px; }
+.f4 .bars { display: flex; align-items: end; gap: 6px; height: 90px; margin-top: 18px; }
+.f4 .bars span { width: 14px; background: #7fe0e6; }
+.f4 .bars span.p { background: #ffc46b; }
+.f4 .phone { position: absolute; left: 40px; bottom: 70px; width: 80px; }
+
+/* ---------- 5 about ---------- */
+.f5 { background: linear-gradient(#0f0b28, #18123a 60%, #102033); }
+.f5 .pads { position: absolute; left: 0; right: 0; bottom: 0; height: 170px; z-index: 0; }
+.f5 .mirror { position: absolute; left: 90px; top: 92px; height: 700px; z-index: 2; }
+.f5 .mirror img { position: absolute; inset: 0; height: 100%; width: auto; }
+.f5 .m-line { filter: grayscale(1) contrast(1.6) brightness(1.15) sepia(0.5) hue-rotate(215deg) saturate(1.4); clip-path: ellipse(31% 34% at 50% 52%); -webkit-mask: linear-gradient(160deg, #000 50%, transparent 50.5%); mask: linear-gradient(160deg, #000 50%, transparent 50.5%); }
+.f5 .m-wrap { position: relative; height: 700px; aspect-ratio: 396 / 520; }
+.f5 .txt { position: absolute; left: 700px; top: 150px; right: 80px; }
+.f5 .state { font: 400 52px/1.08 var(--serif); }
+.f5 .kick { font: italic 400 40px/1.1 var(--serif); color: var(--ink); margin: 18px 0 22px; }
+.f5 .roles { max-width: 54ch; color: #d9d2f2; }
+.f5 .moons { position: absolute; left: 700px; bottom: 150px; display: flex; gap: 30px; align-items: end; }
+.f5 .mo { display: grid; justify-items: center; gap: 10px; font: 400 15px/1 var(--asleep); color: var(--dim); }
+.f5 .mo.now { font-family: var(--serif); color: var(--text); }
+.f5 .mo i { width: 40px; height: 40px; border-radius: 50%; background: var(--moon); }
+.f5 .yr { position: absolute; left: 700px; right: 80px; bottom: 70px; font: 400 17px/1.4 var(--body); color: #d9d2f2; }
+.f5 .yr b { font: 400 17px var(--serif); color: var(--text); }
+
+/* ---------- 6 contact ---------- */
+.f6 { background: linear-gradient(#2a2056 0%, #a5739a 52%, #f1cbb6 100%); }
+.f6 .sun { position: absolute; left: 50%; bottom: 120px; width: 900px; height: 900px; translate: -50% 50%; border-radius: 50%; background: radial-gradient(#ffe3b8 0%, #ffd2a888 30%, transparent 62%); z-index: 0; }
+.f6 .letter { position: absolute; z-index: 2; left: 50%; top: 118px; width: 600px; height: 420px; translate: -50% 0; background: #fbf3e2; color: #2a2056; padding: 44px 54px; rotate: -1deg; box-shadow: 0 20px 40px #2a205633; }
+.f6 .letter .lbl { color: #6b5c8f; }
+.f6 .letter h3 { font: 400 54px/1 var(--serif); margin: 14px 0 12px; }
+.f6 .letter p { font: 400 17px/1.5 var(--body); max-width: 44ch; color: #3b3168; }
+.f6 .letter .mail { font: italic 400 32px/1.2 var(--serif); margin-top: 22px; display: block; color: #2a2056; }
+.f6 .env { position: absolute; z-index: 3; left: 50%; bottom: -40px; width: 600px; translate: -50% 0; }
+.f6 .copy { position: absolute; z-index: 4; left: 50%; top: 380px; translate: 330px 0; display: grid; justify-items: center; gap: 6px; font: italic 400 19px/1 var(--serif); color: #2a2056; }
+.f6 .seal { width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #b088ff, #6b3fc6 70%); box-shadow: 0 4px 10px #2a205655; display: grid; place-items: center; color: #f1e4c3; font: 400 26px/1 var(--serif); }
+.f6 .ground { position: absolute; z-index: 4; left: 0; right: 0; bottom: 70px; justify-content: space-between; padding: 0 120px; display: flex; justify-content: center; gap: 60px; font: italic 400 22px/1 var(--serif); color: #2a2056; }
+.f6 .foot { color: #2a2056; }
+.f6 .nav a { color: #cbbfe8; }
+</style>
+</head>
+<body>
+
+<p class="cap">0 · The system. Left: what is on the site now. Right: the new type and controls. Labels are Redaction's pixelated cuts ("asleep"), which sharpen to plain Redaction when they wake.</p>
+<section class="frame f0" id="f0">
+  <div class="old">
+    <h2>Now</h2>
+    <p class="o-lab">01 / 10 · FEU Tech ACM · Jan 2025</p>
+    <p class="o-body">A three-day learning series. Reaching chrome hands and light-trail ribbons carry from the key visual into every card.</p>
+    <span class="o-btn">Open the sheet</span><span class="o-arw">&#8250;</span>
+    <div class="o-nav"><span>I Brands</span><span>II Posters</span><span>III Films</span></div>
+  </div>
+  <div class="new">
+    <h2>New</h2>
+    <p class="n-name">Lana Huertas</p>
+    <p class="n-voice">And I can do it for you, too.</p>
+    <div class="wake"><span class="s100">Brands</span><span class="s70">Brands</span><span class="s35">Brands</span><span class="s0">Brands</span><i>asleep, waking, awake</i></div>
+    <p class="n-body">Body text is Atkinson Hyperlegible Next at 17px: a plain sans made for reading. Labels use Redaction 35; nav words sleep in Redaction 70 and wake into plain Redaction. No pixel font, no Inter, no boxes behind buttons.</p>
+    <div class="ctl">
+      <a class="go" href="#">Open the sheet <svg width="26" height="12" viewBox="0 0 26 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M0 6h24M19 1l5 5-5 5"/></svg></a>
+      <span class="arw"><svg viewBox="0 0 30 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M29 7H1M6 2L1 7l5 5"/></svg></span>
+      <span class="arw"><svg viewBox="0 0 30 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 7h28M24 2l5 5-5 5"/></svg></span>
+      <nav class="nav" style="margin-left:24px"><a class="now" href="#">I Brands</a><a href="#">II Posters</a><a href="#">III Films</a></nav>
+    </div>
+  </div>
+</section>
+
+<p class="cap">1 · Brands: the seed-packet holder. The key visual has risen out of its packet; the name sits on the date line so the pubmats get the height. Pointing at a packet lifts it with a small spring and names it.</p>
+<section class="frame f1" id="f1"></section>
+
+<p class="cap">2 · Posters: the easel. The twelve hang small on a line across the sky; choosing one takes it down and flies it onto the easel, big and alone.</p>
+<section class="frame f2" id="f2"></section>
+
+<p class="cap">3 · Films: the projector. Choosing a clip clicks the projector; its beam throws the film's frame onto the screen. The strip below picks the film.</p>
+<section class="frame f3" id="f3"></section>
+
+<p class="cap">4 · Products: inside the phone. A pinned stage per app: a film of the real app (this is a frame of the real recording) on the app's own colour, steps that light as you scroll, a rail to jump, and one small working piece below.</p>
+<section class="frame f4" id="f4"></section>
+
+<p class="cap">5 · About: the hand mirror. The portrait is an engraved line drawing that wakes into the photo where you point (shown half way). The moon calendar sits under the statement.</p>
+<section class="frame f5" id="f5"></section>
+
+<p class="cap">6 · Contact: the envelope at dawn. The envelope has opened and the letter has slid up; "Copy the address" presses the wax seal.</p>
+<section class="frame f6" id="f6"></section>
+
+<script src="../sleeping-moon/data.js"></script>
+<script>
+const bar = (now, dark) => `<header class="bar"><span class="home">The night almanac</span><nav class="nav">${["I Brands","II Posters","III Films","IV Products","V About","VI Contact"].map((n,i)=>`<a href="#" class="${i===now?"now":""}">${n}</a>`).join("")}</nav><span class="quiet">Quiet mode: off</span></header>`;
+const R = `<svg viewBox="0 0 30 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 7h28M24 2l5 5-5 5"/></svg>`;
+const L = `<svg viewBox="0 0 30 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M29 7H1M6 2L1 7l5 5"/></svg>`;
+const go = (t) => `<a class="go" href="#">${t} <svg width="26" height="12" viewBox="0 0 26 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M0 6h24M19 1l5 5-5 5"/></svg></a>`;
+const A = "../sleeping-moon/art/";
+
+/* 1 brands */
+{
+  const b = DATA.brands[0];
+  document.getElementById("f1").innerHTML = bar(0) + `<div class="bd" style="background-image:url(${b.backdrop})"></div>
+    <img class="kv" src="${b.imgs[0][1]}" alt="">
+    <div class="txt">
+      <div class="t-line"><span class="lbl">01 / 10</span><span class="t-name">${b.name}</span><span class="lbl">${b.org} · ${b.date}</span></div>
+      <p class="t-tag">${b.tag}</p>
+      <div class="t-row"><p class="t-say">A three-day learning series: Data Dominance, Digital Frontiers, Git Grimoire. I made its key visual, event branding, speaker cards and social media.</p>${go("Open the sheet")}</div>
+    </div>
+    <div class="strip">${b.imgs.slice(0,4).map(x=>`<img src="${x[1]}" alt="">`).join("")}</div>
+    <div class="holder"><img class="hb" src="${A}holder-back.webp" alt=""><div class="row">${[0,1,2,3,4,5,6,7,8,9].map(i=>`<img class="${i===0?"out":i===6?"up":""}" src="${A}packets/p${i}.webp" alt="">`).join("")}</div><img class="hr" src="${A}holder.webp" alt=""></div>
+    <span class="hn">TechnoRun 2025</span>
+    <span class="arw" style="position:absolute;left:300px;bottom:100px">${L}</span><span class="arw" style="position:absolute;right:300px;bottom:100px">${R}</span>
+    <div class="foot"><span>Next: Into the Code F++ 5.0</span><span>Manila, 2026</span></div>
+    <p class="anno" style="left:1080px;bottom:200px">packet lifts 46px with a small spring, tilts 6°, its name appears</p>`;
+}
+
+/* 2 posters */
+{
+  const P = DATA.posters, pick = 4, el = document.getElementById("f2");
+  // the line: a sagging curve across the sky; posters hang from it
+  let hung = "", pegs = "";
+  P.forEach((p, i) => {
+    if (i === pick) return;
+    const x = 60 + i * 112, t = (x - 720) / 760, y = 84 + 58 * (1 - t * t);
+    hung += `<img class="hung" src="${p.img[0]}" style="left:${x}px;top:${y + 6}px;rotate:${((i * 37) % 7) - 3}deg" alt="">`;
+    pegs += `<span class="peg" style="left:${x + 33}px;top:${y - 6}px"></span>`;
+  });
+  const p = P[pick];
+  // the easel art is 267 x 520 with its canvas at about x 14-258, y 95-372; drawn 860 tall
+  const s = 780 / 520, ex = 1440 - 150 - 267 * s, ey = 900 + 6 - 780;
+  el.innerHTML = bar(1) + `<div class="stars"></div>
+    <svg class="line" viewBox="0 0 1480 150" preserveAspectRatio="none"><path d="M0 64 Q740 190 1480 64" fill="none" stroke="#cdbfa0" stroke-width="1.4" opacity="0.7"/></svg>
+    ${hung}${pegs}
+    <img class="easel" src="${A}c_posters.webp" alt="">
+    <img class="onit" src="${p.img[1]}" style="left:${ex + 14 * s}px;top:${ey + 92 * s}px;width:${244 * s}px;height:${282 * s}px;object-fit:cover" alt="">
+    <div class="txt"><p class="lbl">05 / 12 · ${p.m} · ${p.y}</p><h3>${p.t}</h3><p class="t-tag">Taken down from the line and set on the easel.</p>
+      <div style="display:flex;gap:24px;align-items:center">${go("See it large")}<span class="arw">${L}</span><span class="arw">${R}</span></div></div>
+    <div class="foot"><span>Twelve posters. Choose one from the line.</span><span>Manila, 2026</span></div>
+    <p class="anno" style="left:560px;top:250px">the gap on the line is where it came from</p>`;
+}
+
+/* 3 films */
+{
+  const F = DATA.films, el = document.getElementById("f3"), f = F[0];
+  el.innerHTML = bar(2) + `<div class="stars"></div>
+    <svg class="trees" viewBox="0 0 1440 200" preserveAspectRatio="none"><path d="M0 120 C80 60 140 110 200 70 S320 40 380 90 S520 30 600 80 S760 40 840 90 S1000 50 1080 85 S1240 40 1320 80 S1420 70 1440 60 V200 H0Z" fill="#07061a"/></svg>
+    <div class="beam"></div>
+    <img class="proj" src="${A}c_films.webp" alt="">
+    <div class="screen"><img src="${f.img[0]}" alt=""></div>
+    <div class="txt"><div><p class="lbl">01 / 10 · ${f.role}</p><h3>${f.t}</h3></div><div style="display:flex;gap:28px;align-items:end"><span class="time">${f.d}</span>${go("Watch it")}</div></div>
+    <div class="reel">${F.slice(0, 8).map((x, i) => `<figure class="${i === 0 ? "now" : ""}"><img src="${x.img[0]}" alt=""><figcaption>${x.t}</figcaption></figure>`).join("")}</div>
+    <div class="foot"><span>Ten edits. Choose one to light it.</span><span>Manila, 2026</span></div>`;
+}
+
+/* 4 products */
+{
+  const el = document.getElementById("f4"), heights = [30, 52, 22, 64, 40, 18, 70, 34, 26, 58, 44, 80, 20, 36, 62, 28];
+  el.innerHTML = bar(3) + `<div class="world"></div>
+    <div class="rail"><span>Overview</span><span>Intake</span><span class="now">Typing rhythm</span><span>Report</span><span>What I built</span></div>
+    <div class="steps"><p class="lbl" style="color:#9fc1c5">01 / 04 · Desktop app · 2025</p><h3>PsyClick</h3>
+      <p class="step"><strong>A calmer intake</strong>Clients answer one question at a time, so screening feels like a talk, not a form.</p>
+      <p class="step now"><strong>How you type, not what</strong>Keystroke timing is read against the client's own warm-up, never anyone else's.</p>
+      <p class="step"><strong>A report for the clinician</strong>Patterns become a short, plain summary.</p></div>
+    <div class="film"><img src="loops/psyclick-try.webp" alt="PsyClick's typing rhythm panel, recorded from the live app"><span class="pause"><svg width="16" height="18" viewBox="0 0 16 18" fill="currentColor"><rect x="1" y="1" width="4" height="16"/><rect x="11" y="1" width="4" height="16"/></svg></span></div>
+    <span class="note" style="left:1150px;top:128px">Pauses over 0.6 s turn amber</span>
+    <div class="try"><p class="lbl">Try it: type how your week has been</p><p class="field">Long, but good<i></i></p>
+      <div class="bars">${heights.map((h, i) => `<span class="${i === 6 || i === 11 ? "p" : ""}" style="height:${h}px"></span>`).join("")}</div></div>
+    <img class="phone" src="${A}c_products.webp" alt="">
+    <div class="foot"><span style="margin-left:100px">Next: Bloom</span><span>Manila, 2026</span></div>
+    <p class="anno" style="left:236px;top:640px">this is a live frame of the real recording; open the page to see it move</p>`;
+}
+
+/* 5 about */
+{
+  const el = document.getElementById("f5");
+  const ph = ["#f1e4c3", "radial-gradient(circle at 70% 50%, transparent 46%, #f1e4c3 47%)", "radial-gradient(circle at 80% 50%, transparent 52%, #f1e4c3 53%)", "radial-gradient(circle at 92% 50%, transparent 56%, #f1e4c3 57%)", "radial-gradient(circle at 100% 50%, transparent 62%, #f1e4c3 63%)", "radial-gradient(circle at 110% 50%, transparent 70%, #f1e4c3 71%)"];
+  el.innerHTML = bar(4) + `<div class="stars"></div>
+    <svg class="pads" viewBox="0 0 1440 170" preserveAspectRatio="none"><path d="M0 60 Q720 20 1440 60 V170 H0Z" fill="#0d2232"/><ellipse cx="1180" cy="110" rx="90" ry="22" fill="#18402f"/><ellipse cx="1300" cy="140" rx="60" ry="15" fill="#18402f"/><ellipse cx="620" cy="130" rx="70" ry="16" fill="#18402f"/></svg>
+    <div class="mirror"><div class="m-wrap"><img src="${A}c_about.webp" alt=""><img class="m-line" src="${A}c_about.webp" alt=""></div></div>
+    <div class="txt"><p class="state">I build high-quality visual content that people stop for.</p><p class="kick">And I can do it for you, too.</p><p class="roles">I'm a UI/UX, brand and motion designer and developer in Manila. I design the thing, then build it.</p></div>
+    <div class="moons">${["2026", "2025", "2023", "2022", "2020", "2019"].map((y, i) => `<span class="mo ${i === 1 ? "now" : ""}"><i style="background:${ph[i]}"></i>${y}</span>`).join("")}</div>
+    <p class="yr"><b>2025</b> · Lead UI/UX designer, PsyClick · Publicity, FEU Tech ACM · Speaker cards and key visuals for three events</p>
+    <p class="anno" style="left:420px;top:100px">engraved where it sleeps, the photo where you point</p>`;
+}
+
+/* 6 contact */
+{
+  const el = document.getElementById("f6");
+  el.innerHTML = bar(5) + `<div class="sun"></div>
+    <div class="letter"><p class="lbl">A letter</p><h3>Let's talk</h3><p>I'm open to UI/UX, brand and motion work. Hiring, or need publicity for your org? I reply within two days.</p><span class="mail">lanadenisehuertas@gmail.com</span></div>
+    <img class="env" src="${A}c_contact.webp" alt="">
+    <span class="copy"><span class="seal">L</span>Copy the address</span>
+    <div class="ground"><span>LinkedIn</span><span>Back to the moon</span><span>GitHub</span></div>
+    <div class="foot"><span>First light. The moon goes to sleep.</span><span>Manila, 2026</span></div>`;
+}
+</script>
+</body>
+</html>

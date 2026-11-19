@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype: what I work with</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500&display=swap">
+<link rel="stylesheet" href="moon.css">
+<script>document.documentElement.classList.add("js");</script>
+<style>
+  /* the skills constellation: the tools' real icons are the stars, asleep in lilac, joined in three constellations
+     by the first screen's dotted lines; the scroll draws the icons and the lines in, and turns the sparkles */
+  .pad { min-height: 70svh; display: grid; place-items: center; color: var(--ink); font: 400 16px/1.4 var(--lab); }
+  .tools { min-height: 100svh; }
+  .tb { position: relative; width: calc(100 * var(--u)); height: calc(62.5 * var(--u)); margin: 0 auto; }
+  .tb-h { position: absolute; left: calc(11 * var(--u)); top: calc(8.4 * var(--u)); font: 400 clamp(30px, calc(3.4 * var(--u)), 52px) / 1 var(--display-awake); color: var(--ink); }
+  .tb-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .tb-lines line { stroke: rgb(185 162 255 / 0.7); stroke-width: 2; stroke-dasharray: 2 7; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+  .grp { position: absolute; inset: 0; pointer-events: none; will-change: transform; }
+  .tool { position: absolute; left: calc(var(--x) * var(--u)); top: calc(var(--y) * var(--u)); width: calc(var(--s) * var(--u)); translate: -50% -50%; pointer-events: auto; }
+  .tool .pic { --ground: #000; width: 100%; filter: none; transition: translate 180ms var(--pop); }
+  .tool .pic .full { width: 100%; height: auto; }
+  .tool:hover .pic { translate: 0 -4px; }
+  /* a soft light of the tool's own colour, only while it is awake */
+  .tool .glow { position: absolute; left: 50%; top: 50%; width: 260%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; pointer-events: none; z-index: -1;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--c) 42%, transparent), transparent); opacity: 0; transition: opacity 900ms linear; }
+  .tool:hover .glow, .tool:has(.woken) .glow { transition-duration: 200ms; }
+  .tool:hover .glow, .tool.lit .glow, .tool:has(.woken) .glow { opacity: 1; }
+  .tool-n { position: absolute; left: 50%; top: calc(100% + 10px); translate: -50% 0; white-space: nowrap; font: 400 16px/1.2 var(--lab); color: var(--ink); }
+  .tool:hover .tool-n, .tool.lit .tool-n, .tool:has(.woken) .tool-n { color: var(--mark); font-family: var(--display-awake); }
+  /* a pixel sparkle on each star: turns with the scroll, flares when the star is pointed at */
+  .tw { position: absolute; right: -10px; top: -10px; width: 3px; height: 3px; background: var(--mark);
+    box-shadow: -3px 0 var(--mark), 3px 0 var(--mark), 0 -3px var(--mark), 0 3px var(--mark); transition: scale 180ms var(--pop); }
+  .tool:hover .tw, .tool.lit .tw, .tool:has(.woken) .tw { scale: 2; }
+  /* constellation names, set the way a star chart names them */
+  .cn { position: absolute; left: calc(var(--x) * var(--u)); top: calc(var(--y) * var(--u)); font: italic 400 clamp(19px, calc(1.6 * var(--u)), 26px) / 1 "Redaction", Georgia, serif; color: var(--mark); }
+  /* phones and upright screens: the same three constellations, stacked down a tall board */
+  @media (max-width: 760px), (max-aspect-ratio: 1/1) {
+    .tb { height: calc(196 * var(--u)); }
+    .tb-h { left: calc(8 * var(--u)); top: calc(10 * var(--u)); }
+    .tool, .cn { left: calc(var(--px) * var(--u)); top: calc(var(--py) * var(--u)); }
+    .tool { width: calc(var(--ps) * var(--u)); }
+  }
+</style>
+</head>
+<body>
+<main>
+  <section class="pad" aria-hidden="true">Scroll down to the constellation</section>
+  <section class="stop tools" id="tools" aria-labelledby="tb-h">
+    <div class="tb" id="tb">
+      <div class="stars" aria-hidden="true"></div>
+      <h3 class="tb-h" id="tb-h">What I work with</h3>
+      <ul class="vh">
+        <li>Design: Figma, Photoshop, Illustrator and Canva</li>
+        <li>Video: Premiere Pro and After Effects</li>
+        <li>Code: Python and JavaScript</li>
+      </ul>
+      <svg class="tb-lines" viewBox="0 0 100 62.5" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <div class="grp" data-depth="1.2" aria-hidden="true">
+        <p class="cn" style="--x:31;--y:16;--px:8;--py:28">Design</p>
+        <div class="tool" style="--x:44;--y:23;--s:9.3;--px:28;--py:44;--ps:22;--c:#F24E1E"><i class="glow"></i><span class="pic" data-kind="paint"><img class="full" src="/logos/figma.webp" width="192" height="192" alt=""></span><i class="tw" data-k="0"></i><span class="tool-n">Figma</span></div>
+        <div class="tool" style="--x:58;--y:14;--s:8.5;--px:70;--py:36;--ps:20;--c:#31A8FF"><i class="glow"></i><span class="pic" data-kind="paint"><img class="full" src="art/tools/ps.svg" width="240" height="234" alt=""></span><i class="tw" data-k="1"></i><span class="tool-n">Photoshop</span></div>
+        <div class="tool" style="--x:69;--y:28;--s:8;--px:76;--py:70;--ps:18.6;--c:#FF9A00"><i class="glow"></i><span class="pic" data-kind="paint"><img class="full" src="art/tools/ai.svg" width="250" height="250" alt=""></span><i class="tw" data-k="2"></i><span class="tool-n">Illustrator</span></div>
+        <div class="tool" style="--x:54;--y:37;--s:7.4;--px:40;--py:80;--ps:17;--c:#00C4CC"><i class="glow"></i><span class="pic" data-kind="paint" data-lift="0.2"><img class="full" src="art/tools/canva-tile.svg" width="240" height="240" alt=""></span><i class="tw" data-k="3"></i><span class="tool-n">Canva</span></div>
+      </div>
+      <div class="grp" data-depth="2" aria-hidden="true">
+        <p class="cn" style="--x:87;--y:41;--px:8;--py:104">Video</p>
+        <div class="tool" style="--x:89;--y:30;--s:7.2;--px:72;--py:114;--ps:18.6;--c:#9999FF"><i class="glow"></i><span class="pic" data-kind="paint"><img class="full" src="art/tools/ae.svg" width="240" height="234" alt=""></span><i class="tw" data-k="4"></i><span class="tool-n">After Effects</span></div>
+        <div class="tool" style="--x:80;--y:45;--s:8;--px:30;--py:122;--ps:20;--c:#EA77FF"><i class="glow"></i><span class="pic" data-kind="paint"><img class="full" src="art/tools/pr.svg" width="240" height="234" alt=""></span><i class="tw" data-k="5"></i><span class="tool-n">Premiere Pro</span></div>
+      </div>
+      <div class="grp" data-depth="0.6" aria-hidden="true">
+        <p class="cn" style="--x:16;--y:34;--px:8;--py:150">Code</p>
+        <div class="tool" style="--x:24;--y:41;--s:7.4;--px:32;--py:166;--ps:18.6;--c:#FFD43B"><i class="glow"></i><span class="pic" data-kind="paint"><img class="full" src="art/tools/py-tile.svg" width="240" height="234" alt=""></span><i class="tw" data-k="6"></i><span class="tool-n">Python</span></div>
+        <div class="tool" style="--x:36;--y:52;--s:6.6;--px:72;--py:176;--ps:17;--c:#F7DF1E"><i class="glow"></i><span class="pic" data-kind="paint"><img class="full" src="art/tools/js-tile.svg" width="240" height="234" alt=""></span><i class="tw" data-k="7"></i><span class="tool-n">JavaScript</span></div>
+      </div>
+    </div>
+  </section>
+  <section class="pad" aria-hidden="true">The end of the prototype</section>
+</main>
+<script src="moon.js"></script>
+<script>
+(() => {
+  const { $, $$ } = SM, tb = $("#tb"), stop = $("#tools");
+  SM.corners(tb);
+  SM.stars($(".stars", tb), 46, [[8, 6, 34, 18]], 23);
+  const tiles = $$(".tool", tb), bms = SM.pictures(tb).filter((b) => b.pic.closest(".tool"));
+  bms.forEach((b) => b.load().catch(() => {}));
+  // the constellations' lines, between the stars' centres, in board units: Design is a kite, Video and Code a pair each
+  const at = (k) => { const s = tiles[k].style, c = SM.COLUMN.matches; return [parseFloat(s.getPropertyValue(c ? "--px" : "--x")), parseFloat(s.getPropertyValue(c ? "--py" : "--y"))]; };
+  const LINES = [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [6, 7]];
+  const svg = $(".tb-lines", tb);
+  svg.innerHTML = LINES.map(() => "<line/>").join("");
+  const ls = $$("line", svg);
+  const clamp = (v) => Math.min(1, Math.max(0, v));
+  const sparks = $$(".tw", tb), grps = $$(".grp", tb);
+  SM.scrub(() => {
+    const w = SM.where(stop), q = SM.quiet();
+    if (!w.near) return;
+    const vb = SM.COLUMN.matches ? "0 0 100 196" : "0 0 100 62.5";
+    if (svg.getAttribute("viewBox") !== vb) svg.setAttribute("viewBox", vb);
+    // no pointer to wake them: each icon wakes into its colours as the scroll carries it across the middle of the screen
+    if (!SM.HOVER) bms.forEach((b, k) => {
+      const r = b.pic.getBoundingClientRect(), f = q ? 0 : SM.smooth(clamp(1 - Math.abs((r.top + r.height / 2) / w.vh - 0.5) / 0.16));
+      b.setFloor(f); tiles[k].classList.toggle("lit", f > 0.5);
+    });
+    const t = q ? 1 : clamp((w.vh - w.top) / (w.vh * 1.1));       // 0 as the stop comes in, 1 a little after its top reaches the top
+    // the stars are drawn in one after another
+    bms.forEach((b, k) => b.setShow(SM.smooth(clamp((t - 0.12 - k * 0.045) / 0.22))));
+    // then the lines between them, each from one star towards the next
+    ls.forEach((l, j) => {
+      const [a, b] = LINES[j], [ax, ay] = at(a), [bx, by] = at(b), f = SM.smooth(clamp((t - 0.42 - j * 0.06) / 0.2));
+      l.setAttribute("x1", ax); l.setAttribute("y1", ay); l.setAttribute("x2", ax + (bx - ax) * f); l.setAttribute("y2", ay + (by - ay) * f);
+      l.style.opacity = f > 0 ? 1 : 0;
+    });
+    // the three constellations sit at different depths, so they slide past each other a little
+    const drift = q ? 0 : (0.5 - Math.min(1, Math.max(0, (-w.top + w.vh * 0.5) / (w.vh * 1.5)))) * SM.u();
+    grps.forEach((g) => (g.style.transform = `translate3d(0, ${(drift * 3 * +g.dataset.depth).toFixed(1)}px, 0)`));
+    // the sparkles turn with the scroll, never on a timer
+    sparks.forEach((s, k) => (s.style.opacity = q ? 1 : (0.25 + 0.75 * (0.5 + 0.5 * Math.sin(scrollY / 85 + k * 2.3))).toFixed(3)));
+  });
+})();
+</script>
+</body>
+</html>

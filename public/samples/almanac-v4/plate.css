@@ -1,0 +1,137 @@
+/* The sleeping moon: Lana Huertas's first screen as a 1-bit plate.
+   Everything is drawn in one ink (lilac) on night and wakes into colour when touched.
+
+   Layout: one board of 100u x 62.5u (16:10), centred in the viewport, where
+   u = min(1vw, 1.6vh). Every position below is in u on that board, on a single
+   centre axis: mast, moon, name and foot are centred; the six doors sit on a
+   two columns beside the moon, three on each side, mirrored. */
+
+@font-face { font-family: "Redaction"; src: url("../brand/fonts/Redaction-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Redaction 70"; src: url("../brand/fonts/Redaction70-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Redaction 35"; src: url("../brand/fonts/Redaction35-Regular.woff2") format("woff2"); font-display: swap; }
+
+:root {
+  --night: #0c0620;
+  --ink: #b9a2ff;      /* the one ink of the bitmap */
+  --mist: #d9cfff;
+  --cream: #fff1c9;
+  --u: min(1vw, 1.6vh);
+  --enter: cubic-bezier(0.23, 1, 0.32, 1);
+  --move: cubic-bezier(0.77, 0, 0.175, 1);
+  --pixel: "Pixelify Sans", ui-monospace, monospace;
+  --body: "Inter Tight", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--night); }
+body { background: var(--night); color: var(--mist); font: 17px/1.5 var(--body); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+img, canvas { display: block; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--cream); outline-offset: 6px; }
+.skip { position: fixed; left: 12px; top: -80px; z-index: 50; padding: 12px 18px; background: var(--cream); color: #2b1470; font-weight: 600; }
+.skip:focus { top: 12px; }
+
+.plate { position: relative; min-height: 100svh; display: grid; place-items: center; overflow: hidden; background: radial-gradient(46vw 46vw at 50% 44%, #1c0f42 0%, var(--night) 70%); }
+.board { position: relative; width: calc(100 * var(--u)); height: calc(62.5 * var(--u)); transition: transform 520ms var(--move), opacity 520ms var(--move); }
+.board.push { transform: scale(1.7); opacity: 0; }
+
+/* ---------- pixel stars ---------- */
+.stars i { position: absolute; width: 2px; height: 2px; background: var(--ink); }
+.stars i.b { width: 3px; height: 3px; box-shadow: -3px 0 var(--ink), 3px 0 var(--ink), 0 -3px var(--ink), 0 3px var(--ink); }
+
+/* ---------- the frame: one ruled border with stair-stepped corners ---------- */
+.frame { position: absolute; inset: calc(1.4 * var(--u)); border: 2px solid rgb(185 162 255 / 0.55); pointer-events: none; }
+.frame i { position: absolute; width: 18px; height: 18px; background:
+  linear-gradient(var(--night), var(--night)) 0 0 / 12px 12px no-repeat,
+  linear-gradient(rgb(185 162 255 / 0.55), rgb(185 162 255 / 0.55)) 10px 4px / 2px 8px no-repeat,
+  linear-gradient(rgb(185 162 255 / 0.55), rgb(185 162 255 / 0.55)) 4px 10px / 8px 2px no-repeat,
+  linear-gradient(rgb(185 162 255 / 0.55), rgb(185 162 255 / 0.55)) 4px 4px / 8px 2px no-repeat,
+  linear-gradient(rgb(185 162 255 / 0.55), rgb(185 162 255 / 0.55)) 4px 4px / 2px 8px no-repeat; }
+.frame i:nth-child(1) { left: -8px; top: -8px; }
+.frame i:nth-child(2) { right: -8px; top: -8px; transform: scaleX(-1); }
+.frame i:nth-child(3) { left: -8px; bottom: -8px; transform: scaleY(-1); }
+.frame i:nth-child(4) { right: -8px; bottom: -8px; transform: scale(-1); }
+
+/* ---------- mast and foot: two ruled bands, three and two columns ---------- */
+.mast, .foot { position: absolute; left: calc(1.4 * var(--u)); right: calc(1.4 * var(--u)); height: calc(4.2 * var(--u)); min-height: 48px; padding: 0 calc(2.2 * var(--u)); display: grid; align-items: center; z-index: 6; }
+.mast { top: calc(1.4 * var(--u)); grid-template-columns: 1fr auto 1fr; border-bottom: 1px dashed rgb(185 162 255 / 0.4); }
+.foot { bottom: calc(1.4 * var(--u)); grid-template-columns: 1fr auto; border-top: 1px dashed rgb(185 162 255 / 0.4); font: 400 15px/1.2 var(--pixel); color: var(--ink); }
+.issue { font: 400 15px/1.2 var(--pixel); color: var(--ink); }
+.issue span { margin-left: 10px; color: var(--mist); }
+.sub { font-size: 17px; color: var(--mist); text-align: center; white-space: nowrap; }
+.switch { justify-self: end; display: inline-flex; align-items: center; gap: 12px; min-height: 44px; font: 400 15px/1 var(--pixel); color: var(--ink); }
+.switch i { position: relative; width: 36px; height: 18px; border: 2px solid var(--ink); }
+.switch i::after { content: ""; position: absolute; left: 2px; top: 2px; width: 10px; height: 10px; background: var(--ink); transition: transform 140ms var(--enter); }
+.switch[aria-checked="true"] i::after { transform: translateX(18px); background: var(--cream); }
+
+/* ---------- the 1-bit group: black is nothing, lilac is ink; the name sits in front of the moon ---------- */
+.xor { position: absolute; inset: 0; background: #000; mix-blend-mode: screen; }
+.pic { position: relative; display: block; line-height: 0; }
+.pic .full { width: 100%; height: auto; }
+.pic .bm { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+/* with scripts, the painted picture waits under the bitmap and fades in once the bitmap has woken */
+.js .pic .full { opacity: 0; transition: opacity 160ms linear; }
+.js .awake > .pic .full, .js .pic.awake .full { opacity: 1; }
+.js .awake > .pic .bm, .js .pic.awake .bm { opacity: 0; transition: opacity 160ms linear; }
+
+.moon { position: absolute; left: 50%; top: calc(7.8 * var(--u)); width: calc(42 * var(--u)); translate: -50% 0; }
+.name {
+  position: absolute; left: 0; right: 0; bottom: calc(6.1 * var(--u));
+  display: grid; justify-items: center;
+  font: 400 calc(13.4 * var(--u)) / 0.84 "Redaction 35", "Redaction", Georgia, serif;
+  letter-spacing: -0.01em; white-space: nowrap; color: var(--ink);
+  /* a halo of night around each letter, so the name cuts into the moon and stays readable */
+  -webkit-text-stroke: calc(0.9 * var(--u)) #000; paint-order: stroke fill;
+}
+.name > span { grid-area: 1 / 1; transition: opacity 180ms linear; }
+.name .n-door { opacity: 0; align-self: center; }
+.touch .name .n-rest { opacity: 0; }
+.touch .name .n-door { opacity: 1; }
+.touch .name { font-family: "Redaction", Georgia, serif; }
+.js .name { opacity: 0; }
+.js .in .name { opacity: 1; transition: opacity 400ms linear 260ms; }
+
+/* ---------- the six doors ---------- */
+.doors { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.door {
+  --box: calc(10.4 * var(--u));
+  position: absolute; left: calc(50% + var(--dx) * var(--u)); top: calc(var(--cy) * var(--u));
+  translate: -50% -50%;
+  display: grid; justify-items: center; gap: 10px;
+  pointer-events: auto;
+  transition: transform 160ms var(--enter), opacity 160ms linear;
+}
+.door .pic { display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: end center; width: var(--box); height: var(--box); }
+.door .pic .full { width: auto; height: auto; max-width: 100%; max-height: 100%; }
+.door .pic > * { grid-area: 1 / 1; }
+.door .pic .bm { position: static; width: auto; height: auto; }
+.door .lab { font: 400 16px/1 var(--pixel); color: var(--ink); white-space: nowrap; }
+.door .lab i { display: inline-block; min-width: 1.6em; margin-right: 8px; font-style: normal; color: var(--mist); text-align: right; }
+.door.on { transform: translateY(-6px); }
+.door.on .lab { color: var(--cream); }
+.touch .door:not(.on) { opacity: 0.5; }
+
+/* ---------- quiet mode and reduced motion: no camera, no drawing-in ---------- */
+.quiet .board, .quiet .door, .quiet .name > span { transition: none; }
+@media (prefers-reduced-motion: reduce) { .board, .door, .name > span { transition: none; } }
+
+/* ---------- phones and upright tablets: the same plate as one column ---------- */
+@media (max-width: 760px), (max-aspect-ratio: 1/1) {
+  :root { --u: 1vw; }
+  .plate { display: block; }
+  .board { width: 100%; height: auto; min-height: 100svh; padding: calc(1.4 * var(--u) + 60px) 0 calc(1.4 * var(--u) + 60px); }
+  .mast { grid-template-columns: 1fr auto; padding: 0 16px; height: 52px; }
+  .mast .sub { position: absolute; left: 0; right: 0; top: 64px; font-size: 16px; }
+  .switch span { display: none; }
+  .foot { padding: 0 16px; height: 52px; font-size: 14px; }
+  .foot p:last-child { display: none; }
+  .xor { position: relative; inset: auto; padding-top: 44px; }
+  .moon { position: relative; left: auto; top: auto; translate: none; width: min(76vw, 52svh); margin: 0 auto; }
+  .name { position: relative; bottom: auto; margin-top: max(-12vw, -70px); -webkit-text-stroke-width: min(2vw, 12px); font-size: min(25vw, 150px); line-height: 0.82; white-space: normal; text-align: center; }
+  .name .n-rest > span { display: block; }
+  .doors { position: relative; inset: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px 0; padding: 30px 12px 20px; }
+  .door { --box: min(25vw, 170px); position: relative; left: auto; top: auto; translate: none; }
+  .door .lab { font-size: 15px; }
+  .door .lab i { min-width: 0; }
+}

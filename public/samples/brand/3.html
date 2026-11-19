@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand sheet 3: Pop-up herbarium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Damion&family=Inter+Tight:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sheet.css">
+<style>
+/* POP-UP HERBARIUM. The site is a handmade pop-up card on lavender paper.
+   Everything is a physical thing: cut card with a white die-cut edge, tape,
+   stickers, folder tabs. Pull the tab and the garden stands up off the page.
+   A chunky serif names things; a fine script signs them. */
+:root {
+  --ground: #efe8ff;
+  --card: #fffdf8;
+  --ink: #2b1470;
+  --text: #2b1470;
+  --muted: #54468a;
+  --iris: #6b46e0;
+  --edge: #3a1f85;
+  --lilac: #b9a2ff;
+  --orchid: #ee8be4;
+  --butter: #fff1c9;
+  --line: #d9cff5;
+  --accent: #6b46e0;
+  --display: "Gloock", Georgia, serif;
+  --script: "Damion", cursive;
+  --body: "Inter Tight", system-ui, sans-serif;
+  --pop: cubic-bezier(0.3, 1.5, 0.5, 1);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --lift: 0 1px 0 var(--line), 0 14px 28px -16px rgb(43 20 112 / 0.45);
+}
+.script { font-family: var(--script); font-weight: 400; }
+
+/* ---------- hero: a pop-up card ---------- */
+.hero { background: radial-gradient(80% 60% at 50% 30%, #f7f3ff, var(--ground)); }
+.hero h1 { position: relative; z-index: 2; padding: clamp(80px, 11vh, 120px) 4vw 0; font: 400 clamp(62px, 11.6vw, 196px)/0.82 var(--display); letter-spacing: -0.02em; color: var(--ink); text-align: center; }
+.hero h1 .script { display: block; margin-top: -0.12em; font-size: 0.44em; line-height: 1; color: var(--iris); letter-spacing: 0; }
+.stage { position: absolute; left: 50%; bottom: -6vh; z-index: 3; width: min(96vw, 1180px); height: 64vh; translate: -50% 0; perspective: 1400px; perspective-origin: 50% -10%; pointer-events: none; }
+.spread { position: absolute; inset: auto 0 0; height: 74%; transform: rotateX(72deg); transform-origin: 50% 100%; transform-style: preserve-3d; }
+.page { position: absolute; top: 0; bottom: 0; width: 50%; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+.page.l { left: 0; border-radius: 18px 0 0 18px; background: linear-gradient(90deg, var(--card) 80%, #ece4ff); }
+.page.r { right: 0; border-radius: 0 18px 18px 0; background: linear-gradient(270deg, var(--card) 80%, #ece4ff); }
+.spread::after { content: ""; position: absolute; inset: 6% 4%; border: 1.5px dashed var(--lilac); border-radius: 12px; transform: translateZ(1px); }
+.pop { position: absolute; bottom: var(--b); left: var(--x); width: var(--w); translate: -50% 0; transform-origin: 50% 100%; transform: translateZ(2px) rotateX(0deg); transition: transform 1.05s var(--pop); transition-delay: calc(var(--i) * 110ms); }
+.pop img { width: 100%; filter: drop-shadow(0 10px 8px rgb(43 20 112 / 0.28)); }
+.open .pop { transform: translateZ(2px) rotateX(-72deg); }
+.hero .role { position: absolute; left: 4vw; top: 46vh; z-index: 4; max-width: 22ch; font-size: clamp(16px, 1.2vw, 18px); color: var(--muted); }
+.hero .role b { display: block; font: 400 2.3em/1 var(--script); color: var(--ink); }
+
+/* the signature button: a sticker tab you pull; its corner peels when you come near */
+.tab {
+  position: relative; display: inline-flex; align-items: center; gap: 10px;
+  min-height: 62px; padding: 0 26px 0 10px; border-radius: 999px;
+  background: var(--card); color: var(--ink);
+  box-shadow: 0 0 0 5px #fff, 0 0 0 6px var(--line), 0 16px 26px -14px rgb(43 20 112 / 0.55);
+  font: 600 17px var(--body);
+  transition: transform 0.35s var(--pop), box-shadow 0.35s;
+}
+.tab img { width: 52px; transition: transform 0.5s var(--pop); }
+.tab::after { content: ""; position: absolute; right: -2px; top: -2px; width: 22px; height: 22px; border-radius: 0 999px 0 6px; background: linear-gradient(225deg, var(--ground) 50%, #e2d8ff 50%); box-shadow: -3px 3px 5px -2px rgb(43 20 112 / 0.35); transform: scale(0); transform-origin: 100% 0; transition: transform 0.3s var(--pop); }
+.tab:hover, .tab:focus-visible { transform: rotate(-3deg) translateY(-3px); box-shadow: 0 0 0 5px #fff, 0 0 0 6px var(--lilac), 0 24px 34px -16px rgb(43 20 112 / 0.6); }
+.tab:hover img, .tab:focus-visible img { transform: rotate(-14deg) scale(1.12); }
+.tab:hover::after, .tab:focus-visible::after { transform: scale(1); }
+.tab:active { transform: rotate(-1deg) translateY(2px); }
+.hero .tab { position: absolute; right: 4vw; top: 46vh; z-index: 5; }
+.hero.open .tab { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.burst { position: absolute; right: 4vw; top: 46vh; z-index: 5; display: grid; gap: 10px; justify-items: end; pointer-events: none; }
+.burst a { opacity: 0; transform: translateX(30px) rotate(6deg); pointer-events: none; transition: transform 0.6s var(--pop), opacity 0.2s; transition-delay: calc(var(--i) * 70ms + 0.6s); }
+.open .burst a { opacity: 1; transform: rotate(var(--r)); pointer-events: auto; }
+
+/* ---------- paper UI kit ---------- */
+.btn {
+  --f: var(--iris); --e: var(--edge); --t: var(--card);
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap;
+  min-height: 50px; padding: 0 22px; border-radius: 14px;
+  background: var(--f); color: var(--t);
+  box-shadow: 0 5px 0 var(--e), 0 12px 18px -10px rgb(43 20 112 / 0.5);
+  font: 600 16px var(--body); text-decoration: none;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.btn svg .k { fill: currentColor; stroke: none; }
+.btn:hover, .btn.is-hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--e), 0 18px 22px -12px rgb(43 20 112 / 0.55); }
+.btn:active, .btn.is-press { transform: translateY(4px); box-shadow: 0 1px 0 var(--e), 0 4px 8px -6px rgb(43 20 112 / 0.5); }
+.btn.is-focus { outline: 3px solid var(--ink); outline-offset: 5px; }
+.btn.paper { --f: var(--card); --e: var(--lilac); --t: var(--ink); box-shadow: 0 5px 0 var(--e), inset 0 0 0 1.5px var(--lilac), 0 12px 18px -10px rgb(43 20 112 / 0.4); }
+.btn.paper:hover, .btn.paper.is-hover { box-shadow: 0 7px 0 var(--e), inset 0 0 0 1.5px var(--iris), 0 18px 22px -12px rgb(43 20 112 / 0.45); }
+.btn.is-off { --f: #ddd5f3; --e: #c9bfe8; --t: #6e6596; transform: none; cursor: not-allowed; }
+.btn.sq { width: 50px; padding: 0; }
+.link { font-weight: 600; color: var(--ink); text-decoration: none; padding-bottom: 6px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6'%3E%3Cpath d='M0 3q4-3 8 0t8 0' fill='none' stroke='%23ee8be4' stroke-width='2'/%3E%3C/svg%3E") 0 100% / 16px 6px repeat-x; }
+.link:hover { color: var(--iris); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
+.states { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 22px 18px; }
+.states small { display: block; margin-top: 12px; font-size: 14px; color: var(--muted); text-align: center; }
+
+/* ---------- board: cards of paper, some taped down ---------- */
+.board { --gap: 22px; }
+.panel { border-radius: 20px; background: var(--card); box-shadow: 0 0 0 5px #fff, var(--lift); }
+.panel.tape::before, .panel.tape::after { content: ""; position: absolute; top: -12px; width: 96px; height: 28px; background: rgb(185 162 255 / 0.55); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.5); }
+.panel.tape::before { left: 26px; rotate: -6deg; }
+.panel.tape::after { right: 26px; rotate: 5deg; background: rgb(238 139 228 / 0.45); }
+.cap b { font: 400 2rem/1 var(--display); color: var(--ink); margin-bottom: 6px; }
+.idea p.big { font: 400 clamp(2rem, 3.3vw, 3.1rem)/1.04 var(--display); color: var(--ink); }
+.idea p.big .script { color: var(--iris); font-size: 1.2em; }
+.idea ul { margin-top: 22px; display: grid; gap: 12px; list-style: none; }
+.idea li { display: flex; gap: 12px; }
+.idea li img { flex: none; width: 26px; height: 26px; object-fit: contain; }
+
+.logo .lock { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; }
+.mark { display: grid; place-items: center; width: var(--s); height: var(--s); }
+.mark img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 6px rgb(43 20 112 / 0.25)); }
+.logo .word { font: 400 clamp(2.6rem, 5vw, 4.6rem)/0.86 var(--display); letter-spacing: -0.02em; }
+.logo .word .script { display: block; margin-top: 4px; font-size: 0.5em; color: var(--iris); letter-spacing: 0; }
+.sizes { display: flex; align-items: center; gap: 22px; margin-top: 26px; padding-top: 22px; border-top: 1.5px dashed var(--lilac); }
+.sizes .dark { padding: 10px; border-radius: 14px; background: var(--ink); }
+
+.sw { border-radius: 14px; background: var(--card); box-shadow: 0 0 0 4px #fff, var(--lift); }
+.sw i { font-family: var(--display); border-radius: 12px 12px 0 0; }
+
+.type .spec { display: grid; gap: 16px; }
+.type .spec > div { display: grid; grid-template-columns: 160px 1fr; gap: 18px; align-items: baseline; padding-bottom: 14px; border-bottom: 1.5px dashed var(--line); }
+.type .spec span { font-size: 14px; color: var(--muted); }
+.t-dis { font: 400 clamp(3.2rem, 6.4vw, 6rem)/0.86 var(--display); letter-spacing: -0.02em; }
+.t-scr { font: 400 clamp(2.6rem, 4.2vw, 4rem)/1 var(--script); color: var(--iris); }
+.t-body { font-size: 17px; max-width: 52ch; }
+
+.parts .grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px; }
+.folder { position: relative; padding-top: 44px; }
+.folder .tabs { position: absolute; left: 14px; top: 0; display: flex; gap: 4px; }
+.folder .tabs button { min-height: 44px; padding: 0 18px; border-radius: 12px 12px 0 0; background: #e4dbff; font-size: 15px; color: var(--muted); box-shadow: inset 0 -1px 0 var(--line); }
+.folder .tabs button[aria-selected="true"] { background: var(--iris); color: var(--card); box-shadow: none; }
+.folder .tabs button:not([aria-selected="true"]):hover { background: #d8ccff; color: var(--ink); }
+.folder .body { padding: 16px 18px; border-radius: 4px 14px 14px 14px; background: var(--iris); color: var(--card); }
+.nav { display: flex; align-items: center; gap: 22px; padding: 10px 10px 10px 16px; border-radius: 16px; background: var(--ground); box-shadow: inset 0 0 0 1.5px var(--line); }
+.nav .mark { --s: 44px; }
+.nav a:not(.btn) { font-size: 16px; text-decoration: none; }
+.nav a:not(.btn):hover { color: var(--iris); text-decoration: underline; text-underline-offset: 4px; }
+.nav .btn { margin-left: auto; min-height: 44px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px 0 6px; border-radius: 999px; background: var(--card); box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--line), 0 6px 10px -6px rgb(43 20 112 / 0.4); font-size: 15px; }
+.chip img { width: 30px; height: 30px; object-fit: contain; }
+.field label { display: block; margin-bottom: 8px; font-size: 15px; font-weight: 600; }
+.field input { width: 100%; min-height: 52px; padding: 0 16px; border: 0; border-radius: 14px; background: var(--ground); box-shadow: inset 0 0 0 1.5px var(--line); font-size: 17px; }
+.field input:focus { outline: none; box-shadow: inset 0 0 0 2px var(--iris), 0 5px 0 var(--lilac); }
+.field p { margin-top: 8px; font-size: 14px; color: var(--muted); }
+.washi { position: relative; margin-top: 30px; rotate: -1deg; }
+.ticker { padding: 14px 0; background: rgb(185 162 255 / 0.6); font: 400 1.5rem/1 var(--display); color: var(--ink); }
+.washi::before, .washi::after { content: ""; position: absolute; left: 0; right: 0; z-index: 1; height: 6px; background: radial-gradient(circle at 3px 0, var(--card) 3px, transparent 3.5px) 0 0 / 9px 6px repeat-x; }
+.washi::before { top: 0; }
+.washi::after { bottom: 0; transform: scaleY(-1); }
+.ticker img { width: 28px; height: 28px; object-fit: contain; }
+.stack { display: grid; gap: 18px; align-content: start; }
+
+.cards { gap: 22px; }
+.card { position: relative; display: block; padding: 12px 12px 16px; border-radius: 16px; background: var(--card); box-shadow: 0 0 0 4px #fff, 0 0 0 5px var(--line), 0 18px 26px -18px rgb(43 20 112 / 0.6); color: inherit; text-decoration: none; rotate: var(--r, 0deg); transition: transform 0.4s var(--pop), box-shadow 0.3s; }
+.card .ph { display: block; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 10px; }
+.card img { width: 100%; height: 100%; object-fit: cover; }
+.card b { display: block; margin-top: 12px; font: 400 1.5rem/1 var(--display); }
+.card small { font-size: 15px; color: var(--muted); }
+.card .st { position: absolute; right: -14px; top: -16px; width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 6px 5px rgb(43 20 112 / 0.3)); transition: transform 0.6s var(--pop); }
+.card:hover { transform: translateY(-6px) rotate(-1.5deg); box-shadow: 0 0 0 4px #fff, 0 0 0 5px var(--lilac), 0 28px 34px -18px rgb(43 20 112 / 0.6); }
+.card:hover .st { transform: rotate(40deg) scale(1.1); }
+
+.icons figure { border-radius: 16px; background: var(--card); box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--line), 0 8px 12px -8px rgb(43 20 112 / 0.4); color: var(--muted); }
+.icons svg { fill: none; stroke: var(--ink); stroke-width: 1.7; stroke-linejoin: round; }
+.icons svg .k { fill: var(--orchid); stroke: var(--ink); stroke-width: 1.2; }
+
+.garden .set { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; }
+.garden figure { position: relative; display: grid; place-items: center; gap: 4px; padding: 26px 14px 14px; border-radius: 18px; background: var(--ground); box-shadow: inset 0 0 0 1.5px var(--line); }
+.garden figure img { height: 200px; width: auto; max-width: 100%; object-fit: contain; filter: drop-shadow(0 12px 8px rgb(43 20 112 / 0.25)); transition: transform 0.5s var(--pop); }
+.garden figure:hover img { transform: translateY(-8px) rotate(-5deg); }
+.garden figcaption { font: 400 2rem/1 var(--script); color: var(--iris); }
+
+.opener .strip { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; padding: 64px clamp(20px, 3vw, 40px) 30px; border-radius: 4px 18px 18px 18px; background: var(--ground); box-shadow: inset 0 0 0 1.5px var(--line); }
+.opener .ftab { position: absolute; left: 0; top: -40px; display: flex; align-items: center; height: 42px; padding: 0 20px; border-radius: 14px 14px 0 0; background: var(--ground); box-shadow: inset 1.5px 1.5px 0 var(--line), inset -1.5px 0 0 var(--line); font: 600 15px var(--body); color: var(--muted); }
+.opener h3 { font: 400 clamp(3rem, 7vw, 6.6rem)/0.86 var(--display); letter-spacing: -0.02em; }
+.opener h3 + p { font: 400 clamp(2rem, 3vw, 2.8rem)/1.1 var(--script); color: var(--iris); }
+.opener .up { position: absolute; right: 20%; bottom: calc(100% - 26px); width: clamp(110px, 12vw, 180px); transform-origin: 50% 100%; transform: scaleY(0.05); transition: transform 1s var(--pop) 0.3s; filter: drop-shadow(0 12px 8px rgb(43 20 112 / 0.3)); }
+.opener.in .up { transform: none; }
+.opener .wrap { position: relative; margin-top: clamp(110px, 12vw, 170px); }
+
+@media (max-width: 900px) {
+  .hero .role { display: none; }
+  .hero .tab, .burst { top: auto; bottom: 46vh; right: 50%; translate: 50% 0; }
+  .burst { grid-template-columns: 1fr 1fr; justify-items: stretch; width: 92vw; bottom: 40vh; }
+  .burst a { min-height: 44px; font-size: 14px; }
+  .stage { width: 150vw; height: 50vh; bottom: -2vh; }
+  .parts .grid, .opener .strip { grid-template-columns: 1fr; }
+  .garden .set { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .type .spec > div { grid-template-columns: 1fr; gap: 6px; }
+  .opener .up { right: 8%; width: 96px; }
+}
+</style>
+</head>
+<body>
+<header class="hero" id="hero">
+  <h1>Lana Denise Huertas<span class="script">a garden of things I made</span></h1>
+  <p class="role"><b>Pull the tab.</b>UI/UX and visual design, cut, folded and glued in Manila.</p>
+  <div class="stage" aria-hidden="true">
+    <div class="spread">
+      <div class="page l"></div><div class="page r"></div>
+      <span class="pop" style="--x:72%;--b:52%;--w:26%;--i:0"><img src="art/p_moon.webp" alt=""></span>
+      <span class="pop" style="--x:22%;--b:44%;--w:13%;--i:1"><img src="art/p_bud.webp" alt=""></span>
+      <span class="pop" style="--x:50%;--b:22%;--w:30%;--i:2"><img src="art/p_bloom.webp" alt=""></span>
+      <span class="pop" style="--x:84%;--b:12%;--w:16%;--i:3"><img src="art/p_fly.webp" alt=""></span>
+      <span class="pop" style="--x:12%;--b:8%;--w:11%;--i:4"><img src="art/p_bud.webp" alt=""></span>
+    </div>
+  </div>
+  <button class="tab" type="button" id="open" data-moment><img src="art/p_fly.webp" alt="" width="607" height="461">Pull the tab</button>
+  <nav class="burst" aria-label="Sections"></nav>
+</header>
+
+<main class="board">
+  <section class="panel s5 idea tape">
+    <span class="cap"><b>The idea</b>One sentence the whole site keeps.</span>
+    <p class="big">A pop-up card of my work. <span class="script">Pull the tab</span> and the garden stands up.</p>
+    <ul>
+      <li><img src="art/p_bloom.webp" alt="">Everything is a thing you could hold: cut card, tape, stickers, folder tabs.</li>
+      <li><img src="art/p_bud.webp" alt="">Things stand up when they arrive, hinged at the foot, like a pop-up.</li>
+      <li><img src="art/p_moon.webp" alt="">A chunky serif names things. A fine script signs them, at 28 px and up only.</li>
+      <li><img src="art/p_fly.webp" alt="">Light lavender paper, violet ink. Pink is only ever a sticker or a stamp.</li>
+    </ul>
+  </section>
+
+  <section class="panel s7 logo">
+    <span class="cap"><b>Name and mark</b>The mark is the paper bloom, as a sticker.</span>
+    <div class="lock"><span class="mark" style="--s:150px"><img src="art/p_bloom.webp" alt=""></span><p class="word">Lana Denise Huertas<span class="script">UI/UX and visual designer</span></p></div>
+    <div class="sizes">
+      <span class="mark" style="--s:96px"><img src="art/p_bloom.webp" alt=""></span>
+      <span class="mark" style="--s:48px"><img src="art/p_bloom.webp" alt=""></span>
+      <span class="mark" style="--s:24px"><img src="art/p_bloom.webp" alt=""></span>
+      <span class="dark"><span class="mark" style="--s:48px"><img src="art/p_bloom.webp" alt=""></span></span>
+      <span class="note">96, 48 and 24 px, and on violet ink.</span>
+    </div>
+  </section>
+
+  <section class="panel colour">
+    <span class="cap"><b>Colour</b>Paper, ink and three card colours. Ratios measured live.</span>
+    <div class="swatches" id="sw"></div>
+  </section>
+
+  <section class="panel s7 type tape">
+    <span class="cap"><b>Type</b>A display serif and a script, signed in pairs, with a plain sans for reading.</span>
+    <div class="spec">
+      <div><span>Gloock<br>Names and titles, 36 px and up</span><p class="t-dis">Pressed flowers</p></div>
+      <div><span>Damion<br>Signatures under titles, 28 px and up</span><p class="t-scr">ten brands, twelve posters</p></div>
+      <div><span>Inter Tight<br>Reading, 17 px, line height 1.55</span><p class="t-body">I design brands, posters and interfaces for student organisations and start-ups in Manila, and I build some of them in code.</p></div>
+    </div>
+  </section>
+
+  <section class="panel s5 buttons">
+    <span class="cap"><b>Buttons</b>Card with a thick edge: lift on hover, press flat.</span>
+    <div class="states">
+      <div><a class="btn" href="#">See work</a><small>Rest</small></div>
+      <div><a class="btn is-hover" href="#">See work</a><small>Hover</small></div>
+      <div><a class="btn is-press" href="#">See work</a><small>Pressed</small></div>
+      <div><a class="btn is-focus" href="#">See work</a><small>Focus</small></div>
+      <div><span class="btn is-off">Sent</span><small>Disabled</small></div>
+      <div><a class="btn paper" href="#">About me</a><small>Paper</small></div>
+    </div>
+    <div class="row" style="margin-top:22px"><button class="btn sq paper" type="button" aria-label="Play the reel" id="playbtn"></button><a class="link" href="#">Download CV</a></div>
+    <p class="note" style="margin:26px 0 14px">The signature button: a sticker tab. Hover and its corner peels.</p>
+    <button class="tab" type="button"><img src="art/p_fly.webp" alt="">Pull the tab</button>
+  </section>
+
+  <section class="panel parts">
+    <span class="cap"><b>Interface pieces</b>Navigation, folder tabs, sticker tags, a form field and washi tape.</span>
+    <div class="grid">
+      <div class="stack">
+        <nav class="nav" aria-label="Example navigation"><span class="mark"><img src="art/p_bloom.webp" alt=""></span><a href="#">Work</a><a href="#">Posters</a><a href="#">Motion</a><a href="#">About</a><a class="btn" href="#">Let's talk</a></nav>
+        <div class="folder"><div class="tabs" role="tablist" aria-label="Example tabs"><button role="tab" aria-selected="true">Branding</button><button role="tab" aria-selected="false">Posters</button><button role="tab" aria-selected="false">Motion</button><button role="tab" aria-selected="false">UI/UX</button></div><div class="body">10 brands in this folder</div></div>
+        <div class="row" id="chips"></div>
+      </div>
+      <div class="stack"><div class="field"><label for="em">Your email</label><input id="em" type="email" autocomplete="email" placeholder="you@studio.com"><p>I reply within two days.</p></div></div>
+    </div>
+    <div class="washi"><div class="ticker" id="tk"></div></div>
+  </section>
+
+  <section class="panel s8 work">
+    <span class="cap"><b>Work cards</b>Collectible cards, each with a sticker that spins when you pick it up.</span>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section class="panel s4">
+    <span class="cap"><b>Icons</b>Drawn in ink, one stamp of pink.</span>
+    <div class="icons" id="icons"></div>
+  </section>
+
+  <section class="panel garden tape">
+    <span class="cap"><b>The garden</b>Four cut-paper pieces, made in the same six colours. Each signs its own name.</span>
+    <div class="set">
+      <figure><img src="art/p_moon.webp" alt=""><figcaption>moon</figcaption></figure>
+      <figure><img src="art/p_bloom.webp" alt=""><figcaption>bloom</figcaption></figure>
+      <figure><img src="art/p_bud.webp" alt=""><figcaption>bud</figcaption></figure>
+      <figure><img src="art/p_fly.webp" alt=""><figcaption>butterfly</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="panel opener">
+    <span class="cap"><b>How a section opens</b>Each section is a folder. When it arrives, its flower stands up out of the page.</span>
+    <div class="wrap">
+      <div class="strip">
+        <span class="ftab">Folder 1 of 6</span>
+        <img class="up" src="art/p_bloom.webp" alt="">
+        <div><h3>Branding &amp; pubmats</h3><p>ten brands, 2022 to now</p></div>
+        <a class="btn" href="#">Open the folder</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="sheet.js"></script>
+<script>
+const hero = $("#hero");
+$(".burst").innerHTML = PARTS.map((p, i) => `<a class="btn ${i ? "paper" : ""}" href="#" style="--i:${i};--r:${[-3, 2, -2, 3, -1, 2][i]}deg">${p.t}</a>`).join("");
+$("#open").onclick = () => hero.classList.add("open");
+
+swatches($("#sw"), [
+  { name: "Lavender paper", hex: "#efe8ff", on: "#2b1470", role: "ground" },
+  { name: "Card", hex: "#fffdf8", on: "#2b1470", role: "panels, cards" },
+  { name: "Violet ink", hex: "#2b1470", on: "#fffdf8", role: "text, titles" },
+  { name: "Iris card", hex: "#6b46e0", on: "#fffdf8", role: "buttons, script" },
+  { name: "Lilac card", hex: "#b9a2ff", on: "#2b1470", role: "edges, tape" },
+  { name: "Orchid sticker", hex: "#ee8be4", on: "#2b1470", role: "stickers, stamps" },
+  { name: "Butter", hex: "#fff1c9", on: "#2b1470", role: "the bloom's heart" },
+]);
+icons($("#icons"));
+$("#playbtn").innerHTML = icon(2);
+const STK = ["p_bloom", "p_moon", "p_fly", "p_bud"];
+$("#chips").innerHTML = ["Branding", "Posters", "Motion", "UI/UX"].map((t, i) => `<span class="chip"><img src="art/${STK[i]}.webp" alt="">${t}</span>`).join("");
+ticker($("#tk"), ["Branding", "Posters", "Moving pictures", "UI/UX and code", "Open to work"], ` <img src="art/p_bloom.webp" alt="">`);
+cards($("#cards"), 3, (p, i) => `<img class="st" src="art/${STK[i]}.webp" alt="">`);
+$$(".card").forEach((c, i) => c.style.setProperty("--r", [-1.5, 1, -0.5][i] + "deg"));
+const tabs = $(".folder .tabs");
+$$("button", tabs).forEach((b) => (b.onclick = () => { $$("button", tabs).forEach((x) => x.setAttribute("aria-selected", x === b)); $(".folder .body").textContent = { Branding: "10 brands", Posters: "12 posters", Motion: "10 edits", "UI/UX": "4 products" }[b.textContent] + " in this folder"; }));
+</script>
+</body>
+</html>

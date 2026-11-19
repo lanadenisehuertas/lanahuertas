@@ -3,7 +3,6 @@ import BrandShowcase from "@/components/showcase/BrandShowcase";
 import PosterRow from "@/components/showcase/PosterRow";
 import Contact from "@/components/Contact";
 import ScrollFX from "@/components/ScrollFX";
-import GardenFX from "@/components/GardenFX";
 
 export const metadata: Metadata = {
   title: "Branding & pubmats — Lana Denise Huertas",
@@ -19,7 +18,6 @@ export default function DesignPage() {
       <PosterRow />
       <Contact />
       <ScrollFX />
-      <GardenFX />
     </main>
   );
 }
