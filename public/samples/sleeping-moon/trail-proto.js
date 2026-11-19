@@ -1,7 +1,8 @@
-/* Prototype: the stardust trail. The pointer leaves a ribbon of pixel motes behind it, like a wand: they take a little
-   of its speed, rise like embers, wander, twinkle in steps and go out. A small gold star follows the tip on a spring.
+/* Prototype: the stardust trail. The pointer leaves a ribbon of soft motes behind it, like a wand: they take a little
+   of its speed, rise like embers, wander, twinkle gently and fade out. A small gold glint follows the tip on a spring.
    Resting on something you can open makes motes circle it; a click or tap throws a ring of them.
-   Everything is drawn on one canvas with squares snapped to whole CSS pixels. The loop sleeps when nothing is alive. */
+   The motes are soft dots and four-point glints, drawn from small sprites made once per colour; one in twelve is a tiny
+   bitmap rune of square pixels, a trace of the board's 1-bit hand. The loop sleeps when nothing is alive. */
 (() => {
   const still = () => SM.quiet() || matchMedia("(prefers-reduced-motion: reduce)").matches;
   const cv = document.createElement("canvas");
@@ -9,7 +10,7 @@
   document.body.append(cv);
   const ctx = cv.getContext("2d");
   let W = 0, H = 0, dpr = 1;
-  const size = () => { dpr = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.imageSmoothingEnabled = false; };
+  const size = () => { dpr = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
   size(); addEventListener("resize", size);
   SM.trail = true;
 
@@ -19,17 +20,31 @@
     const st = typeof SM.stop === "function" ? SM.stop() : SM.stop;
     const el = st instanceof Element ? st : document.body, cs = getComputedStyle(el);
     const dawn = el.id === "talk" || el.dataset?.sky === "dawn";
-    pal = dawn ? ["#5b3fc4", "#8a5d00", "#7a4fd6"] : [cs.getPropertyValue("--mark").trim() || "#fff1c9", cs.getPropertyValue("--ink").trim() || "#b9a2ff", "#ffffff"];
+    const next = dawn ? ["#5b3fc4", "#8a5d00", "#7a4fd6"] : [cs.getPropertyValue("--mark").trim() || "#fff1c9", cs.getPropertyValue("--ink").trim() || "#b9a2ff", "#ffffff"];
+    if (next.join() !== pal.join() || !sprites.length) { pal = next; sprites = pal.map((c) => [sprite(c, 0), sprite(c, 1)]); }
   };
-  recolour(); SM.onStop?.(recolour);
-
-  /* tiny bitmaps, one string per row: a crescent, a star and a rune */
+  /** a sprite of one colour: kind 0 a soft round dot, kind 1 a four-point glint in a faint halo. The shape is drawn in
+      white first and then filled with the colour, so any CSS colour works */
+  let sprites = [];
+  function sprite(colour, kind) {
+    const S = 64, h = S / 2, c = document.createElement("canvas"); c.width = c.height = S;
+    const x = c.getContext("2d"), g = x.createRadialGradient(h, h, 0, h, h, h);
+    if (kind === 0) { g.addColorStop(0, "rgba(255,255,255,1)"); g.addColorStop(0.22, "rgba(255,255,255,0.9)"); g.addColorStop(0.5, "rgba(255,255,255,0.22)"); g.addColorStop(1, "rgba(255,255,255,0)"); }
+    else { g.addColorStop(0, "rgba(255,255,255,0.5)"); g.addColorStop(0.4, "rgba(255,255,255,0.12)"); g.addColorStop(1, "rgba(255,255,255,0)"); }
+    x.fillStyle = g; x.fillRect(0, 0, S, S);
+    if (kind === 1) {
+      x.fillStyle = "#fff"; x.beginPath();
+      x.moveTo(h, 0); x.quadraticCurveTo(h, h, S, h); x.quadraticCurveTo(h, h, h, S); x.quadraticCurveTo(h, h, 0, h); x.quadraticCurveTo(h, h, h, 0); x.fill();
+    }
+    x.globalCompositeOperation = "source-in"; x.fillStyle = colour; x.fillRect(0, 0, S, S);
+    return c;
+  }
+  /* the runes: tiny bitmaps, one string per row (a crescent, a cross, a rune and a star), drawn in whole CSS pixels */
   const GLYPHS = [["01110", "11000", "10000", "11000", "01110"], ["00100", "00100", "11111", "00100", "00100"], ["10001", "01010", "00100", "01010", "10001"], ["01110", "10101", "11111", "10101", "01110"]]
     .map((g) => g.flatMap((row, y) => [...row].map((c, x) => (c === "1" ? [x - 2, y - 2] : null)).filter(Boolean)));
-  const BIG = ["000010000", "000010000", "000111000", "001111100", "111111111", "001111100", "000111000", "000010000", "000010000"]
-    .flatMap((row, y) => [...row].map((c, x) => (c === "1" ? [x - 4, y - 4] : null)).filter(Boolean));
+  recolour(); SM.onStop?.(recolour);
 
-  /* the pool: kind 0 square, 1 four-point star, 2 glyph, 3 the big flash */
+  /* the pool: kind 0 soft dot, 1 four-point glint, 2 bitmap rune, 3 the big flash of a click */
   const N = 700, P = Array.from({ length: N }, () => ({ on: false, x: 0, y: 0, vx: 0, vy: 0, age: 0, life: 0, s: 1, k: 0, g: 0, c: 0, ph: 0 }));
   let next = 0;
   const spawn = (x, y, vx, vy, k, life, s, c) => {
@@ -42,7 +57,7 @@
     }
   };
   const rand = (a, b) => a + Math.random() * (b - a);
-  const pickKind = () => { const r = Math.random(); return r < 0.62 ? 0 : r < 0.92 ? 1 : 2; };
+  const pickKind = () => { const r = Math.random(); return r < 0.6 ? 0 : r < 0.92 ? 1 : 2; };
   const pickColour = () => { const r = Math.random(); return r < 0.5 ? 0 : r < 0.88 ? 1 : 2; };
 
   /* the pointer and its spring-led head */
@@ -90,8 +105,9 @@
   addEventListener("pointercancel", () => { down = false; }, { passive: true });
   document.addEventListener("pointerleave", () => { rest = null; });
 
-  /* drawing, in whole CSS pixels */
+  /* drawing: sprites for the soft motes, whole CSS pixels for the runes */
   const sq = (x, y, s) => ctx.fillRect(Math.round(x), Math.round(y), s, s);
+  const put = (img, x, y, d) => ctx.drawImage(img, x - d / 2, y - d / 2, d, d);
   function frame(now) {
     raf = 0;
     const dt = Math.max(0, Math.min(48, now - last)) / 16.7; last = now;
@@ -121,21 +137,19 @@
       p.vy = (p.vy - 0.028 * dt) * Math.pow(0.95, dt);
       p.x += p.vx * dt; p.y += p.vy * dt;
       const t = p.age / p.life;
-      // twinkle in steps: each mote blinks off for one beat in four, and fades in coarse steps near the end
-      if (p.k !== 3 && ((((p.age / 85) | 0) + (p.ph | 0)) & 3) === 0) continue;
-      ctx.globalAlpha = t < 0.7 ? 1 : t < 0.85 ? 0.66 : 0.33;
-      ctx.fillStyle = pal[p.c];
-      const s = p.s;
-      if (p.k === 0) sq(p.x, p.y, t < 0.5 ? s + 1 : s);
-      else if (p.k === 1) { const arm = t < 0.4 ? 2 : 1; sq(p.x, p.y, s); for (let i = 1; i <= arm; i++) { sq(p.x + i * s, p.y, s); sq(p.x - i * s, p.y, s); sq(p.x, p.y + i * s, s); sq(p.x, p.y - i * s, s); } }
-      else if (p.k === 2) { for (const [gx, gy] of GLYPHS[p.g]) sq(p.x + gx * s, p.y + gy * s, s); }
-      else { const c = t < 0.3 ? 3 : t < 0.6 ? 2 : 1; ctx.globalAlpha = 1; for (const [gx, gy] of BIG) sq(p.x + gx * c - c / 2, p.y + gy * c - c / 2, c); }
+      // a gentle twinkle, and a smooth fade over the last part of its life
+      const end = t < 0.55 ? 1 : 1 - (t - 0.55) / 0.45, tw = p.k === 3 ? 1 : 0.72 + 0.28 * Math.sin(p.age / 110 + p.ph * 1.6);
+      ctx.globalAlpha = end * end * (3 - 2 * end) * tw;
+      const s = p.s, sp = sprites[p.c];
+      if (p.k === 0) put(sp[0], p.x, p.y, (t < 0.5 ? 9 : 7) * s);
+      else if (p.k === 1) put(sp[1], p.x, p.y, (t < 0.4 ? 15 : 11) * s);
+      else if (p.k === 2) { ctx.fillStyle = pal[p.c]; for (const [gx, gy] of GLYPHS[p.g]) sq(p.x + gx * s, p.y + gy * s, s); }
+      else { ctx.globalAlpha = 1 - t; put(sprites[0][1], p.x, p.y, 26 + 30 * t); put(sprites[2][0], p.x, p.y, 16 * (1 - t) + 4); }
     }
     if (headOn) {
-      ctx.globalAlpha = 1; ctx.fillStyle = pal[0];
-      const blink = ((now / 120) | 0) & 1;
-      sq(hx - 1, hy - 1, 2); sq(hx - 1, hy - 4, 2); sq(hx - 1, hy + 2, 2); sq(hx - 4, hy - 1, 2); sq(hx + 2, hy - 1, 2);
-      if (blink) { ctx.fillStyle = pal[2]; sq(hx - 1, hy - 1, 2); }
+      // the head: a gold glint with a white heart that breathes rather than blinks
+      ctx.globalAlpha = 1; put(sprites[0][1], hx, hy, 16);
+      ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now / 200); put(sprites[2][0], hx, hy, 7);
     }
     ctx.globalAlpha = 1;
     if (alive || headOn || (rest && idle < 5000)) raf = requestAnimationFrame(frame);

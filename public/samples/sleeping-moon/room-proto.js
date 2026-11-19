@@ -51,12 +51,8 @@
     wide: {
       view: { w: 1440, h: 810 }, box: { w: 1400, h: 800, back: -1000, front: 600 },
       name: { top: 660, role: 30 },
-      cams: [
-        { t: 0, x: 0, y: -40, z: 120, yaw: 0, pitch: -4 },
-        { t: 1.0, x: -60, y: -40, z: 10, yaw: 4, pitch: -3 },
-        { t: 2.0, x: 0, y: -40, z: -150, yaw: 0, pitch: -3.5 },
-        { t: 2.8, x: 0, y: -50, z: -250, yaw: 0, pitch: -3 },
-      ],
+      // the camera's drift: from the first view to the last before the push, on one shallow arc to the left and back
+      cams: [{ x: 0, y: -40, z: 120, pitch: -4 }, { x: 0, y: -50, z: -400, pitch: -3 }], arc: 36,
       ring: { x: 0, y: -60, z: -560, r: 260, out: -2200 },
       items: [
         ["window", "window", 380, 0, 250, -992],
@@ -72,12 +68,7 @@
       lens: 1300,
       view: { w: 720, h: 1280 }, box: { w: 900, h: 1200, back: -1000, front: 700 },
       name: { top: 150, role: 40 },
-      cams: [
-        { t: 0, x: 0, y: 40, z: 150, yaw: 0, pitch: -3 },
-        { t: 1.0, x: -30, y: 40, z: 30, yaw: 3, pitch: -3 },
-        { t: 2.0, x: 30, y: 50, z: -140, yaw: 0, pitch: -2.5 },
-        { t: 2.8, x: 40, y: 50, z: -240, yaw: 0, pitch: -2.5 },
-      ],
+      cams: [{ x: 0, y: 40, z: 150, pitch: -3 }, { x: 40, y: 50, z: -360, pitch: -2.5 }], arc: 22,
       ring: { x: 40, y: 50, z: -560, r: 200, out: -2200 },
       // the moon's stop comes up from below on phones and reaches the top at 5 screens: the circle and the moon land at
       // the moon's resting place first, then the night opens over the last tenth of a screen as the stop arrives under
@@ -142,10 +133,41 @@
       return { line: out + back, folds, tieback: `M${xr + s * 6} ${tie - 6}q${s * 28} 10 ${s * 54} 0` };
     };
     const L = drape(-1), R = drape(1);
+    // the rod stays on the wall; each curtain hangs from it on a plane of its own, which sways a little in the night air
+    // (room-proto.css), pivoting where it meets the rod
     const curtains = `<path d="M${wx0 - 60} ${rodY}H${wx1 + 60}" stroke="${INK}" stroke-width="5"/>` +
-      `<circle cx="${wx0 - 66}" cy="${rodY}" r="9" fill="${INK}"/><circle cx="${wx1 + 66}" cy="${rodY}" r="9" fill="${INK}"/>` +
-      `<path d="${L.line}${R.line}" stroke="${INK}" stroke-width="3" fill="none"/><path d="${L.folds}${R.folds}" stroke="${DIM}" stroke-width="3" stroke-dasharray="4 10" fill="none"/>` +
-      `<path d="${L.tieback}${R.tieback}" stroke="${INK}" stroke-width="4" fill="none"/>`;
+      `<circle cx="${wx0 - 66}" cy="${rodY}" r="9" fill="${INK}"/><circle cx="${wx1 + 66}" cy="${rodY}" r="9" fill="${INK}"/>`;
+    const hang = (c, sgn) => {
+      const x0 = sgn < 0 ? wx - ww * 0.7 - 110 : wx + ww * 0.24, bw = ww * 0.46 + 110, bh = h - rodY + 4;
+      const body = `<path d="${c.line}" stroke="${INK}" stroke-width="3" fill="none"/><path d="${c.folds}" stroke="${DIM}" stroke-width="3" stroke-dasharray="4 10" fill="none"/>` +
+        `<path d="${c.tieback}" stroke="${INK}" stroke-width="4" fill="none"/>`;
+      const pivot = sgn < 0 ? bw - 40 : 40;
+      return `<div class="rm-pl rm-lines" style="transform:translate3d(${(x0 - w / 2).toFixed(1)}px,${(rodY - h / 2).toFixed(1)}px,${back + 1}px)">` +
+        `<svg class="rm-drape${sgn < 0 ? "" : " rm-drape-r"}" viewBox="${x0.toFixed(1)} ${rodY} ${bw.toFixed(1)} ${bh}" width="${bw.toFixed(1)}" height="${bh}" style="transform-origin:${pivot.toFixed(0)}px 0" aria-hidden="true">${body}</svg></div>`;
+    };
+    // the window's night: a pane just behind the glass with its own sky, so the window is never a dead black hole.
+    // Stars twinkle, thin clouds drift across, now and then a star falls, and a haze of moonlight breathes low in the
+    // glass. Two of the stars keep the board's bitmap, as tiny square crosses. All of it fades as the moon rises.
+    // the pane is exactly the hole's box and sits just behind the wall, so the window's stone frame, drawn in front,
+    // covers everything of it but the glass
+    const gw = hx1 - hx0, gh = hy1 - ya, gx = hx0, gy = ya;
+    let gs = 3, glass = "";
+    const grnd = () => ((gs = (gs * 16807) % 2147483647) - 1) / 2147483646;
+    for (let i = 0; i < 26; i++) {
+      const x = (8 + grnd() * 84).toFixed(1), y = (4 + grnd() * 80).toFixed(1), d = (2.5 + grnd() * 3).toFixed(1);
+      const px = i === 7 || i === 18 ? " rm-px" : "", gold = grnd() < 0.2 ? " rm-gold" : "";
+      glass += `<i class="rm-st${px}${gold}" style="left:${x}%;top:${y}%;--d:${d}px;--t:${(2.6 + grnd() * 4).toFixed(2)}s;--w:${(-grnd() * 6).toFixed(2)}s"></i>`;
+    }
+    glass += [[18, 46, 0.62], [42, 61, 0.8], [66, 38, 0.5]].map(([top, dur, sc], k) =>
+      `<b class="rm-cloud" style="top:${top}%;--cw:${(gw * sc).toFixed(0)}px;--gw:${gw.toFixed(0)}px;--t:${dur}s;--w:${(-dur * (0.2 + k * 0.3)).toFixed(1)}s"></b>`).join("");
+    glass += `<b class="rm-fall"></b><b class="rm-haze"></b>`;
+    const pane = `<div class="rm-glass" style="width:${gw.toFixed(0)}px;height:${gh.toFixed(0)}px;transform:translate3d(${(gx - w / 2).toFixed(1)}px,${(gy - h / 2).toFixed(1)}px,${back - 2}px)">${glass}</div>`;
+    // motes of dust drifting slowly in the light from the window, between it and the eye
+    let dust = "";
+    for (let i = 0; i < 16; i++) {
+      dust += `<i style="left:${(grnd() * 100).toFixed(1)}%;top:${(20 + grnd() * 75).toFixed(1)}%;--d:${(2.5 + grnd() * 2.5).toFixed(1)}px;--t:${(11 + grnd() * 9).toFixed(1)}s;--w:${(-grnd() * 20).toFixed(1)}s;--x:${((grnd() - 0.5) * 60).toFixed(0)}px"></i>`;
+    }
+    const motes = `<div class="rm-dust" style="width:${(ww * 1.5).toFixed(0)}px;height:${(h * 0.75).toFixed(0)}px;transform:translate3d(${(wx - ww * 0.75 - w / 2).toFixed(1)}px,${(-h * 0.3).toFixed(1)}px,${back + 380}px)">${dust}</div>`;
     // no stars on the wall itself: the night is only ever seen through the window's glass
     const backWall = svg(w, h, rail(w, h) + `<g stroke="${DIM}" stroke-width="3" stroke-dasharray="4 10" fill="none">${panels}</g>` + curtains + `<rect x="1.5" y="1.5" width="${w - 3}" height="${h - 3}" stroke="${INK}" stroke-width="3" fill="none"/>`);
     const side = svg(d, h, `<rect width="${d}" height="${h}" fill="${SIDE}"/>${rail(d, h)}${edge(`M${d - 1.5} 0V${h}`)}`);
@@ -163,8 +185,8 @@
     // so dimming never repaints the drawing); the back wall's lines have no fill of their own and simply fade
     const at = (tf, html, tone) => `<div class="rm-pl${tone ? "" : " rm-lines"}" style="transform:${tf}">${html}${tone ? `<i class="rm-shade" style="background:${tone}"></i>` : ""}</div>`;
     // the floor and the ceiling are laid down from the front edge backwards; the side walls stand from the front edge back
-    return `<div class="rm-pl rm-mask" style="transform:translate3d(${-w / 2}px,${-h / 2}px,${back - 1}px)">${backFill}</div>` +
-      at(`translate3d(${-w / 2}px,${-h / 2}px,${back}px)`, backWall) +
+    return pane + `<div class="rm-pl rm-mask" style="transform:translate3d(${-w / 2}px,${-h / 2}px,${back - 1}px)">${backFill}</div>` +
+      at(`translate3d(${-w / 2}px,${-h / 2}px,${back}px)`, backWall) + hang(L, -1) + hang(R, 1) + motes +
       at(`translate3d(${-w / 2}px,${h / 2}px,${front}px) rotateX(-90deg)`, floor, FLOOR) +
       `<div class="rm-beam" style="transform:translate3d(${-w / 2}px,${h / 2 - 1}px,${front}px) rotateX(-90deg)">${svg(w, d,
         `<defs><linearGradient id="rmb" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#d9ccff" stop-opacity="0.34"/><stop offset="1" stop-color="#b9a2ff" stop-opacity="0"/></linearGradient></defs>` +
@@ -185,7 +207,7 @@
 
   const N = 300, RC = 100;
   const awake = new Set();
-  let ghosts = {}, beam, set, B = BEAT, sky, moon, skip, mask, view, world, words, night, circle, halo, flash, vig, blooms = [], cctx, els = {}, pos = {}, pics = [], built = "", lastSpell = -1;
+  let glassEl = null, ghosts = {}, beam, set, B = BEAT, sky, moon, skip, mask, view, world, words, night, circle, halo, flash, vig, blooms = [], cctx, els = {}, pos = {}, pics = [], built = "", lastSpell = -1;
   const build = () => {
     const key = SM.COLUMN.matches ? "tall" : "wide";
     if (built === key) return;
@@ -215,7 +237,7 @@
           ${SIX.map((id) => [1, 2, 3, 4].map((k) => `<div class="rm-ghost" data-g="${id}" style="width:${pos[id].w}px;height:${pos[id].h.toFixed(1)}px"><img src="${SRC(id)}" width="${IMG[id][0]}" height="${IMG[id][1]}" alt=""></div>`).join("")).join("")}
           ${set.items.map(piece).join("")}
           <div class="rm-circle" style="width:${r.r * 3}px;height:${r.r * 3}px">
-            <i class="rm-halo"></i><canvas width="${N}" height="${N}"></canvas>
+            <i class="rm-halo"></i><canvas></canvas>
             ${SIX.map((_, k) => { const a = (DOORMAP[k] * Math.PI) / 3 + 0.5, x = r.r * 1.5 + Math.cos(a) * r.r * 0.84, y = r.r * 1.5 + Math.sin(a) * r.r * 0.84; return `<i class="rm-bloom" style="left:${(x - bs / 2).toFixed(1)}px;top:${(y - bs / 2).toFixed(1)}px;width:${bs}px;height:${bs}px"></i>`; }).join("")}
           </div>
         </div>
@@ -227,7 +249,8 @@
     ghosts = {}; $$(".rm-ghost", host).forEach((g) => (ghosts[g.dataset.g] ||= []).push(g)); beam = $(".rm-beam", host);
     view = $(".rm-view", host); world = $(".rm-world", host); words = $(".rm-words", host); night = $(".rm-night", host);
     circle = $(".rm-circle", host); halo = $(".rm-halo", host); flash = $(".rm-flash", host); vig = $(".rm-vig", host);
-    sky = $(".rm-sky", host); moon = $(".rm-moon", host); mask = $(".rm-mask", host); skip = $(".rm-skip", host); blooms = $$(".rm-bloom", host); cctx = $("canvas", circle).getContext("2d"); lastSpell = -1;
+    sky = $(".rm-sky", host); moon = $(".rm-moon", host); mask = $(".rm-mask", host); skip = $(".rm-skip", host); blooms = $$(".rm-bloom", host); cctx = SM.spell.hires($("canvas", circle), N, N, 3.5); lastSpell = -1;
+    glassEl = $(".rm-glass", host);
     els = {}; $$(".rm-it", host).forEach((el) => (els[el.dataset.id] = el));
     drawSky();
     for (const [id] of set.items) if (!SIX.includes(id)) place(els[id], pos[id], 0);
@@ -247,7 +270,7 @@
   };
   /** a standing picture at its place in the room, turned to face the camera */
   const place = (el, p, yaw) => { el.style.transform = `translate3d(${(p.x - p.w / 2).toFixed(1)}px,${p.top.toFixed(1)}px,${p.z}px) rotateY(${yaw.toFixed(2)}deg)`; };
-  /** the night beyond the window: a far plane of sparse stars */
+  /** the night beyond the window: a far plane of sparse stars, kept as single pixels, the room's one wide bitmap */
   const drawSky = () => {
     const cv = $(".rm-sky canvas", host), g = cv.getContext("2d");
     cv.width = 1600; cv.height = 1000;
@@ -290,21 +313,51 @@
   /* ------------------------------------------------------------------ waking: by the pointer or a tap, or as it lifts */
   const wake = (id) => { if (awake.has(id)) return; awake.add(id); SM.bitmap(els[id])?.wakeUp(320); };
 
-  /* ------------------------------------------------------------------ the camera: a slow curve toward the window, on a spring */
-  const cr = (a, b, c, d, u) => 0.5 * (2 * b + (-a + c) * u + (2 * a - 5 * b + 4 * c - d) * u * u + (-a + 3 * b - 3 * c + d) * u * u * u);
-  const along = (keys, t) => {
-    if (t <= keys[0].t) return { ...keys[0] };
-    const last = keys[keys.length - 1];
-    if (t >= last.t) return { ...last };
-    let i = 0; while (keys[i + 1].t <= t) i++;
-    const u = (t - keys[i].t) / (keys[i + 1].t - keys[i].t), k0 = keys[i - 1] || keys[i], k3 = keys[i + 2] || keys[i + 1], o = {};
-    for (const f of ["x", "y", "z", "yaw", "pitch"]) o[f] = cr(k0[f], keys[i][f], keys[i + 1][f], k3[f], u);
-    return o;
+  /* ------------------------------------------------------------------ the camera: one dolly from the room through the window
+     The camera moves on one continuous path with no stops: it eases in, drifts slowly toward the window on a single
+     shallow arc while the six gather and the star is drawn, then gathers speed through the glass and eases into the
+     landing. Its depth is planned in the logarithm of its distance to the far plane where the circle lands, so things
+     grow on screen at a steady rate rather than slowly and then all at once, and the speed never jumps: the drift's
+     pace flows straight into the push. Sideways and up and down it follows the depth, so it travels in a clean line. */
+  let dollyKey = "", dollyL = null;
+  /** the eye's log distance to the far plane, over the scroll: L0 at the start, Ld where the push begins, L1 landed */
+  const dolly = (L0, Ld, L1) => {
+    const P0 = B.push[0], P1 = B.push[1], N = 600, dp = P1 / N;
+    const rate = (x) => sm(0, 0.7, x) * (1 - sm(P1 - 0.55, P1, x)), boost = (x) => sm(P0 - 0.15, P0 + 0.55, x);
+    const ca = new Float64Array(N + 1), cb = new Float64Array(N + 1);
+    for (let i = 1; i <= N; i++) {
+      const x0 = (i - 1) * dp, x1 = i * dp, r0 = rate(x0), r1 = rate(x1);
+      ca[i] = ca[i - 1] + ((r0 + r1) / 2) * dp; cb[i] = cb[i - 1] + ((r0 * boost(x0) + r1 * boost(x1)) / 2) * dp;
+    }
+    // the drift's pace c and the push's extra K are solved so the dolly reaches Ld exactly at P0 and L1 exactly at P1
+    const i0 = Math.round(P0 / dp), dd = Ld - L0, dt = L1 - L0;
+    const K = Math.max(0, (dt * ca[i0] - dd * ca[N]) / (dd * cb[N] - dt * cb[i0])), c = dt / (ca[N] + K * cb[N]);
+    return (p) => {
+      if (p <= 0) return L0;
+      if (p >= P1) return L1;
+      const x = p / dp, i = Math.floor(x), t = x - i;
+      return L0 + c * ((ca[i] + K * cb[i]) * (1 - t) + (ca[i + 1] + K * cb[i + 1]) * t);
+    };
+  };
+  const camAt = (p) => {
+    const [c0, c1] = set.cams, r = set.ring, P0 = B.push[0];
+    const e = endCam(target()), L0 = Math.log(P - r.out + c0.z), key = `${P}|${B.push}|${e.z.toFixed(1)}`;
+    if (key !== dollyKey) { dollyKey = key; dollyL = dolly(L0, Math.log(P - r.out + c1.z), Math.log(P - r.out + e.z)); }
+    const L = dollyL(p), z = Math.exp(L) - P + r.out;
+    // the drift: one shallow arc to the side and back, turning a little toward the window as it goes
+    const u = clamp(p / P0), su = SM.smooth(u), bow = Math.sin(Math.PI * su);
+    const d = { x: mix(c0.x, c1.x, su) - set.arc * bow, y: mix(c0.y, c1.y, su), yaw: (set.arc / 15) * bow, pitch: mix(c0.pitch, c1.pitch, su) };
+    if (p <= P0) return { ...d, z };
+    // the push: lined up on the landing in step with the depth, so it flies straight rather than drifting sideways
+    const Ld = Math.log(P - r.out + c1.z), Lend = Math.log(P - r.out + e.z), g = SM.smooth(clamp((L - Ld) / (Lend - Ld)));
+    return { x: mix(d.x, e.x, g), y: mix(d.y, e.y, g), z, yaw: d.yaw * (1 - g), pitch: d.pitch * (1 - g) };
   };
   // where the board's circle is on screen
   const target = () => {
     const U = SM.u();
-    if (!SM.COLUMN.matches) { const bd = board.getBoundingClientRect(); return { cx: bd.left + 50 * U, cy: bd.top + 28.8 * U, R: 28 * U }; }
+    // on wide screens: where the board's circle will rest once the moon's stop is pinned, not where it is while it is
+    // still coming up under the room, so the camera flies one straight line to it instead of rising and sinking with it
+    if (!SM.COLUMN.matches) { const bd = board.getBoundingClientRect(), up = Math.max(0, hero.getBoundingClientRect().top); return { cx: bd.left + 50 * U, cy: bd.top - up + 28.8 * U, R: 28 * U }; }
     // on phones the moon's stop is still below the fold while the circle flies: aim at where its moon will rest once the
     // stop has come up to the top, and move with the stop over the last moments as the night opens onto it
     const m = $("#moonpic").getBoundingClientRect(), top = hero.getBoundingClientRect().top;
@@ -317,6 +370,7 @@
     const ty = new DOMMatrixReadOnly(getComputedStyle(m).transform).m42 || 0;
     let cx = mr.left + mr.width / 2, cy = mr.top + mr.height / 2 - ty;
     if (SM.COLUMN.matches) cy -= hero.getBoundingClientRect().top * (1 - sm(B.night[0], B.night[1], p));
+    else cy -= Math.max(0, hero.getBoundingClientRect().top);
     return { sc, d: m.offsetWidth / (kv * sc), x: r.x + (cx - tg.cx) / (kv * sc), y: r.y + (cy - tg.cy) / (kv * sc) };
   };
   // where the camera must stand at the end, so the flown-out circle lands exactly on the board's circle
@@ -334,11 +388,12 @@
   /* the scroll, in screens, mapped onto the beats: the opening (beats 0 to 1.2) takes the first 0.8 of a screen,
      so the room moves as much for a turn of the wheel at the start as the page does everywhere else; the rest is spread
      evenly up to the landing (4.65), which is left where the moon's stop needs it */
-  const WARP = [[0, 0], [0.8, 1.2], [4.65, 4.65]];
+  const WARP_L = 4.65, WARP_A = 0.5;
   const warp = (s) => {
-    if (s <= 0 || s >= 4.65) return s;
-    const k = s < WARP[1][0] ? 0 : 1, [s0, b0] = WARP[k], [s1, b1] = WARP[k + 1];
-    return b0 + ((s - s0) / (s1 - s0)) * (b1 - b0);
+    if (s <= 0 || s >= WARP_L) return s;
+    // s + a·s·(1 - s/L)²: half again as fast at the start, easing to the scroll's own pace by the landing, with no kink
+    const x = s / WARP_L;
+    return s + WARP_A * s * (1 - x) * (1 - x);
   };
   const scrollT = () => warp(-sec.getBoundingClientRect().top / innerHeight);
   const kick = () => { if (!raf && inView) { lastT = performance.now(); raf = requestAnimationFrame(loop); } };
@@ -347,9 +402,9 @@
     const dt = Math.min(0.05, Math.max(0.001, (now - lastT) / 1000)); lastT = now;
     const t = scrollT();
     if (Math.abs(t - p) > 1.5) { p = t; v = 0; }
-    // a spring a little under critical damping: the camera leans into the move and settles just past it; near the
-    // landing it is critically damped, so the circle settles onto the board's circle without overshooting it
-    const K = 120, C = 2 * Math.sqrt(K) * (p > B.push[1] - 0.3 ? 1 : 0.8);
+    // a critically damped spring: the camera has a little weight behind the scroll but never overshoots and swings back,
+    // so the circle settles onto the board's circle exactly
+    const K = 120, C = 2 * Math.sqrt(K);
     v += ((t - p) * K - v * C) * dt; p += v * dt;
     if (Math.abs(t - p) < 0.0003 && Math.abs(v) < 0.0003) { p = t; v = 0; }
     lx += (tlx - lx) * Math.min(1, dt * 5); ly += (tly - ly) * Math.min(1, dt * 5);
@@ -372,9 +427,8 @@
     words.style.transform = `translate3d(0, ${(-wq * 40).toFixed(1)}px, 0)`;
 
     // the camera: the slow drift, then out through the window to the board
-    const q = lin(B.push[0], B.push[1], p), qe = inOut(q);
-    let cam = along(set.cams, p);
-    if (q > 0) { const e = endCam(target()); cam = { x: mix(cam.x, e.x, qe), y: mix(cam.y, e.y, qe), z: mix(cam.z, e.z, qe), yaw: cam.yaw * (1 - qe), pitch: cam.pitch * (1 - qe) }; }
+    const q = lin(B.push[0], B.push[1], p);
+    const cam = camAt(p);
     const look = 1 - sm(B.lift, B.push[0], p);
     const yaw = cam.yaw + lx * 4.5 * look, pitch = cam.pitch - ly * 2.5 * look;
     world.style.transform = `translateZ(${P}px) rotateX(${pitch.toFixed(2)}deg) rotateY(${(-yaw).toFixed(2)}deg) translateZ(${-P}px) translate3d(${(-cam.x).toFixed(1)}px,${(-cam.y).toFixed(1)}px,${(-cam.z).toFixed(1)}px)`;
@@ -391,6 +445,8 @@
     flash.style.opacity = (0.55 * bell(lin(0.28, 0.62, q))).toFixed(3);
     // the room's own stars go out behind the flash, so that only the moon's sky is ever seen as the night thins
     sky.style.opacity = (1 - sm(0.4, 0.8, q)).toFixed(3);
+    // the window's own night (stars, clouds, haze) gives way to the moon rising in the glass
+    if (glassEl) glassEl.style.opacity = (near * (1 - sm(B.rise[0] - 0.35, B.rise[0] + 0.25, p))).toFixed(3);
     // the moon rises in the window's empty glass while the camera pushes on: it waits at the circle's far depth, so the
     // flown-out circle closes round it, and at the end it is the board's own moon, which takes over in the same place
     if (p > B.rise[0] - 0.4) {
@@ -475,6 +531,7 @@
     spoke = true;
     const t = scrollT();
     inView = t > -1 && t < SPAN + 0.2;
+    host.classList.toggle("rm-rest", !inView);
     if (!inView) { host.style.visibility = t > SPAN ? "hidden" : ""; return; }
     kick();
   };

@@ -158,7 +158,7 @@
       const drift = q ? 0 : (0.5 - clamp((-w.top + w.vh * 0.5) / (w.vh * 1.5))) * SM.u();
       grps.forEach((g) => (g.style.transform = `translate3d(0, ${(drift * 3 * +g.dataset.depth).toFixed(1)}px, 0)`));
       // the sparkles turn with the scroll, never on a timer
-      sparks.forEach((s, k) => (s.style.opacity = q ? 1 : (0.25 + 0.75 * (0.5 + 0.5 * Math.sin(scrollY / 85 + k * 2.3))).toFixed(3)));
+      sparks.forEach((s, k) => (s.style.opacity = q ? 1 : (0.25 + 0.75 * (0.5 + 0.5 * Math.sin(SM.y / 85 + k * 2.3))).toFixed(3)));
     };
     board(); SM.scrub(board);
   });

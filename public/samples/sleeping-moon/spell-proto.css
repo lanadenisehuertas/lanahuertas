@@ -4,7 +4,7 @@
 .stop.hero.rising.casting { height: calc((2.4 + var(--cast, 0)) * 100svh); }
 .hero.casting .pl-line { display: none; }
 
-.spell { position: absolute; left: 0; top: 0; z-index: 4; display: none; pointer-events: none; image-rendering: pixelated; }
+.spell { position: absolute; left: 0; top: 0; z-index: 4; display: none; pointer-events: none; }
 .casting .spell { display: block; }
 /* a soft light behind the circle; it sits under the 1-bit group, which lets it through where the group is black */
 .spell-glow, .cp-glow { position: absolute; left: 50%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; opacity: 0; pointer-events: none; will-change: transform, opacity;
@@ -30,7 +30,7 @@
 .quiet .cast-ph { display: none; }
 .cp-stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 .cp-night { position: absolute; inset: 0; background: #000; will-change: opacity; }
-.cp-stage canvas { position: absolute; left: 0; top: 0; z-index: 1; image-rendering: pixelated; pointer-events: none; }
+.cp-stage canvas { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; }
 .cp-glow { top: 47%; width: 130vw; }
 .cp-title { position: absolute; z-index: 2; left: 0; right: 0; top: calc(var(--band) + 6svh); margin: 0; padding: 0 6vw; text-align: center; font-size: 13vw; line-height: 0.95; color: var(--ink); }
 .cp-title span { display: inline-block; }

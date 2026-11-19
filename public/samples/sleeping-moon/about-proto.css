@@ -90,8 +90,9 @@ main > .stop.about:has(.idx.hold) { padding-bottom: 8svh; }
 .quiet .fr-vid { display: none; }
 @media (prefers-reduced-motion: reduce) { .fr-vid { display: none; } }
 .yr-list .e-t { text-wrap: balance; }
-/* Peanut by the mirror (about-proto.js): sat at its foot on the right, a little in front of the frame */
-.mirror .peanut { position: absolute; z-index: 3; right: -16%; bottom: -3%; width: 30%; }
+/* Peanut by the mirror (about-proto.js): small, sat at its foot on the right, a little in front of the frame and inside
+   the mirror's own column, so she never covers the words beside it */
+.mirror .peanut { position: absolute; z-index: 3; right: -7%; bottom: -2%; width: 18%; }
 .mirror .peanut .full { width: 100%; height: auto; }
 .me-cat { margin: 6px 0 0; font: italic 400 19px/1.4 "Redaction", Georgia, serif; color: var(--mark); }
-@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .mirror .peanut { right: -6%; width: 28%; } }
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .mirror .peanut { right: -2%; width: 19%; } }

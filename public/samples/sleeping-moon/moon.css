@@ -116,7 +116,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* ---------- pictures: asleep (canvas), awake (the image itself) ---------- */
 .pic { position: relative; display: block; line-height: 0; }
 .pic .full { width: 100%; height: auto; }
-.pic .bm { position: absolute; left: 0; top: 0; image-rendering: pixelated; }
+.pic .bm { position: absolute; left: 0; top: 0; }
+/* a drawn object's bitmap keeps its square cells; a photo's smooth duotone is scaled smoothly */
+.pic .bm.bits { image-rendering: pixelated; }
 .pic .bm:not([style]) { width: 0; height: 0; }   /* until it is built, a canvas takes no room */
 .js .pic .full { opacity: 0; transition: opacity 160ms linear; }
 .js .pic.awake .full { opacity: 1; }
@@ -144,12 +146,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .lantern { position: fixed; left: 0; top: 0; z-index: 39; width: calc(2 * var(--r, 130px)); height: calc(2 * var(--r, 130px)); margin: calc(-1 * var(--r, 130px)) 0 0 calc(-1 * var(--r, 130px)); border: 2px dotted var(--rule); border-radius: 50%; pointer-events: none; opacity: 0; transition: opacity 200ms linear; }
 .lantern.on { opacity: 1; }
 
-/* ---------- dither wipes for swapping one thing for another ---------- */
-.wipe-in { animation: wipe-in 220ms steps(1) both; }
-.wipe-out { animation: wipe-out 180ms steps(1) both; }
-@keyframes wipe-in { 0% { -webkit-mask-image: var(--m1); mask-image: var(--m1); } 25% { -webkit-mask-image: var(--m2); mask-image: var(--m2); } 50% { -webkit-mask-image: var(--m3); mask-image: var(--m3); } 75% { -webkit-mask-image: var(--m4); mask-image: var(--m4); } 100% { -webkit-mask-image: none; mask-image: none; } }
-@keyframes wipe-out { 0% { -webkit-mask-image: var(--m4); mask-image: var(--m4); } 33% { -webkit-mask-image: var(--m3); mask-image: var(--m3); } 66% { -webkit-mask-image: var(--m2); mask-image: var(--m2); } 100% { -webkit-mask-image: var(--m1); mask-image: var(--m1); opacity: 0; } }
-.wipe-in, .wipe-out { -webkit-mask-size: 24px 24px; mask-size: 24px 24px; }
+/* ---------- swapping one thing for another: a quick, clean cross-fade (opacity only, no stepped masks) ---------- */
+.wipe-in { animation: wipe-in 220ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+.wipe-out { animation: wipe-out 150ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+@keyframes wipe-in { from { opacity: 0; transform: translate3d(0, 0.18em, 0); } to { opacity: 1; transform: none; } }
+@keyframes wipe-out { from { opacity: 1; } to { opacity: 0; } }
 
 /* ---------- the travel iris: drawn by SM.travel only while a jump is under way ---------- */
 .iris { position: fixed; inset: 0; z-index: 85; width: 100vw; height: 100vh; pointer-events: none; display: none; }

@@ -637,6 +637,30 @@ const DATA = {
      "/work/brands/elysium/2025-04-21-facebook-05.webp",
      720,
      720
+    ],
+    [
+     "/work/sm/startup-qc-winners.webp",
+     "/work/startup-qc-winners.webp",
+     720,
+     720
+    ],
+    [
+     "/work/sm/junior-officer-perks.webp",
+     "/work/junior-officer-perks.webp",
+     720,
+     720
+    ],
+    [
+     "/work/sm/acm-kickoff.webp",
+     "/work/acm-kickoff.webp",
+     720,
+     720
+    ],
+    [
+     "/work/sm/women-in-cs.webp",
+     "/work/women-in-cs.webp",
+     720,
+     797
     ]
    ],
    "ground": "#160e1d",
@@ -749,20 +773,6 @@ const DATA = {
    "ink": "#cc6bef"
   },
   {
-   "id": "women-in-cs",
-   "t": "Women in Computer Science",
-   "m": "ACM, FEU Tech",
-   "y": "2025",
-   "img": [
-    "/work/sm/women-in-cs.webp",
-    "/work/women-in-cs.webp",
-    720,
-    797
-   ],
-   "ground": "#140e1d",
-   "ink": "#b68bdd"
-  },
-  {
    "id": "never-again",
    "t": "Never Again, Never Forget",
    "m": "Student council",
@@ -817,48 +827,6 @@ const DATA = {
    ],
    "ground": "#0e1d0f",
    "ink": "#efb363"
-  },
-  {
-   "id": "acm-kickoff",
-   "t": "Kick-Off Celebration",
-   "m": "ACM, FEU Tech",
-   "y": "2024",
-   "img": [
-    "/work/sm/acm-kickoff.webp",
-    "/work/acm-kickoff.webp",
-    720,
-    720
-   ],
-   "ground": "#180725",
-   "ink": "#c07cf4"
-  },
-  {
-   "id": "junior-officer-perks",
-   "t": "Perks of Being a Junior Officer",
-   "m": "ACM, FEU Tech",
-   "y": "2024",
-   "img": [
-    "/work/sm/junior-officer-perks.webp",
-    "/work/junior-officer-perks.webp",
-    720,
-    720
-   ],
-   "ground": "#160c1f",
-   "ink": "#c184db"
-  },
-  {
-   "id": "startup-qc-winners",
-   "t": "StartUp QC, 2nd runner-up",
-   "m": "ACM, FEU Tech",
-   "y": "2025",
-   "img": [
-    "/work/sm/startup-qc-winners.webp",
-    "/work/startup-qc-winners.webp",
-    720,
-    720
-   ],
-   "ground": "#110e1d",
-   "ink": "#c381da"
   }
  ],
  "films": [

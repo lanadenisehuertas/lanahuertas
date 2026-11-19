@@ -68,7 +68,7 @@
       x.classList.add("away");
     });
     $$(".ch", restName).forEach((c, i) => { c.style.transitionDelay = `${Math.abs(i - 6) * 18}ms`; c.style.transform = `translateY(${(i % 2 ? -1 : 1) * 2.2 * U}px)`; });
-    setTimeout(() => SM.travel(id, { x: vx, y: vy }, { onJump: reset }), 300);
+    setTimeout(() => SM.travel(id, { x: vx, y: vy }, { onJump: reset }), 380);   // the iris closes as the door arrives
   }
   /** put the plate back as it was, unseen, for when the visitor returns */
   function reset() {

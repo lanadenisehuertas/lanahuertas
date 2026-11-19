@@ -108,7 +108,7 @@
       // so this does not lay the page out every frame
       rise.forEach((el) => {
         if (el._gen !== SM.placedGen || el._w !== innerWidth) { el._gen = SM.placedGen; el._w = innerWidth; el._top = el.getBoundingClientRect().top + scrollY; }
-        const r = { top: el._top - scrollY };
+        const r = { top: el._top - SM.y };
         if (r.top > vh * 1.6 && el._v === "0.000") return;
         const v = quiet ? 1 : SM.smooth(Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.42)))), V = v.toFixed(3);
         if (el._v !== V) { el._v = V; el.style.setProperty("--in", V); }
@@ -126,9 +126,18 @@
       m.addEventListener("click", (e) => { e.preventDefault(); SM.glide(yrs[k].getBoundingClientRect().top + scrollY - innerHeight * 0.32); });
     });
     let yi = -1;
+    // each year's place in the page is measured once and again only when the page changes size (SM.placedGen), so
+    // the scrub reads no layout while it writes, and costs nothing while the calendar is far from the window
+    const at0 = (el) => {
+      if (el._gen !== SM.placedGen || el._w !== innerWidth) {
+        const r = el.getBoundingClientRect();
+        el._gen = SM.placedGen; el._w = innerWidth; el._top = r.top + SM.y; el._h = r.height;
+      }
+      return el._top - SM.y;
+    };
     SM.scrub(() => {
-      const top = yrs[0].getBoundingClientRect().top;
-      if (top > innerHeight * 2 || yrs[n - 1].getBoundingClientRect().bottom < -innerHeight) return;
+      const top = at0(yrs[0]);
+      if (top > innerHeight * 2 || at0(yrs[n - 1]) + yrs[n - 1]._h < -innerHeight) return;
       // the reading line, a third of the way down the window
       const line = innerHeight * 0.36;
       // the moon and the year hold while a year is read, and turn over to the next across the same stretch of scroll
@@ -136,7 +145,7 @@
       // short year and a long one roll at the same pace and the roll never rushes or drags
       const W = innerHeight * (SM.COLUMN.matches ? 0.16 : 0.2), lead = innerHeight * 0.06;
       let at = 0;
-      for (let j = 1; j < n; j++) at += SM.smooth(Math.min(1, Math.max(0, (line + lead - yrs[j].getBoundingClientRect().top) / W)));
+      for (let j = 1; j < n; j++) at += SM.smooth(Math.min(1, Math.max(0, (line + lead - at0(yrs[j])) / W)));
       at = Math.min(n - 1, at);
       moon?.setPhase(phase(0) + (at / (n - 1)) * 0.86);
       moon?.setFloor(SM.smooth(Math.max(0, at - (n - 2))));   // full, it wakes into colour: now
@@ -145,7 +154,7 @@
       const now = Math.round(at);
       if (now !== yi) { yi = now; smalls.forEach((m, j) => (j === now ? m.setAttribute("aria-current", "true") : m.removeAttribute("aria-current"))); }
       yrs.forEach((el) => {
-        const r = el.getBoundingClientRect(), v = SM.quiet() ? 1 : SM.smooth(Math.min(1, Math.max(0, (innerHeight - r.top) / (innerHeight * 0.5))));
+        const v = SM.quiet() ? 1 : SM.smooth(Math.min(1, Math.max(0, (innerHeight - at0(el)) / (innerHeight * 0.5))));
         const V = v.toFixed(3);
         if (el._v !== V) { el._v = V; el.style.setProperty("--in", V); }
       });

@@ -1,6 +1,7 @@
 /* Prototype: a sky with depth (depth-proto.js). The far nebula and the near stars sit either side of the star field.
-   The nebula is kept faint: its dither is fine, and fine dither over a large area is what the owner dislikes. */
-.sky .neb { inset: -18% -8% auto; height: 136%; background: url("art/sky-neb.webp") center / cover no-repeat; image-rendering: pixelated; opacity: 0.35; will-change: transform; }
+   The nebula is a smooth, soft cloud: the old dithered one, scaled up in hard pixels, read as a grid of squares
+   over the whole sky and was tiring to look at. */
+.sky .neb { inset: -18% -8% auto; height: 136%; background: url("art/sky-neb-soft.webp") center / cover no-repeat; opacity: 0.35; will-change: transform; }
 /* twice the screen's height: the stars of its top half are repeated in its bottom half */
 .sky .near { inset: 0 -6% auto; height: 200%; will-change: transform; }
 .sky .near b { position: absolute; width: 3px; height: 3px; background: #e9e1ff; box-shadow: -3px 0 #b9a2ff, 3px 0 #b9a2ff, 0 -3px #b9a2ff, 0 3px #b9a2ff; }

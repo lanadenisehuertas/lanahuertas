@@ -24,7 +24,7 @@
 .hero.rising:not(.risen) .door { pointer-events: none; }
 .board { position: relative; width: calc(100 * var(--u)); height: calc(62.5 * var(--u)); }
 /* leaving through a door (journey.js): the chosen door flies to the middle, the rest fall away, the name breaks up */
-.door.chosen { transition: transform 520ms var(--move); }
+.door.chosen { transition: transform 440ms var(--move); }
 .door.chosen .label { opacity: 0; transition: opacity 120ms linear; }
 .door.away { opacity: 0; transition: transform 380ms var(--enter), opacity 260ms linear; }
 .n-rest .ch { display: inline-block; transition: transform 360ms var(--enter), opacity 240ms linear; }

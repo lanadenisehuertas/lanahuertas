@@ -1,17 +1,20 @@
 /* The sleeping moon: the system. Pages load this first and use the SM object.
 
-   A picture (.pic) holds the real image (.full) and a canvas (.bm). The canvas has
-   one canvas pixel per bitmap cell and is scaled up with image-rendering:
-   pixelated, so the pixels stay sharp on any screen. Each cell knows whether it is
-   inside the shape, whether its ink is on (8x8 Bayer dither of the picture's
-   lightness) and its colour. What a cell shows is decided by:
-     show     how much of the bitmap has been drawn in (the entrance, once)
+   A picture (.pic) holds the real image (.full) and a canvas (.bm). How it sleeps depends on what it is:
+     drawn objects (data-kind paint and line: the tools, the doors, the room's things, the ornaments) sleep as 1-bit
+     bitmaps, ink on the ground in an 8 x 8 Bayer dither with crisp square cells fixed to the picture;
+     photos of the work and the moon (photo, moon) sleep as a smooth lilac duotone, their lightness laid between the
+     stop's ground and its ink, so no large area is ever dithered.
+   Waking, the colour comes in as a sweep of moonlight from the top left down across the picture. On a bitmap the cells
+   at the front turn one by one, each when the front's light passes its Bayer threshold; on a smooth picture the front
+   is feathered, and a sparse seam of square cells glints along it while it moves.
+   What the canvas shows is decided by:
+     show     how much of the picture has come in (the entrance, once)
      wake     how much of the whole picture has turned to colour, from pointing at it
      floor    how much has turned to colour from the scroll: a picture wakes as far
               as the scroll has brought it in, and goes back to sleep as it leaves
      face     for a picture with two faces, how much of the second face is in
-   All of them move through the same Bayer order, so pixels switch in a pattern and
-   never fade. */
+   All of them travel along the same sweep, so the picture changes in one soft front, never in a scatter of pixels. */
 const SM = (() => {
   const root = document.documentElement;
   const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -39,6 +42,8 @@ const SM = (() => {
       this.canvas.setAttribute("aria-hidden", "true");
       this.ctx = this.canvas.getContext("2d");
       this.kind = pic.dataset.kind || "paint";   // paint: shape from the image's alpha · photo: the whole box · line: engraving · moon: a disc
+      this.bits = this.kind === "paint" || this.kind === "line";   // drawn objects sleep as 1-bit bitmaps
+      this.canvas.classList.toggle("bits", this.bits);
       this.show = 0; this.wake = 0; this.floor = 0; this.face = 0; this.lr = 0; this.lx = 0; this.ly = 0;
       this.phase = pic.dataset.phase ? +pic.dataset.phase : 1;   // a moon's lit part: 1 full, 0.5 half, 0 new
       this.timers = {};
@@ -52,7 +57,8 @@ const SM = (() => {
       this.loading = nearOnce(this.pic).then(() => Promise.all(srcs.map(loadImage))).then((ims) => { this.imgs = ims; this.build(); });
       return this.loading;
     }
-    /** read one image at cell size into { inside, on, col } */
+    /** read one image at canvas size into two layers: { sleep, wake }, each RGBA. Asleep is the duotone (or, for a
+        picture with no ground of its own, the ink alone, as strong as the picture is light); awake is the picture. */
     cells(img, cols, rows) {
       const off = document.createElement("canvas"); off.width = cols; off.height = rows;
       const o = off.getContext("2d", { willReadFrequently: true });
@@ -63,16 +69,16 @@ const SM = (() => {
         o.drawImage(img, (cols - w) * (pos[0] / 100), (rows - h) * ((pos[1] ?? 50) / 100), w, h);
       } else o.drawImage(img, 0, 0, cols, rows);
       const d = o.getImageData(0, 0, cols, rows).data, n = cols * rows, k = this.kind, flat = this.pic.hasAttribute("data-flat");
-      const inside = new Uint8Array(n), on = new Uint8Array(n), col = new Uint8ClampedArray(n * 3), v = new Float32Array(n);
+      const inside = new Float32Array(n), v = new Float32Array(n);
+      const edge = 1.2 / Math.min(cols, rows);   // a disc's edge is soft over about one canvas pixel
       let sum = 0, count = 0;
       for (let i = 0; i < n; i++) {
         const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2], a = d[i * 4 + 3] / 255, lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-        if (k === "moon") { const x = ((i % cols) + 0.5) / cols - 0.5, y = (Math.floor(i / cols) + 0.5) / rows - 0.5; inside[i] = Math.hypot(x, y) < 0.488 ? 1 : 0; v[i] = lum; }
+        if (k === "moon") { const x = ((i % cols) + 0.5) / cols - 0.5, y = (Math.floor(i / cols) + 0.5) / rows - 0.5; inside[i] = Math.min(1, Math.max(0, (0.488 - Math.hypot(x, y)) / edge + 0.5)); v[i] = lum; }
         else if (k === "photo") { inside[i] = 1; v[i] = lum; }
-        else if (k === "line") { inside[i] = a * lum > 0.16 ? 1 : 0; v[i] = a * lum; }
-        else { inside[i] = a >= 0.5 ? 1 : 0; v[i] = lum; }
-        col[i * 3] = r; col[i * 3 + 1] = g; col[i * 3 + 2] = b;
-        if (inside[i]) { sum += v[i]; count++; }
+        else if (k === "line") { inside[i] = Math.min(1, Math.max(0, (a * lum - 0.08) / 0.16)); v[i] = a * lum; }
+        else { inside[i] = a; v[i] = lum; }
+        if (inside[i] > 0.5) { sum += v[i]; count++; }
       }
       if (flat) {
         // a box blur over lightness, twice, so only the big shapes of the picture are left
@@ -81,24 +87,48 @@ const SM = (() => {
           for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) { let s = 0, c = 0; for (let d = -R; d <= R; d++) { const xx = x + d; if (xx >= 0 && xx < cols) { s += v[y * cols + xx]; c++; } } tmp[y * cols + x] = s / c; }
           for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) { let s = 0, c = 0; for (let d = -R; d <= R; d++) { const yy = y + d; if (yy >= 0 && yy < rows) { s += tmp[yy * cols + x]; c++; } } v[y * cols + x] = s / c; }
         }
-        sum = 0; for (let i = 0; i < n; i++) sum += v[i];
       }
-      // level each picture around its own average, so dark and light pictures both read as bitmaps
+      // level each picture around its own average, so dark and light pictures both read; softer than the old 1-bit
+      // levels, since a smooth tone needs less push than a dither did to show its shapes
       const mean = sum / Math.max(1, count);
-      const gain = { moon: 3.0, photo: 3.0, line: 2.2, paint: 1.75 }[k], lift = this.pic.dataset.lift ? +this.pic.dataset.lift : { moon: 0.6, photo: 0.5, line: 0.62, paint: 0.48 }[k];   // data-lift: a picture whose ground is mid-tone can ask to sleep darker
+      if (this.bits) return this.bitCells(d, v, mean, cols, rows, flat);
+      const gain = { moon: 1.9, photo: 1.7, line: 1.5, paint: 1.2 }[k], lift = this.pic.dataset.lift ? +this.pic.dataset.lift : { moon: 0.6, photo: 0.5, line: 0.62, paint: 0.48 }[k];
+      const ink = this.ink, paper = this.paper, sleep = new Uint8ClampedArray(n * 4), wake = new Uint8ClampedArray(n * 4);
+      for (let i = 0, j = 0; i < n; i++, j += 4) {
+        const inn = inside[i];
+        wake[j] = d[j]; wake[j + 1] = d[j + 1]; wake[j + 2] = d[j + 2]; wake[j + 3] = inn * 255;
+        if (inn <= 0) continue;
+        const lv = Math.min(1, Math.max(0, (v[i] - mean) * gain + lift)), t = lv * lv * (3 - 2 * lv);
+        if (paper) {
+          sleep[j] = paper[0] + (ink[0] - paper[0]) * t; sleep[j + 1] = paper[1] + (ink[1] - paper[1]) * t; sleep[j + 2] = paper[2] + (ink[2] - paper[2]) * t; sleep[j + 3] = inn * 255;
+        } else {
+          sleep[j] = ink[0]; sleep[j + 1] = ink[1]; sleep[j + 2] = ink[2]; sleep[j + 3] = inn * t * 255;
+        }
+      }
+      return { sleep, wake };
+    }
+    /** the 1-bit layers of a drawn object: which cells are inside its shape, which of those are ink when asleep (the
+        Bayer dither of its levelled lightness, with a solid outline on painted shapes so the silhouette reads), and
+        its colours for when it wakes */
+    bitCells(d, v, mean, cols, rows, flat) {
+      const n = cols * rows, k = this.kind, inside = new Uint8Array(n), on = new Uint8Array(n);
+      for (let i = 0; i < n; i++) {
+        const a = d[i * 4 + 3] / 255, lum = (0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2]) / 255;
+        inside[i] = k === "line" ? (a * lum > 0.16 ? 1 : 0) : a >= 0.5 ? 1 : 0;
+      }
+      const gain = { line: 2.2, paint: 1.75 }[k], lift = this.pic.dataset.lift ? +this.pic.dataset.lift : { line: 0.62, paint: 0.48 }[k];
       for (let i = 0; i < n; i++) {
         if (!inside[i]) continue;
-        const x = i % cols, y = Math.floor(i / cols);
-        const level = (v[i] - mean) * gain + lift;
+        const x = i % cols, y = (i / cols) | 0, level = (v[i] - mean) * gain + lift;
         on[i] = flat ? (level > 0.5 ? 1 : 0) : level * 64 > B8[(y & 7) * 8 + (x & 7)] + 0.5 ? 1 : 0;
         if (k === "line" || flat) continue;
-        // a solid outline keeps the silhouette readable
-        const rim = k !== "moon" && (x === 0 || y === 0 || x === cols - 1 || y === rows - 1);
+        const rim = x === 0 || y === 0 || x === cols - 1 || y === rows - 1;
         if (rim || !inside[i - 1] || !inside[i + 1] || !inside[i - cols] || !inside[i + cols]) on[i] = 1;
       }
-      return { inside, on, col };
+      return { bits: true, inside, on, col: d };
     }
-    /** work out the cells for the picture's current size on screen */
+    /** work out the canvas for the picture's current size on screen: fine enough to look smooth when the browser scales
+        it up, coarse enough (about thirty thousand pixels) to redraw every frame the scroll moves it */
     build() {
       if (!this.imgs) return;
       const w = this.full.offsetWidth, h = this.full.offsetHeight;
@@ -106,12 +136,32 @@ const SM = (() => {
       const cs = getComputedStyle(this.pic);
       this.ink = rgb(cs.getPropertyValue("--ink") || "#b9a2ff");
       this.paper = this.kind === "photo" || this.kind === "paint" ? rgb(cs.getPropertyValue("--ground") || "#0c0620") : null;
-      const base = u() * (w > u() * 22 ? 0.28 : this.kind === "photo" ? 0.22 : 0.14) * (parseFloat(this.pic.dataset.cell) || 1);
-      const cell = Math.max(2, Math.round(base));
+      // a bitmap's cells are the old size: coarse enough to read as cells, finer on small things (data-cell scales them);
+      // a smooth picture's canvas is fine enough to look smooth when scaled, coarse enough to redraw every frame
+      const cell = this.bits ? Math.max(2, Math.round(u() * (w > u() * 22 ? 0.28 : 0.14) * (parseFloat(this.pic.dataset.cell) || 1)))
+        : Math.max(1.5, Math.sqrt((w * h) / 32000));
       const cols = Math.max(12, Math.round(w / cell)), rows = Math.max(12, Math.round(h / cell));
       Object.assign(this.canvas.style, { left: this.full.offsetLeft + "px", top: this.full.offsetTop + "px", width: w + "px", height: h + "px" });
       this.canvas.width = cols; this.canvas.height = rows;
       this.cols = cols; this.rows = rows;
+      // the sweep: where each point sits on the way from the top left to the bottom right, with a slow ripple so the
+      // front of the light is never a ruled line
+      const sweep = new Float32Array(cols * rows);
+      let lo = Infinity, hi = -Infinity;
+      for (let y = 0, i = 0; y < rows; y++) for (let x = 0; x < cols; x++, i++) {
+        const fx = x / cols, fy = y / rows, t = 0.62 * fy + 0.38 * fx + 0.035 * Math.sin(fx * 7.1 + fy * 3.3) + 0.02 * Math.sin(fy * 11.7 - fx * 4.2);
+        sweep[i] = t; if (t < lo) lo = t; if (t > hi) hi = t;
+      }
+      for (let i = 0; i < sweep.length; i++) sweep[i] = (sweep[i] - lo) / (hi - lo);
+      this.sweep = sweep;
+      // the seam's cells: squares about six CSS pixels across, each with a fixed chance, so the glints stand still on
+      // the picture and only the front decides which of them show
+      const blk = Math.max(2, Math.round(6 / cell)), seam = new Float32Array(cols * rows);
+      for (let y = 0, i = 0; y < rows; y++) for (let x = 0; x < cols; x++, i++) {
+        let h = (((x / blk) | 0) * 374761393 + ((y / blk) | 0) * 668265263) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177);
+        seam[i] = ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+      }
+      this.seam = seam;
       this.a = this.cells(this.imgs[0], cols, rows);
       this.b = this.imgs[1] ? this.cells(this.imgs[1], cols, rows) : null;
       this.image = this.ctx.createImageData(cols, rows);
@@ -119,15 +169,55 @@ const SM = (() => {
     }
     draw() {
       if (!this.image) return;
-      const { cols, rows, a, b, show, face, ink, paper, lx, ly, lr, phase } = this, px = this.image.data, lr2 = lr * lr, wake = Math.max(this.wake, this.floor);
+      if (this.bits) return this.drawBits();
+      const { cols, rows, a, b, show, face, lx, ly, lr, phase, sweep, seam } = this, px = this.image.data, wake = Math.max(this.wake, this.floor);
+      const F = 0.24, ramp = (p, t) => { const q = (p * (1 + F) - t) / F; return q <= 0 ? 0 : q >= 1 ? 1 : q * q * (3 - 2 * q); };
+      const soft = lr ? lr * 0.35 : 1;
       for (let y = 0, i = 0; y < rows; y++) {
         const dy = y + 0.5 - ly, ny = (y + 0.5) / rows - 0.5, edge = (2 * phase - 1) * Math.sqrt(Math.max(0, 0.25 - ny * ny));   // the terminator
         for (let x = 0; x < cols; x++, i++) {
-          const j = i * 4, t = (B8[(y & 7) * 8 + (x & 7)] + 0.5) / 64, s = b && t < face ? b : a;
-          if (!s.inside[i] || t >= show || (phase < 1 && (x + 0.5) / cols - 0.5 > edge)) { px[j + 3] = 0; continue; }
-          let lit = t < wake;
-          if (!lit && lr) { const dx = x + 0.5 - lx, e = 1 - 0.42 * t; lit = dx * dx + dy * dy < lr2 * e * e; }  // a dithered edge, never a blur
-          if (lit) { px[j] = s.col[i * 3]; px[j + 1] = s.col[i * 3 + 1]; px[j + 2] = s.col[i * 3 + 2]; px[j + 3] = 255; }
+          const j = i * 4, t = sweep[i];
+          let al = ramp(show, t);
+          if (al > 0 && phase < 1) { const q = (edge - ((x + 0.5) / cols - 0.5)) * cols * 0.6 + 0.5; al *= q <= 0 ? 0 : q >= 1 ? 1 : q; }
+          if (al <= 0) { px[j + 3] = 0; continue; }
+          let wk = ramp(wake, t);
+          if (lr && wk < 1) { const dx = x + 0.5 - lx, r = Math.sqrt(dx * dx + dy * dy), q = (lr - r) / soft; if (q > wk) wk = q >= 1 ? 1 : q; }
+          const fk = b ? ramp(face, t) : 0;
+          let r, g, bl, al2;
+          if (fk <= 0 || fk >= 1) {
+            const L = fk >= 1 ? b : a, S = L.sleep, W = L.wake, sk = 1 - wk;
+            r = S[j] * sk + W[j] * wk; g = S[j + 1] * sk + W[j + 1] * wk; bl = S[j + 2] * sk + W[j + 2] * wk; al2 = S[j + 3] * sk + W[j + 3] * wk;
+          } else {
+            const sk = 1 - wk, fa = 1 - fk;
+            const ra = a.sleep[j] * sk + a.wake[j] * wk, ga = a.sleep[j + 1] * sk + a.wake[j + 1] * wk, ba = a.sleep[j + 2] * sk + a.wake[j + 2] * wk, aa = a.sleep[j + 3] * sk + a.wake[j + 3] * wk;
+            const rb = b.sleep[j] * sk + b.wake[j] * wk, gb = b.sleep[j + 1] * sk + b.wake[j + 1] * wk, bb = b.sleep[j + 2] * sk + b.wake[j + 2] * wk, ab = b.sleep[j + 3] * sk + b.wake[j + 3] * wk;
+            r = ra * fa + rb * fk; g = ga * fa + gb * fk; bl = ba * fa + bb * fk; al2 = aa * fa + ab * fk;
+          }
+          // the seam: where the light is half way in, a few of the square cells glint pale lilac
+          if (wk > 0.04 && wk < 0.96) {
+            const m = 4 * wk * (1 - wk);
+            if (seam[i] < m * m * m * 0.4) { r += (232 - r) * 0.7; g += (222 - g) * 0.7; bl += (255 - bl) * 0.7; }
+          }
+          px[j] = r; px[j + 1] = g; px[j + 2] = bl; px[j + 3] = al2 * al;
+        }
+      }
+      this.ctx.putImageData(this.image, 0, 0);
+    }
+    /** a bitmap's frame: every cell is either asleep (ink, ground or nothing) or awake (its colour), never between. A cell
+        turns when the sweep's light at it passes its Bayer threshold, so the front breaks up cell by cell */
+    drawBits() {
+      const { cols, rows, a, b, show, face, lx, ly, lr, sweep, ink, paper } = this, px = this.image.data, wake = Math.max(this.wake, this.floor);
+      const F = 0.24, ramp = (p, t) => { const q = (p * (1 + F) - t) / F; return q <= 0 ? 0 : q >= 1 ? 1 : q * q * (3 - 2 * q); };
+      const soft = lr ? lr * 0.35 : 1;
+      for (let y = 0, i = 0; y < rows; y++) {
+        const dy = y + 0.5 - ly, row = (y & 7) * 8;
+        for (let x = 0; x < cols; x++, i++) {
+          const j = i * 4, t = sweep[i], th = (B8[row + (x & 7)] + 0.5) / 64;
+          const s = b && ramp(face, t) > th ? b : a;
+          if (!s.inside[i] || ramp(show, t) <= th) { px[j + 3] = 0; continue; }
+          let wk = ramp(wake, t);
+          if (lr && wk < 1) { const dx = x + 0.5 - lx, q = (lr - Math.sqrt(dx * dx + dy * dy)) / soft; if (q > wk) wk = q >= 1 ? 1 : q; }
+          if (wk > th) { px[j] = s.col[j]; px[j + 1] = s.col[j + 1]; px[j + 2] = s.col[j + 2]; px[j + 3] = 255; }
           else if (s.on[i]) { px[j] = ink[0]; px[j + 1] = ink[1]; px[j + 2] = ink[2]; px[j + 3] = 255; }
           else if (paper) { px[j] = paper[0]; px[j + 1] = paper[1]; px[j + 2] = paper[2]; px[j + 3] = 255; }
           else px[j + 3] = 0;
@@ -159,7 +249,7 @@ const SM = (() => {
     rest(hold = 60000, ms = 900) { clearTimeout(this.timers.rest); this.timers.rest = setTimeout(() => this.sleep(ms), hold); }
     /** the sharp picture shows only while the bitmap is all colour */
     sync() { this.pic.classList.toggle("awake", Math.max(this.wake, this.floor) >= 1); }
-    /** set by the scroll, every frame it moves: in steps of 1/64, the size of one step of the Bayer order */
+    /** set by the scroll, every frame it moves: in steps of 1/64, fine enough that the sweep glides */
     setFloor(v) {
       v = Math.round(Math.min(1, Math.max(0, v)) * 64) / 64;
       if (v === this.floor) return;
@@ -177,9 +267,11 @@ const SM = (() => {
     /** read the colours again (after --ink or --ground changed) and redraw */
     recolour() {
       if (!this.image) return;
-      const cs = getComputedStyle(this.pic);
-      this.ink = rgb(cs.getPropertyValue("--ink") || "#b9a2ff");
-      if (this.paper) this.paper = rgb(cs.getPropertyValue("--ground") || "#0c0620");
+      const cs = getComputedStyle(this.pic), ink = rgb(cs.getPropertyValue("--ink") || "#b9a2ff"), paper = this.paper ? rgb(cs.getPropertyValue("--ground") || "#0c0620") : null;
+      if (ink.join() === this.ink.join() && (!paper || paper.join() === this.paper.join())) return;
+      this.ink = ink; if (paper) this.paper = paper;
+      this.a = this.cells(this.imgs[0], this.cols, this.rows);
+      this.b = this.imgs[1] ? this.cells(this.imgs[1], this.cols, this.rows) : null;
       this.draw();
     }
     /** a moon's phase, set by the scroll */
@@ -267,22 +359,15 @@ const SM = (() => {
     return el;
   };
 
-  /* ====================================================================== dither masks for .wipe-in / .wipe-out */
-  [0.25, 0.5, 0.75, 0.94].forEach((cover, k) => {
-    const c = document.createElement("canvas"); c.width = c.height = 8;
-    const x = c.getContext("2d"), d = x.createImageData(8, 8);
-    for (let i = 0; i < 64; i++) d.data[i * 4 + 3] = (B8[i] + 0.5) / 64 < cover ? 255 : 0;
-    x.putImageData(d, 0, 0);
-    root.style.setProperty(`--m${k + 1}`, `url(${c.toDataURL()})`);
-  });
-  /** replace what a box shows with a dither wipe: old child out, new child in */
+  /* ====================================================================== .wipe-in / .wipe-out (moon.css): a short cross-fade */
+  /** replace what a box shows with a short fade: old child out, new child in */
   const swap = (box, next) => {
     const old = box.firstElementChild;
     if (quiet() || !old) { box.replaceChildren(next); return; }
     old.classList.remove("wipe-in"); old.classList.add("wipe-out");
     next.classList.add("wipe-in");
     box.append(next);
-    setTimeout(() => old.remove(), 190);
+    setTimeout(() => old.remove(), 160);
     setTimeout(() => next.classList.remove("wipe-in"), 240);
   };
 
@@ -299,7 +384,14 @@ const SM = (() => {
   let sy = scrollY, target = scrollY, gliding = false, lastT = 0, frameReq = 0;
   const maxY = () => Math.max(0, document.documentElement.scrollHeight - innerHeight);
   const smoothOn = () => HOVER && !quiet();
-  const runScrubs = () => scrubs.forEach((fn) => { try { fn(); } catch (e) { console.error(e); } });
+  /* the scroll position is read once a frame, before the scrubs run: reading scrollY after a scrub has written styles
+     makes the browser lay the page out again, so every later read in the same frame would pay for a fresh layout */
+  let frameY = null;
+  const runScrubs = () => {
+    frameY = scrollY;
+    scrubs.forEach((fn) => { try { fn(); } catch (e) { console.error(e); } });
+    frameY = null;
+  };
   const frameLoop = (now) => {
     frameReq = 0;
     if (gliding) {
@@ -323,13 +415,20 @@ const SM = (() => {
     if (!gliding) sy = scrollY;
     target = y; gliding = true; kick();
   };
+  // whether a box can scroll on its own, asked once per box: the wheel asks it of every box under the pointer
+  const scrollable = new WeakMap();
+  const scrolls = (n) => {
+    let v = scrollable.get(n);
+    if (v === undefined) { v = /(auto|scroll)/.test(getComputedStyle(n).overflowY); scrollable.set(n, v); }
+    return v;
+  };
   addEventListener("wheel", (e) => {
     if (!smoothOn() || e.ctrlKey || e.defaultPrevented) return;
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
     if (document.querySelector("dialog[open]") || document.body.classList.contains("menu-open") || travelling) return;
     // a box inside the page that can still scroll that way keeps the wheel
     for (let n = e.target; n && n !== document.body && n.nodeType === 1; n = n.parentElement) {
-      if (n.scrollHeight > n.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(n).overflowY)) {
+      if (scrolls(n) && n.scrollHeight > n.clientHeight + 1) {
         if (e.deltaY < 0 ? n.scrollTop > 0 : n.scrollTop + n.clientHeight < n.scrollHeight - 1) return;
       }
     }
@@ -364,7 +463,7 @@ const SM = (() => {
       const r = el.getBoundingClientRect();
       c = { gen, w: innerWidth, top: r.top + scrollY, h: r.height }; placed.set(el, c);
     }
-    const top = c.top - scrollY;
+    const top = c.top - (frameY ?? scrollY);
     return { top, bottom: top + c.h, height: c.h };
   };
   const where = (el) => {
@@ -387,37 +486,15 @@ const SM = (() => {
     }
   });
 
-  /* dither masks for one thing coming in over another, from nothing (0) to everything (LEVELS). The tile mixes three
-     sizes of square: some cells stay whole, some split in four, some in sixteen, so a dissolve reads as a scatter of
-     big and small grains rather than an even grid. Each square has its own fixed threshold (the cell's place in the
-     8 x 8 Bayer order blended with the square's place inside its cell), so a square once shown stays shown as the
-     cover grows. mask(cover) gives the CSS for an element's mask. */
-  const LEVELS = 28;
-  const B2 = [0, 2, 3, 1], B4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
-  let maskTiles = null, maskCell = 0;
+  /* masks for one thing coming in over another, from nothing (0) to everything (LEVELS): a band of moonlight with a soft
+     edge sweeps down across it, the same front as a picture waking. mask(cover) gives the CSS for an element's mask. */
+  const LEVELS = 40;
   const mask = (cover) => {
-    const cell = Math.max(8, Math.round(u() * 0.9));
-    if (!maskTiles || maskCell !== cell) {
-      maskCell = cell;
-      // which cells split, and how far: a fixed hash per cell, about two in five whole, a third in four, the rest in sixteen
-      const split = Array.from({ length: 64 }, (_, i) => { const h = ((i * 2654435761) >>> 0) % 100; return h < 40 ? 1 : h < 72 ? 2 : 4; });
-      const squares = [];
-      for (let i = 0; i < 64; i++) {
-        const n = split[i], s = cell / n, cx = (i % 8) * cell, cy = Math.floor(i / 8) * cell, base = B8[i] / 64;
-        for (let j = 0; j < n * n; j++) {
-          const inner = n === 1 ? 0.5 : (n === 2 ? B2[j] / 4 : B4[j] / 16);
-          squares.push([cx + (j % n) * s, cy + Math.floor(j / n) * s, s, n === 1 ? base : base * 0.55 + inner * 0.45]);
-        }
-      }
-      maskTiles = Array.from({ length: LEVELS + 1 }, (_, k) => {
-        const c = document.createElement("canvas"); c.width = c.height = cell * 8;
-        const x = c.getContext("2d"); x.fillStyle = "#000";
-        for (const [sx, sy, s, t] of squares) if (t < k / LEVELS) x.fillRect(Math.round(sx), Math.round(sy), Math.ceil(s), Math.ceil(s));
-        return `url(${c.toDataURL()})`;
-      });
-    }
     const level = quiet() ? (cover >= 0.5 ? LEVELS : 0) : Math.round(Math.min(1, Math.max(0, cover)) * LEVELS);
-    return { level, image: level >= LEVELS ? "none" : level <= 0 ? "hide" : maskTiles[level], size: `${cell * 8}px ${cell * 8}px` };
+    if (level >= LEVELS) return { level, image: "none", size: "100% 100%" };
+    if (level <= 0) return { level, image: "hide", size: "100% 100%" };
+    const F = 0.3, p = level / LEVELS, b = p * (1 + F), a = b - F;
+    return { level, image: `linear-gradient(168deg, #000 ${(a * 100).toFixed(1)}%, rgb(0 0 0 / 0.55) ${(((a + b) / 2) * 100).toFixed(1)}%, transparent ${(b * 100).toFixed(1)}%)`, size: "100% 100%" };
   };
   const paintMask = (el, level) => {
     const m = mask(level / LEVELS);
@@ -553,15 +630,19 @@ const SM = (() => {
     const vh = innerHeight, top = s.getBoundingClientRect().top;
     const cell = Math.max(8, Math.round(u() * 0.9)), H = cell * 10;
     if (layer._cell !== cell) {
-      /* the edge: ten rows of big cells filling in the Bayer order, its line ragged like a far ridge (a sum of waves
-         that repeats every 64 cells, so the tile joins itself), never an even band across the window */
+      /* the edge: a ridge of solid square cells, stepped like a far hill line (a sum of waves that repeats every 64
+         cells, so the tile joins itself), with a few loose cells just above it. No dither fill and no blur: the cells
+         are fixed, so nothing flickers while it rises */
       layer._cell = cell;
-      const W = 64, lift = Array.from({ length: W }, (_, k) => 2 + 1.2 * Math.sin((2 * Math.PI * 2 * k) / W + 0.7) + 0.8 * Math.sin((2 * Math.PI * 5 * k) / W + 2.1));
+      const W = 64, lift = Array.from({ length: W }, (_, k) => 3.2 + 1.6 * Math.sin((2 * Math.PI * 2 * k) / W + 0.7) + 1.0 * Math.sin((2 * Math.PI * 5 * k) / W + 2.1));
       const c = document.createElement("canvas"); c.width = cell * W; c.height = H;
       const x = c.getContext("2d"); x.fillStyle = "#000";
-      for (let r = 0; r < 10; r++) for (let k = 0; k < W; k++) {
-        const cover = Math.min(1, Math.max(0, (r + 0.5 - lift[k]) / 6));
-        if (B8[(r & 7) * 8 + (k & 7)] < cover * 64) x.fillRect(k * cell, r * cell, cell, cell);
+      const loose = (k, r) => { let h = (k * 374761393 + r * 668265263) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967295; };
+      for (let k = 0; k < W; k++) {
+        const top = Math.round(lift[k]);
+        x.fillRect(k * cell, top * cell, cell, H - top * cell);
+        if (top - 2 >= 0 && loose(k, 1) < 0.22) x.fillRect(k * cell, (top - 2) * cell, cell, cell);
+        else if (top - 1 >= 0 && loose(k, 2) < 0.12) x.fillRect(k * cell, (top - 1) * cell, cell, cell);
       }
       const st = layer.style;
       st.height = `calc(100% + ${H}px)`;
@@ -599,9 +680,9 @@ const SM = (() => {
   const landing = (el) => el.getBoundingClientRect().top + scrollY + (el.dataset.land === "end" ? Math.max(0, el.offsetHeight - innerHeight) : 0);
   const go = (id) => { const el = document.getElementById(id); if (el) glide(landing(el)); };
   /* ====================================================================== travel
-     A jump between stops: a dither iris in the next stop's own ground colour closes from the point you chose,
+     A jump between stops: a soft-edged iris in the next stop's own ground colour closes from the point you chose,
      the stop's numeral and name stand in it for a moment, you are moved there, and the iris opens again from
-     the middle. Cells switch in the Bayer order mixed with their distance, so it reads as large pixels, never a fade.
+     the middle.
      travel(id, { x, y }, { onJump }) resolves when the iris has opened. Quiet mode jumps at once. */
   let iris = null;
   document.fonts?.load("64px Redaction").catch(() => {});
@@ -616,7 +697,7 @@ const SM = (() => {
     if (!iris) { iris = document.createElement("canvas"); iris.className = "iris"; iris.setAttribute("aria-hidden", "true"); document.body.append(iris); }
     const dpr = Math.min(2, devicePixelRatio || 1), W = innerWidth, H = innerHeight;
     iris.width = Math.round(W * dpr); iris.height = Math.round(H * dpr);
-    const c = iris.getContext("2d"), cell = Math.max(14, Math.round(u() * 1.6)), cols = Math.ceil(W / cell), rows = Math.ceil(H / cell);
+    const c = iris.getContext("2d");
     const ground = colourOf(el, "ground"), ink = colourOf(el, "ink");
     // the stop's numeral and name, drawn once; they show only where the iris has closed
     const lm = (el.dataset.label || "").match(/^([IVX]+)\s+(.+)$/), [num, name] = lm ? [lm[1], lm[2]] : ["", el.dataset.name || el.getAttribute("aria-label") || ""];
@@ -625,17 +706,15 @@ const SM = (() => {
     k.fillStyle = ink; k.textAlign = "center"; k.textBaseline = "alphabetic";
     k.font = `400 ${big}px Redaction, Georgia, serif`; k.fillText(name, card.width / 2, card.height / 2 + big * 0.32);
     k.font = `400 ${20 * dpr}px "Redaction 35", Redaction, serif`; k.fillText(num, card.width / 2, card.height / 2 - big * 0.62);
-    const order = (ox, oy) => {
-      const far = Math.max(Math.hypot(ox, oy), Math.hypot(W - ox, oy), Math.hypot(ox, H - oy), Math.hypot(W - ox, H - oy));
-      const t = new Float32Array(cols * rows);
-      for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) t[y * cols + x] = (Math.hypot((x + 0.5) * cell - ox, (y + 0.5) * cell - oy) / far) * 0.72 + (B8[(y & 7) * 8 + (x & 7)] / 64) * 0.28;
-      return t;
-    };
+    // the iris: a circle from (ox, oy) whose radius grows to the far corner, with a feathered rim
+    const order = (ox, oy) => ({ ox, oy, far: Math.max(Math.hypot(ox, oy), Math.hypot(W - ox, oy), Math.hypot(ox, H - oy), Math.hypot(W - ox, H - oy)) });
     const paint = (t, p, closing) => {
       c.setTransform(dpr, 0, 0, dpr, 0, 0); c.globalCompositeOperation = "source-over"; c.clearRect(0, 0, W, H);
-      c.fillStyle = ground; c.beginPath();
-      for (let i = 0; i < t.length; i++) if (closing ? t[i] < p : t[i] >= p) c.rect((i % cols) * cell, Math.floor(i / cols) * cell, cell, cell);
-      c.fill();
+      const feather = Math.max(60, t.far * 0.18), r = p * (t.far + feather), r0 = Math.max(0, r - feather);
+      const g = c.createRadialGradient(t.ox, t.oy, r0, t.ox, t.oy, Math.max(r0 + 0.1, r));
+      g.addColorStop(0, closing ? ground : "transparent"); g.addColorStop(1, closing ? "transparent" : ground);
+      if (!closing) { c.fillStyle = ground; c.fillRect(0, 0, W, H); c.globalCompositeOperation = "destination-out"; const h = c.createRadialGradient(t.ox, t.oy, r0, t.ox, t.oy, Math.max(r0 + 0.1, r)); h.addColorStop(0, "#000"); h.addColorStop(1, "rgb(0 0 0 / 0)"); c.fillStyle = h; c.fillRect(0, 0, W, H); c.globalCompositeOperation = "source-over"; }
+      else { c.fillStyle = g; c.fillRect(0, 0, W, H); }
       c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = "source-atop"; c.drawImage(card, 0, 0);
     };
     const run = (t, ms, closing) => new Promise((done) => {
@@ -645,9 +724,9 @@ const SM = (() => {
     });
     iris.classList.add("on");
     const ox = from?.x ?? W / 2, oy = from?.y ?? H / 2;
-    return run(order(ox, oy), opts.closeMs || 380, true)
-      .then(() => new Promise((r) => { jump(); setTimeout(r, 70); }))
-      .then(() => run(order(W / 2, H / 2), 340, false))
+    return run(order(ox, oy), opts.closeMs || 340, true)
+      .then(() => new Promise((r) => { jump(); setTimeout(r, 60); }))
+      .then(() => run(order(W / 2, H / 2), 300, false))
       .then(() => { iris.classList.remove("on"); c.clearRect(0, 0, iris.width, iris.height); travelling = false; });
   };
   if (route) route.addEventListener("click", (e) => {
@@ -760,5 +839,5 @@ const SM = (() => {
   /** a thin drawn arrow, for .arw buttons */
   const arrow = (dir) => `<svg viewBox="0 0 26 14" aria-hidden="true"><path d="${dir < 0 ? "M25 7H2M7.5 1.5L2 7l5.5 5.5" : "M1 7h23M18.5 1.5L24 7l-5.5 5.5"}"/></svg>`;
   addEventListener("pageshow", () => tick());
-  return { $, $$, u, quiet, HOVER, COLUMN, Bitmap, pictures, bitmap, type, swap, say, go, glide, scrub, where, whenNear, smooth, mask, applyMask, band, tone, blend, travel, view, wakeable, stars, tick, moonSvg, start, arrow, corners, steps, setSteps, landing, onStop: (fn) => listeners.push(fn), get stop() { return current; }, get placedGen() { return gen; } };
+  return { $, $$, u, quiet, HOVER, COLUMN, Bitmap, pictures, bitmap, type, swap, say, go, glide, scrub, where, whenNear, smooth, mask, applyMask, band, tone, blend, travel, view, wakeable, stars, tick, moonSvg, start, arrow, corners, steps, setSteps, landing, onStop: (fn) => listeners.push(fn), get stop() { return current; }, get placedGen() { return gen; }, get y() { return frameY ?? scrollY; } };
 })();

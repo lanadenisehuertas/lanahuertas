@@ -26,7 +26,7 @@
   const at = (stop, k, step) => stop.getBoundingClientRect().top + scrollY + k * step * innerHeight + 2;
 
   /* ================================================================ II Posters: the line
-     The twelve posters hang large, one after another, on a dotted line, each held by a painted clothespin. The stop
+     The eight posters hang large, one after another, on a dotted line, each held by a painted clothespin. The stop
      is pinned; scrolling draws the line along, so the posters pass the middle of the window one at a time. The one in
      the middle hangs straight and wakes into colour; the others swing a little on their pins as they come and go and
      sleep in lilac. The line slows as each poster reaches the middle, so every poster has a moment of its own. A
