@@ -9,12 +9,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500&display=swap">
-<link rel="preload" href="../brand/fonts/Redaction35-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="moon.css">
-<link rel="stylesheet" href="reel.css">
-<link rel="stylesheet" href="brand.css">
+<link rel="preload" href="/samples/brand/fonts/Redaction35-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/samples/sleeping-moon/moon.css">
+<link rel="stylesheet" href="/samples/sleeping-moon/reel.css">
+<link rel="stylesheet" href="/samples/sleeping-moon/brand.css">
 <script>document.documentElement.classList.add("js"); try { if (localStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
-<script src="data.js"></script>
+<script src="/samples/sleeping-moon/data.js"></script>
 <!-- the brand is chosen from the address; the page takes the brand's own world (brand.js) -->
 <script>
   var BRAND_AT = Math.max(0, DATA.brands.findIndex(function (b) { return b.slug === new URLSearchParams(location.search).get("b"); }));
@@ -56,7 +56,7 @@
   </noscript>
 </main>
 
-<script src="moon.js"></script>
-<script src="brand.js"></script>
+<script src="/samples/sleeping-moon/moon.js"></script>
+<script src="/samples/sleeping-moon/brand.js"></script>
 </body>
 </html>
