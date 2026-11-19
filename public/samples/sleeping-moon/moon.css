@@ -235,3 +235,5 @@ dialog.viewer[open] { display: grid; grid-template-rows: 1fr auto; }
   .viewer .prev, .viewer .next { top: auto; bottom: 16px; translate: none; }
 }
 main > section[tabindex="-1"]:focus { outline: none; }
+/* nothing in the page may stick out sideways: on phones it lets the whole page be dragged left and right */
+main { overflow-x: clip; }

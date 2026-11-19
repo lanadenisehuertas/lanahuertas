@@ -93,7 +93,8 @@ main > .stop.reel { display: block; padding: 0; min-height: 0; }
   .pk-text { gap: 8px; }
   .pk-name { font-size: 30px; }
   .pk-text .say { display: none; }
-  .s-row { order: -1; height: 42svh; overflow-x: auto; scrollbar-width: none; gap: 10px; align-items: stretch; }
+  /* the row scrolls sideways only: a few pixels of height overflow made it take vertical swipes, so the page stuck */
+  .s-row { order: -1; height: 42svh; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; gap: 10px; align-items: stretch; }
   .s-row::-webkit-scrollbar { display: none; }
   .s-piece[hidden] { display: block; }
   .s-col, .s-col[hidden] { display: contents; }

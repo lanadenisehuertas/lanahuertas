@@ -37,6 +37,25 @@
 <link rel="stylesheet" href="/samples/sleeping-moon/words-proto.css">
 <link rel="stylesheet" href="/samples/sleeping-moon/about-proto.css">
 <link rel="stylesheet" href="/samples/sleeping-moon/fix-proto.css">
+<script>
+/* Phones: the address bar slides away and back as you scroll, which changes innerHeight and fires "resize" on nearly
+   every swipe. The rooms are measured against innerHeight, so they would jump and the pictures would be redrawn each
+   time. On a touch screen the page keeps the height it had and takes a new one only when the width changes (the phone
+   is turned) or the height changes by more than an address bar would (the keyboard opens). */
+(() => {
+  if (!matchMedia("(pointer: coarse)").matches) return;
+  const d = Object.getOwnPropertyDescriptor(window, "innerHeight") || Object.getOwnPropertyDescriptor(Window.prototype, "innerHeight");
+  if (!d || !d.get || !d.configurable) return;
+  const real = () => d.get.call(window);
+  let w = innerWidth, h = real();
+  try { Object.defineProperty(window, "innerHeight", { configurable: true, get: () => h }); } catch (e) { return; }
+  addEventListener("resize", (e) => {
+    const nw = innerWidth, nh = real();
+    if (nw !== w || Math.abs(nh - h) > 160) { w = nw; h = nh; return; }
+    e.stopImmediatePropagation();
+  }, true);
+})();
+</script>
 <script>document.documentElement.classList.add("js", "loading", "has-study"); try { if (localStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
 </head>
 <body data-route="room">
