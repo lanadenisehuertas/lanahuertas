@@ -1,0 +1,104 @@
+/* The reel: a stop that shows its things one at a time as you scroll. Brands and products use it.
+   Each plate is its thing's own world: its ground colour, its ink, and its backdrop cut into flat tones, with a
+   board of 100u x 62.5u on it like the first screen (the words in the left column, the work large to the right, the
+   room's object on the ground under the work, the moth and lily in the corners). The next world comes in over the
+   last through a dither of big tiles that follows the scroll (reel.js). Two numbers drive everything on a plate:
+   --a, its arrival (0 to 1), and --f, how far the scroll is through it (-1 to 1), for a slow drift. */
+
+main > .stop:not(.dawn) { --ground: #000; --ink: #b9a2ff; --text: #d9cfff; --mark: #fff1c9; --rule: rgb(185 162 255 / 0.5); }
+
+main > .stop.reel { display: block; padding: 0; min-height: 0; }
+.stage { position: sticky; top: 0; width: 100%; justify-self: stretch; align-self: start; height: 100svh; overflow: hidden; display: grid; place-items: center; }
+.reel-plate { --a: 1; --f: 0; position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; background: var(--ground); color: var(--text);
+  -webkit-mask-repeat: repeat; mask-repeat: repeat; -webkit-mask-position: 0 0; mask-position: 0 0; }
+.reel-plate .r-board { z-index: 1; }
+
+/* the backdrop: the world's own picture as a few flat tones in a coarse bitmap, drifting slower than the work.
+   It stays a bitmap even when awake, so the work leads. A fall of the ground colour keeps the words readable. */
+.backdrop { position: absolute; inset: -6% -3%; z-index: 0; pointer-events: none;
+  transform: translate3d(0, calc(var(--f) * -2.6 * var(--u)), 0) scale(calc(1.04 + (1 - var(--a)) * 0.05)); }
+.backdrop.pic { line-height: 0; }
+.backdrop .full { width: 100%; height: 100%; object-fit: cover; }
+.js .backdrop.pic .full { opacity: 0 !important; }
+.js .backdrop.pic .bm, .quiet .backdrop.pic .bm { display: block; opacity: 1 !important; }
+.reel-plate::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(90deg, var(--ground) 0%, color-mix(in srgb, var(--ground) 82%, transparent) 26%, color-mix(in srgb, var(--ground) 18%, transparent) 58%, transparent 80%),
+              linear-gradient(0deg, var(--ground) 0%, color-mix(in srgb, var(--ground) 60%, transparent) 16%, transparent 34%); }
+.r-board { position: relative; width: calc(100 * var(--u)); height: calc(62.5 * var(--u)); }
+.r-board > * { position: absolute; }
+/* a soft light of the current work's own colour behind it, never a box */
+.r-glow { position: absolute; left: 50%; top: 50%; width: calc(64 * var(--u)); height: calc(52 * var(--u)); translate: calc(-50% + 11.5 * var(--u)) calc(-50% - 7 * var(--u)); pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--ink) 24%, transparent), transparent); opacity: var(--a); }
+
+/* ---------- the words: one column on the left, the same in every room ---------- */
+.pk-text { left: calc(10 * var(--u)); top: calc(9.5 * var(--u)); width: calc(21 * var(--u)); display: grid; grid-template-columns: minmax(0, 1fr); gap: calc(0.9 * var(--u)); align-content: start; z-index: 2;
+  transform: translate3d(0, calc((1 - var(--a)) * 3 * var(--u) + var(--f) * -0.8 * var(--u)), 0); }
+.pk-name { font: 400 clamp(32px, calc(3.6 * var(--u)), 58px) / 0.95 var(--display); letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
+.current .pk-name { font-family: var(--display-awake); }
+.pk-meta { font-size: 16px; line-height: 1.4; color: var(--text); }
+/* a caption's lines come in one after another as its plate arrives (--w, 0 to 1, from the scroll): the name first,
+   then each line under it, so the words read in order, never all at once */
+.pk-text > * { --o: clamp(0, calc((var(--w, 1) - var(--i, 0) * 0.08) / 0.45), 1); opacity: var(--o); translate: 0 calc((1 - var(--o)) * 10px); }
+.pk-text > :nth-child(2) { --i: 1; } .pk-text > :nth-child(3) { --i: 2; } .pk-text > :nth-child(4) { --i: 3; }
+.pk-text > :nth-child(5) { --i: 4; } .pk-text > :nth-child(6) { --i: 5; } .pk-text > :nth-child(n + 7) { --i: 6; }
+.reel-plate .pk-name { color: var(--ink); }
+.reel-plate .pk-tag { color: color-mix(in srgb, var(--ink) 55%, #fff); }
+.pk-tag { font: italic 400 clamp(19px, calc(1.6 * var(--u)), 25px) / 1.22 "Redaction", Georgia, serif; color: var(--ink); }
+.r-board .say { font-size: 17px; line-height: 1.5; color: var(--text); }
+.pk-text .go { justify-self: start; margin-top: calc(0.4 * var(--u)); }
+
+/* ---------- I Brands: the key visual and its pubmats in one row, as tall as the space allows ---------- */
+.s-row { left: calc(33.5 * var(--u)); right: calc(10 * var(--u)); top: calc(7.4 * var(--u)); height: calc(32 * var(--u)); display: flex; align-items: end; gap: calc(1.4 * var(--u)); z-index: 2; }
+.pk-card { position: relative; flex: none; height: 100%; max-width: 100%; cursor: zoom-in; }
+/* the key visual starts small at the mouth of its packet in the holder (--fx, --fy, measured in reel.js) and rises into place */
+/* the key visual comes up out of its packet as far as the scroll has brought its world in */
+.pk-in { position: absolute; inset: 0; transform-origin: 50% 100%; opacity: min(1, calc(var(--a) * 5));
+  transform: translate3d(calc(var(--fx, 0px) * (1 - var(--a))), calc(var(--fy, 300px) * (1 - var(--a)) + var(--f) * -1.4 * var(--u)), 0) scale(calc(0.16 + 0.84 * var(--a))); }
+.pk-win { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* each piece arrives a little after the one before it and drifts a little faster, so the row has depth */
+.s-piece { --pa: clamp(0, calc((var(--a) - 0.3 - var(--d) * 0.12) / 0.4), 1);
+  position: relative; flex: none; height: 100%; cursor: zoom-in; opacity: var(--pa);
+  transform: translate3d(0, calc((1 - var(--pa)) * 3 * var(--u) + var(--f) * -1 * (1.8 + var(--d) * 0.6) * var(--u)), 0);
+  transition: translate 180ms var(--pop); }
+.s-piece[hidden], .s-col[hidden] { display: none; }
+/* two landscape pieces stacked in one column, each half the row's height */
+.s-col { flex: none; height: 100%; display: flex; flex-direction: column; justify-content: end; align-items: start; gap: calc(1.4 * var(--u)); }
+.s-col .s-piece { height: calc(15.3 * var(--u)); }
+.s-piece img { width: 100%; height: 100%; object-fit: cover; }
+.reel-plate .s-piece:hover { translate: 0 -4px; }
+
+/* the holder: packets standing behind a carved rail on the ground under the work; three layers, all asleep in lilac */
+.holder { position: absolute; z-index: 40; left: calc(50% + 11.5 * var(--u)); top: calc(50% + 11.6 * var(--u)); width: calc(46 * var(--u)); height: calc(12 * var(--u)); translate: -50% 0; }
+.h-back, .h-rail { position: absolute; inset: 0; pointer-events: none; }
+.h-back .full, .h-rail .full { width: 100%; height: 100%; }
+.h-back { z-index: 0; } .h-rail { z-index: 2; }
+.h-row { position: absolute; z-index: 1; left: 7%; right: 7%; bottom: 18%; display: flex; justify-content: center; align-items: end; }
+/* --up (reel.js, from the scroll): the current brand's packet stands up out of the rail, its neighbours part way */
+.h-pk { --up: 0; position: relative; flex: none; width: calc(5 * var(--u)); min-width: 28px; margin-left: calc(-0.95 * var(--u));
+  transform: translate3d(0, calc(var(--up) * -3.2 * var(--u)), 0) rotate(calc((var(--i) - 4.5) * 1.3deg * var(--up)));
+  transition: translate 180ms var(--pop); }
+.h-pk:first-child { margin-left: 0; }
+.h-pk .pic .full { width: 100%; height: auto; }
+/* pointing at a packet lifts it a little more, on a small spring, and wakes it */
+.h-pk.on { translate: 0 calc(-1.4 * var(--u)); z-index: 3; }
+.h-name { position: absolute; left: 50%; bottom: calc(100% + 8px); translate: -50% 0; white-space: nowrap; font: italic 400 17px/1 "Redaction", Georgia, serif; color: var(--mark); opacity: 0; }
+.h-pk.on .h-name { opacity: 1; }
+.quiet .h-pk, .quiet .s-piece { transition: none; }
+
+/* ---------- phones and upright tablets: the plate as one column, the holder at the foot ---------- */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .r-glow { display: none; }
+  .r-board { width: 100%; height: 100%; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 16px; padding: calc(var(--edge) + var(--band) + 14px) 16px calc(26vw + 34px); }
+  .r-board > * { position: relative; left: auto; right: auto; top: auto; width: auto; }
+  .pk-text { gap: 8px; }
+  .pk-name { font-size: 30px; }
+  .pk-text .say { display: none; }
+  .s-row { order: -1; height: 42svh; overflow-x: auto; scrollbar-width: none; gap: 10px; align-items: stretch; }
+  .s-row::-webkit-scrollbar { display: none; }
+  .s-piece[hidden] { display: block; }
+  .s-col, .s-col[hidden] { display: contents; }
+  .s-col .s-piece { height: auto; }
+  .pk-card { max-width: none; }
+  .holder { top: auto; bottom: 10px; left: 50%; width: calc(100vw - 32px); height: calc((100vw - 32px) / 3.85); }
+  .h-pk { width: 9%; min-width: 0; margin-left: -1.5%; }
+}

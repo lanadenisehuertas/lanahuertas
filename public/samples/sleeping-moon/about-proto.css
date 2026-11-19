@@ -1,0 +1,97 @@
+/* Prototype: About (about-proto.js). What matters is marked, and "What I work with" holds while its entries arrive. */
+
+/* phones: the moon strip that rides the top of the window is solid night to its foot, so the years pass cleanly under it */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .cal-pin { background: linear-gradient(#000 88%, transparent); padding-bottom: 22px; }
+}
+
+/* the statement's key words are already awake and gold */
+.me-say .display .em .ch { color: var(--mark); font-family: var(--display-awake); }
+
+/* prizes and honours: gold, in the smooth cut, with a pixel star before them */
+.yr-list li.prize .e-t { color: var(--mark); font-family: var(--display-awake); }
+.yr-list li.prize .e-t::before { content: ""; display: inline-block; width: 0.6em; height: 0.6em; margin-right: 0.32em; vertical-align: 0.04em; image-rendering: pixelated;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9' shape-rendering='crispEdges'%3E%3Cpath fill='%23fff1c9' d='M4 0h1v2h1v1h1v1h2v1H7v1H6v1H5v2H4V7H3V6H2V5H0V4h2V3h1V2h1z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.yr-list li.prize.seen .e-t::before { animation: prize 900ms steps(6) both; }
+@keyframes prize { 0% { opacity: 0; scale: 0.3; rotate: -90deg; } 60% { opacity: 1; scale: 1.5; rotate: 10deg; } 100% { opacity: 1; scale: 1; rotate: 0deg; } }
+/* roles where Lana led: brighter, in the smooth cut */
+.yr-list li.lead .e-t { color: #efe8ff; font-family: var(--display-awake); }
+/* the parts of a line worth catching at a glance */
+strong.ach { font-weight: 600; color: var(--mark); }
+
+/* the statement holds on screen while the pen writes it (wide screens; about-proto.js adds the wrapper) */
+.me-hold { height: 175svh; }
+.me-hold > .me { position: sticky; top: 0; height: 100svh; min-height: 0; }
+
+/* "What I work with" holds on screen while its entries come in one by one */
+main > .stop.about:has(.idx.hold) { padding-bottom: 8svh; }
+.idx.hold { display: block; height: 185svh; padding: 0; }
+.idx.hold .idx-pin { position: sticky; top: 0; height: 100svh; display: grid; grid-template-columns: calc(30 * var(--u)) minmax(0, 1fr); column-gap: calc(5 * var(--u));
+  align-content: center; align-items: start; padding: var(--band) calc(6 * var(--u)) 0; }
+.idx.hold .idx-text p { opacity: var(--k, 0); transform: translate3d(0, calc((1 - var(--k, 0)) * 2.4 * var(--u)), 0); }
+.idx.hold .idx-text p i { transition: color 600ms linear, text-shadow 600ms linear; }
+.idx.hold .idx-text p.now i { color: #fffaf0; text-shadow: 0 0 14px rgb(255 241 201 / 0.55); transition-duration: 120ms; }
+.quiet .idx.hold .idx-text p { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .idx.hold .idx-text p { opacity: 1; transform: none; } .yr-list li.prize.seen .e-t::before { animation: none; } }
+
+/* "What I work with": the constellation board (about-proto.js), then the list under it */
+.tb { position: relative; width: calc(100 * var(--u)); height: calc(62.5 * var(--u)); margin: calc(9 * var(--u)) auto 0; }
+.tb .idx-h { position: absolute; z-index: 2; left: calc(11 * var(--u)); top: calc(8.4 * var(--u)); margin: 0; }
+.tb-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.tb-lines line { stroke: rgb(185 162 255 / 0.7); stroke-width: 2; stroke-dasharray: 2 7; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.tb .grp { position: absolute; inset: 0; pointer-events: none; will-change: transform; }
+.tool { position: absolute; left: calc(var(--x) * var(--u)); top: calc(var(--y) * var(--u)); width: calc(var(--s) * var(--u)); translate: -50% -50%; pointer-events: auto; }
+.tool .pic { --ground: #000; width: 100%; transition: translate 180ms var(--pop); }
+.tool .pic .full { width: 100%; height: auto; }
+.tool:hover .pic { translate: 0 -4px; }
+/* a soft light of the tool's own colour, only while it is awake */
+.tool .glow { position: absolute; left: 50%; top: 50%; width: 260%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; pointer-events: none; z-index: -1;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--c) 42%, transparent), transparent); opacity: 0; transition: opacity 900ms linear; }
+.tool:hover .glow, .tool:has(.woken) .glow { transition-duration: 200ms; }
+.tool:hover .glow, .tool.lit .glow, .tool:has(.woken) .glow { opacity: 1; }
+.tool-n { position: absolute; left: 50%; top: calc(100% + 10px); translate: -50% 0; white-space: nowrap; font: 400 16px/1.2 var(--lab); color: var(--ink); }
+.tool:hover .tool-n, .tool.lit .tool-n, .tool:has(.woken) .tool-n { color: var(--mark); font-family: var(--display-awake); }
+/* a pixel sparkle on each star: turns with the scroll, flares when the star is pointed at */
+.tool .tw { position: absolute; right: -10px; top: -10px; width: 3px; height: 3px; background: var(--mark); animation: none;
+  box-shadow: -3px 0 var(--mark), 3px 0 var(--mark), 0 -3px var(--mark), 0 3px var(--mark); transition: scale 180ms var(--pop); }
+.tool:hover .tw, .tool.lit .tw, .tool:has(.woken) .tw { scale: 2; }
+/* constellation names, set the way a star chart names them */
+.cn { position: absolute; left: calc(var(--x) * var(--u)); top: calc(var(--y) * var(--u)); margin: 0; font: italic 400 clamp(19px, calc(1.6 * var(--u)), 26px) / 1 "Redaction", Georgia, serif; color: var(--mark); }
+/* the list under the board no longer has its own heading: one column, the full width */
+.idx:not(:has(.idx-h)), .idx.hold:not(:has(.idx-h)) .idx-pin { grid-template-columns: minmax(0, 1fr); }
+.idx:not(:has(.idx-h)) { padding-top: calc(3 * var(--u)); }
+/* the list as a catalogue across the whole width: each kind of work named large in gold, its tools under it */
+.idx .idx-text { columns: auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(4.4 * var(--u)) calc(4 * var(--u)); align-items: start; width: 100%; }
+.idx .idx-text p { margin: 0; font-size: 18px; line-height: 1.55; color: var(--text); text-wrap: pretty; }
+.idx .idx-text p i { display: block; margin: 0 0 calc(1 * var(--u)); font: italic 400 clamp(26px, calc(2.5 * var(--u)), 36px) / 1.05 "Redaction", Georgia, serif; color: var(--mark); white-space: nowrap; }
+/* seven kinds over four columns: the last one takes the space the row leaves */
+.idx .idx-text p:last-child:nth-child(4n + 3) { grid-column: span 2; }
+.idx.hold { height: 165svh; }
+.idx.hold .idx-pin { padding: var(--band) calc(6 * var(--u)) 0; }
+@media (max-width: 1100px) and (min-width: 761px) and (min-aspect-ratio: 1/1) { .idx .idx-text { grid-template-columns: repeat(3, minmax(0, 1fr)); } .idx .idx-text p:last-child:nth-child(n) { grid-column: auto; } }
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .idx .idx-text { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .idx .idx-text p:last-child:nth-child(n) { grid-column: auto; }
+  .idx .idx-text p i { white-space: normal; }
+  .idx .idx-text p i { font-size: 28px; margin-bottom: 6px; }
+}
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .tb { width: 100%; height: calc(196 * var(--u)); margin-top: 48px; }
+  .tb .idx-h { left: calc(8 * var(--u)); top: calc(10 * var(--u)); }
+  .tool, .cn { left: calc(var(--px) * var(--u)); top: calc(var(--py) * var(--u)); }
+  .tool { width: calc(var(--ps) * var(--u)); }
+}
+@media (prefers-reduced-motion: reduce) { .tool .pic, .tool .glow, .tool .tw { transition: none; } }
+
+/* films: a short silent loop plays on the monitor while its film is under the playhead */
+.fr-frame { position: relative; }
+.fr-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 400ms linear; pointer-events: none; }
+.fr-vid.on { opacity: 1; }
+.quiet .fr-vid { display: none; }
+@media (prefers-reduced-motion: reduce) { .fr-vid { display: none; } }
+.yr-list .e-t { text-wrap: balance; }
+/* Peanut by the mirror (about-proto.js): sat at its foot on the right, a little in front of the frame */
+.mirror .peanut { position: absolute; z-index: 3; right: -16%; bottom: -3%; width: 30%; }
+.mirror .peanut .full { width: 100%; height: auto; }
+.me-cat { margin: 6px 0 0; font: italic 400 19px/1.4 "Redaction", Georgia, serif; color: var(--mark); }
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .mirror .peanut { right: -6%; width: 28%; } }

@@ -1,0 +1,142 @@
+/* Prototype: the dawn ending, one object and one sky. The letter in the envelope is the form ("Let's talk": name,
+   email, message, Send in the fold). The visitors' stars are the sky itself, on both sides of the envelope; "Leave
+   yours" turns the letter into the star maker. The address and the links stay on the ground.
+   Phones: the letter is as tall as what is written on it and tucks into the envelope; then the stars; then the ground. */
+
+/* the two moths come back as ornament: one over each field of stars, high in the corners the sky leaves empty */
+.talk .t-moth { top: calc(8.4 * var(--u)); width: calc(6 * var(--u)); opacity: 0.8; }
+.talk .t-moth.l { left: calc(9 * var(--u)); }
+.talk .t-moth.r { right: calc(9 * var(--u)); }
+.talk { --halo: #f3d9d6; }
+.end-h { margin: 0 0 4px; font: 400 clamp(30px, calc(3 * var(--u)), 48px) / 1 var(--display-awake); color: var(--ink); }
+.end-line { margin: 0 0 4px; font: 400 18px/1.45 var(--body); color: var(--text); }
+.talk form button, .ls button { border: 0; background-color: transparent; cursor: pointer; }
+
+/* The envelope, and its letter set as a form. It sits low enough that the risen letter keeps a clear breath of sky
+   under the masthead, and its pocket ends just above the ground, so the address line follows the letter directly. */
+.talk .env { width: calc(29 * var(--u)); top: calc(15.8 * var(--u)); }
+.talk .letter { padding: 5cqi 6cqi 0; gap: 0; display: block; justify-items: stretch; overflow: visible; }
+.talk .letter .t-big { margin: 0 0 1.5cqi; font-size: clamp(34px, 12cqi, 64px); }
+.letter .fld { margin-top: 1.6cqi; }
+.letter .fld input, .letter .fld textarea { padding: 3px 0 4px; font-size: 17px; line-height: 1.4; }
+.lr { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+/* name and email share a line on the letter; a field that needs fixing says so where its label was */
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+.lr:has(.err:not(:empty)) .l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.lr .err { text-align: left; }
+.lr .err, .lr .more { margin: 0; font: 400 16px/1.3 var(--body); text-align: right; }
+/* Send sits in the fold of the envelope, under the last line */
+.letter .send-row { display: flex; justify-content: center; margin-top: 1.2cqi; }
+.letter .vs-make .row { justify-content: center; margin-top: 1cqi; }
+.letter .vs-make { gap: 0; }
+.letter .vs-make fieldset { margin-top: 1cqi; }
+.letter .vs-make legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.letter .opt { width: 42px; height: 42px; }
+
+/* The sky is two fields either side of the envelope. The words for the stars sit directly on top of the left field, so
+   the heading, its count and "Leave yours" read as the caption of the stars right under them, not as a stray corner. */
+.ls { position: absolute; z-index: 5; left: calc(5 * var(--u)); top: calc(17.4 * var(--u)); width: calc(24 * var(--u)); text-align: left; display: grid; justify-items: start; }
+.vs-skybox { position: absolute; z-index: 4; inset: 0; pointer-events: none; }
+.vs-sky { position: absolute; pointer-events: auto; }
+.vs-sky.l { left: calc(3 * var(--u)); width: calc(28 * var(--u)); top: calc(27.6 * var(--u)); height: calc(19 * var(--u)); }
+.vs-sky.r { left: calc(69 * var(--u)); width: calc(28 * var(--u)); top: calc(15 * var(--u)); height: calc(31.6 * var(--u)); }
+.making .vs-sky { cursor: crosshair; }
+
+/* The ground holds two lines. First the address with its copy button right beside it; then, on the width the lilies
+   frame, the two profiles together on the left and the way back to the moon alone on the right. */
+.talk .t-ground { top: calc(47 * var(--u)); padding-top: calc(3.2 * var(--u)); gap: calc(0.6 * var(--u)); }
+.t-mail { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 4px calc(2 * var(--u)); margin: 0; }
+.talk .t-addr { font-size: clamp(18px, calc(1.7 * var(--u)), 26px); min-height: 44px; display: inline-flex; align-items: center; }
+.talk .t-mail .go { margin: 0; }
+/* the lilies stand in the ground beside its two lines, below the fields of stars, so no star ever lands on a leaf */
+.talk .t-lily { bottom: auto; top: calc(0.4 * var(--u)); }
+.talk .t-links { align-items: center; width: calc(52 * var(--u)); }
+.t-pair { display: flex; gap: calc(2.4 * var(--u)); }
+/* the sign-off closes the board on its last line, small and centred, the way a colophon ends a printed sheet */
+.talk .t-made { position: absolute; z-index: 3; left: 0; right: 0; bottom: calc(var(--edge, 0px) + 18px); margin: 0; text-align: center; }
+
+/* fields: words over a line, no boxes */
+.fld { display: block; }
+.fld .l { display: block; margin: 0 0 2px; font: 400 17px/1.3 var(--lab); color: var(--ink); }
+.fld input, .fld textarea { display: block; width: 100%; padding: 6px 0; border: 0; border-bottom: 2px solid var(--rule); border-radius: 0;
+  background: transparent; color: var(--text); font: 400 18px/1.45 var(--body); resize: none; }
+.fld input:focus, .fld textarea:focus { outline: none; border-bottom-color: var(--ink); }
+.fld input[aria-invalid="true"], .fld textarea[aria-invalid="true"] { border-bottom-style: dashed; border-bottom-color: var(--ink); }
+.fld .err, .fld .more { display: block; margin-top: 3px; font: 400 16px/1.35 var(--body); }
+.fld .err { color: var(--ink); }
+.fld .err:empty { display: none; }
+.fld .more { color: #4a2f86; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 24px; }
+.btn.quiet { color: var(--ink); }
+
+/* Write to me */
+.write { display: grid; gap: 12px; }
+.write[hidden] { display: none; }
+.write .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.w-done { margin: 0; font: italic 400 20px/1.35 "Redaction", Georgia, serif; color: var(--ink); }
+.w-done:empty { display: none; }
+
+/* the last stars */
+.vs-count { font-variant-numeric: tabular-nums; }
+.vs-star { position: absolute; left: calc(var(--x) * 100%); top: calc(var(--y) * 100%); width: 44px; height: 44px; translate: -50% -50%;
+  display: grid; place-items: center; padding: 0; border: 0; background: none; color: var(--c); cursor: pointer; opacity: calc(var(--o, 0) * var(--dim, 1)); }
+.vs-star svg, .vs-new svg, .opt svg { display: block; }
+.vs-star svg { width: var(--sz, 22px); height: var(--sz, 22px); transition: scale 180ms var(--pop); }
+.vs-star.seed { --sz: 30px; z-index: 1; }
+.vs-star.mine { z-index: 2; }
+.vs-star:hover svg, .vs-star.on svg, .vs-star:focus-visible svg { scale: 1.5; }
+.vs-star:focus-visible, .vs-new:focus-visible { outline: 2px dotted var(--ink); outline-offset: 2px; border-radius: 50%; }
+.sp path { fill: currentColor; }
+.sp path.dim { opacity: 0.3; }
+.making .vs-star { --dim: 0.4; }
+.vs-star.mine::after { content: ""; position: absolute; right: 4px; top: 4px; width: 3px; height: 3px; background: var(--ink);
+  box-shadow: -3px 0 var(--ink), 3px 0 var(--ink), 0 -3px var(--ink), 0 3px var(--ink); }
+.vs-note { position: absolute; z-index: 4; max-width: 24ch; pointer-events: none; translate: 18px -50%; opacity: 0; transition: opacity 160ms linear;
+  text-shadow: 0 0 6px var(--halo), 0 0 14px var(--halo), 0 0 22px var(--halo); }
+.vs-note.left { translate: calc(-100% - 18px) -50%; text-align: right; }
+.vs-note.on { opacity: 1; }
+.vs-note b { display: block; font: 400 22px/1.1 var(--display-awake); color: var(--ink); }
+.vs-note span { display: block; margin-top: 4px; font: 400 17px/1.45 var(--body); color: var(--text); }
+.vs-note span:empty { display: none; }
+.vs-new { position: absolute; left: 0; top: 0; z-index: 3; width: 60px; height: 60px; margin: -30px 0 0 -30px; display: grid; place-items: center; padding: 0;
+  border: 2px dotted var(--ink); border-radius: 50%; background: none; color: var(--c); cursor: pointer; transition: transform 220ms var(--enter); }
+.vs-new[hidden] { display: none; }
+.vs-new svg { width: 28px; height: 28px; }
+
+/* the maker, in the right column while it is open */
+.vs-make { display: grid; gap: 12px; }
+.vs-make[hidden] { display: none; }
+.vs-make fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+.vs-make legend { display: block; padding: 0; margin: 0 0 2px; font: 400 17px/1.3 var(--lab); color: var(--ink); }
+.hint { margin: 0; font: italic 400 19px/1.3 "Redaction", Georgia, serif; color: var(--ink); }
+.opts { display: flex; flex-wrap: wrap; gap: 2px; }
+.opt { position: relative; display: grid; place-items: center; width: 46px; height: 46px; cursor: pointer; color: var(--ink); }
+.opt input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.opt svg { width: 26px; height: 26px; opacity: 0.45; transition: scale 160ms var(--pop); }
+.opt:hover svg { opacity: 0.75; }
+.opt:has(input:checked) svg { opacity: 1; scale: 1.2; color: var(--pick); }
+.opt:has(input:focus-visible) { outline: 2px dotted var(--ink); outline-offset: -2px; border-radius: 50%; }
+.sw i { width: 22px; height: 22px; background: var(--c); }
+.sw:has(input:checked) i { box-shadow: 0 0 0 3px var(--halo), 0 0 0 5px var(--ink); }
+
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  /* the letter is as tall as its form; its foot tucks into the envelope's pocket */
+  .talk .env { width: min(88vw, 440px); margin-top: 8px; aspect-ratio: auto; display: block; padding-bottom: 74cqi; }
+  .talk .env-back, .talk .env-front { inset: auto 0 0 0; height: auto; aspect-ratio: 815 / 1035; }
+  .talk .letter { position: relative; left: auto; top: auto; width: 82cqi; height: auto; margin: 0 auto -52cqi; padding: 6cqi 6cqi 58cqi; transform: none; rotate: -1deg; text-align: left; }
+  .letter .fld { margin-top: 10px; }
+  .two { display: block; }
+  .letter .send-row { justify-content: flex-start; margin-top: 12px; }
+  .ls { left: auto; top: auto; width: 100%; margin-top: 56px; padding: 0 2vw; }
+  .ls .vs-make { margin-top: 12px; width: 100%; }
+  .vs-skybox { inset: auto; width: 100%; pointer-events: auto; display: grid; }
+  .vs-sky.l, .vs-sky.r { position: relative; left: auto; top: auto; width: 100%; height: 62vw; }
+  /* the address and its button stack, centred; the three links share one line under them, then the stars follow */
+  /* the ground sits in the column right under the envelope; its band of dawn colour fades out again at its foot, so
+     the stars that follow it rise into the same sky with no seam between them */
+  .talk .t-ground { top: auto; padding: 32px 16px 24px; background: linear-gradient(transparent, #f2d2d2 40px, #f2d2d2 calc(100% - 48px), transparent); }
+  .t-mail { flex-direction: column; align-items: center; gap: 0; }
+  .talk .t-links { width: auto; flex-wrap: wrap; justify-content: center; gap: 0 28px; }
+  .t-pair { gap: 28px; }
+  .talk .t-made { position: relative; bottom: auto; padding: 40px 0 calc(var(--edge, 0px) + 32px); }
+}

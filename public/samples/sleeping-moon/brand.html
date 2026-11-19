@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A brand by Lana Huertas</title>
+<meta name="description" content="A brand identity by Lana Huertas: the key visual, the pieces made for it and its palette.">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500&display=swap">
+<link rel="preload" href="../brand/fonts/Redaction35-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="moon.css">
+<link rel="stylesheet" href="reel.css">
+<link rel="stylesheet" href="brand.css">
+<script>document.documentElement.classList.add("js"); try { if (localStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
+<script src="data.js"></script>
+<!-- the brand is chosen from the address; the page takes the brand's own world (brand.js) -->
+<script>
+  var BRAND_AT = Math.max(0, DATA.brands.findIndex(function (b) { return b.slug === new URLSearchParams(location.search).get("b"); }));
+  var BRAND = DATA.brands[BRAND_AT];
+  document.title = BRAND.name + ", a brand by Lana Huertas";
+</script>
+</head>
+<body class="past brand-page" data-route="always">
+<a class="skip" href="#spec">Skip to the brand</a>
+
+<div class="chrome">
+  <header class="mast">
+    <p class="issue">The night almanac <span id="issue-stop">I Brands</span></p>
+    <div class="centre">
+      <nav class="route" id="route" aria-label="Stops">
+        <a class="home" href="/#moon" data-stop="moon" aria-label="Back to the moon"></a>
+        <a href="/#brands" data-stop="brands" aria-current="true"><i>I</i>Brands</a>
+        <a href="/#posters" data-stop="posters"><i>II</i>Posters</a>
+        <a href="/#films" data-stop="films"><i>III</i>Films</a>
+        <a href="/#products" data-stop="products"><i>IV</i>Products</a>
+        <a href="/#about" data-stop="about"><i>V</i>About</a>
+        <a href="/#talk" data-stop="talk"><i>VI</i>Contact</a>
+      </nav>
+    </div>
+    <div class="tools">
+      <button class="menu-btn" type="button" id="menu" aria-expanded="false">Menu</button>
+      <button class="switch" type="button" role="switch" aria-checked="false" id="quiet"><span>Quiet mode</span><i></i></button>
+    </div>
+  </header>
+  <footer class="foot">
+    <p class="live" id="live" aria-live="polite">Everything here is asleep. Bring your light to wake it.</p>
+    <p>Manila, 2026</p>
+  </footer>
+</div>
+
+<main id="page">
+  <noscript>
+    <section class="stop"><div class="plate"><p>This page needs JavaScript to lay out a brand. <a href="/#brands">Go back to the ten brands.</a></p></div></section>
+  </noscript>
+</main>
+
+<script src="moon.js"></script>
+<script src="brand.js"></script>
+</body>
+</html>

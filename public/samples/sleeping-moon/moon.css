@@ -1,0 +1,237 @@
+/* The sleeping moon: the system shared by every page.
+   Everything sleeps as a 1-bit bitmap in one ink on the ground colour and wakes
+   into colour under the lantern, on arrival, and on touch.
+
+   Layout unit: u = min(1vw, 1.6vh). A plate is 100u wide; at 16:10 it is exactly
+   one screen. Everything sits on one centre axis or in mirrored columns. */
+
+@font-face { font-family: "Redaction"; src: url("../brand/fonts/Redaction-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Redaction"; font-style: italic; src: url("../brand/fonts/Redaction-Italic.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Redaction 35"; src: url("../brand/fonts/Redaction35-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Redaction 70"; src: url("../brand/fonts/Redaction70-Regular.woff2") format("woff2"); font-display: swap; }
+
+/* Type: Redaction for everything that is a name, a title or a voice; its coarse cuts for labels (35) and for nav
+   words while they sleep (70); Atkinson Hyperlegible Next for reading. Nothing else. */
+:root {
+  --u: min(1vw, 1.6vh);
+  --band: max(calc(4.2 * var(--u)), 48px);   /* height of the masthead and of the foot */
+  --edge: 0px;                               /* no frame: the window is the screen */
+  --enter: cubic-bezier(0.23, 1, 0.32, 1);
+  --move: cubic-bezier(0.77, 0, 0.175, 1);
+  --pop: cubic-bezier(0.34, 1.56, 0.64, 1);  /* hover lifts: a small spring */
+  --rise: cubic-bezier(0.16, 1, 0.3, 1);     /* entrances, played once */
+  --display: "Redaction 35", "Redaction", Georgia, serif;   /* asleep: the coarse cut */
+  --display-awake: "Redaction", Georgia, serif;             /* awake: the smooth cut */
+  --lab: "Redaction 35", "Redaction", Georgia, serif;       /* labels, 16px and up */
+  --drowsy: "Redaction 70", "Redaction", Georgia, serif;    /* nav words, asleep */
+  --body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+/* the five colours are typed, so the masthead and foot can cross-fade when the world behind them changes (moon.js band) */
+@property --ground { syntax: "<color>"; inherits: true; initial-value: #000; }
+@property --ink { syntax: "<color>"; inherits: true; initial-value: #b9a2ff; }
+@property --text { syntax: "<color>"; inherits: true; initial-value: #d9cfff; }
+@property --mark { syntax: "<color>"; inherits: true; initial-value: #fff1c9; }
+@property --rule { syntax: "<color>"; inherits: true; initial-value: rgb(185 162 255 / 0.5); }
+body {
+  --ground: #000;
+  --ink: #b9a2ff;
+  --text: #d9cfff;
+  --mark: #fff1c9;    /* the awake or current thing */
+  --rule: rgb(185 162 255 / 0.5);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: #000; }
+body { color: var(--text); font: 17px/1.55 var(--body); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+/* ---------- one sky behind every stop, the first screen's own night: black, with lilac pixel stars. Only the
+   contact stop changes it: first light comes up the window with the stop's top edge, its edge cut in big pixels,
+   as far as you have scrolled (moon.js) ---------- */
+.sky { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.sky > i { position: absolute; inset: 0; }
+.sky .night { background: #000; }
+.sky .dawn { bottom: auto; height: 100%; visibility: hidden; transform: translate3d(0, 100vh, 0); will-change: transform;
+  background: radial-gradient(60% 46% at 50% 92%, #fff4dc 0%, #fbe1d4 30%, transparent 62%), linear-gradient(#cdb6ea 0%, #e6c4dc 38%, #f5d7d6 70%, #f7e3d9 100%); }
+.sky .field b { position: absolute; width: 2px; height: 2px; background: #b9a2ff; }
+.sky .field b.big { width: 3px; height: 3px; box-shadow: -3px 0 #b9a2ff, 3px 0 #b9a2ff, 0 -3px #b9a2ff, 0 3px #b9a2ff; }
+img, canvas, svg { display: block; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; touch-action: manipulation; }
+:focus-visible { outline: 2px solid var(--mark); outline-offset: 5px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: fixed; left: 12px; top: -80px; z-index: 90; padding: 12px 18px; background: #fff1c9; color: #2b1470; font-weight: 600; }
+.skip:focus { top: 12px; }
+
+/* ---------- the fixed window: frame, masthead, foot ---------- */
+.chrome { position: fixed; inset: 0; z-index: 40; pointer-events: none; }
+.mast, .foot {
+  position: absolute; left: var(--edge); right: var(--edge); height: var(--band);
+  padding: 0 calc(2.2 * var(--u)); display: grid; align-items: center;
+  pointer-events: auto; font: 400 16px/1.2 var(--lab); color: var(--ink);
+}
+/* the bands are the sky's own colour fading out, so nothing reads as a bar across the window */
+.mast::before, .foot::before { content: ""; position: absolute; inset: 0 0 -60% 0; z-index: -1; background: linear-gradient(var(--ground) 55%, transparent); transition: opacity 300ms linear; }
+.foot::before { inset: -60% 0 0 0; background: linear-gradient(transparent, var(--ground) 45%); }
+.mast, .foot { isolation: isolate; transition: --ground 240ms linear, --ink 240ms linear, --text 240ms linear, --mark 240ms linear, --rule 240ms linear; }
+.mast { top: var(--edge); grid-template-columns: 1fr auto 1fr; }
+.foot { bottom: var(--edge); grid-template-columns: 1fr auto; }
+.issue span { margin-left: 10px; color: var(--text); }
+.centre { display: grid; justify-items: center; align-items: center; }
+.centre > * { grid-area: 1 / 1; transition: opacity 200ms linear; }
+.sub { font: 400 17px/1.3 var(--body); color: var(--text); text-align: center; white-space: nowrap; }
+.route { display: flex; align-items: center; gap: 4px; opacity: 0; visibility: hidden; }
+.past .route { opacity: 1; visibility: visible; }
+.past .sub { opacity: 0; visibility: hidden; }
+.route a { position: relative; display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 10px; white-space: nowrap; font: 400 17px/1 var(--drowsy); }
+.route a i { font-style: normal; color: var(--text); font-family: var(--lab); }
+.route a:hover, .route a[aria-current="true"] { color: var(--mark); font-family: var(--display-awake); }
+/* the current stop: a small crescent under its name */
+.route a[data-stop]:not(.home)[aria-current="true"]::after { content: ""; position: absolute; left: 50%; bottom: 3px; width: 7px; height: 7px; margin-left: -3px; border-radius: 50%; box-shadow: inset -2px 1px 0 0 var(--mark); rotate: -30deg; }
+.route .home { padding: 0 14px 0 4px; }
+.route svg { width: 22px; height: 22px; shape-rendering: crispEdges; }
+.route svg .d { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.route svg .l { fill: var(--ink); }
+.tools { justify-self: end; display: flex; align-items: center; gap: 10px; }
+.switch { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; }
+/* quiet mode: a small moon that is full when quiet is on, a thin crescent when off */
+.switch i { position: relative; width: 16px; height: 16px; border-radius: 50%; box-shadow: inset -4px 2px 0 0 var(--ink); transition: box-shadow 200ms var(--enter); }
+.switch[aria-checked="true"] i { box-shadow: inset 0 0 0 8px var(--ink); }
+.menu-btn { display: none; }
+.live { color: var(--ink); }
+
+/* ---------- stops and plates ---------- */
+.stop { position: relative; min-height: 100svh; display: grid; place-items: center; padding: calc(var(--edge) + var(--band)) 0; isolation: isolate; }
+.plate { position: relative; width: calc(100 * var(--u)); padding: calc(1.2 * var(--u)) calc(6 * var(--u)); }
+.head { display: grid; justify-items: center; gap: calc(0.6 * var(--u)); text-align: center; margin-bottom: calc(2.4 * var(--u)); }
+.head .num { font: 400 16px/1 var(--lab); color: var(--ink); }
+.head h2 { font: 400 clamp(44px, calc(6.2 * var(--u)), 96px) / 0.95 var(--display); color: var(--ink); letter-spacing: -0.01em; }
+.head .line { max-width: 72ch; color: var(--text); }
+.label { font: 400 16px/1.25 var(--lab); color: var(--ink); }
+.label i { font-style: normal; color: var(--text); margin-right: 8px; }
+
+/* ---------- type that wakes: letters inside the lantern, and current titles, take the smooth cut ---------- */
+.display { font-family: var(--display); font-weight: 400; }
+.type .ch.lit, .current .type .ch, .type.awake .ch { font-family: var(--display-awake); }
+
+/* ---------- pictures: asleep (canvas), awake (the image itself) ---------- */
+.pic { position: relative; display: block; line-height: 0; }
+.pic .full { width: 100%; height: auto; }
+.pic .bm { position: absolute; left: 0; top: 0; image-rendering: pixelated; }
+.pic .bm:not([style]) { width: 0; height: 0; }   /* until it is built, a canvas takes no room */
+.js .pic .full { opacity: 0; transition: opacity 160ms linear; }
+.js .pic.awake .full { opacity: 1; }
+.js .pic.awake .bm { opacity: 0; transition: opacity 160ms linear; }
+/* a framed picture: a fixed box that the image fills */
+.pic.box { overflow: hidden; background: var(--ground); }
+.pic.box .full { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); }
+
+/* ---------- ornament ---------- */
+.orn { position: absolute; pointer-events: none; opacity: 0.8; }
+/* the moth and lily in the corners of every board: moth top left and bottom right, lily top right and bottom left */
+.orn.o-tl { left: calc(2.6 * var(--u)); top: calc(7 * var(--u)); width: calc(6.4 * var(--u)); }
+.orn.o-br { right: calc(2.6 * var(--u)); bottom: calc(7.2 * var(--u)); width: calc(6.4 * var(--u)); transform: scaleX(-1); }
+.orn.o-tr { right: calc(3.2 * var(--u)); top: calc(6.8 * var(--u)); width: calc(4.4 * var(--u)); }
+.orn.o-bl { left: calc(3.2 * var(--u)); bottom: calc(6.8 * var(--u)); width: calc(4.4 * var(--u)); transform: scaleX(-1); }
+/* the first screen's four corner ornaments, carried onto every room's board (SM.corners) */
+.corners { position: absolute; left: 50%; top: 50%; width: calc(100 * var(--u)); height: calc(62.5 * var(--u)); translate: -50% -50%; pointer-events: none; z-index: 0; }
+.stars { position: absolute; inset: 0; pointer-events: none; z-index: -1; }
+.stars i { position: absolute; width: 2px; height: 2px; background: var(--ink); }
+.stars i.b { width: 3px; height: 3px; box-shadow: -3px 0 var(--ink), 3px 0 var(--ink), 0 -3px var(--ink), 0 3px var(--ink); }
+.chart { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.chart line, .chart path { stroke: var(--rule); stroke-width: 2; stroke-dasharray: 2 7; fill: none; vector-effect: non-scaling-stroke; }
+
+/* ---------- the lantern ring ---------- */
+.lantern { position: fixed; left: 0; top: 0; z-index: 39; width: calc(2 * var(--r, 130px)); height: calc(2 * var(--r, 130px)); margin: calc(-1 * var(--r, 130px)) 0 0 calc(-1 * var(--r, 130px)); border: 2px dotted var(--rule); border-radius: 50%; pointer-events: none; opacity: 0; transition: opacity 200ms linear; }
+.lantern.on { opacity: 1; }
+
+/* ---------- dither wipes for swapping one thing for another ---------- */
+.wipe-in { animation: wipe-in 220ms steps(1) both; }
+.wipe-out { animation: wipe-out 180ms steps(1) both; }
+@keyframes wipe-in { 0% { -webkit-mask-image: var(--m1); mask-image: var(--m1); } 25% { -webkit-mask-image: var(--m2); mask-image: var(--m2); } 50% { -webkit-mask-image: var(--m3); mask-image: var(--m3); } 75% { -webkit-mask-image: var(--m4); mask-image: var(--m4); } 100% { -webkit-mask-image: none; mask-image: none; } }
+@keyframes wipe-out { 0% { -webkit-mask-image: var(--m4); mask-image: var(--m4); } 33% { -webkit-mask-image: var(--m3); mask-image: var(--m3); } 66% { -webkit-mask-image: var(--m2); mask-image: var(--m2); } 100% { -webkit-mask-image: var(--m1); mask-image: var(--m1); opacity: 0; } }
+.wipe-in, .wipe-out { -webkit-mask-size: 24px 24px; mask-size: 24px 24px; }
+
+/* ---------- the travel iris: drawn by SM.travel only while a jump is under way ---------- */
+.iris { position: fixed; inset: 0; z-index: 85; width: 100vw; height: 100vh; pointer-events: none; display: none; }
+.iris.on { display: block; }
+
+/* ---------- buttons: one primary, one secondary ---------- */
+/* solid: a block of ink; line: words with an underline that draws across on hover. No outlines, no offset shadows. */
+/* one kind of button: italic Redaction words over a hairline; a brighter line draws across on hover, the arrow steps on */
+.btn, .go { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 2px; white-space: nowrap;
+  font: italic 400 clamp(19px, calc(1.5 * var(--u)), 23px) / 1 "Redaction", Georgia, serif; color: var(--mark);
+  background: linear-gradient(var(--mark), var(--mark)) 0 calc(100% - 7px) / 0% 1px no-repeat, linear-gradient(var(--rule), var(--rule)) 0 calc(100% - 7px) / 100% 1px no-repeat;
+  transition: background-size 260ms var(--enter); }
+.btn:hover, .go:hover { background-size: 100% 1px, 100% 1px; }
+.btn:active, .go:active { transform: scale(0.98); }
+.btn svg, .go svg { width: 18px; height: 18px; flex: none; transition: transform 200ms var(--pop); }
+.btn:hover svg, .go:hover svg { transform: translateX(3px); }
+.go svg path, .btn svg path { fill: none; stroke: currentColor; stroke-width: 1.4; }
+/* arrows: a thin drawn arrow in a 44px reach, no plate behind it */
+.arw { display: inline-grid; place-items: center; width: 44px; height: 44px; color: var(--ink); background: none; transition: transform 200ms var(--pop); }
+.arw svg { width: 26px; height: 14px; }
+.arw svg path { fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.arw:hover { color: var(--mark); }
+.arw.prev:hover { transform: translateX(-3px); } .arw.next:hover { transform: translateX(3px); }
+.arw[disabled] { opacity: 0.28; pointer-events: none; }
+/* the one control every room uses: "3 of 12" and the two arrows */
+.steps { display: flex; align-items: center; gap: 12px; }
+.steps .count { color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* the counter's stars, drawn as pixel crosses like the rest of the night: passed ones lit, the current one with long
+   arms in the moon's cream, those to come faint */
+.steps .count { display: inline-flex; align-items: center; min-height: 44px; }
+/* the row of stars wraps rather than widen the column it sits in, and the arrows drop under it when space is short */
+.steps { flex-wrap: wrap; row-gap: 4px; min-width: 0; }
+.steps .count { min-width: 0; }
+.steps .pips { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px 11px; padding: 6px; }
+.steps .pips i { width: 3px; height: 3px; color: var(--ink); opacity: 0.4; background: currentColor; box-shadow: -3px 0, 3px 0, 0 -3px, 0 3px; }
+.steps .pips i.was { color: var(--text); opacity: 0.85; }
+.steps .pips i.now { color: var(--mark); opacity: 1; box-shadow: -3px 0, 3px 0, 0 -3px, 0 3px, -6px 0, 6px 0, 0 -6px, 0 6px; }
+.arws { display: inline-flex; }
+
+/* ---------- the viewer ---------- */
+/* while it is open the page under it stays where it was; the scrollbar's room is kept, so nothing shifts */
+html:has(dialog.viewer[open]) { overflow: hidden; scrollbar-gutter: stable; }
+dialog.viewer { width: 100vw; height: 100vh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: rgb(0 0 0 / 0.96); color: #d9cfff; }
+dialog.viewer[open] { display: grid; grid-template-rows: 1fr auto; }
+.viewer figure { display: grid; place-items: center; min-height: 0; padding: 72px 96px 8px; }
+.viewer figure img { max-width: 100%; max-height: calc(100vh - 170px); width: auto; height: auto; }
+.viewer .bar { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 14px 20px 26px; font: 400 16px/1.2 var(--lab); color: #b9a2ff; }
+.viewer .bar b { font: 400 22px/1 "Redaction", Georgia, serif; color: #fff1c9; }
+.viewer button { display: grid; place-items: center; width: 48px; height: 48px; color: #d9cfff; }
+.viewer button:hover { color: #fff1c9; }
+.viewer button svg path { stroke-width: 1.4; }
+.viewer .x { position: absolute; right: 22px; top: 22px; }
+.viewer .prev, .viewer .next { position: absolute; top: 50%; translate: 0 -50%; }
+.viewer .prev { left: 22px; } .viewer .next { right: 22px; }
+
+
+/* ---------- quiet mode and reduced motion: everything awake, no lantern ---------- */
+.quiet .pic .full, .js .pic.plain .full { opacity: 1; }
+.quiet .pic .bm, .quiet .lantern { display: none; }
+.quiet .type .ch { font-family: var(--display-awake); }
+.quiet .wipe-in, .quiet .wipe-out { animation: none; }
+.quiet * { transition-duration: 0.01ms !important; }
+
+/* ---------- phones and upright tablets: one column ---------- */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  :root { --u: 1vw; --band: 52px; --edge: 6px; }
+  .mast { grid-template-columns: 1fr auto auto; padding: 0 12px; gap: 6px; }
+  .issue span { display: none; }
+  .centre { position: fixed; inset: 0; z-index: 60; display: none; align-content: center; background: var(--ground); }
+  .menu-open .centre { display: grid; }
+  .sub { display: none; }
+  .route, .past .route { opacity: 1; visibility: visible; flex-direction: column; align-items: stretch; gap: 6px; font-size: 22px; }
+  .route a { min-height: 56px; justify-content: center; font-family: var(--display-awake); }
+  .menu-btn { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; font: italic 400 19px/1 "Redaction", Georgia, serif; color: var(--mark); }
+  .switch span { display: none; }
+  .foot { display: none; }
+  .centre::before { display: none; }
+  .lantern { display: none; }
+  .corners { display: none; }
+  .stop { padding: calc(var(--edge) + var(--band) + 8px) 0 28px; }
+  .plate { width: 100%; padding: 16px 16px; }
+  .viewer figure { padding: 72px 12px 8px; }
+  .viewer .prev, .viewer .next { top: auto; bottom: 16px; translate: none; }
+}
+main > section[tabindex="-1"]:focus { outline: none; }
