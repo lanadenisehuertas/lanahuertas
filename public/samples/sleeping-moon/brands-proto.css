@@ -11,15 +11,108 @@ body { transition: background-color 500ms linear; }
 .b-index ul { display: flex; flex-wrap: wrap; gap: 6px calc(2.2 * var(--u)); margin: 0; padding: 0; list-style: none; }
 .b-index a { display: inline-block; padding: 10px 0; font: italic 400 clamp(19px, calc(1.6 * var(--u)), 24px) / 1.1 "Redaction", Georgia, serif; color: var(--mark); text-decoration: none; transition: transform 160ms var(--enter); }
 .b-index a:hover { transform: translateY(-3px); text-decoration: underline; text-underline-offset: 6px; }
-.b-one { scroll-margin-top: calc(var(--band) - 2 * var(--u)); }
-/* one brand runs into the next without a full screen of nothing between them */
-main > .b-stop.b-more { min-height: 0; }
-main .b-one > .b-stop { min-height: 0; }
+
+/* ---------- one brand, one spread ----------
+   Each brand is a single board as tall as its own work, not a screen: the numeral, name and tagline at the top of
+   the left column, the key visual beside them on the right (never taller than the window leaves room for), the brief
+   and palette under the name, and its other pieces in a row across the foot. The board's top padding clears the
+   masthead, so a brand reached from the index lands with its name in view. */
+main .b-one > .b-stop { min-height: 0; padding: 0; place-items: start center; }
+.b-spread { min-height: 0; grid-template-columns: calc(24 * var(--u)) minmax(0, 1fr); grid-template-rows: auto 1fr auto;
+  grid-template-areas: "head work" "info work" "rest rest"; row-gap: calc(1.8 * var(--u));
+  padding: calc(var(--band) + 4 * var(--u)) calc(10 * var(--u)) calc(3.6 * var(--u)); }
+.b-spread .b-head { grid-area: head; padding-top: 0; gap: calc(0.7 * var(--u)); }
+.b-spread .b-info { grid-area: info; padding-top: 0; }
+.b-spread .b-work { grid-area: work; align-self: start; justify-items: center; }
+.b-spread .kv .pic .full { max-height: min(calc(46 * var(--u)), calc(100svh - 2 * var(--band) - 9 * var(--u))); }
+.b-rest { grid-area: rest; display: grid; gap: calc(1.1 * var(--u)); margin-top: calc(1.4 * var(--u)); }
+.b-rest-h { color: var(--ink); }
+.b-long .b-name { font-size: clamp(32px, calc(3.3 * var(--u)), 52px); }
+/* the pieces in rows (brands-proto.js): each piece grows by its own width-to-height, so a row is one height and fills
+   the width, but never taller than --hmax; a row of only a few square pieces stops short instead */
+.b-spread .b-wall { --gap: calc(1.4 * var(--u)); --hmax: calc(18 * var(--u)); display: grid; gap: var(--gap); }
+.b-row { display: flex; align-items: start; gap: var(--gap); max-width: calc(var(--sum) * var(--hmax) + (var(--n) - 1) * var(--gap)); }
+.b-spread .piece { flex: var(--a) 1 0; min-width: 0; width: auto; height: auto; max-width: none; }
+/* the numeral above the name, with the brand's own phase of the moon, the same one the index at the foot lights */
+.b-num { display: flex; align-items: center; gap: 10px; margin: 0 0 calc(0.4 * var(--u)); }
+.b-num i { font-style: normal; color: var(--mark); margin-right: 8px; }
+.b-ph svg { display: block; width: 18px; height: 18px; shape-rendering: crispEdges; }
+.b-ph .d { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.b-ph .l { fill: var(--ink); }
+.b-name:focus { outline: none; }
+.b-name:focus-visible { outline: 2px solid var(--mark); outline-offset: 5px; }
+/* the moth and lily keep to the corners of the whole spread, however tall it is */
+.b-one .corners { top: 0; height: 100%; translate: -50% 0; }
+main > .b-end { padding-top: calc(4 * var(--u)); }
 .b-end .b-text { display: flex; flex-wrap: wrap; gap: calc(3 * var(--u)); }
+
+/* ---------- the index at the foot of the window ----------
+   Fixed in the foot band, in the middle: the arrows to the brands either side, a moon phase for each brand that is
+   lit for the one being read, and that brand's numeral and name, which opens the list of all ten. It takes the colours
+   of the brand being read, as the masthead does. */
+.b-nav { position: fixed; left: 50%; bottom: var(--edge); z-index: 45; height: var(--band); translate: -50% 0;
+  display: flex; align-items: center; gap: 2px; color: var(--ink); }
+.b-nav a { color: inherit; text-decoration: none; }
+.b-step { display: grid; place-items: center; width: 44px; height: 44px; color: var(--ink); transition: color 160ms linear, transform 160ms var(--enter); }
+.b-step svg { width: 26px; height: 14px; }
+.b-step path { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.b-step:hover { color: var(--mark); }
+.b-step[data-d="-1"]:hover { transform: translateX(-3px); }
+.b-step[data-d="1"]:hover { transform: translateX(3px); }
+.b-step:active { transform: scale(0.94); }
+.b-step[aria-disabled="true"] { opacity: 0.35; cursor: default; transform: none; }
+.b-phases { display: flex; margin: 0; padding: 0 6px; list-style: none; }
+.b-phases a { position: relative; display: grid; place-items: center; width: 30px; height: 44px; }
+.b-phases .b-ph svg { width: 16px; height: 16px; transition: transform 160ms var(--enter); }
+.b-phases .b-ph .d, .b-phases .b-ph .l { opacity: 0.75; }
+.b-phases a:hover .b-ph svg { transform: translateY(-3px); }
+.b-phases a[aria-current="true"] .b-ph svg { transform: scale(1.3); }
+.b-phases a[aria-current="true"] .b-ph .d { fill: var(--mark); stroke: var(--mark); opacity: 1; }
+.b-phases a[aria-current="true"] .b-ph .l { fill: var(--mark); opacity: 1; }
+/* a moon's brand, shown above it while it is pointed at or has focus */
+.b-tip { position: absolute; left: 50%; bottom: calc(100% + 4px); translate: -50% 4px; padding: 8px 12px; white-space: nowrap;
+  font: 400 17px/1 var(--display-awake); color: var(--mark); background: var(--ground); opacity: 0; pointer-events: none;
+  transition: opacity 140ms linear, translate 160ms var(--enter); }
+.b-tip i { font: normal 400 16px/1 var(--lab); color: var(--text); margin-right: 8px; }
+.b-phases a:hover .b-tip, .b-phases a:focus-visible .b-tip { opacity: 1; translate: -50% 0; }
+.open .b-tip { display: none; }
+.b-now { display: inline-flex; align-items: baseline; gap: 8px; width: 15em; min-height: 44px; padding: 0 10px; text-align: left; white-space: nowrap; overflow: hidden;
+  font: 400 17px/44px var(--display-awake); color: var(--mark); }
+.b-now i { font: normal 400 16px/44px var(--lab); color: var(--text); }
+.b-now-name { overflow: hidden; text-overflow: ellipsis; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--mark) 40%, transparent); text-underline-offset: 6px; }
+.b-now:hover .b-now-name, .b-now[aria-expanded="true"] .b-now-name { text-decoration-color: var(--mark); }
+/* the list of all ten opens upward out of the index, a pane of the brand's own ground with a soft fall of it around */
+.b-list { position: absolute; left: 50%; bottom: calc(100% + 4px); translate: -50% 0; width: max-content; min-width: 320px;
+  max-height: calc(100svh - 2 * var(--band) - 24px); overflow: auto; overscroll-behavior: contain; padding: 14px 10px 10px;
+  background: color-mix(in srgb, var(--ground) 88%, var(--ink)); box-shadow: 0 0 80px 24px color-mix(in srgb, var(--ground) 80%, transparent); }
+.b-list[hidden] { display: none; }
+.b-list ol { margin: 0; padding: 0; list-style: none; }
+.b-list ol a { display: flex; align-items: baseline; gap: 14px; min-height: 44px; padding: 10px 16px; font: 400 21px/1.1 var(--drowsy); color: var(--ink); transition: transform 160ms var(--enter); }
+.b-list ol a i { width: 2.4em; flex: none; font: normal 400 16px/1 var(--lab); color: var(--text); }
+.b-list ol a:hover, .b-list ol a:focus-visible, .b-list ol a[aria-current="true"] { color: var(--mark); font-family: var(--display-awake); }
+.b-list ol a:hover { transform: translateX(3px); }
+.b-list .b-home { margin: 6px 16px 0; font: italic 400 19px/1 "Redaction", Georgia, serif; color: var(--mark); }
+.quiet .b-step, .quiet .b-tip, .quiet .b-list a, .quiet .b-phases svg { transition: none; }
+
+/* ---------- phones and upright tablets: one column, and the index as a thumb bar ---------- */
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
   .b-index { width: 100%; padding: calc(var(--band) + 24px) 16px 8px; }
   .b-index-h { font-size: 40px; }
   .b-index ul { gap: 0 18px; }
+  .b-spread { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "head" "work" "info" "rest";
+    row-gap: 20px; padding: calc(var(--band) + 28px) 16px 36px; }
+  .b-spread .b-work { justify-items: center; }
+  .b-spread .kv .pic .full { max-height: 62svh; }
+  .b-rest { gap: 12px; margin-top: 8px; }
+  .b-spread .b-wall { --gap: 12px; --hmax: 70vw; }
+  main > .b-end { padding-top: 16px; padding-bottom: calc(var(--band) + 96px); }
+  /* the foot band is gone on a phone, so the index brings its own fall of the ground colour behind it */
+  .b-nav { left: 0; right: 0; bottom: 0; height: auto; translate: none; justify-content: space-between;
+    padding: 22px 8px calc(8px + env(safe-area-inset-bottom)); }
+  .b-nav::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(transparent, var(--ground) 42%); }
+  .b-phases { display: none; }
+  .b-step { width: 52px; height: 52px; }
+  .b-now { flex: 1; width: auto; min-width: 0; justify-content: center; font-size: 19px; }
+  .b-list { left: 12px; right: 12px; bottom: calc(100% - 12px); translate: none; width: auto; min-width: 0; max-height: calc(100svh - var(--band) - 110px); }
 }
-@media (prefers-reduced-motion: reduce) { .b-world .backdrop, body, .b-index a { transition: none; } }
 .issue span { display: none; }

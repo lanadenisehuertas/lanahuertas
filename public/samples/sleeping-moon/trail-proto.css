@@ -1,4 +1,3 @@
 /* Prototype: the stardust trail (trail-proto.js). One canvas over the page, under the chrome's open dialogs. */
 .trail { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 45; pointer-events: none; }
 .quiet .trail { display: none; }
-@media (prefers-reduced-motion: reduce) { .trail { display: none; } }

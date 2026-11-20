@@ -55,7 +55,6 @@
         <h3 class="pk-name po-t"></h3>
         <p class="pk-meta po-m"></p>
         <button class="go" type="button" id="po-big">See it large</button>
-        ${SM.steps("poster")}
       </div>
     </div>`;
     const room = $(".po", pm), win = $(".po-win", pm), track = $(".po-track", pm), hangs = $$(".po-hang", pm), focus = $(".po-focus", pm), words = $(".po-text", pm), line = $(".po-line", pm);
@@ -70,9 +69,9 @@
       const p = P[i];
       $(".po-t", pm).textContent = p.t;
       $(".po-m", pm).textContent = meta(p);
-      SM.setSteps(pm, i, n);
       hangs.forEach((h, k) => { h.tabIndex = k === i ? 0 : -1; h.setAttribute("aria-current", String(k === i)); h.setAttribute("aria-label", `${P[k].t}, ${k + 1} of ${n}${k === i ? ". Open it large" : ". Bring it to the middle"}`); });
-      posters.dataset.hint = i < n - 1 ? `Next: ${P[i + 1].t}` : `${p.t} is the last one.`;
+      // the pegs are the room's pager (each a button with its poster's name), so the foot says nothing more here
+      posters.dataset.hint = "";
       if (SM.stop === posters) SM.say();
     };
     /* asleep, a poster is a few flat lilac shapes (data-flat), never a fine dither over its whole size */
@@ -126,21 +125,14 @@
     (SM.rooms ||= {}).posters = { jump };
     hangs.forEach((h, k) => {
       h.addEventListener("click", () => (k === cur ? SM.view(list, k) : jump(k)));
-      h.addEventListener("focus", () => { if (k !== cur && h.matches(":focus-visible")) jump(k, true); });
+      h.addEventListener("focus", () => { if (k !== cur && !SM.arrowing && h.matches(":focus-visible")) jump(k, true); });
       SM.wakeable(h, { line: `${P[k].t}, ${P[k].m}` });
     });
-    $(".po-track", pm).addEventListener("keydown", (e) => {
-      const k = { ArrowRight: cur + 1, ArrowLeft: cur - 1, Home: 0, End: n - 1 }[e.key];
-      if (k === undefined) return;
-      e.preventDefault(); e.stopPropagation();
-      const j = Math.max(0, Math.min(n - 1, k));
-      hangs[j].focus({ preventScroll: true }); jump(j);
-    });
+    // the arrow keys move along the pegs and the line glides to the one they reach
+    SM.arrows($(".po-track", pm), hangs, () => cur, jump);
     // a poster reached by Tab while its room is off the screen brings the room to it, so the focus ring is always seen
     const seen = (el) => { const r = el.getBoundingClientRect(); return r.right > 0 && r.left < SM.vw && r.bottom > 0 && r.top < SM.vh; };
-    hangs.forEach((h) => h.addEventListener("focus", () => { win.scrollLeft = 0; if (!seen(h)) jump(+h.dataset.i, true); }));
-    $(".prev", pm).addEventListener("click", () => jump(cur - 1));
-    $(".next", pm).addEventListener("click", () => jump(cur + 1));
+    hangs.forEach((h) => h.addEventListener("focus", () => { win.scrollLeft = 0; if (!SM.arrowing && !seen(h)) jump(+h.dataset.i, true); }));
     $("#po-big").addEventListener("click", () => SM.view(list, cur));
     keys(posters, (d) => jump(cur + d));
     caption(0);
@@ -151,7 +143,7 @@
      An editor's timeline. The ten films lie end to end on V1, each as long as it runs, with the sound under them on
      A1 and a ruler of minutes above. The stop is pinned; scrolling plays the timeline: the playhead runs along it,
      the timecode counts, and the frame of the film under the playhead fills the monitor, pushing in slowly as the
-     film runs. At each cut the next film's frame dissolves in through big dither tiles, as a cross-dissolve would.
+     film runs. At each cut the next film's frame blooms in over it in moonlight cells.
      Clicking a clip moves the playhead to it. */
   const fm = $("#m-films"), films = $("#films");
   if (fm && typeof DATA !== "undefined") {
@@ -237,22 +229,30 @@
       const base = Math.floor(q), frac = q - base, g = seg[base];
       head.style.transform = `translate3d(${(g.x0 + frac * (g.x1 - g.x0) - 1).toFixed(1)}px, 0, 0)`;
       tc.textContent = tcs(starts[base] + frac * secs[base]);
-      // the monitor: this film's frame, pushing in as it runs; the next one dissolves in over the last third
+      // the monitor: this film's frame, pushing in as it runs; over the last third the next one blooms in over it in
+      // moonlight cells (SM.bloom). Only that one steps through its stages: the rest are under it or not there
       const cover = base < n - 1 ? clamp((frac - 0.68) / 0.32) : 0;
       frames.forEach((f, k) => {
         const c = k === base ? 1 : k === base + 1 ? cover : 0;
-        SM.applyMask(f, c);
+        SM.bloom(f, c, k !== base + 1);
         if (c <= 0) return;
         const p = quiet ? 0 : k === base ? frac : 0;
         f.style.transform = `scale(${(1.02 + p * 0.07).toFixed(4)})`;
       });
       clips.forEach((c, k) => bms[k]?.setFloor(k === base ? 1 : k === base + 1 ? cover : 0));
-      // the words go out at each cut and come back with the next film's
-      const edge = base === 0 && frac < 0.5 ? 1 : base === n - 1 && frac > 0.5 ? 1 : Math.min(frac, 1 - frac);
-      const o = quiet ? 1 : SM.smooth(clamp(edge / 0.16));
-      words.style.setProperty("--w", o.toFixed(3));
       if (base !== cur) caption(base);
+      // the words: this film's leave letter by letter as the next frame blooms, and the next film's come in after the
+      // cut, its title spelled out of runes (SM.letters, in reel.js). Quiet mode changes them at the cut
+      const lv = quiet || base >= n - 1 ? 0 : clamp((frac - 0.62) / 0.3), en = quiet || base === 0 ? 1 : clamp(frac / 0.24);
+      if (lv > 0 || en < 1) SM.letters.prep(words);
+      const LV = lv ? lv.toFixed(3) : "", EN = en < 1 ? en.toFixed(3) : "";
+      if (words._lv !== LV) { words._lv = LV; LV ? words.style.setProperty("--lv", LV) : words.style.removeProperty("--lv"); }
+      if (words._en !== EN) { words._en = EN; EN ? words.style.setProperty("--en", EN) : words.style.removeProperty("--en"); }
+      SM.letters.runes(words, en);
     };
+    // each film's light blooms from its own point on the frame
+    const AT = ["0.5 0.42", "0.32 0.38", "0.68 0.56", "0.44 0.64", "0.62 0.34"];
+    frames.forEach((f, k) => (f.dataset.bloom = AT[k % AT.length]));
     SM.scrub(update);
     const jump = (k, instant) => SM.glide(films.getBoundingClientRect().top + scrollY + (Math.max(0, Math.min(n - 1, k)) + 0.3) * STEP * SM.vh, instant);
     (SM.rooms ||= {}).films = { jump };
@@ -313,7 +313,7 @@
       // the landing page's recording plays with the film, and only then (it is fetched the first time it is wanted)
       const v = $(".a-land-v", pl);
       if (v) {
-        const go = on && close && !paused && !SM.quiet() && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const go = on && close && !paused && !SM.quiet();
         if (go && !v.src) v.src = v.dataset.src;
         if (go && v.paused) v.play().catch(() => {});
         else if (!go && !v.paused) v.pause();
@@ -417,8 +417,8 @@
        against each other), so every screen is seen without a click; each still opens large */
     const shotsHtml = (p) => {
       const land = LAND[p.id];
-      const lead = land ? `<li class="a-land"><figure><video class="a-land-v" muted loop playsinline preload="none" poster="${land[1]}" data-src="${land[0]}" width="${land[2]}" height="${land[3]}" aria-label="The ${esc(p.t)} landing page, scrolled from top to bottom"></video><figcaption>The landing page</figcaption></figure></li>` : "";
-      const tiles = p.shots.map(([src, w, h], k) => `<li><button class="a-shot" type="button" data-k="${k}" aria-label="Open the ${esc(shotName(src))} screen large"><img src="${SMALL.has(p.id) ? src.replace(/\.webp$/, "-sm.webp") : src}" width="${w}" height="${h}" alt="" loading="lazy" decoding="async"></button></li>`).join("");
+      const lead = land ? `<li class="a-land"><figure data-bloom><video class="a-land-v" muted loop playsinline preload="none" poster="${land[1]}" data-src="${land[0]}" width="${land[2]}" height="${land[3]}" aria-label="The ${esc(p.t)} landing page, scrolled from top to bottom"></video><figcaption>The landing page</figcaption></figure></li>` : "";
+      const tiles = p.shots.map(([src, w, h], k) => `<li><button class="a-shot" type="button" data-bloom data-k="${k}" aria-label="Open the ${esc(shotName(src))} screen large"><img src="${SMALL.has(p.id) ? src.replace(/\.webp$/, "-sm.webp") : src}" width="${w}" height="${h}" alt="" loading="lazy" decoding="async"></button></li>`).join("");
       return `<div class="a-shots"><ul class="a-track" aria-label="${esc(p.t)} screens">${lead}${tiles}</ul></div>`;
     };
     const room = SM.reel(products, A.map((p) => {
@@ -441,7 +441,7 @@
             ${SM.steps("app")}
           </div>
           <figure class="a-film">
-            <picture><source media="(prefers-reduced-motion: reduce)" srcset="${poster}"><img class="a-loop" loading="lazy" src="${poster}" data-loop="${src}" data-poster="${poster}" width="${w}" height="${h}" alt="${esc(f.alt)}"></picture>
+            <picture data-bloom="0.5 0.5"><img class="a-loop" loading="lazy" src="${poster}" data-loop="${src}" data-poster="${poster}" width="${w}" height="${h}" alt="${esc(f.alt)}"></picture>
             <figcaption><button class="a-pause" type="button" aria-pressed="false">${pauseIcon}<span>Pause the film</span></button></figcaption>
           </figure>
           ${shotsHtml(p)}

@@ -94,8 +94,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .tools { justify-self: end; display: flex; align-items: center; gap: 10px; }
 .switch { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; }
 /* quiet mode: a small moon that is full when quiet is on, a thin crescent when off */
-.switch i { position: relative; width: 16px; height: 16px; border-radius: 50%; box-shadow: inset -4px 2px 0 0 var(--ink); transition: box-shadow 200ms var(--enter); }
-.switch[aria-checked="true"] i { box-shadow: inset 0 0 0 8px var(--ink); }
+/* the crescent is drawn in currentColor, not in var(--ink): the band's ink changes with the scroll, and a shadow whose
+   colour changed would start its own transition every frame; currentColor keeps the transition for the moon's shape */
+.switch i { position: relative; width: 16px; height: 16px; border-radius: 50%; color: var(--ink); box-shadow: inset -4px 2px 0 0 currentColor; transition: box-shadow 200ms var(--enter); }
+.switch[aria-checked="true"] i { box-shadow: inset 0 0 0 8px currentColor; }
 .menu-btn { display: none; }
 .live { color: var(--ink); }
 
@@ -152,8 +154,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @keyframes wipe-in { from { opacity: 0; transform: translate3d(0, 0.18em, 0); } to { opacity: 1; transform: none; } }
 @keyframes wipe-out { from { opacity: 1; } to { opacity: 0; } }
 
-/* ---------- the travel iris: drawn by SM.travel only while a jump is under way ---------- */
-.iris { position: fixed; inset: 0; z-index: 85; width: 100vw; height: 100vh; pointer-events: none; display: none; }
+/* ---------- the travel iris: drawn by SM.travel only while a jump is under way, in square cells kept hard ---------- */
+.iris { position: fixed; inset: 0; z-index: 85; width: 100vw; height: 100vh; pointer-events: none; display: none; image-rendering: pixelated; }
 .iris.on { display: block; }
 
 /* ---------- buttons: one primary, one secondary ---------- */
@@ -238,3 +240,5 @@ dialog.viewer[open] { display: grid; grid-template-rows: 1fr auto; }
 main > section[tabindex="-1"]:focus { outline: none; }
 /* nothing in the page may stick out sideways: on phones it lets the whole page be dragged left and right */
 main { overflow-x: clip; }
+/* room copy never leaves one word alone on its last line */
+.pk-text p, .po-text p, .fr-text p, .say { text-wrap: pretty; }

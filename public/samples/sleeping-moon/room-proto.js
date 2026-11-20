@@ -15,7 +15,8 @@
      it lands exactly on the moon's board's own circle, where the six dissolve into the light of its points
      as the night thins to show the board (spell-proto.js takes over from there).
    The camera follows the scroll on a spring, so it has weight but settles exactly where the scroll says, and everything
-   reverses when you scroll back. Quiet mode and reduced motion skip the room. */
+   reverses when you scroll back. Quiet mode (the visitor's own switch) skips the room; the system's reduced-motion
+   setting does not, since the room moves only as the visitor scrolls it. */
 (() => {
   const { $, $$ } = SM;
   const hero = $("#moon"), board = $("#board");
@@ -28,11 +29,11 @@
   const inOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
   const out3 = (x) => 1 - (1 - x) ** 3;
   const bell = (x) => (x > 0 && x < 1 ? Math.sin(Math.PI * x) : 0);
-  const still = () => SM.quiet() || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
 
   /* the beats, in screens of scroll through the room (the stage holds for SPAN screens) */
   const SPAN = 5;
-  const BEAT = { cout: [4.23, 4.47], mout: [4.4, 4.62], rise: [1.2, 2.3], name: [0.55, 0.95], lift: 1.85, stagger: 0.1, fly: 0.55, draw: [2.4, 2.95], push: [2.95, 4.05], land: [4.05, 4.65] };
+  const BEAT = { cout: [4.23, 4.47], mout: [4.4, 4.62], rise: [1.2, 2.3], name: [0.8, 1.15], lift: 1.85, stagger: 0.1, fly: 0.55, draw: [2.4, 2.95], push: [2.95, 4.05], land: [4.05, 4.65] };
   let P = 2400;   // the perspective: how far the eye stands in front of the screen, in room units (a long lens, so
                     // the side walls are short and the room reads as a room, not a corridor)
 
@@ -42,32 +43,44 @@
   const SIX = ["brands", "posters", "films", "products", "about", "contact"];
   const SRC = (k) => (SIX.includes(k) ? `art/c_${k}.webp` : `art/room/${k}.webp`);
   const DOORMAP = [4, 3, 2, 5, 0, 1];   // door k is born from the star's point j, as in spell-proto.js
+  /* what Lana does, in the room's two lines. It sleeps like everything else, in the coarse 1-bit cut of the type, and
+     wakes letter by letter into the smooth italic as the scroll carries the light along it (WAKE, in beats): a hard
+     front with a row of loose letters just ahead of it, which have caught the light but not yet woken */
+  const ROLE = ["A UI/UX and graphic designer in Manila,", "making pictures, films and code that wake up when you look."];
+  const WAKE = [0.04, 0.62], LOOSE = 3;
 
   /* two rooms: a wide one for screens and a tall one for phones. The view is a box of view.w x view.h scaled to fit the
      screen; the room is box.w wide and box.h tall with the floor at +box.h/2, its back wall at z = box.back, and its floor
      running forward to z = box.front. Pieces stand with their bottom centre at (x, by, z), or on another piece's top
-     ([that piece, fraction of its height from its top]). */
+     ([that piece, fraction of its height from its top]).
+     The room is laid out like the spell it becomes: each of the six stands on the side of the room where its point of
+     the star is, so they all rise outward and up to their points without crossing. On the left, the round table with the
+     projector (Films, low left) in front and the easel (Posters, high left) further back; on the right, the desk with the
+     packets (Brands, the top point) and the phone (Products, high right), and the mirror hung on the wall above it
+     (About, low right); the letter rests on the window's sill (Contact, the bottom point). Every piece keeps well inside
+     the walls, so no wall ever cuts one, and inside the frame for the whole of the camera's drift. */
   const SETS = {
     wide: {
       view: { w: 1440, h: 810 }, box: { w: 1400, h: 800, back: -1000, front: 600 },
-      name: { top: 660, role: 30 },
+      name: { top: 618, role: 30 },
       // the camera's drift: from the first view to the last before the push, on one shallow arc to the left and back
       cams: [{ x: 0, y: -40, z: 120, pitch: -4 }, { x: 0, y: -50, z: -400, pitch: -3 }], arc: 36,
       ring: { x: 0, y: -60, z: -560, r: 260, out: -2200 },
       items: [
-        ["window", "window", 380, 0, 250, -992],
-        ["about", "about", 160, 370, 110, -986],
-        ["contact", "contact", 120, 112, 246, -975],
-        ["posters", "posters", 200, -250, 400, -640],
-        ["desk", "desk-line", 460, -500, 400, -260], ["brands", "brands", 210, -540, ["desk", 0.2], -256], ["products", "products", 74, -360, ["desk", 0.2], -256],
-        ["table", "table-line", 340, 530, 400, -250], ["films", "films", 240, 515, ["table", 0.16], -246],
+        // the window sits a little low on its wall, so the tip of its arch clears the masthead on a 16:9 screen
+        ["window", "window", 370, 0, 272, -992],
+        ["about", "about", 150, 350, -30, -982],
+        ["contact", "contact", 104, -50, 268, -975],
+        ["posters", "posters", 180, -205, 400, -720],
+        ["table", "table-line", 270, -395, 400, -380], ["films", "films", 200, -402, ["table", 0.16], -376],
+        ["desk", "desk-line", 350, 355, 400, -380], ["brands", "brands", 170, 320, ["desk", 0.2], -376], ["products", "products", 58, 478, ["desk", 0.2], -376],
       ],
     },
     tall: {
       // a phone's tall view is filled by a shorter lens: with the wide room's long one the room would sit small in it
       lens: 1300,
       view: { w: 720, h: 1280 }, box: { w: 900, h: 1200, back: -1000, front: 700 },
-      name: { top: 150, role: 40 },
+      name: { top: 150, role: 36 },
       cams: [{ x: 0, y: 40, z: 150, pitch: -3 }, { x: 40, y: 50, z: -360, pitch: -2.5 }], arc: 22,
       ring: { x: 40, y: 50, z: -560, r: 200, out: -2200 },
       // the moon's stop comes up from below on phones and reaches the top at 5 screens: the circle and the moon land at
@@ -76,33 +89,21 @@
       beat: { push: [2.95, 4.25], land: [4.25, 4.85], night: [4.88, 4.99], cout: [4.88, 4.98], mout: [4.9, 4.99] },
       items: [
         ["window", "window", 290, 40, 300, -992],
-        ["about", "about", 170, 300, 40, -986],
-        ["contact", "contact", 140, 140, 296, -975],
-        ["posters", "posters", 150, 55, 600, -880],
-        ["desk", "desk-line", 400, -200, 600, -200], ["brands", "brands", 190, -235, ["desk", 0.2], -196], ["products", "products", 66, -70, ["desk", 0.2], -196],
-        ["table", "table-line", 300, 270, 600, -190], ["films", "films", 210, 258, ["table", 0.16], -186],
+        ["about", "about", 150, 270, 20, -982],
+        ["contact", "contact", 96, 0, 296, -975],
+        ["posters", "posters", 120, -100, 600, -780],
+        ["table", "table-line", 220, -180, 600, -470], ["films", "films", 160, -186, ["table", 0.16], -466],
+        ["desk", "desk-line", 280, 215, 600, -470], ["brands", "brands", 136, 180, ["desk", 0.2], -466], ["products", "products", 48, 300, ["desk", 0.2], -466],
       ],
     },
   };
 
   /* ------------------------------------------------------------------ the engraved planes: few lines, drawn as SVG */
-  const INK = "#b9a2ff", DIM = "#5a4a99", FAINT = "#3b3170";
+  const INK = "#b9a2ff", DIM = "#5a4a99";
   // the room's surfaces are night, not nothing: the back wall a little lighter than the side walls, the floor and the
   // ceiling darkest, so the room has volume before a single line is drawn
   const WALL = "#0d0a24", SIDE = "#08061a", FLOOR = "#060414", CEIL = "#040310";
   const svg = (w, h, body) => `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">${body}</svg>`;
-  /** a sparse wallpaper of small four-point stars and crescents, on the back wall only */
-  const stars = (w, y0, y1, step, seed) => {
-    let s = seed, out = "";
-    const rnd = () => ((s = (s * 16807) % 2147483647) - 1) / 2147483646;
-    for (let y = y0 + step / 2; y < y1; y += step) for (let x = step / 2; x < w; x += step) {
-      const px = (x + (rnd() - 0.5) * step * 0.5).toFixed(0), py = (y + (rnd() - 0.5) * step * 0.4).toFixed(0), r = 3 + rnd() * 3;
-      out += rnd() < 0.3
-        ? `<path transform="translate(${px} ${py})" d="M${-r} 0a${r * 1.3} ${r * 1.3} 0 1 0 ${r * 1.6} ${-r * 1.2}a${r} ${r} 0 1 1 ${-r * 1.6} ${r * 1.2}z"/>`
-        : `<path transform="translate(${px} ${py})" d="M0 ${-r * 1.6}L${r * 0.35} ${-r * 0.35}L${r * 1.6} 0L${r * 0.35} ${r * 0.35}L0 ${r * 1.6}L${-r * 0.35} ${r * 0.35}L${-r * 1.6} 0L${-r * 0.35} ${-r * 0.35}z"/>`;
-    }
-    return `<g fill="${FAINT}">${out}</g>`;
-  };
   /** one rail and a crown moulding along a wall w wide and h tall, dotted like the rules of the moon's board, so the room is drawn
       in the same hand as the page it flies to */
   const rail = (w, h) => `<path d="M0 ${h * 0.74}H${w}M0 18H${w}" stroke="${DIM}" stroke-width="4" stroke-dasharray="4 12" fill="none"/>`;
@@ -212,7 +213,22 @@
 
   const N = 300, RC = 100;
   const awake = new Set();
-  let glassEl = null, ghosts = {}, beam, set, B = BEAT, sky, moon, skip, mask, view, world, words, night, circle, halo, flash, vig, blooms = [], cctx, els = {}, pos = {}, pics = [], built = "", lastSpell = -1;
+  let glassEl = null, beam, set, B = BEAT, sky, moon, skip, view, world, words, night, circle, halo, flash, vig, blooms = [], cctx, els = {}, pos = {}, pics = [], built = "", lastSpell = -1;
+  // the role's letters, and how far along them the light has come
+  let roleCh = [], roleN = -1;
+  // what dims with the room, each written on its own element (op, below) rather than through custom properties on the
+  // world, which every one of its few hundred nodes would inherit and so be restyled for at every step of the scroll
+  let fades = { near: [], lines: [], shades: [], room: [] };
+  /* the echoes that trail each of the six as it flies: four fading copies of it a little further back along its path.
+     They are drawn together on one flat canvas over the room, each at the place and size the camera sees that point of
+     the path at (echoAt), instead of as two dozen pictures in the 3D world that the browser would restyle, sort and
+     composite every frame. They are nearer the eye than the thing they trail, so over it is where the room had them. */
+  let echo = null, echoG = null, echoW = 0, echoH = 0, echoK = 1, echoOn = false;
+  const ECHO = [0.5, 0.32, 0.19, 0.09];
+  /* the circle's motion blur: a softened copy of the finished drawing, made once (soften), which the frame fades in over
+     the sharp one in step with the speed, instead of a blur filter on the moving circle, which the browser would have
+     to work out again every frame */
+  let soft = null, sharp = null, softFor = -1;
   const build = () => {
     const key = SM.COLUMN.matches ? "tall" : "wide";
     if (built === key) return;
@@ -222,14 +238,14 @@
     for (const [id, art, w, x, by, z] of set.items) {
       const h = (w * IMG[art][1]) / IMG[art][0];
       const bottom = Array.isArray(by) ? pos[by[0]].top + pos[by[0]].h * by[1] : by;
-      pos[id] = { x, top: bottom - h, w, h, z, cy: bottom - h / 2 };
+      pos[id] = { x, top: bottom - h, w, h, z, cy: bottom - h / 2, on: Array.isArray(by) ? by[0] : null };
     }
     const img = (art) => `<img class="full" src="${SRC(art)}" width="${IMG[art][0]}" height="${IMG[art][1]}" alt="">`;
     const piece = ([id, art, w]) => {
       const six = SIX.includes(id), line = art.endsWith("-line");
-      // the desk is drawn as seen from its right; it stands on the left of the room, seen from the middle, so it is
-      // turned to face the other way (its far side is then the one toward the wall, as it should be)
-      const inner = line ? (id === "desk" ? img(art).replace("<img ", '<img style="transform:scaleX(-1)" ') : img(art)) : `<span class="pic" data-kind="paint" data-enter="manual" data-still${six ? "" : ' data-lift="0.3"'}>${img(art)}</span>`;
+      // the desk is drawn as it is seen standing to the right of the eye, its left end showing; on the left of a room it
+      // would be turned to face the other way
+      const inner = line ? (id === "desk" && pos[id].x < 0 ? img(art).replace("<img ", '<img style="transform:scaleX(-1)" ') : img(art)) : `<span class="pic" data-kind="paint" data-enter="manual" data-still${six ? "" : ' data-lift="0.3"'}>${img(art)}</span>`;
       const nm = six ? `<span class="rm-nm">${id[0].toUpperCase() + id.slice(1)}</span>` : "";
       return `<div class="rm-it ${six ? "rm-six" : "rm-leaf rm-furn"}" data-id="${id}" style="width:${w}px;height:${pos[id].h.toFixed(1)}px">${inner}${nm}</div>`;
     };
@@ -239,28 +255,40 @@
           <div class="rm-sky"><canvas></canvas></div>
           <div class="rm-moon"><span class="pic moon" data-kind="moon" data-enter="manual" data-still><img class="full" src="art/moon-asleep.webp" width="640" height="640" alt=""></span></div>
           ${planes(set)}
-          ${SIX.map((id) => [1, 2, 3, 4].map((k) => `<div class="rm-ghost" data-g="${id}" style="width:${pos[id].w}px;height:${pos[id].h.toFixed(1)}px"><img src="${SRC(id)}" width="${IMG[id][0]}" height="${IMG[id][1]}" alt=""></div>`).join("")).join("")}
           ${set.items.map(piece).join("")}
           <div class="rm-circle" style="width:${r.r * 3}px;height:${r.r * 3}px">
-            <i class="rm-halo"></i><canvas></canvas>
+            <i class="rm-halo"></i><canvas class="rm-sharp"></canvas><canvas class="rm-soft"></canvas>
             ${SIX.map((_, k) => { const a = (DOORMAP[k] * Math.PI) / 3 + 0.5, x = r.r * 1.5 + Math.cos(a) * r.r * 0.84, y = r.r * 1.5 + Math.sin(a) * r.r * 0.84; return `<i class="rm-bloom" style="left:${(x - bs / 2).toFixed(1)}px;top:${(y - bs / 2).toFixed(1)}px;width:${bs}px;height:${bs}px"></i>`; }).join("")}
           </div>
         </div>
-        <div class="rm-words" style="top:${set.name.top}px"><p class="rm-role" style="font-size:${set.name.role}px">UI/UX and graphic designer in Manila</p><span class="pl-cue rm-cue"><i></i></span></div>
+        <div class="rm-words" style="top:${set.name.top}px"><p class="rm-role" style="font-size:${set.name.role}px">${ROLE.map((l) => `<span class="rm-l">${l.split(" ").map((w) => `<span class="rm-w">${[...w].map((c) => `<span class="rm-c" data-c="${c}">${c}</span>`).join("")}</span>`).join(" ")}</span>`).join(" ")}</p><span class="pl-cue rm-cue"><i></i></span></div>
       </div>
+      <canvas class="rm-echo" aria-hidden="true"></canvas>
       <i class="rm-vig" aria-hidden="true"></i><i class="rm-flash" aria-hidden="true"></i>
       <div class="rm-night" aria-hidden="true"></div>
       <a class="go rm-skip" href="#moon">Skip the intro</a>`;
-    ghosts = {}; $$(".rm-ghost", host).forEach((g) => (ghosts[g.dataset.g] ||= []).push(g)); beam = $(".rm-beam", host);
+    beam = $(".rm-beam", host);
     view = $(".rm-view", host); world = $(".rm-world", host); words = $(".rm-words", host); night = $(".rm-night", host);
     circle = $(".rm-circle", host); halo = $(".rm-halo", host); flash = $(".rm-flash", host); vig = $(".rm-vig", host);
-    sky = $(".rm-sky", host); moon = $(".rm-moon", host); mask = $(".rm-mask", host); skip = $(".rm-skip", host); blooms = $$(".rm-bloom", host); cctx = SM.spell.hires($("canvas", circle), N, N, 3.5); lastSpell = -1;
+    sky = $(".rm-sky", host); moon = $(".rm-moon", host); skip = $(".rm-skip", host); blooms = $$(".rm-bloom", host);
+    sharp = $(".rm-sharp", circle); soft = $(".rm-soft", circle); cctx = SM.spell.hires(sharp, N, N, 3.5); lastSpell = -1; softFor = -1;
+    echo = $(".rm-echo", host); echoG = echo.getContext("2d"); echoOn = false;
     glassEl = $(".rm-glass", host);
+    roleCh = $$(".rm-c", host); roleN = -1;
     els = {}; $$(".rm-it", host).forEach((el) => (els[el.dataset.id] = el));
+    // the planes: plain black ones go only as the eye reaches the back wall; drawn lines also dim with the room; a toned
+    // plane keeps its black and dims its lines under a shade; the furniture and the dust dim with the room
+    const pl = $$(".rm-pl", host);
+    fades = {
+      near: pl.filter((el) => !el.classList.contains("rm-lines")),
+      lines: pl.filter((el) => el.classList.contains("rm-lines")),
+      shades: $$(".rm-shade", host),
+      room: [...$$(".rm-leaf", host).filter((el) => el.dataset.id !== "window"), $(".rm-dust", host)].filter(Boolean),
+    };
     drawSky();
     for (const [id] of set.items) if (!SIX.includes(id)) place(els[id], pos[id], 0);
     pics = SM.pictures(host);
-    pics.forEach((b) => b.load().then(() => b.setShow(1)).catch(() => {}));
+    loads = pics.map((b) => b.load().then(() => b.setShow(1)).catch(() => {}));
     awake.forEach((id) => SM.bitmap(els[id])?.wakeUp(0));
     SIX.forEach((id) => {
       els[id].addEventListener("pointerenter", (e) => { if (e.pointerType !== "touch" && !still()) wake(id); });
@@ -275,7 +303,8 @@
   };
   /** a standing picture at its place in the room, turned to face the camera */
   const place = (el, p, yaw) => { el.style.transform = `translate3d(${(p.x - p.w / 2).toFixed(1)}px,${p.top.toFixed(1)}px,${p.z}px) rotateY(${yaw.toFixed(2)}deg)`; };
-  /** the night beyond the window: a far plane of sparse stars, kept as single pixels, the room's one wide bitmap */
+  /** the night beyond the window: a far plane of sparse stars, kept as single pixels, the room's one wide bitmap. Its
+      canvas is drawn at one pixel a cell and stretched five times by CSS (room-proto.css), unsmoothed */
   const drawSky = () => {
     const cv = $(".rm-sky canvas", host), g = cv.getContext("2d");
     cv.width = 1600; cv.height = 1000;
@@ -312,7 +341,14 @@
     moon.style.width = moon.style.height = L.d.toFixed(1) + "px";
     $(".pic", moon).dataset.cell = ((+$("#moonpic").dataset.cell || 1) / (kv * L.sc)).toFixed(3);
     pics.forEach((b) => b.imgs && b.build());
-    lastSpell = -1;
+    lastSpell = -1; softFor = -1;
+    // the echoes' canvas covers the stage, at no more than one and a half of the screen's pixels to each of its own
+    echoW = host.clientWidth; echoH = host.clientHeight; echoK = Math.min(1.5, devicePixelRatio || 1);
+    echo.width = Math.round(echoW * echoK); echo.height = Math.round(echoH * echoK);
+    echoOn = true; clearEcho();
+    // the six keep clear of the frame's sides, and of the masthead and the foot, which lie over the stage
+    const band = Math.max(4.2 * U, 48);
+    edge = { x: 12, t: band * 1.1, b: SM.COLUMN.matches ? 16 : band };
   };
 
   /* ------------------------------------------------------------------ waking: by the pointer or a tap, or as it lifts */
@@ -457,6 +493,61 @@
     try { premeasure(); } finally { inFrame = false; }
   });
 
+  /* ------------------------------------------------------------------ the frame's helpers */
+  /** an opacity written only when it changes; whatever has faded right out is also hidden, so the browser stops
+      painting and compositing it */
+  const op = (el, a, hide = true) => {
+    const s = a > 0.0005 ? a.toFixed(3) : "0";
+    if (el._o === s) return;
+    el._o = s; el.style.opacity = s;
+    if (hide) el.style.visibility = s === "0" ? "hidden" : "";
+  };
+  /** the room's forever-moving ornaments (the curtains, the window's night, the dust) rest while nobody can see them */
+  let rested = null, lastNear = 1;
+  const rest = (r) => { if (rested !== r) { rested = r; host.classList.toggle("rm-rest", r); } };
+  /** where the camera sees a point of the room: its place on the stage and how much things there are scaled. The same
+      sums the browser does for the world's transform (room-proto.css): the camera's offset, the turn about the point
+      the lens stands at, then the lens's perspective and the view's own scale, from the middle of the stage */
+  const echoAt = (cam, yaw, pitch, x, y, z) => {
+    const a = (-yaw * Math.PI) / 180, b = (pitch * Math.PI) / 180;
+    const x1 = x - cam.x, y1 = y - cam.y, z1 = z - cam.z - P;
+    const x2 = x1 * Math.cos(a) + z1 * Math.sin(a), z2 = -x1 * Math.sin(a) + z1 * Math.cos(a);
+    const y3 = y1 * Math.cos(b) - z2 * Math.sin(b), z3 = y1 * Math.sin(b) + z2 * Math.cos(b) + P;
+    const k = (P / (P - z3)) * kv;
+    return { x: echoW / 2 + x2 * k, y: echoH / 2 + y3 * k, k };
+  };
+  /** how clear of the frame's edges a standing piece is seen: 1 while it keeps a margin from every edge, falling to 0
+      as it reaches one (or once the camera has passed it), so a piece the camera leaves behind dissolves before the
+      frame could cut it */
+  const clear = (cam, yaw, pitch, q) => {
+    const a = echoAt(cam, yaw, pitch, q.x - q.w / 2, q.top, q.z), b = echoAt(cam, yaw, pitch, q.x + q.w / 2, q.top + q.h, q.z);
+    if (a.k <= 0 || b.k <= 0) return 0;
+    return clamp(Math.min(a.x, a.y, echoW - b.x, echoH - b.y) / Math.max(16, echoW * 0.03));
+  };
+  /** where a picture w x h at scale s, seen at e, must be drawn to sit inside the frame, clear of the masthead and the
+      foot (edge, below): null if it already does, or else its nearest place inside, at the largest scale that fits */
+  const inside = (e, w, h, s) => {
+    if (e.k <= 0) return null;
+    const x0 = edge.x, x1 = echoW - edge.x, y0 = edge.t, y1 = echoH - edge.b;
+    const s2 = Math.max(0, Math.min(s, (x1 - x0) / (w * e.k), (y1 - y0) / (h * e.k)));
+    const hw = (w / 2) * s2 * e.k, hh = (h / 2) * s2 * e.k;
+    const x = clamp(e.x, x0 + hw, x1 - hw), y = clamp(e.y, y0 + hh, y1 - hh);
+    return x === e.x && y === e.y && s2 === s ? null : { x, y, s: s2 };
+  };
+  let edge = { x: 12, t: 48, b: 12 };
+  const clr = {};
+  const clearEcho = () => { if (echoOn) { echoOn = false; echoG.setTransform(1, 0, 0, 1, 0, 0); echoG.clearRect(0, 0, echo.width, echo.height); echo.style.visibility = "hidden"; } };
+  /** the circle's softened copy, made once the drawing is whole (and again after the drawing is redone at a new size) */
+  const soften = () => {
+    if (softFor === lastSpell) return;
+    softFor = lastSpell;
+    soft.width = Math.round(sharp.width / 2); soft.height = Math.round(sharp.height / 2);
+    const g = soft.getContext("2d");
+    // as blurred as the circle ever was by its speed (3px of its own size), at the copy's half resolution
+    if ("filter" in g) g.filter = `blur(${((3 * soft.width) / (set.ring.r * 3)).toFixed(2)}px)`;
+    g.drawImage(sharp, 0, 0, soft.width, soft.height);
+  };
+
   /* ------------------------------------------------------------------ one frame */
   let spoke = false;
   const HINT = SM.HOVER ? "Point at things to wake them, then scroll." : "Tap things to wake them, then scroll.";
@@ -465,11 +556,18 @@
   const draw = () => {
     const r = set.ring, speed = Math.min(1, Math.abs(v) * 1.6);   // how fast the scroll is carrying things, for motion blur
     const f = sm(B.land[0], B.land[1], p);
-    host.style.visibility = p > SPAN - 0.005 ? "hidden" : "";
+    const hv = p > SPAN - 0.005 ? "hidden" : "";
+    if (host._v !== hv) { host._v = hv; host.style.visibility = hv; }
     document.body.classList.toggle("in-room", p < B.lift);
-    const wq = sm(BEAT.name[0], BEAT.name[1], p);
-    words.style.opacity = (1 - wq).toFixed(3);
-    words.style.transform = `translate3d(0, ${(-wq * 40).toFixed(1)}px, 0)`;
+    const wq = sm(BEAT.name[0], BEAT.name[1], p), wt = `translate3d(0, ${(-wq * 40).toFixed(1)}px, 0)`;
+    op(words, 1 - wq);
+    // the role wakes along its letters as the scroll goes: behind the front they are awake, the few just ahead are loose
+    const rn = Math.round(lin(WAKE[0], WAKE[1], p) * (roleCh.length + LOOSE));
+    if (rn !== roleN) {
+      roleN = rn;
+      roleCh.forEach((c, i) => { const st = i < rn - LOOSE ? "rm-c w" : i < rn ? "rm-c f" : "rm-c"; if (c.className !== st) c.className = st; });
+    }
+    if (words._t !== wt) { words._t = wt; words.style.transform = wt; }
 
     // the camera: the slow drift, then out through the window to the board
     const q = lin(B.push[0], B.push[1], p);
@@ -479,108 +577,152 @@
     world.style.transform = `translateZ(${P}px) rotateX(${pitch.toFixed(2)}deg) rotateY(${(-yaw).toFixed(2)}deg) translateZ(${-P}px) translate3d(${(-cam.x).toFixed(1)}px,${(-cam.y).toFixed(1)}px,${(-cam.z).toFixed(1)}px)`;
     // the room dims while the six gather, then is gone as the circle reaches the back wall (so the wall never cuts it
     // off as it goes through) or the eye does, whichever is first
-    const eye = cam.z + P, near = Math.min(1 - sm(set.box.back + 900, set.box.back + 160, eye), 1 - sm(0.08, 0.5, q)), room = mix(1, 0.28, sm(BEAT.lift, BEAT.lift + 0.8, p)) * near;
-    mask.style.opacity = near.toFixed(3);
-    world.style.setProperty("--room", room.toFixed(3));
+    const eye = cam.z + P, near = Math.min(1 - sm(set.box.back + 900, set.box.back + 160, eye), 1 - sm(0.08, 0.5, q));
+    const dim = mix(1, 0.28, sm(BEAT.lift, BEAT.lift + 0.8, p)), room = dim * near;
     // the walls keep their black whole (so the moon behind them is only ever seen through the glass); only their lines dim
-    world.style.setProperty("--dim", mix(1, 0.28, sm(BEAT.lift, BEAT.lift + 0.8, p)).toFixed(3));
-    world.style.setProperty("--near", near.toFixed(3));
-    vig.style.opacity = (0.75 * sm(BEAT.lift, BEAT.lift + 0.8, p) * (1 - sm(0.3, 0.8, q))).toFixed(3);
+    fades.near.forEach((el) => op(el, near));
+    fades.lines.forEach((el) => op(el, near * dim));
+    fades.shades.forEach((el) => op(el, 1 - dim));
+    // the furniture also dissolves as the camera carries it toward the edge of the frame, so the frame never cuts it
+    fades.room.forEach((el) => { const id = el.dataset.id; if (id) clr[id] = clear(cam, yaw, pitch, pos[id]); op(el, id ? room * clr[id] : room); });
+    op(vig, 0.75 * sm(BEAT.lift, BEAT.lift + 0.8, p) * (1 - sm(0.3, 0.8, q)));
     // a flash of moonlight as the circle goes through the glass
-    flash.style.opacity = (0.55 * bell(lin(0.28, 0.62, q))).toFixed(3);
+    op(flash, 0.55 * bell(lin(0.28, 0.62, q)));
     // the room's own stars go out behind the flash, so that only the moon's sky is ever seen as the night thins
-    sky.style.opacity = (1 - sm(0.4, 0.8, q)).toFixed(3);
-    // the window's own night (stars, clouds, haze) gives way to the moon rising in the glass
-    if (glassEl) glassEl.style.opacity = (near * (1 - sm(B.rise[0] - 0.35, B.rise[0] + 0.25, p))).toFixed(3);
+    op(sky, 1 - sm(0.4, 0.8, q));
+    // the window's own night (stars, clouds, haze) gives way to the moon rising in the glass, and rests once it has
+    if (glassEl) { const gl = near * (1 - sm(B.rise[0] - 0.35, B.rise[0] + 0.25, p)); op(glassEl, gl); glassEl.classList.toggle("rm-off", gl <= 0.0005); }
+    lastNear = near; rest(!inView || near <= 0);
     // the moon rises in the window's empty glass while the camera pushes on: it waits at the circle's far depth, so the
     // flown-out circle closes round it, and at the end it is the board's own moon, which takes over in the same place
     if (p > B.rise[0] - 0.4) {
       const L = land(), up = inOut(lin(B.rise[0], B.rise[1], p)), y = L.y + (1 - up) * L.d * 1.3;
       moon.style.transform = `translate3d(${(L.x - L.d / 2).toFixed(1)}px,${(y - L.d / 2).toFixed(1)}px,${r.out - 1}px)`;
-      moon.style.opacity = (1 - sm(B.mout[0], B.mout[1], p)).toFixed(3);
-      moon.style.visibility = "visible";
-    } else moon.style.visibility = "hidden";
-    for (const [id] of set.items) if (!SIX.includes(id)) place(els[id], pos[id], yaw);
+      op(moon, 1 - sm(B.mout[0], B.mout[1], p), false);
+      if (moon._vis !== "visible") { moon._vis = "visible"; moon.style.visibility = "visible"; }
+    } else if (moon._vis !== "hidden") { moon._vis = "hidden"; moon.style.visibility = "hidden"; }
+    // the furniture turns to face the camera; the window is set in the back wall and stays flush with it
+    for (const [id] of set.items) if (!SIX.includes(id)) place(els[id], pos[id], id === "window" ? 0 : yaw);
     // the window's stone frame stays while the circle goes out through its glass, and fades as the camera comes close
     // enough that its cells would grow coarse
-    els.window.style.opacity = (room * (1 - sm(-560, -300, pos.window.z - cam.z))).toFixed(3);
+    op(els.window, room * (1 - sm(-560, -300, pos.window.z - cam.z)));
 
-    // the circle: draws itself between the six in front of the window, flies out, lands on the board's circle
-    const s = lin(BEAT.draw[0], BEAT.draw[1], p);
+    // the circle: draws itself between the six in front of the window, flies out, lands on the board's circle. Its
+    // canvas is drawn again only when the drawing has moved on by a visible step (a forty-eighth of the way)
+    const s = Math.round(lin(BEAT.draw[0], BEAT.draw[1], p) * 48) / 48;
     const cz = mix(r.z, r.out, inOut(lin(B.push[0] + 0.05, B.push[1] - 0.1, p)));
     const cblur = speed * 3 * bell(q);
     circle.style.transform = `translate3d(${r.x - r.r * 1.5}px,${r.y - r.r * 1.5}px,${cz.toFixed(1)}px)`;
-    circle.style.opacity = (sm(BEAT.draw[0] - 0.25, BEAT.draw[0] + 0.1, p) * (1 - sm(B.cout[0], B.cout[1], p))).toFixed(3);
-    circle.style.filter = cblur > 0.15 ? `blur(${cblur.toFixed(2)}px)` : "";
-    halo.style.opacity = (0.5 * s + 0.4 * bell(lin(0.1, 0.6, q))).toFixed(3);
-    if (Math.abs(s - lastSpell) > 0.002 || (s === 1 && lastSpell !== 1)) { lastSpell = s; SM.spell.cast(cctx, N, N, { cx: N / 2, cy: N / 2, R: RC, targets: null }, s, 0, null); }
+    const co = sm(BEAT.draw[0] - 0.25, BEAT.draw[0] + 0.1, p) * (1 - sm(B.cout[0], B.cout[1], p));
+    op(circle, co);
+    op(halo, 0.5 * s + 0.4 * bell(lin(0.1, 0.6, q)));
+    if (co > 0 && s !== lastSpell) { lastSpell = s; SM.spell.cast(cctx, N, N, { cx: N / 2, cy: N / 2, R: RC, targets: null }, s, 0, null); }
+    // its motion blur, as the speed carries it out through the glass: the softened copy fades in over the sharp one
+    const kb = cblur > 0.15 && s === 1 && !still() ? Math.min(1, cblur / 3) : 0;
+    if (kb > 0) soften();
+    op(soft, kb); op(sharp, 1 - kb, false);
 
     // the six: in their places, then up on clean arcs to the star's points, carried out with the circle;
     // on landing each shrinks into the light of its point, which the rising moon then carries out to its door
+    let echoes = false;
+    const fade = sm(0, 0.6, f);
     SIX.forEach((id, k) => {
-      const el = els[id], h = pos[id], j = DOORMAP[k], a = (j * Math.PI) / 3 + 0.5;
+      const h = pos[id], j = DOORMAP[k], a = (j * Math.PI) / 3 + 0.5;
       const tx = r.x + Math.cos(a) * r.r * 0.84, ty = r.y + Math.sin(a) * r.r * 0.84, tz = cz + 2;
       const g0 = B.lift + k * B.stagger, g = lin(g0, g0 + B.fly, p), u = out3(g);
-      if (g > 0) wake(id);
       const side = h.x < r.x ? -1 : 1;
       // a curve that rises and swings a little out on its own side before coming in to its point
       const c = { x: (h.x + tx) / 2 + side * 120, y: Math.min(h.cy, ty) - 150, z: (h.z + tz) / 2 + 80 };
-      const fit6 = Math.min(1, (r.r * 0.45) / Math.max(h.w, h.h)), fade = sm(0, 0.6, f);
-      const at = (uu) => {
-        const bz = (a0, c0, b0) => (1 - uu) ** 2 * a0 + 2 * (1 - uu) * uu * c0 + uu * uu * b0;
-        return `translate3d(${(bz(h.x, c.x, tx) - h.w / 2).toFixed(1)}px,${(bz(h.cy, c.y, ty) - h.h / 2).toFixed(1)}px,${bz(h.z, c.z, tz).toFixed(1)}px) rotateY(${(yaw * (1 - uu)).toFixed(2)}deg) scale(${(mix(1, fit6, uu) * mix(1, 0.12, fade)).toFixed(4)})`;
-      };
-      el.style.transform = at(u);
-      const scl = mix(1, fit6, u) * mix(1, 0.12, fade);
+      const fit6 = Math.min(1, (r.r * 0.45) / Math.max(h.w, h.h));
+      const bz = (a0, c0, b0) => (1 - u) ** 2 * a0 + 2 * (1 - u) * u * c0 + u * u * b0;
+      let X = bz(h.x, c.x, tx), Y = bz(h.cy, c.y, ty), Z = bz(h.z, c.z, tz), scl = mix(1, fit6, u) * mix(1, 0.12, fade);
+      const el = els[id];
+      if (g > 0) wake(id);
+      // while it flies it is kept inside the frame, clear of the masthead and the foot: where the circle swells past the
+      // screen as the camera pushes on, it slides in from its point just as far as it must, and back out as the circle
+      // settles, so the frame never cuts it (and only if the frame is too small for it at all is it made smaller)
+      if (g > 0) {
+        const e = echoAt(cam, yaw, pitch, X, Y, Z), q = inside(e, h.w, h.h, scl);
+        if (q) { X += (q.x - e.x) / e.k; Y += (q.y - e.y) / e.k; scl = q.s; }
+      }
+      el.style.transform = `translate3d(${(X - h.w / 2).toFixed(1)}px,${(Y - h.h / 2).toFixed(1)}px,${Z.toFixed(1)}px) rotateY(${(yaw * (1 - u)).toFixed(2)}deg) scale(${scl.toFixed(4)})`;
       // its echoes: copies a little further back along the same path, fainter the further back, drawn out by the speed of
       // the scroll and gone as it settles at its point, so it is seen to fly rather than to slide
       const trail = g > 0 && g < 1 && !still() ? sm(0.02, 0.12, g) * (1 - sm(0.82, 1, g)) * mix(0.45, 1, speed) : 0;
-      (ghosts[id] || []).forEach((gh, i) => {
-        if (trail <= 0.01) { if (gh._on) { gh._on = false; gh.style.opacity = "0"; } return; }
-        gh._on = true;
-        const gg = Math.max(0, g - (i + 1) * 0.035 * (0.6 + speed * 1.6));
-        gh.style.transform = at(out3(gg));
-        gh.style.opacity = (trail * [0.5, 0.32, 0.19, 0.09][i]).toFixed(3);
-      });
-      el.style.opacity = (1 - sm(0.25, 0.6, f)).toFixed(3);
+      const im = trail > 0.01 && (el._im || (el._im = $(".full", el)));
+      if (im && im.naturalWidth) {
+        if (!echoes) {
+          echoes = true;
+          if (!echoOn) { echoOn = true; echo.style.visibility = "visible"; }
+          echoG.setTransform(1, 0, 0, 1, 0, 0); echoG.clearRect(0, 0, echo.width, echo.height); echoG.setTransform(echoK, 0, 0, echoK, 0, 0);
+        }
+        for (let i = ECHO.length - 1; i >= 0; i--) {
+          const uu = out3(Math.max(0, g - (i + 1) * 0.035 * (0.6 + speed * 1.6)));
+          const bz = (a0, c0, b0) => (1 - uu) ** 2 * a0 + 2 * (1 - uu) * uu * c0 + uu * uu * b0;
+          const e = echoAt(cam, yaw, pitch, bz(h.x, c.x, tx), bz(h.cy, c.y, ty), bz(h.z, c.z, tz));
+          let s0 = mix(1, fit6, uu) * mix(1, 0.12, fade), ex = e.x, ey = e.y;
+          const q = inside(e, h.w, h.h, s0);
+          if (q) { ex = q.x; ey = q.y; s0 = q.s; }
+          const w = h.w * s0 * e.k, hh = h.h * s0 * e.k;
+          echoG.globalAlpha = trail * ECHO[i];
+          echoG.drawImage(im, ex - w / 2, ey - hh / 2, w, hh);
+        }
+      }
+      // what stands on a piece of furniture goes with it until it lifts off
+      op(el, (1 - sm(0.25, 0.6, f)) * (h.on ? mix(clr[h.on] ?? 1, 1, sm(0, 0.2, g)) : 1), false);
       // its name comes up as it lifts (one after another, with the stagger), stays at a steady size while it flies, and
       // goes as the camera pushes on, where the moon's doors take the same names in the same places
       const nm = el._nm || (el._nm = $(".rm-nm", el));
       const no = g > 0 ? sm(0, 0.35, g) * (1 - sm(B.push[0] - 0.25, B.push[0] + 0.05, p)) : 0;
-      nm.style.opacity = no > 0.001 ? no.toFixed(3) : "";
-      nm.style.scale = g > 0 ? (1 / scl).toFixed(3) : "";
+      const nmo = no > 0.001 ? no.toFixed(3) : "", nms = g > 0 ? (1 / Math.max(scl, 0.05)).toFixed(3) : "";
+      if (nm._o !== nmo) { nm._o = nmo; nm.style.opacity = nmo; }
+      if (nm._s !== nms) { nm._s = nms; nm.style.scale = nms; }
       // no blur filter on the six themselves: the echoes carry the motion, and a filter on a moving picture costs a
       // repaint of the whole picture every frame
       // light blooms at its point as it arrives, and again as the circle lands
-      blooms[k].style.opacity = Math.max(bell(lin(g0 + B.fly * 0.7, g0 + B.fly * 0.7 + 0.35, p)), 0.9 * bell(lin(0, 0.75, f))).toFixed(3);
+      op(blooms[k], Math.max(bell(lin(g0 + B.fly * 0.7, g0 + B.fly * 0.7 + 0.35, p)), 0.9 * bell(lin(0, 0.75, f))));
     });
+    if (!echoes) clearEcho();
     sec.classList.toggle("lifted", p > B.lift);
 
-    night.style.opacity = (1 - (B.night ? sm(B.night[0], B.night[1], p) : f)).toFixed(3);
-    beam.style.opacity = (sm(B.rise[0] + 0.2, B.rise[1], p) * (1 - sm(0.05, 0.35, q))).toFixed(3);
+    op(night, 1 - (B.night ? sm(B.night[0], B.night[1], p) : f), false);
+    op(beam, sm(B.rise[0] + 0.2, B.rise[1], p) * (1 - sm(0.05, 0.35, q)));
     // the way past the room stays offered while the six fly and the star draws, until the ring heads out of the window
-    skip.style.opacity = (1 - sm(B.push[0], B.push[0] + 0.35, p)).toFixed(3);
-    skip.style.visibility = p > B.push[0] + 0.35 ? "hidden" : "";
+    op(skip, 1 - sm(B.push[0], B.push[0] + 0.35, p), false);
+    const sv = p > B.push[0] + 0.35 ? "hidden" : "";
+    if (skip._v !== sv) { skip._v = sv; skip.style.visibility = sv; }
     const hh = p < B.lift - 0.1 ? HINT : RISE;
     if (hero.dataset.hint !== hh) hero.dataset.hint = hh;
     if (liveEl && liveEl.textContent !== hh && p < B.land[1]) liveEl.textContent = hh;
   };
 
   /* ------------------------------------------------------------------ the scroll */
+  let ready = false, loads = [];
   const run = () => {
     if (still() || !SM.where(sec).h) {   // the section's height as the scroll keeps it, so no layout each frame
       if (spoke) { spoke = false; hero.dataset.hint = REST; SM.say(); document.body.classList.remove("in-room"); }
       inView = false; return;
     }
+    if (!ready) return;
     build();
     spoke = true;
     const t = scrollT();
     inView = t > -1 && t < SPAN + 0.2;
-    host.classList.toggle("rm-rest", !inView);
-    if (!inView) { host.style.visibility = t > SPAN ? "hidden" : ""; return; }
+    rest(!inView || lastNear <= 0);
+    if (!inView) { const hv = t > SPAN ? "hidden" : ""; if (host._v !== hv) { host._v = hv; host.style.visibility = hv; } return; }
     kick();
   };
   SM.scrub(run);
+  /* the room is built once the page has painted its first frame and the browser has a moment to spare (or after at most
+     four tenths of a second), so the first screen's own work is not held up by the room's pictures. The loading veil
+     waits for the room (SM.roomReady, magic-proto.js) as it waits for the first screen's pictures, so the room is
+     standing, pictures and all, before the page is first seen */
+  const idle = window.requestIdleCallback ? (fn) => requestIdleCallback(fn, { timeout: 400 }) : (fn) => setTimeout(fn, 200);
+  SM.roomReady = new Promise((done) => requestAnimationFrame(() => idle(() => {
+    ready = true; run();
+    const imgs = $$("img", host).filter((im) => !im.complete).map((im) => new Promise((r) => { im.addEventListener("load", r, { once: true }); im.addEventListener("error", r, { once: true }); }));
+    Promise.all([...loads, ...imgs]).then(done, done);
+  })));
   let rz = 0;
   addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (!set) return; if (built !== (SM.COLUMN.matches ? "tall" : "wide")) build(); else fit(); run(); }, 160); });
 

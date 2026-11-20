@@ -5,7 +5,6 @@
 .room-intro { position: relative; z-index: 10; height: 600svh; margin-bottom: -200svh; pointer-events: none; }
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .room-intro { margin-bottom: -100svh; } }
 .quiet .room-intro { display: none; }
-@media (prefers-reduced-motion: reduce) { .room-intro { display: none !important; } }
 /* the moon's board no longer opens with its own title, and the phone's separate spell stage is not needed */
 .has-study .hero.rising .prelude { display: none; }
 .has-study:not(.quiet) .cast-ph { display: none !important; }
@@ -16,40 +15,41 @@
 /* the view: a fixed-size box scaled to the screen; its perspective is the camera's lens */
 .rm-view { position: absolute; left: 50%; top: 50%; perspective-origin: 50% 50%; }
 /* the world sits at the middle of the view; every piece in it is placed by a 3D transform from that point */
-.rm-world { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; --room: 1; }
+.rm-world { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
 .rm-world > * { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
-.rm-leaf { opacity: var(--room); }
 .rm-pl svg { display: block; }
 /* the walls, floor and ceiling stay solid black while the room dims, and only their engraved lines fade, so nothing
-   behind them shows through; the planes themselves go only as the eye reaches the back wall */
-.rm-pl { opacity: var(--near, 1); }
-/* the lines dim under a shade of the plane's own tone (room-proto.js), or, on the back wall, which is lines alone, by
-   fading; either way only a layer's opacity changes, so the drawing is never repainted while the room dims */
-.rm-pl.rm-lines { opacity: calc(var(--near, 1) * var(--dim, 1)); }
-.rm-shade { position: absolute; inset: 0; opacity: calc(1 - var(--dim, 1)); pointer-events: none; will-change: opacity; }
+   behind them shows through; the planes themselves go only as the eye reaches the back wall. The lines dim under a
+   shade of the plane's own tone, or, on the back wall, which is lines alone, by fading; either way only a layer's
+   opacity changes, so the drawing is never repainted while the room dims (room-proto.js writes each opacity on its
+   own element, so nothing else in the room is restyled) */
+.rm-shade { position: absolute; inset: 0; opacity: 0; pointer-events: none; will-change: opacity; }
 
 /* standing pictures turn about their own foot to face the camera */
 .rm-it { transform-origin: 50% 100%; }
 .rm-it .pic, .rm-it > img { display: block; width: 100%; height: auto; }
-.rm-six { transform-origin: 50% 50%; pointer-events: auto; cursor: pointer; will-change: transform, opacity; }
+.rm-six { transform-origin: 50% 50%; pointer-events: auto; cursor: pointer; will-change: transform; }
 .room-intro.lifted .rm-six { pointer-events: none; }
 
 /* the night beyond the window, far behind the back wall */
-/* the far sky is laid out at its canvas's own size and scaled up five times, so the browser keeps one small texture
-   for it rather than painting an 8000px plane every frame */
-.rm-sky { width: 1600px; height: 1000px; transform: translate3d(-800px, -500px, -3400px) scale(5); }
-.rm-sky canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+/* the far sky's canvas has one pixel for each of its cells (1600 by 1000, room-proto.js) and is stretched by CSS to the
+   plane's full size, five times over and unsmoothed, so its cells stay square and hard-edged while the browser keeps
+   only the small canvas, never a layer the plane's size */
+.rm-sky { width: 8000px; height: 5000px; transform: translate3d(-800px, -500px, -3400px); }
+.rm-sky canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 
 /* the circle: a square plane; its rings are drawn smooth on the canvas (only its runes are small bitmaps), with a soft moonlit halo behind them and a
    bloom of light at each point that flares as a thing arrives there and again as the circle lands */
-/* the echoes trail each of the six as it flies (room-proto.js); the moon's light lies on the floor as the moon rises */
-.rm-ghost { transform-origin: 50% 50%; opacity: 0; pointer-events: none; will-change: transform, opacity; }
-.rm-ghost img { display: block; width: 100%; height: auto; }
+/* the moon's light lies on the floor as the moon rises */
 .rm-beam { opacity: 0; pointer-events: none; }
 .rm-beam svg { display: block; }
 .rm-circle { transform-origin: 50% 50%; opacity: 0; will-change: transform, opacity; }
 .rm-circle > * { position: absolute; }
 .rm-circle canvas { inset: 0; width: 100%; height: 100%; }
+/* the circle's softened copy, for its motion blur (room-proto.js), over the sharp drawing and shown only as it flies */
+.rm-soft { opacity: 0; visibility: hidden; }
+/* the echoes that trail the six as they fly: one flat canvas over the room, drawn only while they fly (room-proto.js) */
+.rm-echo { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; visibility: hidden; }
 .rm-halo { inset: 8%; border-radius: 50%; opacity: 0; background: radial-gradient(closest-side, rgb(185 162 255 / 0) 62%, rgb(185 162 255 / 0.22) 80%, rgb(185 162 255 / 0) 100%); }
 .rm-bloom { border-radius: 50%; opacity: 0; background: radial-gradient(closest-side, rgb(255 241 201 / 0.85), rgb(185 162 255 / 0.32) 45%, rgb(185 162 255 / 0) 100%); }
 
@@ -59,8 +59,20 @@
 .rm-flash { background: radial-gradient(ellipse 55% 60% at 50% 45%, rgb(255 241 201 / 0.7), rgb(185 162 255 / 0.35) 40%, rgb(185 162 255 / 0) 75%); }
 
 /* what Lana does, low in front of the room, with the scroll cue under it (the moon's stop owns the name) */
-.rm-words { position: absolute; left: 0; right: 0; display: grid; justify-items: center; padding: 0 4%; text-align: center; will-change: transform, opacity; }
+.rm-words { position: absolute; left: 0; right: 0; display: grid; justify-items: center; padding: 0 4%; text-align: center; }
 .rm-role { margin: 0; font-family: "Redaction", Georgia, serif; font-style: italic; line-height: 1.3; color: var(--mark); text-shadow: 0 0 10px #000, 0 0 4px #000; }
+/* the role sleeps in the coarse 1-bit cut and wakes letter by letter into the smooth italic as the scroll carries the
+   light along it (room-proto.js). Each letter keeps the italic's own width from the first paint, and its sleeping glyph
+   is drawn over that place, so waking changes only what is painted and never moves a word. A letter is either asleep
+   (lilac, coarse), loose (it has caught the light, still coarse) or awake (the smooth italic): a hard front, no fade */
+.rm-l { display: block; }
+.rm-w { white-space: nowrap; }
+.rm-c { position: relative; visibility: hidden; }
+.rm-c::before { content: attr(data-c); position: absolute; left: 50%; top: 0; translate: -50% 0; visibility: visible;
+  font-family: "Redaction 70", "Redaction 35", Georgia, serif; font-style: normal; color: var(--ink); }
+.rm-c.f::before { color: var(--mark); }
+.rm-c.w { visibility: visible; }
+.rm-c.w::before { visibility: hidden; }
 
 .rm-cue { margin-top: 18px; }
 
@@ -118,7 +130,7 @@
   animation: rm-breathe 8s ease-in-out infinite alternate; }
 @keyframes rm-breathe { from { opacity: 0.55; } to { opacity: 1; } }
 
-.rm-dust { pointer-events: none; opacity: var(--room); }
+.rm-dust { pointer-events: none; }
 .rm-dust i { position: absolute; width: var(--d); height: var(--d); border-radius: 50%; opacity: 0;
   background: radial-gradient(closest-side, rgb(244 239 255 / 0.9), rgb(185 162 255 / 0));
   animation: rm-mote var(--t) linear var(--w) infinite; }
@@ -127,4 +139,6 @@
   20%, 70% { opacity: 0.75; }
   100% { opacity: 0; transform: translate3d(var(--x), -180px, 0); }
 }
-.rm-rest .rm-drape, .rm-rest .rm-glass > *, .rm-rest .rm-dust i { animation-play-state: paused; }
+/* they rest while the room is off screen or the camera has gone through the window (.rm-rest), and the window's night
+   rests once the moon has risen in its place (.rm-off) */
+.rm-rest .rm-drape, .rm-rest .rm-glass > *, .rm-rest .rm-dust i, .rm-glass.rm-off > * { animation-play-state: paused; }

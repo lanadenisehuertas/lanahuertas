@@ -65,7 +65,7 @@ main > .stop.about { display: block; padding: 0 0 32svh; }
 .idx-text p { break-inside: avoid; margin-bottom: calc(1.4 * var(--u)); font-size: 17px; line-height: 1.55; color: var(--text); }
 .idx-text i { font: italic 400 1.15em/1 "Redaction", Georgia, serif; color: var(--mark); margin-right: 4px; }
 
-/* ---------- VI Contact: the envelope at dawn. The letter rises out of it once; the ground fades in under it ---------- */
+/* ---------- VI Contact: first light. The scene's places are set in dawn-proto.css; these are its parts ---------- */
 main > .stop.talk { display: block; padding: 0; overflow: hidden; }
 .dawnboard { position: relative; width: calc(100 * var(--u)); height: max(100svh, calc(62.5 * var(--u))); margin: 0 auto; }
 /* the envelope: back, letter, front pocket. Everything inside is measured in the envelope's own width (cqi) */
@@ -77,25 +77,12 @@ main > .stop.talk { display: block; padding: 0; overflow: hidden; }
 .letter { position: absolute; z-index: 1; left: 9cqi; top: 46cqi; width: 82cqi; height: 104cqi; padding: 7cqi 7cqi 0; display: grid; align-content: start; justify-items: start; gap: 3.2cqi;
   background: linear-gradient(#fffaf1, #fbefdf); color: #2b1470; box-shadow: 0 2cqi 6cqi rgb(80 40 90 / 0.22); rotate: calc(-1.2deg * var(--up));
   transform: translate3d(0, calc(var(--up) * -70cqi), 0); }
-.t-big { font: 400 clamp(40px, 14cqi, 76px) / 0.9 var(--display-awake); letter-spacing: -0.015em; color: #2b1470; }
-.t-line { font-size: clamp(16px, 3.8cqi, 18px); line-height: 1.5; color: #2b1470; }
-.t-addr { font: italic 400 clamp(16px, 4.8cqi, 30px) / 1.1 "Redaction", Georgia, serif; color: #2b1470; white-space: nowrap;
+.t-big { font: 400 clamp(56px, calc(8.2 * var(--u)), 144px) / 0.86 var(--display-awake); letter-spacing: -0.02em; color: #2b1470; }
+.t-addr { font: italic 400 clamp(20px, calc(1.8 * var(--u)), 28px) / 1.1 "Redaction", Georgia, serif; color: #2b1470; white-space: nowrap;
   text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 .t-addr:hover { color: #5b3fc4; }
-.letter .go { margin-top: -1cqi; }
-/* the ground: a soft band of dawn colour that fades up into the sky, with the links on it */
-.t-ground { position: absolute; z-index: 3; top: calc(49 * var(--u)); bottom: 0; left: calc(50% - 50vw); width: 100vw;
-  background: linear-gradient(transparent, #f2d2d2 calc(3 * var(--u))); display: grid; justify-items: center; align-content: start; gap: calc(0.4 * var(--u)); padding-top: calc(3.2 * var(--u)); }
-.t-lily { position: absolute; bottom: calc(100% - 4.4 * var(--u)); width: calc(4.6 * var(--u)); }
-.t-lily.l { left: calc(50% - 34 * var(--u)); transform: scaleX(-1); }
-.t-lily.r { left: calc(50% + 29.4 * var(--u)); }
-.t-moth { position: absolute; top: calc(12 * var(--u)); width: calc(7 * var(--u)); opacity: 0.85; }
-.t-moth.l { left: calc(8 * var(--u)); }
-.t-moth.r { right: calc(8 * var(--u)); transform: scaleX(-1); }
-.t-links { display: flex; justify-content: space-between; width: calc(56 * var(--u)); }
 .t-links svg path { fill: none; stroke: currentColor; stroke-width: 1.4; }
 .t-links svg { width: 14px; height: 14px; }
-.t-made { font-size: 16px; color: #4a2f86; }
 .quiet .mo { transition: none; }
 /* the statement and the index come up as the scroll brings them into the window (stops.js) */
 .me-say > p, .idx-h, .idx-text p { --in: 1; opacity: var(--in); transform: translate3d(0, calc((1 - var(--in)) * 2.4 * var(--u)), 0); }
@@ -126,11 +113,5 @@ main > .stop.talk { display: block; padding: 0; overflow: hidden; }
   main > .stop.about { padding-bottom: 30svh; }
 
   .dawnboard { width: 100%; height: auto; display: flex; flex-direction: column; align-items: center; text-align: center; padding: calc(var(--band) + 24px) 16px 0; }
-  .dawnboard > * { position: relative !important; }
-  .t-moth { display: none; }
-  .env { left: auto; top: auto; translate: none; width: min(84vw, 420px); margin-top: 62cqi; }
-  .env { margin-top: min(60vw, 300px); }
-  .t-ground { top: auto; left: auto; align-self: stretch; width: auto; margin: -10px -16px 0; padding: 40px 16px 48px; }
-  .t-lily { display: none; }
-  .t-links { width: auto; flex-wrap: wrap; justify-content: center; gap: 8px 28px; }
+  .env { position: relative; left: auto; top: auto; translate: none; width: min(84vw, 420px); }
 }

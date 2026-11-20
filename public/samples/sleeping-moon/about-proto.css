@@ -8,6 +8,63 @@
 /* the statement's key words are already awake and gold */
 .me-say .display .em .ch { color: var(--mark); font-family: var(--display-awake); }
 
+/* About's words, written by the scroll (about-proto.js). Each letter carries --f, 0 before the scroll reaches it and 1
+   once written; each kind of line turns it into its own look. Only transforms, opacity, the letter's fill and its
+   overlays change, so the words never move the page. A letter whole (--f: 1) looks exactly as it did before. */
+.fx { position: relative; }
+.fx .ch { --f: 1; }
+.fx .ch::before, .fx .ch::after { position: absolute; left: 0; top: 0; pointer-events: none; -webkit-text-fill-color: currentColor; }
+/* the line's own text stands in for a letter that is still a rune or a pixel: its fill fades in last */
+.fx-runes .ch, .fx-pixel .ch { -webkit-text-fill-color: color-mix(in srgb, currentColor calc(clamp(0, (var(--f) - 0.62) * 3, 1) * 100%), transparent); }
+/* runes, then the pixel cut, then the smooth face: a rune flickers up in gold (about-proto.js turns it over with the
+   scroll), the letter sets in the coarse 70 cut and then the 35, and resolves; it rises a little as it comes */
+.fx-runes .ch { transform: translate3d(0, calc((1 - var(--f)) * (1 - var(--f)) * 0.32em), 0); }
+.fx-runes .ch:not(.rn)::after { content: attr(data-g); left: 50%; translate: -50% 0; font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "Apple Symbols", var(--body);
+  font-style: normal; color: var(--wg); text-shadow: 0 0 0.3em rgb(255 241 201 / 0.7); opacity: clamp(0, min(var(--f) * 9, (0.44 - var(--f)) * 6), 1); }
+.fx-runes .ch::before, .fx-pixel .ch::before { content: attr(data-c); font-family: "Redaction 70", "Redaction", Georgia, serif; font-style: normal;
+  color: color-mix(in srgb, var(--wg) 70%, currentColor); opacity: clamp(0, min((var(--f) - 0.2) * 6, (0.9 - var(--f)) * 4.5), 1); }
+.fx-runes .ch[data-s="35"]::before, .fx-pixel .ch[data-s="35"]::before { font-family: "Redaction 35", "Redaction", Georgia, serif; color: color-mix(in srgb, var(--wg) 35%, currentColor); }
+/* a word's hover decode (words-proto.js) still works on a written title */
+.fx .ch.rn { -webkit-text-fill-color: transparent; }
+/* the pixel cut, condensing: the letters start spread wide and a size up, in the coarse cut */
+.fx-pixel .ch { transform: translate3d(calc(var(--i) * (1 - var(--f)) * (1 - var(--f)) * 0.4em), 0, 0) scale(calc(1 + (1 - var(--f)) * 0.3)); }
+.fx-pixel .ch::before { opacity: clamp(0, min(var(--f) * 5, (0.92 - var(--f)) * 4), 1); }
+/* a breath drawn in: each word comes in with its letters set wide apart, warm, and its spacing closes up */
+.fx-breathe .ch { opacity: clamp(0, var(--f) * 1.8, 1); transform: translate3d(calc(var(--i) * (1 - var(--f)) * (1 - var(--f)) * 0.45em), 0, 0);
+  -webkit-text-fill-color: color-mix(in srgb, var(--wg) calc(clamp(0, 1 - var(--f), 1) * 90%), currentColor); }
+/* words rising one by one */
+.fx-rise .ch { opacity: clamp(0, var(--f) * 2, 1); transform: translate3d(0, calc((1 - var(--f)) * (1 - var(--f)) * 0.7em), 0); }
+/* the quill: each letter is inked from its left edge as the nib crosses it; the ink is wet and bright behind the nib
+   and dries to the line's gold */
+.fx-ink .ch { --w: clamp(0, var(--f) / 0.35, 1); --wet: clamp(0, (1 - var(--f)) / 0.65, 1);
+  clip-path: inset(-0.4em calc((1 - var(--w)) * (100% + 0.5em) - 0.25em) -0.4em -0.25em);
+  -webkit-text-fill-color: color-mix(in srgb, #fff calc(var(--wet) * 75%), currentColor); text-shadow: 0 0 calc(var(--wet) * 0.4em) rgb(255 241 201 / calc(var(--wet) * 0.9)); }
+/* typed: a letter appears at once, gold while fresh, cooling to the line's colour behind the caret */
+.fx-type .ch { opacity: clamp(0, var(--f) * 50, 1); -webkit-text-fill-color: color-mix(in srgb, var(--wg) calc(clamp(0, 1 - var(--f), 1) * 100%), currentColor); }
+/* Peanut's line: each letter drops in from above, turning, as if batted into place */
+.fx-tumble .ch { opacity: clamp(0, var(--f) * 2.5, 1); transform-origin: 50% 90%;
+  transform: translate3d(0, calc((1 - var(--f)) * (1 - var(--f)) * -1em), 0) rotate(calc((1 - var(--f)) * var(--s) * 50deg)); }
+/* the odometer: the digit in the line keeps its place and the strip of digits over it rolls up to it */
+.fx-odo .ch { -webkit-text-fill-color: transparent; clip-path: inset(0 -0.3em); opacity: clamp(0, var(--f) * 5, 1); }
+.fx-odo .od-s { position: absolute; left: 0; top: 0; display: grid; transform: translate3d(0, calc(var(--f) * var(--k) * -1lh), 0); -webkit-text-fill-color: currentColor; }
+.fx-odo .od-s b { font-weight: inherit; }
+/* key words (and the strong lines) ignite as they land: a flare of pale gold that settles to a soft glow */
+.fx .em .ch, .fx .ach .ch { --gl: calc(clamp(0, var(--f) * 2 - 1, 1) * max(0.3, 1 - (var(--f) - 0.88) * (var(--f) - 0.88) * 45));
+  color: var(--mark); text-shadow: 0 0 calc(var(--gl) * 0.45em) rgb(255 241 201 / calc(var(--gl) * 0.8)); }
+.fx-runes .em .ch { transform: translate3d(0, calc((1 - var(--f)) * (1 - var(--f)) * 0.32em), 0) scale(calc(1 + clamp(0, 1 - (var(--f) - 0.86) * (var(--f) - 0.86) * 60, 1) * 0.12)); }
+/* the pens: a caret for typing, a little pixel quill for the ink, moved by the scroll (about-proto.js) */
+.fx-pen { position: absolute; left: 0; top: 0; pointer-events: none; opacity: 0; will-change: transform, opacity; }
+.fx-caret { width: 0.5em; height: 1.2em; margin-top: -0.6em; background: var(--wg); }
+.fx-quill { width: 30px; height: 30px; margin: -30px 0 0 -1px; image-rendering: pixelated;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15 15' shape-rendering='crispEdges'%3E%3Cpath fill='%23fff1c9' d='M13 0h2v1H13zM11 1h2v1H11zM14 1h1v1H14zM10 2h2v1H10zM13 2h2v1H13zM9 3h2v1H9zM12 3h2v1H12zM8 4h2v1H8zM11 4h3v1H11zM7 5h2v1H7zM10 5h3v1H10zM6 6h2v1H6zM9 6h3v1H9zM5 7h2v1H5zM8 7h3v1H8zM5 8h1v1H5zM7 8h3v1H7zM4 9h5v1H4zM4 10h4v1H4zM3 11h3v1H3zM2 12h3v1H2zM1 13h2v1H1zM0 14h2v1H0z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
+/* moonlight at the nib */
+.fx-quill::after { content: ""; position: absolute; left: -3px; bottom: -3px; width: 6px; height: 6px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px 4px rgb(255 241 201 / 0.7); }
+/* the statement's lines and the years come in by their letters alone, so the whole-line rise (stops.js) is set aside */
+.me-say > p.fx, .tb .idx-h.fx, .idx-h.fx { opacity: 1; transform: none; }
+.cal .yr { opacity: 1; transform: none; }
+.quiet .fx .ch { --f: 1 !important; }
+.quiet .fx-pen { display: none; }
+
 /* prizes and honours: gold, in the smooth cut, with a pixel star before them */
 .yr-list li.prize .e-t { color: var(--mark); font-family: var(--display-awake); }
 .yr-list li.prize .e-t::before { content: ""; display: inline-block; width: 0.6em; height: 0.6em; margin-right: 0.32em; vertical-align: 0.04em; image-rendering: pixelated;
@@ -32,7 +89,9 @@ main > .stop.about:has(.idx.hold) { padding-bottom: 8svh; }
 .idx.hold .idx-text p i { transition: color 600ms linear, text-shadow 600ms linear; }
 .idx.hold .idx-text p.now i { color: #fffaf0; text-shadow: 0 0 14px rgb(255 241 201 / 0.55); transition-duration: 120ms; }
 .quiet .idx.hold .idx-text p { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { .idx.hold .idx-text p { opacity: 1; transform: none; } .yr-list li.prize.seen .e-t::before { animation: none; } }
+/* under the system's reduced-motion setting only the prize star's own little spin is stilled; the lines still come in
+   with the scroll, which the visitor drives */
+@media (prefers-reduced-motion: reduce) { .yr-list li.prize.seen .e-t::before { animation: none; } }
 
 /* "What I work with": the constellation board (about-proto.js), then the list under it */
 .tb { position: relative; width: calc(100 * var(--u)); height: calc(62.5 * var(--u)); margin: calc(9 * var(--u)) auto 0; }
@@ -82,13 +141,46 @@ main > .stop.about:has(.idx.hold) { padding-bottom: 8svh; }
   .tool { width: calc(var(--ps) * var(--u)); }
 }
 @media (prefers-reduced-motion: reduce) { .tool .pic, .tool .glow, .tool .tw { transition: none; } }
+.tool:focus-visible { outline: 2px solid var(--mark); outline-offset: 6px; border-radius: 4px; }
+
+/* the woken tool's skills, on a small label hanging from it by a dotted thread (about-proto.js places it and fades it
+   with the scroll). The label is a patch of the room's own ground, whose edge melts into the night with a faint
+   lilac glow, so it needs no border and --text on it keeps its contrast whatever drifts behind it: the group's name in
+   the italic of the display face, then its skills in the body face. The label and its thread are one layer whose
+   opacity alone changes. */
+.tb-tag { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; visibility: hidden; will-change: opacity; }
+.tb-tie { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.tb-tie line { stroke: rgb(185 162 255 / 0.75); stroke-width: 2; stroke-dasharray: 2 6; stroke-linecap: round; }
+.tb-say { position: absolute; left: 0; top: 0; width: min(calc(21 * var(--u)), 400px); display: grid; gap: 12px; padding: 12px 16px 14px; border-radius: 12px;
+  background: var(--ground); box-shadow: 0 0 10px 6px var(--ground), 0 0 30px 12px rgb(185 162 255 / 0.12); text-align: left; }
+/* a label made wider than usual to find room (about-proto.js) sets the code group's two lines side by side */
+.tb-say { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); column-gap: 20px; align-items: start; }
+.tb-say p { display: grid; gap: 4px; margin: 0; }
+.tb-say i { font: italic 400 20px / 1.15 "Redaction", Georgia, serif; color: var(--mark); }
+.tb-say span { font: 400 16px / 1.45 var(--body); color: var(--text); text-wrap: pretty; }
+/* a constellation answers the pointer as a whole too: its name, a band along its lines and (for the design group) the
+   figure its lines draw all hang its label (about-proto.js), and while the pointer is on it its lines brighten to gold
+   and its stars catch a little of their own light */
+.tb .cn { pointer-events: auto; cursor: default; transition: text-shadow 200ms linear; }
+.tb-hits { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.tb-hits line { stroke: transparent; stroke-width: 36px; vector-effect: non-scaling-stroke; pointer-events: stroke; }
+.tb-hits polygon { fill: transparent; pointer-events: fill; }
+.tb-lines line { transition: stroke 200ms linear; }
+.tb-lines line.hot { stroke: var(--mark); }
+.tb .grp.hot .cn { text-shadow: 0 0 12px rgb(255 241 201 / 0.6); }
+.tb .grp.hot .tool .glow { opacity: 0.55; transition-duration: 200ms; }
+/* the hint under the board's heading, so the labels are found */
+.tb-hint { position: absolute; z-index: 2; left: calc(11 * var(--u)); top: calc(8.4 * var(--u) + clamp(30px, calc(3.4 * var(--u)), 52px) + 14px); margin: 0;
+  max-width: calc(30 * var(--u)); font: 400 16px/1.4 var(--body); color: var(--text); }
+@media (prefers-reduced-motion: reduce) { .tb .cn, .tb-lines line { transition: none; } }
+/* phones keep the full skills list on show, and the tools sit in one column, so they need no label */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .tb-tag, .tb-hits, .tb-hint { display: none; } }
 
 /* films: a short silent loop plays on the monitor while its film is under the playhead */
 .fr-frame { position: relative; }
 .fr-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 400ms linear; pointer-events: none; }
 .fr-vid.on { opacity: 1; }
 .quiet .fr-vid { display: none; }
-@media (prefers-reduced-motion: reduce) { .fr-vid { display: none; } }
 .yr-list .e-t { text-wrap: balance; }
 /* Peanut by the mirror (about-proto.js): small, sat at its foot on the right, a little in front of the frame and inside
    the mirror's own column, so she never covers the words beside it */

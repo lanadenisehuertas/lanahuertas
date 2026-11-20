@@ -1,22 +1,21 @@
 /* Prototype: words that answer the pointer (see words-proto.css).
    Headings and work titles are split into letters. Near the pointer the letters lift, catch the light and wake into
    the smooth cut, then settle back on a spring. A work's title spells itself out of runes when the pointer arrives
-   (or a finger taps it, or focus reaches its plate). Body lines light the word under the pointer. A few section
-   headings are written letter by letter by the scroll. Links and buttons belong to magic-proto.js. */
+   (or a finger taps it, or focus reaches its plate). Body lines light the word under the pointer. About's lines are
+   written in by the scroll in about-proto.js, which splits them into letters the same way, so they lift here too.
+   Links and buttons belong to magic-proto.js. */
 (() => {
   const { $$ } = SM;
   /* the About statement, in the almanac's voice (Lana chose it 2026-11-17); set before the letters are split */
   const meSay = document.querySelector(".me-say .display:not(.kick)"), meKick = document.querySelector(".me-say .display.kick");
   if (meSay) meSay.textContent = "I make the pictures people remember a brand by: posters, packets, films and apps.";
   if (meKick) meKick.textContent = "Tell me what yours should wake up as.";
-  const still = () => SM.quiet() || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
   const LIFT = ".pk-name, .yr-n, .cal-h, .idx-h, #about .display, .e-t, #talk h2, #talk h3, .al-q";
   const TITLE = ".pk-name, .e-t";
   const BODY = ".say, .pk-tag, .pk-meta, .a-role, .t-read, .cal-key, .me-roles, .e-w, .t-line, .t-made, .end-line, .dl-keep, #about li, #about p:not(.display):not(.label)";
-  const WRITE = ".cal-h, .idx-h, #about .display";
-  const WRITEW = ".me-roles, .cal-key";
   const skip = (el) => el.closest("a, button, form, label, .route, dialog, .vh, .veil");
 
   /* split into letters, keeping whole words for screen readers (a hidden copy) and on one line each */
@@ -151,72 +150,10 @@
   });
   document.addEventListener("focusout", () => $$(".wl.focus-lit").forEach((x) => x.classList.remove("focus-lit")));
 
-  /* ---------------------------------------------------------------- headings written by the scroll */
-  const written = [];
-  const prepWrite = () => {
-    $$(WRITE).forEach((h) => { if (!h._wr && split(h)) { h._wr = true; h.classList.add("wscr"); written.push(h); } });
-    // short lines go word by word; the words stay real text for screen readers
-    $$(WRITEW).forEach((h) => {
-      if (h._wr || h.children.length || skip(h)) return;
-      h.innerHTML = h.textContent.trim().split(/\s+/).map((w) => `<span class="wv">${w.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</span>`).join(" ");
-      h._ch = $$(".wv", h); h._wr = true; h.classList.add("wscw"); written.push(h);
-    });
-  };
-  prepWrite();
-  /* progress for a line inside a hold: the hold's travel from its top at 30% down the window to the end of its pinned stretch,
-     shared out between its lines by length, ending a little early so the finished words rest on screen */
-  const held = (h, H) => {
-    const hold = h.closest(".me-hold");
-    if (!hold) return null;
-    const hr = hold.getBoundingClientRect(), q = clamp((H * 0.3 - hr.top) / (H * 0.3 + (hr.height - H) * 0.82), 0, 1);
-    const lines = written.filter((x) => hold.contains(x)), len = lines.map((x) => x.textContent.length), all = len.reduce((a, b) => a + b, 0);
-    let a = 0;
-    for (let i = 0; i < lines.length; i++) {
-      const b = a + len[i] / all;
-      if (lines[i] === h) return clamp((q - a) / (b - a), 0, 1);
-      a = b;
-    }
-    return null;
-  };
-  /** where each heading is, and where the pen is in those that move on: only reads the page */
-  const penAt = () => {
-    const H = SM.vh, calm = still(), todo = [];
-    for (const h of written) {
-      const r = h.getBoundingClientRect();
-      if (r.bottom < -H || r.top > H * 2) continue;
-      // written from when its top enters the lower edge to when it reaches the middle of the screen; inside a hold
-      // (the About statement) the lines are written one after another while the hold keeps them on screen
-      const p = calm ? 1 : held(h, H) ?? clamp((H * 0.96 - r.top) / (H * 0.3), 0, 1), n = h._ch.length, k = Math.round(p * n);
-      if (h._k === k) continue;
-      const grew = k > (h._k || 0), pen = grew && k > 0 && k < n + 1 && !calm ? h._ch[k - 1] : null;
-      todo.push([h, k, n, pen, pen && pen.getBoundingClientRect()]);
-    }
-    return todo;
-  };
-  /** ink the letters penAt found: only changes the page */
-  const ink = (todo) => {
-    for (const [h, k, n, pen, cr] of todo) {
-      h._k = k;
-      h._ch.forEach((c, i) => { c.classList.toggle("w", i < k); c.classList.toggle("wn", i < k && i >= k - 3 && k < n); });
-      // the pen throws a little stardust as it writes forward, more on the words that matter
-      if (pen) SM.sparkle?.(cr.right, cr.top + cr.height * 0.6, pen.closest(".em") ? 5 : 2);
-    }
-  };
-  const write = () => ink(penAt());
-  write();
-  // while the page moves, the reading happens in the page's own read pass (before any scrub writes), so it costs no
-  // layout of its own
-  let penRead = null;
-  SM.measure(() => { penRead = penAt(); });
-  SM.scrub(() => { if (penRead) { ink(penRead); penRead = null; } else write(); });
-
   /* the first words spell themselves out of runes once the veil lifts */
   const intro = document.querySelector(".pl-title");
   if (intro) {
     const go = () => { if (document.documentElement.classList.contains("loading")) return false; setTimeout(() => decode(intro, 1100), 260); return true; };
     if (!go()) { const w = new MutationObserver(() => { if (go()) w.disconnect(); }); w.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] }); }
   }
-  // rooms build their text as you reach them
-  let mo = 0;
-  new MutationObserver(() => { clearTimeout(mo); mo = setTimeout(() => { prepWrite(); write(); }, 150); }).observe(document.querySelector("main"), { childList: true, subtree: true });
 })();

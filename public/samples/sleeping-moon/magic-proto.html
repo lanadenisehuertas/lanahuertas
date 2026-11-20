@@ -57,7 +57,7 @@
   }, true);
 })();
 </script>
-<script>document.documentElement.classList.add("js", "loading", "has-study"); try { if (localStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
+<script>document.documentElement.classList.add("js", "loading", "has-study"); try { localStorage.removeItem("quiet"); if (sessionStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
 </head>
 <body data-route="room">
 <div class="veil" id="veil" role="status" aria-label="Loading"><div class="veil-moon" aria-hidden="true"></div><p class="veil-word display" aria-hidden="true">Waking the night</p></div>
@@ -68,7 +68,7 @@
   <header class="mast">
     <p class="issue">The night almanac <span id="issue-stop"></span></p>
     <div class="centre">
-      <p class="sub" id="sub" aria-live="polite">UI/UX and graphic designer in Manila</p>
+      <p class="sub" id="sub" aria-live="polite">UI/UX, graphics, film and code, made in Manila</p>
       <nav class="route" id="route" aria-label="Stops">
         <a class="home" href="#moon" data-stop="moon" aria-label="Back to the moon"></a>
         <a href="#brands" data-stop="brands"><i aria-hidden="true">I</i>Brands</a>
@@ -119,7 +119,7 @@
           <span class="pic" data-enter="manual"><img class="full" src="art/c_brands.webp" width="520" height="336" alt=""></span>
           <span class="label"><i aria-hidden="true">I</i>Brands</span>
         </a>
-        <a class="door" href="#posters" data-stop="posters" data-door="Posters" data-line="Twelve one-off posters." style="--dx: -34.8; --cy: 25.4">
+        <a class="door" href="#posters" data-stop="posters" data-door="Posters" data-line="Eight one-off posters." style="--dx: -34.8; --cy: 25.4">
           <span class="pic" data-enter="manual"><img class="full" src="art/c_posters.webp" width="267" height="520" alt=""></span>
           <span class="label"><i aria-hidden="true">II</i>Posters</span>
         </a>

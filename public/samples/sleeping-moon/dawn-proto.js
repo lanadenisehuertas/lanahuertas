@@ -1,31 +1,24 @@
 /* The dawn ending (see dawn-proto.css). The letter is sent through formsubmit.co, as on the live site; the stars are
-   the site's guestbook (/api/garden), drawn as stars and moons. */
+   the site's guestbook (/api/garden), drawn as stars and moons. The sun that comes up behind the envelope and the
+   hills the six stand on are drawn here too, in square cells, and both follow the scroll. */
 (() => {
   const { $, $$ } = SM, end = $("#talk"), board = $("#talk .dawnboard"), letter = $("#talk .letter");
   if (!board || !letter) return;
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const arrow = `<svg viewBox="0 0 26 14" aria-hidden="true"><path d="M1 7h23M18.5 1.5L24 7l-5.5 5.5"/></svg>`;
-  const ext = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3L3 13"/></svg>`;
   const KINDS = { star: "A star", crescent: "A crescent moon", half: "A half moon", full: "A full moon" };
   // each colour a visitor picks, as it shows in the morning sky: deep enough to read on the dawn (3:1 and up), never red
   const COLS = { lilac: "#5b3fc4", gold: "#8a5d00", pink: "#a3367f", sky: "#1f5c9e", peach: "#96541a", mint: "#1d7651" };
   const NAMES = { lilac: "Lilac", gold: "Gold", pink: "Pink", sky: "Sky blue", peach: "Peach", mint: "Mint" };
 
-  end.dataset.hint = "First light. Open for UI/UX, brand and motion work.";
+  // the ending says nothing in the foot: the scene speaks for itself, and the foot line stays empty
+  end.dataset.hint = "";
 
-  /* The address and its copy button leave the letter for the ground, where they share one line: the address first and
-     the button right beside it, since the button only makes sense next to what it copies. Under that line the two
-     profiles pair up on the left and the way back to the moon stands alone on the right. The sign-off leaves the ground
-     altogether and goes to the very foot of the board, where it reads as a quiet colophon. The letter becomes the form. */
-  const addr = $(".t-addr", letter), copy = $("#t-copy", letter), links = $(".t-links", board), top = $("#t-top", board), made = $(".t-made", board);
-  const mail = Object.assign(document.createElement("p"), { className: "t-mail" });
-  mail.append(addr, copy); links.before(mail);
-  const pair = Object.assign(document.createElement("span"), { className: "t-pair" });
-  pair.append(...$$("a:not(#t-top)", links));
-  links.prepend(pair); links.append(top);
+  /* The letter is the form. It opens the way a letter does, to the one it is written to, and its fields are the
+     letter's lines. */
   letter.innerHTML = `
-    <form class="write" novalidate aria-labelledby="w-h">
-      <h2 class="t-big" id="w-h">Let's talk</h2>
+    <form class="write" novalidate aria-label="A letter to Lana">
+      <p class="t-dear">Dear Lana,</p>
       <div class="two"><label class="fld"><span class="lr"><span class="l">Name</span><span class="err" id="w-err-name"></span></span><input name="name" autocomplete="name" maxlength="80" required aria-describedby="w-err-name"></label>
       <label class="fld"><span class="lr"><span class="l">Email</span><span class="err" id="w-err-email"></span></span><input name="email" type="email" autocomplete="email" maxlength="120" required aria-describedby="w-err-email"></label></div>
       <label class="fld"><span class="lr"><span class="l">Message</span><span class="err" id="w-err-message"></span></span><textarea name="message" rows="2" maxlength="2000" required aria-describedby="w-err-message"></textarea></label>
@@ -40,9 +33,10 @@
       <label class="fld"><span class="lr"><span class="l">Note (optional)</span><span class="more" id="s-more">90 left</span></span><input name="note" maxlength="90" aria-describedby="s-more"></label>
       <div class="row"><button class="btn" type="submit">Leave it</button><button class="btn quiet vs-cancel" type="button">Not now</button></div>
     </form>`;
-  /* The stars come after the ground in the reading order (and in the phone's single column): first the letter, then the
-     other ways to reach me, then the sky the visitors left. The sign-off closes the board after all of them. */
-  $(".t-ground", board).insertAdjacentHTML("afterend", `
+  /* The stars come after the letter in the reading order: first the words and the address, then the letter, then the
+     sky the visitors left, then the horizon with the six and the way back. On wide screens the sky is the upper right
+     of the scene with its words under it; in the phone's single column the words come first and the sky under them. */
+  $(".env", board).insertAdjacentHTML("afterend", `
     <div class="ls">
       <h2 class="end-h" id="vs-h">The last stars</h2>
       <p class="end-line vs-line" aria-live="polite"><span class="vs-count">0</span> left by visitors</p>
@@ -52,7 +46,6 @@
       <div class="vs-sky l"></div><div class="vs-sky r"></div>
       <p class="vs-note" aria-hidden="true"><b></b><span></span></p>
     </div>`);
-  board.append(made);
 
   /* ---------- the letter: a private message (the live site sends these through formsubmit.co) ---------- */
   const write = $(".write", end), done = $(".w-done", end);
@@ -101,7 +94,7 @@
     }
   });
 
-  /* ---------- the last stars: two fields of sky, one each side of the envelope. A star's x runs 0 to 1 across both ---------- */
+  /* ---------- the last stars: two fields of sky, side by side. A star's x runs 0 to 1 across both ---------- */
   const zones = $$(".vs-sky", end), note = $(".vs-note", end), make = $(".vs-make", end), line = $(".vs-line", end), openBtn = $(".vs-open", end), boxEl = $(".vs-skybox", end);
   const zoneOf = (x) => (x < 0.5 ? 0 : 1), local = (x) => (x - zoneOf(x) * 0.5) * 2;
   const sprite = (kind) => {
@@ -155,6 +148,13 @@
     if (ln && !end.classList.contains("making")) ln.innerHTML = n ? `<span class="vs-count">${n}</span> left by visitors` : "None from visitors yet. Leave the first.";
   };
   list.forEach((v) => zones[zoneOf(v.x)].append(starEl(v)));
+  // the night's own stars, small and pale, are still out among them, and fade as the sun comes up (the scrub below
+  // turns --night down); they are only sky, so a click passes through them to the field
+  zones.forEach((z, k) => {
+    let h = 7 + k * 31;
+    const r = () => ((h = Math.imul(h ^ (h >>> 15), 2246822519) + 0x9e3779b9 | 0) >>> 0) / 4294967296;
+    for (let n = 0; n < 9; n++) z.insertAdjacentHTML("afterbegin", `<i class="vs-dust${n % 3 ? "" : " big"}" style="left:${(4 + r() * 92).toFixed(1)}%;top:${(4 + r() * 92).toFixed(1)}%"></i>`);
+  });
   // the visitors' stars, from the guestbook; while it cannot be reached only Lana's and Peanut's are shown
   fetch("/api/garden", { headers: { Accept: "application/json" } }).then((r) => r.json()).then((d) => {
     if (!d || !d.live || !Array.isArray(d.flowers)) return;
@@ -173,8 +173,10 @@
     const box = boxEl.getBoundingClientRect(), r = b.getBoundingClientRect();
     const x = r.left + r.width / 2 - box.left, y = r.top + r.height / 2 - box.top;
     $("b", note).textContent = b._v.name; $("span", note).textContent = b._v.note;
-    const z = b.parentNode.getBoundingClientRect(), mid = r.left + r.width / 2, right = mid < z.left + z.width / 2;   // the note stays in its own field of sky
-    note.style.maxWidth = `min(24ch, ${Math.round(Math.max(right ? z.right - mid - 22 : mid - z.left - 22, 120))}px)`;
+    // the note stays in the sky: it opens towards whichever side of the two fields has more room
+    const z0 = zones[0].getBoundingClientRect(), z1 = zones[1].getBoundingClientRect();
+    const zl = Math.min(z0.left, z1.left), zr = Math.max(z0.right, z1.right), mid = r.left + r.width / 2, right = mid < (zl + zr) / 2;
+    note.style.maxWidth = `min(24ch, ${Math.round(Math.max(right ? zr - mid - 22 : mid - zl - 22, 120))}px)`;
     note.classList.toggle("left", !right);
     note.style.left = x + "px"; note.style.top = clamp(y, 40, box.height - 40) + "px";
     note.classList.add("on");
@@ -186,20 +188,20 @@
   /* the scroll brings them out in the order they were left, and turns their twinkle */
   let making = false;
   count();
-  // the board's place in the page is measured once and again only when the page changes size (SM.placedGen), so the
+  // the sky's place in the page is measured once and again only when the page changes size (SM.placedGen), so the
   // scrub reads no layout each frame
-  const boardAt = () => {
-    if (board._gen !== SM.placedGen || board._w !== SM.vw) {
-      const b = board.getBoundingClientRect();
-      board._gen = SM.placedGen; board._w = SM.vw; board._top = b.top + SM.y; board._h = b.height;
+  const skyAt = () => {
+    if (boxEl._gen !== SM.placedGen || boxEl._w !== SM.vw) {
+      const b = zones[0].getBoundingClientRect();
+      boxEl._gen = SM.placedGen; boxEl._w = SM.vw; boxEl._top = b.top + SM.y;
     }
-    const top = board._top - SM.y;
-    return { top, bottom: top + board._h };
+    return boxEl._top - SM.y;
   };
   SM.scrub(() => {
-    const r = boardAt(), vh = SM.vh, q = SM.quiet();
-    if (r.bottom < -vh || r.top > vh * 2) return;
-    const p = q ? 2 : (vh * 0.9 - r.top) / (vh * 0.8), stars = $$(".vs-star", boxEl), n = stars.length;
+    const top = skyAt(), vh = SM.vh, q = SM.quiet();
+    if (top > vh * 2 || top < -vh * 2) return;
+    // they come out as their field of sky rises from the foot of the window to its upper half
+    const p = q ? 2 : (vh * 0.95 - top) / (vh * 0.6), stars = $$(".vs-star", boxEl), n = stars.length;
     stars.forEach((s, i) => {
       const k = list.indexOf(s._v), o = clamp((p * 1.15 - (k / n) * 0.95) / 0.1);
       const tw = q || o < 1 ? 1 : 0.8 + 0.2 * Math.sin(SM.y / 70 + i * 1.7);
@@ -229,7 +231,7 @@
   };
   make.addEventListener("change", paint);
   const open = () => {
-    // on a phone the letter is far above the sky, so the maker opens under the words instead
+    // on a phone the letter is far from the sky, so the maker opens under the words instead
     if (SM.COLUMN.matches) $(".ls", end).append(make); else { letter.append(make); write.hidden = true; }
     making = true; openedAt = performance.now(); end.classList.add("making"); openBtn.hidden = true; make.hidden = false; newEl.hidden = false;
     line.textContent = SM.COLUMN.matches ? "Tap the sky to place it." : "Click the sky to place it.";
@@ -289,5 +291,131 @@
       document.dispatchEvent(new CustomEvent("sm:burst", { detail: b }));
     }).catch(() => { $("#s-err-name").textContent = "The sky couldn't be reached. Try again in a bit."; })
       .finally(() => { sub.disabled = false; sub.textContent = "Leave it"; });
+  });
+
+  /* ---------- first light: the sun comes up behind the envelope, over a horizon of square cells ----------
+     Both are tiny pictures, one pixel a cell, that CSS scales up unsmoothed (dawn-proto.css), so every edge stays a
+     hard square. The hills are a valley: low in the middle, where the sun comes up behind the envelope, and rising
+     to each side, and each of the six stands on its own step of them, a little higher the further out it is, so the
+     six make a shallow arc around the sun. The scroll raises the sun a cell at a time, and brings the six down onto
+     their steps, the inner ones first; scrolling back sets the sun again. */
+  const dawn = $(".t-dawn", board), env = $(".env", board);
+  if (!dawn) return;
+  const sunC = $(".t-sun", dawn), hillC = $(".t-hills", dawn), sixAs = $$(".t-six a", dawn);
+  const SUN = "#ffcf73", SUN_PALE = "#ffe3a6", HILL = "#bfa3da", HILL_FAR = "#d3bde8", FIELD = "#b99dd7", FIELD_NEAR = "#b398d3";
+  // what the layout needs, read in the page's own read pass (SM.measure) and only when the page has changed size;
+  // the scrub then draws and places from it, so it never reads layout itself
+  let geo = null, drawn = null;
+  const read = () => {
+    const col = SM.COLUMN.matches, u = SM.u(), W = dawn.clientWidth, H = dawn.clientHeight;
+    if (!W || !H) return null;
+    const cell = col ? 4 : Math.max(6, Math.round(u * 0.6));
+    const six = sixAs.map((a) => ({ w: a.offsetWidth, h: a.offsetHeight })), sixH = Math.max(...six.map((d) => d.h));
+    // the horizon: on wide screens a little above the foot of the envelope's body, which stands in front of it (the
+    // lavender in the last eighth of the picture lies on the ground); in the column high enough above the foot of the
+    // horizon's box for the six to stand on the ground in front of it. A whole number of cells down, so the hills and
+    // the sun share one grid
+    const floor = Math.round((col ? H - sixH - 12 * cell : env.offsetTop + env.offsetHeight * 0.84 - dawn.offsetTop) / cell) * cell;
+    const envW = env.offsetWidth;
+    const r = dawn.getBoundingClientRect();
+    return { col, u, W, H, cell, floor, envW, six, top: r.top + SM.y, gen: SM.placedGen, vw: SM.vw };
+  };
+  SM.measure(() => { if (!geo || geo.gen !== SM.placedGen || geo.vw !== SM.vw) geo = read() || geo; });
+
+  // lays the scene out from what was read: the sun, the hills, and the six on them
+  const lay = (g) => {
+    const { col, u, W, H, cell, floor } = g;
+    /* the sun. On wide screens its disc is much wider than the envelope, so it shows as two bright shoulders either
+       side of it, ringed by a paler band; in the column it is small and whole, and has rays */
+    const R = Math.max(10, Math.round((col ? Math.min(W * 0.2, 104) : g.envW * 0.86) / cell)), r0 = R + 2, r1 = col ? R + 3 + Math.round(R * 0.3) : R + 3;
+    const sw = 2 * r1 + 1, sh = r1 + 1, s = sunC.getContext("2d");
+    sunC.width = sw; sunC.height = sh;
+    for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) {
+      const dx = x - r1, dy = r1 - y, d2 = dx * dx + dy * dy;
+      if (d2 <= R * R) { s.fillStyle = SUN; s.fillRect(x, y, 1, 1); }
+      else if (!col && d2 > (r0 - 0.5) ** 2 && d2 <= (r1 + 0.5) ** 2) { s.fillStyle = SUN_PALE; s.fillRect(x, y, 1, 1); }
+    }
+    // in the column, thirteen rays, every fifteen degrees across the upper half; the ones between are a little shorter
+    if (col) {
+      s.fillStyle = SUN;
+      for (let k = 0; k <= 12; k++) {
+        const a = (k / 12) * Math.PI, end = k % 2 ? r1 - Math.round(R * 0.12) : r1;
+        for (let t = r0 + 1; t <= end; t++) s.fillRect(r1 + Math.round(t * Math.cos(a)), r1 - Math.round(t * Math.sin(a)), 1, 1);
+      }
+    }
+    Object.assign(sunC.style, { width: `${sw * cell}px`, height: `${sh * cell}px`, left: `${Math.round(W / 2 - (sw * cell) / 2)}px`, top: `${floor - (sh - 1) * cell}px` });
+
+    /* the six. On wide screens, three each side of the sun, from the middle outwards; in the column, one row spread
+       evenly along the ground in front of the hills, under the sun */
+    const ws = g.six.map((d) => d.w), xs = [];
+    if (col) {
+      const edge = 12, room = W - 2 * edge, sum = ws.reduce((a, b) => a + b, 0), gap = Math.max(2, Math.min(32, (room - sum) / 5));
+      let x = edge + Math.max(0, (room - sum - 5 * gap) / 2);
+      ws.forEach((w, i) => { xs[i] = x; x += w + gap; });
+    } else {
+      const gap = 2.2 * u, inner = g.envW / 2 + 2.6 * u;
+      let x = W / 2 - inner;
+      for (const i of [2, 1, 0]) { x -= ws[i]; xs[i] = x; x -= gap; }
+      x = W / 2 + inner;
+      for (const i of [3, 4, 5]) { xs[i] = x; x += ws[i] + gap; }
+    }
+    // the hills: how high (in cells) the ground stands at a distance from the middle. Flat across the valley, then
+    // rising to each side with a slow swell in it. On wide screens the valley is only as wide as the envelope: the
+    // hills start just behind its sides, three cells up, and hide the sun's lower edge there; in the column the
+    // valley is as wide as the sun, so the whole of it shows
+    const cols = Math.ceil(W / cell) + 6, rows = Math.ceil(H / cell) + 1, left = Math.round(W / 2 - (cols * cell) / 2);
+    const flat = col ? (R + 1) * cell : g.envW / 2 - 3 * cell, base = col ? 1 : 3, top = col ? 6 : 8;
+    const rise = (px) => {
+      const d = Math.abs(px - W / 2), t = clamp((d - flat) / Math.max(1, W / 2 - flat));
+      return t <= 0 ? 0 : Math.max(1, Math.round(base + (top - base) * (1 - Math.pow(1 - t, 1.6)) + 0.7 * Math.sin(px / (cell * 5.3))));
+    };
+    // on wide screens each of the six stands on a step of its own, as high as the ground under its middle (never lower
+    // than its inner neighbour), a cell wider than itself each side; in the column they all stand on the near ground
+    const steps = col ? [] : xs.map((x0, i) => ({ a: x0 - cell, b: x0 + ws[i] + cell, h: rise(x0 + ws[i] / 2) }));
+    if (!col) [[2, 1, 0], [3, 4, 5]].forEach((side) => side.reduce((low, i) => { steps[i].h = Math.max(steps[i].h, low + 1); return steps[i].h; }, 0));
+    const hc = hillC.getContext("2d");
+    hillC.width = cols; hillC.height = rows;
+    const floorRow = Math.round(floor / cell);
+    const loose = (k, r) => { let h = (k * 374761393 + r * 668265263) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967295; };
+    for (let k = 0; k < cols; k++) {
+      const px = left + (k + 0.5) * cell, st = steps.find((p) => px >= p.a && px < p.b);
+      const h = st ? st.h : rise(px);
+      // a far ridge behind, in a paler lilac, a few cells over the near ground where the hills rise
+      const far = h > 0 ? h + 2 + Math.round(1.2 + Math.sin(px / (cell * 9.1) + 1.3)) : 0;
+      if (far > h) { hc.fillStyle = HILL_FAR; hc.fillRect(k, floorRow - far, 1, far - h); }
+      hc.fillStyle = HILL;
+      hc.fillRect(k, floorRow - h, 1, rows - floorRow + h);
+      if (!st && h > 1 && loose(k, 3) < 0.14) hc.fillRect(k, floorRow - h - 1, 1, 1);
+      // on wide screens the ground in front lies in two broad fields, each a shade deeper than the one behind it,
+      // their edges stepped a cell up and down
+      if (!col) [[7, FIELD], [17, FIELD_NEAR]].forEach(([d, c], j) => {
+        const e = floorRow + d + Math.round(Math.sin(k / (6 + j * 4) + j * 2.1));
+        if (e < rows) { hc.fillStyle = c; hc.fillRect(k, e, 1, rows - e); }
+      });
+    }
+    Object.assign(hillC.style, { width: `${cols * cell}px`, height: `${rows * cell}px`, left: `${left}px`, top: "0px" });
+    sixAs.forEach((a, i) => {
+      a.style.left = `${Math.round(xs[i])}px`;
+      a.style.top = `${col ? H - 4 * cell - g.six[i].h : floorRow * cell - steps[i].h * cell - g.six[i].h}px`;
+    });
+    return { sh, cell, order: col ? [0, 1, 2, 3, 4, 5] : [2, 3, 1, 4, 0, 5] };
+  };
+  let sunAt = -1, sixAt = [];
+  SM.scrub(() => {
+    if (!geo) return;
+    if (drawn?.g !== geo) { drawn = { g: geo, ...lay(geo) }; sunAt = -1; sixAt = []; }
+    const top = geo.top - SM.y, vh = SM.vh, q = SM.quiet();
+    if (top > vh * 1.5 || top + geo.H < -vh) return;
+    // how far up the sun is, 0 to 1: as the scene arrives on wide screens (its horizon is near the window's foot), and
+    // as the horizon itself comes up the window in the column
+    const w = SM.where(end);
+    const v = q ? 1 : SM.smooth(geo.col ? clamp((vh * 0.98 - top) / (vh * 0.5)) : clamp((w.arrive - 0.4) / 0.6));
+    const off = Math.round((1 - v) * (drawn.sh - 1)) * drawn.cell;
+    if (off !== sunAt) { sunAt = off; sunC.style.transform = `translate3d(0, ${off}px, 0)`; boxEl.style.setProperty("--night", (1 - 0.7 * v).toFixed(2)); }
+    // the six come down onto their steps one after another, a cell at a time, the two nearest the sun first
+    drawn.order.forEach((i, n) => {
+      const o = q ? 1 : SM.smooth(clamp(v * 1.7 - n * 0.12)), d = -Math.round((1 - o) * 4) * drawn.cell;
+      if (sixAt[i] !== d) { sixAt[i] = d; sixAs[i].style.transform = d ? `translate3d(0, ${d}px, 0)` : ""; }
+    });
   });
 })();

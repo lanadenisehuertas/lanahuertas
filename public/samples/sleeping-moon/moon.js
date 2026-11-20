@@ -17,12 +17,16 @@
    All of them travel along the same sweep, so the picture changes in one soft front, never in a scatter of pixels. */
 const SM = (() => {
   const root = document.documentElement;
-  const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const HOVER = matchMedia("(hover: hover) and (pointer: fine)").matches;
   const COLUMN = matchMedia("(max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px)");
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
-  if (RM) root.classList.add("quiet");
+  /* quiet mode is only ever the visitor's own switch, kept for this visit alone (sessionStorage, read in the page's head).
+     The system's reduced-motion setting does not turn it on: everything here moves with the scroll, which the visitor
+     drives, so the whole site shows under that setting, and only things that move on their own are stilled by CSS.
+     An older version kept the switch for good in localStorage; that key is cleared, so no one comes back to a quiet site
+     they never chose this visit */
+  try { localStorage.removeItem("quiet"); } catch (e) {}
   const quiet = () => root.classList.contains("quiet");
   /* the window's size, kept between resizes: reading innerWidth or innerHeight after a style has been written makes the
      browser restyle and lay out the page on the spot, and the scroll asks for them many times a frame */
@@ -64,6 +68,22 @@ const SM = (() => {
 
   /* ====================================================================== bitmap */
   const all = new Set(), near = new Set();
+  /* Pictures that have loaded are built one after another, each in a task of its own between frames, never several in
+     one go: a build reads the picture's size and its pixels, and when a scroll brings many pictures near at once,
+     building them all together held up the frames of that scroll for a long moment. A task builds what it can in a few
+     milliseconds (at least one picture) and leaves the rest to the next. */
+  const queued = [];
+  let builder = 0;
+  const buildSoon = (bm) => new Promise((done, fail) => { queued.push([bm, done, fail]); if (!builder) builder = setTimeout(buildSome, 0); });
+  const buildSome = () => {
+    const t0 = performance.now();
+    while (queued.length) {
+      const [bm, done, fail] = queued.shift();
+      try { bm.build(); done(); } catch (e) { fail(e); }
+      if (performance.now() - t0 > 4) break;
+    }
+    builder = queued.length ? setTimeout(buildSome, 0) : 0;
+  };
   class Bitmap {
     constructor(pic) {
       this.pic = pic; pic._bm = this;
@@ -84,7 +104,7 @@ const SM = (() => {
       const srcs = [this.full.getAttribute("src")]; if (this.pic.dataset.alt) srcs.push(this.pic.dataset.alt);
       // a picture in a stop far down the page waits until that stop is within a screen of the window before it fetches
       // its image, so the first screens are not slowed by rooms nobody has reached yet
-      this.loading = nearOnce(this.pic).then(() => Promise.all(srcs.map((s, k) => loadImage(s, k ? null : this.full)))).then((ims) => { this.imgs = ims; this.build(); });
+      this.loading = nearOnce(this.pic).then(() => Promise.all(srcs.map((s, k) => loadImage(s, k ? null : this.full)))).then((ims) => { this.imgs = ims; return buildSoon(this); });
       return this.loading;
     }
     /** read one image at canvas size into two layers: { sleep, wake }, each RGBA. Asleep is the duotone (or, for a
@@ -347,6 +367,18 @@ const SM = (() => {
     if (!p.closest("a, button") && !p.hasAttribute("data-still")) {
       p.addEventListener("pointerenter", (e) => e.pointerType !== "touch" && b.wakeUp(320));
       p.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") b.rest(); });
+      // on a touch screen a tap does what hovering does: the picture wakes and stays awake for a while. The wake waits for
+      // the finger to lift in place, so a swipe that starts on a picture only scrolls: the browser cancels the pointer
+      // once it takes the gesture for a scroll, and a finger that slides further than a tap never wakes anything.
+      // Nothing here blocks the scroll (the listeners are passive and prevent nothing), and pictures inside a link or
+      // button are left out, so their own click is never answered twice.
+      let down = null;
+      p.addEventListener("pointerdown", (e) => { down = e.pointerType === "touch" ? { id: e.pointerId, x: e.clientX, y: e.clientY } : null; }, { passive: true });
+      p.addEventListener("pointercancel", () => { down = null; }, { passive: true });
+      p.addEventListener("pointerup", (e) => {
+        const d = down; down = null;
+        if (d && d.id === e.pointerId && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 10) { b.wakeUp(320); b.rest(); }
+      }, { passive: true });
     }
     return b;
   });
@@ -382,7 +414,10 @@ const SM = (() => {
   };
   // the pointer moving: a frame of its own, read then write. The page moving: the page's frame reads in its read pass
   // and lights in a scrub (registered below, once scrub exists), so the letters cost no layout of their own
-  const frame = () => { raf = 0; light(lettersAt()); };
+  /* while the page itself is moving its frame is coming anyway, and reads the letters in its read pass; the pointer's
+     own frame then stands aside, since it would run after the page's writes and make the browser lay the page out a
+     second time in that frame */
+  const frame = () => { raf = 0; if (frameReq) return; light(lettersAt()); };
   let lettersRead;
   const tick = () => { if (!raf) raf = requestAnimationFrame(frame); };
   if (HOVER) {
@@ -552,54 +587,194 @@ const SM = (() => {
     }
   });
 
-  /* masks for one thing coming in over another, from nothing (0) to everything (LEVELS): a band of moonlight with a soft
-     edge sweeps down across it, the same front as a picture waking. mask(cover) gives the CSS for an element's mask. */
-  const LEVELS = 40;
-  const mask = (cover) => {
-    const level = quiet() ? (cover >= 0.5 ? LEVELS : 0) : Math.round(Math.min(1, Math.max(0, cover)) * LEVELS);
-    if (level >= LEVELS) return { level, image: "none", size: "100% 100%" };
-    if (level <= 0) return { level, image: "hide", size: "100% 100%" };
-    const F = 0.3, p = level / LEVELS, b = p * (1 + F), a = b - F;
-    return { level, image: `linear-gradient(168deg, #000 ${(a * 100).toFixed(1)}%, rgb(0 0 0 / 0.55) ${(((a + b) / 2) * 100).toFixed(1)}%, transparent ${(b * 100).toFixed(1)}%)`, size: "100% 100%" };
+  /* ====================================================================== the bloom
+     One picture handing over to the next. Moonlight blooms out from a point on the picture in coarse square cells
+     (about one u across, never finer than 14px), so the picture comes in cell by cell, the hard squares a drawn object
+     wakes in, and only the picture: its words and its world hand over in their own ways (reel.js). Each cell has its
+     place in the order from how far it is from the bloom's centre, broken up by a little noise of its own; near the
+     centre the cells turn in blocks of four by four, then two by two, then one by one, so the bloom starts coarse and
+     refines as it spreads. Just ahead of the front runs a rim of pale moonlight cells, lavender at the picture's side
+     and gold at the leading edge, with a few loose gold cells strayed beyond it, like a spell catching the light.
+     Going, a picture breaks the same way: from the centre out, through the rim, into a few last sparks.
+
+     bloom(el, s, snap): s runs from 0 (not there) through 1 (whole) to 2 (gone). The picture is cut by a mask, an SVG of
+     the cells (so every edge is hard at any size), and the rim is a child <i> over it with an SVG of its own. The masks
+     for each picture size are made once per step and kept, and made ahead while the page is idle. A picture's size comes
+     from a ResizeObserver, so nothing is read from the page while the scroll moves it. data-bloom="x y" (fractions of
+     the picture) puts the centre where the light should come from; otherwise each picture has its own. */
+  const BLOOM = 32, RIM = 0.1, LOOSE = 0.8;
+  const bloomHash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 1274126177) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); h = Math.imul(h ^ (h >>> 16), 2246822519); return ((h ^ (h >>> 15)) >>> 0) / 4294967296; };
+  const bloomCell = () => Math.max(14, Math.round(u() * 1.15));
+  /* a grid: every cell's place in the order (0 first to 1 last), and whether it may stray ahead of the rim */
+  const grids = new Map(), warmQueue = [];
+  const gridFor = (cols, rows, cx, cy) => {
+    const key = `${cols}x${rows}@${cx.toFixed(2)},${cy.toFixed(2)}`;
+    let g = grids.get(key);
+    if (g) { grids.delete(key); grids.set(key, g); return g; }   // kept in the order last used
+    const n = cols * rows, o = new Float32Array(n), loose = new Uint8Array(n), spark = new Float32Array(n), ox = cx * cols, oy = cy * rows;
+    const far = Math.max(Math.hypot(ox, oy), Math.hypot(cols - ox, oy), Math.hypot(ox, rows - oy), Math.hypot(cols - ox, rows - oy));
+    const small = Math.min(cols, rows), dist = (x, y) => Math.hypot(x - ox, y - oy) / far;
+    let lo = Infinity, hi = -Infinity;
+    for (let y = 0, i = 0; y < rows; y++) for (let x = 0; x < cols; x++, i++) {
+      // the block a cell turns with: four by four near the centre, two by two further out, then alone
+      let b = 1;
+      if (small >= 14 && dist((((x >> 2) << 2) + 2), (((y >> 2) << 2) + 2)) < 0.3) b = 4;
+      else if (small >= 6 && dist((((x >> 1) << 1) + 1), (((y >> 1) << 1) + 1)) < 0.6) b = 2;
+      const bx = Math.floor(x / b) * b, by = Math.floor(y / b) * b;
+      const v = dist(bx + b / 2, by + b / 2) * 0.78 + bloomHash(bx, by, b) * 0.22;
+      o[i] = v; if (v < lo) lo = v; if (v > hi) hi = v;
+      loose[i] = bloomHash(x, y, 9) < 0.14 ? 1 : 0;
+      spark[i] = bloomHash(x, y, 11);   // each cell's own chance of catching the light in the rim, so the rim is a scatter of single cells
+    }
+    for (let i = 0; i < n; i++) o[i] = ((o[i] - lo) / Math.max(1e-6, hi - lo)) * 0.9999;
+    g = { key, cols, rows, o, loose, spark, lv: new Map() };
+    grids.set(key, g);
+    // only the grids last used keep their steps: the oldest let go of theirs
+    if (grids.size > 24) { const old = grids.keys().next().value; grids.get(old).lv.clear(); grids.delete(old); }
+    warmQueue.push(g); warmSoon();
+    return g;
   };
-  const paintMask = (el, level) => {
-    const m = mask(level / LEVELS);
-    el.style.visibility = m.image === "hide" ? "hidden" : "visible";
-    const img = m.image === "hide" || m.image === "none" ? "none" : m.image;
-    el.style.webkitMaskImage = el.style.maskImage = img;
-    el.style.webkitMaskSize = el.style.maskSize = m.size;
+  /* one step of a grid, as CSS: the mask and the rim. S runs from 1 to BLOOM - 1 coming in, BLOOM + 1 to 2 BLOOM - 1 going */
+  const svgUrl = (g, body) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${g.cols} ${g.rows}" preserveAspectRatio="none" shape-rendering="crispEdges">${body}</svg>`)}")`;
+  const bloomStep = (g, S) => {
+    let st = g.lv.get(S);
+    if (st) return st;
+    const going = S > BLOOM, L = going ? S - BLOOM : S, { cols, rows, o, loose, spark } = g;
+    // the front: coming in, the picture is every cell before it; going, every cell after its rim
+    const t = going ? -RIM + ((1 + RIM * (1 + LOOSE)) * L) / BLOOM : -RIM * (1 + LOOSE) + ((1 + RIM * (1 + LOOSE)) * L) / BLOOM;
+    /* 0 nothing, 1 the picture, 2 the rim's lavender, 3 its gold. In the rim a cell catches the light by its own chance,
+       more often the nearer it is to the picture, so the rim is a thin scatter of single cells, never a solid band */
+    const kind = (i) => {
+      const v = o[i];
+      if (going) {
+        if (v >= t + RIM) return 1;
+        if (v >= t) { const f = (v - t) / RIM; return spark[i] < 0.22 + 0.36 * f ? (f > 0.45 ? 2 : 3) : 1; }
+        return v >= t - RIM * LOOSE && loose[i] ? 3 : 0;
+      }
+      if (v < t) return 1;
+      if (v < t + RIM) { const f = (v - t) / RIM; return spark[i] < 0.58 - 0.36 * f ? (f < 0.45 ? 2 : 3) : 0; }
+      return v < t + RIM * (1 + LOOSE) && loose[i] ? 3 : 0;
+    };
+    // each row's runs of one kind as one rectangle: the shown cells for the mask, the two pale ones for the rim
+    let m = "", lav = "", gold = "";
+    const ks = new Uint8Array(cols);
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) ks[x] = kind(y * cols + x);
+      for (let x = 0; x < cols;) {
+        const k = ks[x];
+        if (!k) { x++; continue; }
+        let e = x + 1;
+        while (e < cols && ks[e]) e++;
+        m += `M${x} ${y}h${e - x}v1h${x - e}z`;
+        for (let a = x; a < e;) {
+          const kk = ks[a];
+          let b = a + 1;
+          while (b < e && ks[b] === kk) b++;
+          if (kk === 2) lav += `M${a} ${y}h${b - a}v1h${a - b}z`; else if (kk === 3) gold += `M${a} ${y}h${b - a}v1h${a - b}z`;
+          a = b;
+        }
+        x = e;
+      }
+    }
+    st = { mask: m ? svgUrl(g, `<path d="${m}"/>`) : "hide",
+      rim: lav || gold ? svgUrl(g, `${lav ? `<path fill="#c9b6ff" d="${lav}"/>` : ""}${gold ? `<path fill="#fff1c9" d="${gold}"/>` : ""}`) : "" };
+    g.lv.set(S, st);
+    return st;
   };
-  /* hold frames: a dissolve never jumps. However fast the page is flung, the shown level steps toward the scroll's level
-     at most one step every HOLD ms, so every stage of the dissolve is on screen for a moment and nothing is skipped;
-     a slow scroll is followed exactly. */
-  const HOLD = 22, chasing = new Set();
-  let chaseReq = 0, chaseT = 0;
-  const chase = (now) => {
-    chaseReq = 0;
-    const steps = Math.max(1, Math.floor((now - chaseT) / HOLD));
-    if (now - chaseT >= HOLD) chaseT = now;
+  /* every step of the grids met lately is made while the page is idle, so a handover only looks its steps up */
+  let warming = 0;
+  const warmSoon = () => { if (!warming) warming = (window.requestIdleCallback || ((f) => setTimeout(() => f({ timeRemaining: () => 6 }), 80)))(warm); };
+  const warm = (dl) => {
+    warming = 0;
+    while (warmQueue.length && dl.timeRemaining() > 2) {
+      const g = warmQueue[0];
+      if (!grids.has(g.key)) { warmQueue.shift(); continue; }
+      let S = 1;
+      while (S < 2 * BLOOM && (S === BLOOM || g.lv.has(S))) S++;
+      if (S >= 2 * BLOOM) { warmQueue.shift(); continue; }
+      bloomStep(g, S);
+    }
+    if (warmQueue.length) warmSoon();
+  };
+  /* each picture's grid follows its size; the centre is the picture's own */
+  const bloomRO = new ResizeObserver((es) => es.forEach((e) => {
+    const el = e.target, bs = e.borderBoxSize?.[0], w = bs ? bs.inlineSize : e.contentRect.width, h = bs ? bs.blockSize : e.contentRect.height;
+    if (el._bpos == null) { el._bpos = getComputedStyle(el).position; if (el._bpos === "static") el.style.position = "relative"; }
+    sizeBloom(el, w, h);
+  }));
+  const sizeBloom = (el, w, h) => {
+    const cell = bloomCell(), cols = Math.max(3, Math.round(w / cell)), rows = Math.max(3, Math.round(h / cell));
+    if (!w || !h) { el._bg = null; return; }
+    if (el._bg && el._bg.cols === cols && el._bg.rows === rows) return;
+    if (!el._bc) {
+      const at = (el.dataset.bloom || "").split(/\s+/).map(Number);
+      el._bc = at.length === 2 && at.every((v) => v >= 0 && v <= 1) ? at : [0.3 + 0.4 * bloomHash(cols, rows, 3), 0.3 + 0.35 * bloomHash(rows, cols, 5)];
+    }
+    el._bg = gridFor(cols, rows, el._bc[0], el._bc[1]);
+    if (el._bs != null) paintBloom(el, el._bs, true);
+  };
+  const paintBloom = (el, S, again) => {
+    const st = el.style;
+    let vis = true, mask = "none", rim = "";
+    if (S <= 0 || S >= 2 * BLOOM) vis = false;
+    else if (S !== BLOOM) {
+      // until the picture's size is known it simply cuts over at the middle of its coming or going
+      if (!el._bg) vis = S < BLOOM ? S >= BLOOM / 2 : S < BLOOM * 1.5;
+      else { const s = bloomStep(el._bg, S); if (s.mask === "hide") vis = false; else { mask = s.mask; rim = s.rim; } }
+    }
+    const v = vis ? "visible" : "hidden";
+    if (el._bv !== v) { el._bv = v; st.visibility = v; }
+    if (el._bk !== mask || again) {
+      el._bk = mask;
+      st.webkitMaskImage = st.maskImage = mask;
+      if (mask !== "none") { st.webkitMaskSize = st.maskSize = "100% 100%"; st.webkitMaskRepeat = st.maskRepeat = "no-repeat"; }
+    }
+    if (el._br !== rim || again) {
+      el._br = rim;
+      let gl = el._gl;
+      if (rim && (!gl || gl.parentNode !== el)) {
+        gl = el._gl = gl || Object.assign(document.createElement("i"), { className: "glint" });
+        gl.setAttribute("aria-hidden", "true");
+        gl.style.cssText = "position:absolute;inset:0;z-index:6;pointer-events:none;background:no-repeat 0 0 / 100% 100%";
+        el.append(gl);
+      }
+      if (gl) { gl.style.backgroundImage = rim || "none"; gl.style.display = rim ? "block" : "none"; }
+    }
+  };
+  /* hold frames: a bloom never jumps. However fast the page is flung, the picture steps toward the scroll's step one
+     step a frame (two when frames are slow), so every stage is on screen for a moment and nothing is skipped; a slow
+     scroll is followed exactly. The steps are taken in the page's own frame, among the scrubs, after the frame's read
+     pass: a frame of their own would write before the page's frame reads the scroll, and make it lay the page out on
+     the spot. While a picture is still catching up, the page's frame is asked for again. */
+  const HOLD = 16, chasing = new Set();
+  // while the page glides its frame asks for the next one itself, so asking here too would run it twice a frame
+  const again = () => { if (!gliding) kick(); };
+  scrub(() => {
+    if (!chasing.size) return;
+    const now = performance.now();
     for (const el of chasing) {
-      const d = el._mt - el._ml;
+      const d = el._bt - el._bs;
       if (!d) { chasing.delete(el); continue; }
-      if (now - el._mlt < HOLD) continue;
-      el._ml += Math.sign(d) * Math.min(Math.abs(d), steps); el._mlt = now;
-      paintMask(el, el._ml);
-      if (el._ml === el._mt) chasing.delete(el);
+      if (now - el._bt0 < HOLD - 2) continue;
+      el._bs += Math.sign(d) * Math.min(Math.abs(d), Math.min(2, Math.max(1, Math.floor((now - el._bt0) / HOLD))));
+      el._bt0 = now;
+      paintBloom(el, el._bs);
+      if (el._bs === el._bt) chasing.delete(el);
     }
-    if (chasing.size) chaseReq = requestAnimationFrame(chase);
-  };
-  /** put mask(cover) on an element: hidden at 0, whole at 1, tiles between, reached a step at a time */
-  const applyMask = (el, cover) => {
-    const target = mask(cover).level;
-    el._mt = target;
-    if (el._ml == null || quiet() || Math.abs(target - el._ml) <= 1) {
-      if (el._ml !== target) { el._ml = target; el._mlt = performance.now(); paintMask(el, target); }
-      chasing.delete(el);
-      return target;
+    if (chasing.size) again();
+  });
+  /** el's picture at s: 0 not there, 1 whole, 2 gone. snap goes straight there (for a picture no one can see). Quiet
+      mode cuts at the middle of each half. */
+  const bloom = (el, s, snap) => {
+    if (!el._bw) { el._bw = true; bloomRO.observe(el); }
+    const B = BLOOM, q = quiet(), S = q ? (s < 0.5 ? 0 : s < 1.5 ? B : 2 * B) : Math.round(Math.min(2, Math.max(0, s)) * B);
+    el._bt = S;
+    if (el._bs == null || snap || q || Math.abs(S - el._bs) <= 1) {
+      if (el._bs !== S) { el._bs = S; paintBloom(el, S); }
+      chasing.delete(el); el._bt0 = performance.now();
+      return;
     }
-    if (!chasing.has(el)) { chasing.add(el); el._mlt = el._mlt || 0; }
-    if (!chaseReq) { chaseT = performance.now(); chaseReq = requestAnimationFrame(chase); }
-    return el._ml;
+    chasing.add(el); again();
   };
 
   /* ====================================================================== stops, masthead, live line */
@@ -610,8 +785,9 @@ const SM = (() => {
   /** say what is awake, or nothing to return to the resting line */
   const say = (text) => {
     const hero = !document.body.classList.contains("past");
-    // each line is written only when its words change, so a screen reader is not told the same thing over and over
-    const a = hero && text ? text : rest.sub, b = !hero && text ? text : (current?.dataset.hint || rest.live);
+    // each line is written only when its words change, so a screen reader is not told the same thing over and over;
+    // a stop whose hint is empty (the posters, whose pegs say it all) leaves the foot line empty
+    const a = hero && text ? text : rest.sub, b = !hero && text ? text : (current?.dataset.hint ?? rest.live);
     if (sub && sub.textContent !== a) sub.textContent = a;
     if (live && live.textContent !== b) live.textContent = b;
   };
@@ -664,12 +840,23 @@ const SM = (() => {
   const tone = (o) => Object.fromEntries(BAND.map((p) => [p, rgba(o[p])]));
   const blend = (a, b, t) => Object.fromEntries(BAND.map((p) => [p, a[p].map((v, i) => v + (b[p][i] - v) * t)]));
   const cssOf = (c) => `rgb(${Math.round(c[0])} ${Math.round(c[1])} ${Math.round(c[2])} / ${c[3].toFixed(3)})`;
+  /* A band only cross-fades a jump (a new tone, or the page's own colours given back). The small steps the scroll makes
+     while it blends one world into the next are written as they are, with the band's transition off: a transition
+     started again every frame would run on the main thread and restyle the whole band and everything in it each frame,
+     for a fade nobody can see. A jump keeps the fade on for as long as the fade takes, so the steps that follow it do not
+     cut it short. */
+  const JUMP = 20, FADE = 260;
   const band = (t, which) => {
     const vals = t ? BAND.map((p) => cssOf(t[p])) : null, key = vals ? vals.join() : "";
     for (const k of which ? [which] : ["mast", "foot"]) {
       const el = bands[k];
       if (!el || el._band === key) continue;
       el._band = key;
+      const was = el._tone, now = performance.now();
+      if (!t || !was || BAND.some((p) => t[p].some((v, i) => Math.abs(v - was[p][i]) > (i === 3 ? 0.08 : JUMP)))) el._fadeTill = now + FADE;
+      el._tone = t;
+      const fade = now < (el._fadeTill || 0);
+      if (el._fade !== fade) { el._fade = fade; el.style.transition = fade ? "" : "none"; }
       BAND.forEach((p, i) => (vals ? el.style.setProperty("--" + p, vals[i]) : el.style.removeProperty("--" + p)));
     }
   };
@@ -748,9 +935,11 @@ const SM = (() => {
   const landing = (el) => el.getBoundingClientRect().top + scrollY + (el.dataset.land === "end" ? Math.max(0, el.offsetHeight - VH) : 0);
   const go = (id) => { const el = document.getElementById(id); if (el) glide(landing(el)); };
   /* ====================================================================== travel
-     A jump between stops: a soft-edged iris in the next stop's own ground colour closes from the point you chose,
-     the stop's numeral and name stand in it for a moment, you are moved there, and the iris opens again from
-     the middle.
+     A jump between stops: an iris of coarse square cells in the next stop's own ground colour closes from the point you
+     chose, stepped like a pixel circle, with a row of loose cells strayed beyond its edge and a few cells of the stop's
+     ink glinting among them. The stop's numeral and name stand in it for a moment, you are moved there, and the iris
+     opens again from the middle, its edge breaking up the same way. The cells are fixed to the window and each loose
+     cell has its own fixed chance, so the edge steps outward without flickering.
      travel(id, { x, y }, { onJump }) resolves when the iris has opened. Quiet mode jumps at once. */
   let iris = null;
   document.fonts?.load("64px Redaction").catch(() => {});
@@ -774,16 +963,43 @@ const SM = (() => {
     k.fillStyle = ink; k.textAlign = "center"; k.textBaseline = "alphabetic";
     k.font = `400 ${big}px Redaction, Georgia, serif`; k.fillText(name, card.width / 2, card.height / 2 + big * 0.32);
     k.font = `400 ${20 * dpr}px "Redaction 35", Redaction, serif`; k.fillText(num, card.width / 2, card.height / 2 - big * 0.62);
-    // the iris: a circle from (ox, oy) whose radius grows to the far corner, with a feathered rim
-    const order = (ox, oy) => ({ ox, oy, far: Math.max(Math.hypot(ox, oy), Math.hypot(W - ox, oy), Math.hypot(ox, H - oy), Math.hypot(W - ox, H - oy)) });
+    /* the cells: about one and a half u across, squared to the window's pixels so no edge is ever smoothed. A loose cell
+       stands within EDGE cells of the circle's edge, more likely the nearer it is */
+    const cell = Math.max(16, Math.round(u() * 1.5)), cols = Math.ceil(W / cell), rows = Math.ceil(H / cell), EDGE = 1.8;
+    const chance = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 1274126177) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+    const X = (x) => Math.round(x * cell * dpr), Y = (y) => Math.round(y * cell * dpr);
+    const fill = (x0, x1, y) => { if (x1 >= x0) c.fillRect(X(x0), Y(y), X(x1 + 1) - X(x0), Y(y + 1) - Y(y)); };
+    const order = (ox, oy) => ({ ox, oy, far: Math.max(Math.hypot(ox, oy), Math.hypot(W - ox, oy), Math.hypot(ox, H - oy), Math.hypot(W - ox, H - oy)) + EDGE * cell * 1.5 });
+    /* p from 0 to 1: closing, the circle of ground grows from (ox, oy) until it covers the window; opening, a hole grows
+       in it from the middle. Each row is one run of whole cells (the stepped circle), plus the loose cells near the edge */
     const paint = (t, p, closing) => {
-      c.setTransform(dpr, 0, 0, dpr, 0, 0); c.globalCompositeOperation = "source-over"; c.clearRect(0, 0, W, H);
-      const feather = Math.max(60, t.far * 0.18), r = p * (t.far + feather), r0 = Math.max(0, r - feather);
-      const g = c.createRadialGradient(t.ox, t.oy, r0, t.ox, t.oy, Math.max(r0 + 0.1, r));
-      g.addColorStop(0, closing ? ground : "transparent"); g.addColorStop(1, closing ? "transparent" : ground);
-      if (!closing) { c.fillStyle = ground; c.fillRect(0, 0, W, H); c.globalCompositeOperation = "destination-out"; const h = c.createRadialGradient(t.ox, t.oy, r0, t.ox, t.oy, Math.max(r0 + 0.1, r)); h.addColorStop(0, "#000"); h.addColorStop(1, "rgb(0 0 0 / 0)"); c.fillStyle = h; c.fillRect(0, 0, W, H); c.globalCompositeOperation = "source-over"; }
-      else { c.fillStyle = g; c.fillRect(0, 0, W, H); }
-      c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = "source-atop"; c.drawImage(card, 0, 0);
+      c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = "source-over"; c.clearRect(0, 0, iris.width, iris.height);
+      const r = p * t.far, R = r + EDGE * cell, r0 = Math.max(0, r - EDGE * cell), glints = [];
+      c.fillStyle = ground;
+      for (let y = 0; y < rows; y++) {
+        const dy = (y + 0.5) * cell - t.oy;
+        // the run of cells whose middles are inside the circle
+        const span = (rad) => { const q = rad * rad - dy * dy; if (q <= 0) return null; const hw = Math.sqrt(q); return [Math.ceil((t.ox - hw) / cell - 0.5), Math.floor((t.ox + hw) / cell - 0.5)]; };
+        const a = span(r), out = span(closing ? R : r), inn = closing ? a : span(r0);
+        if (closing) { if (a) fill(Math.max(0, a[0]), Math.min(cols - 1, a[1]), y); }
+        else if (!a) fill(0, cols - 1, y);
+        else { fill(0, Math.min(cols - 1, a[0] - 1), y); fill(Math.max(0, a[1] + 1), cols - 1, y); }
+        // the loose cells: closing, just outside the edge; opening, just inside the hole
+        if (!out) continue;
+        for (let x = Math.max(0, out[0]); x <= Math.min(cols - 1, out[1]); x++) {
+          if (inn && x >= inn[0] && x <= inn[1]) { x = inn[1]; continue; }
+          const d = Math.hypot((x + 0.5) * cell - t.ox, dy);
+          const near = closing ? 1 - (d - r) / (R - r) : 1 - (r - d) / (r - r0 || 1);
+          if (closing ? d <= r : d > r) continue;
+          const ch = chance(x, y, 1);
+          if (ch < 0.62 * near) fill(x, x, y);
+          if (ch < 0.1 * near) glints.push(x, y);
+        }
+      }
+      c.globalCompositeOperation = "source-atop"; c.drawImage(card, 0, 0);
+      // a few loose cells catch the stop's ink, a glint at the edge
+      c.globalCompositeOperation = "source-over"; c.fillStyle = ink;
+      for (let i = 0; i < glints.length; i += 2) fill(glints[i], glints[i], glints[i + 1]);
     };
     const run = (t, ms, closing) => new Promise((done) => {
       const t0 = performance.now();
@@ -813,25 +1029,28 @@ const SM = (() => {
     sw.addEventListener("click", () => {
       const on = !quiet();
       root.classList.toggle("quiet", on); sw.setAttribute("aria-checked", String(on));
-      try { localStorage.setItem("quiet", on ? "1" : "0"); } catch (e) {}
+      try { sessionStorage.setItem("quiet", on ? "1" : "0"); } catch (e) {}
       tick();
     });
   }
 
   /* ====================================================================== viewer: SM.view([{ src, w, h, alt, cap }], index) */
   let box, items = [], at = 0, opener = null;
-  /** a picture someone asked for comes in through big tiles over a fifth of a second (at once in quiet mode) */
-  const reveal = (el, ms = 220) => {
-    if (!el || quiet()) return;
-    el._ml = null;
+  /** a picture someone asked for blooms in over a third of a second (at once in quiet mode). It is a click, not the
+      scroll, so its size is read here, and every step is drawn as it comes */
+  const reveal = (el, ms = 340) => {
+    if (!el) return;
+    if (quiet()) { bloom(el, 1, true); return; }
+    const r = el.getBoundingClientRect();
+    sizeBloom(el, r.width, r.height);
     const t0 = performance.now();
-    const step = (now) => { const q = Math.min(1, (now - t0) / ms); applyMask(el, 1 - Math.pow(1 - q, 3)); if (q < 1) requestAnimationFrame(step); };
-    applyMask(el, 0); requestAnimationFrame(step);
+    const step = (now) => { const q = Math.min(1, (now - t0) / ms); bloom(el, 1 - Math.pow(1 - q, 3), true); if (q < 1) requestAnimationFrame(step); };
+    bloom(el, 0, true); requestAnimationFrame(step);
   };
   const showItem = (i) => {
     at = (i + items.length) % items.length; const it = items[at];
     $("figure", box).innerHTML = `<img src="${it.src}" width="${it.w}" height="${it.h}" alt="${it.alt || ""}">`;
-    reveal($("figure img", box));
+    reveal($("figure", box));
     $(".bar b", box).textContent = it.cap || ""; $(".bar span", box).textContent = items.length > 1 ? `${at + 1} of ${items.length}` : "";
     $$(".prev, .next", box).forEach((b) => (b.hidden = items.length < 2));
   };
@@ -910,5 +1129,22 @@ const SM = (() => {
   /** a thin drawn arrow, for .arw buttons */
   const arrow = (dir) => `<svg viewBox="0 0 26 14" aria-hidden="true"><path d="${dir < 0 ? "M25 7H2M7.5 1.5L2 7l5.5 5.5" : "M1 7h23M18.5 1.5L24 7l-5.5 5.5"}"/></svg>`;
   addEventListener("pageshow", () => tick());
-  return { $, $$, u, quiet, HOVER, COLUMN, Bitmap, pictures, bitmap, type, swap, say, go, glide, scrub, where, whenNear, smooth, mask, applyMask, band, tone, blend, travel, view, wakeable, stars, tick, moonSvg, start, arrow, corners, steps, setSteps, landing, onStop: (fn) => listeners.push(fn), get stop() { return current; }, get placedGen() { return gen; }, get moving() { return !!frameReq; }, measure: (fn) => { measures.add(fn); return () => measures.delete(fn); }, get y() { return readY(); }, get vw() { return VW; }, get vh() { return VH; } };
+
+  /* the arrow keys of a row of pieces that is also a pager. They count from the piece that has focus, not from the piece
+     the room is showing, so a keyboard user who has tabbed along the row is never sent back; Home and End go to the ends.
+     The focus ring moves first and the room follows it with go(index). */
+  /* while the arrows move the focus, SM.arrowing is true: a room's own focus listener, which brings the room to an item
+     reached by Tab at once, leaves it alone then, so the page glides to the item (go) instead of jumping first */
+  let arrowing = false;
+  const arrows = (el, items, current, go) => el.addEventListener("keydown", (e) => {
+    const at = items.indexOf(document.activeElement), from = at < 0 ? current() : at;
+    const k = { ArrowRight: from + 1, ArrowLeft: from - 1, Home: 0, End: items.length - 1 }[e.key];
+    if (k === undefined) return;
+    e.preventDefault(); e.stopPropagation();
+    const j = Math.max(0, Math.min(items.length - 1, k));
+    arrowing = true;
+    try { items[j].focus({ preventScroll: true }); } finally { arrowing = false; }
+    go(j);
+  });
+  return { $, $$, u, quiet, HOVER, COLUMN, Bitmap, pictures, bitmap, type, swap, say, go, glide, scrub, where, whenNear, smooth, bloom, band, tone, blend, travel, view, wakeable, arrows, stars, tick, moonSvg, start, arrow, corners, steps, setSteps, landing, onStop: (fn) => listeners.push(fn), get stop() { return current; }, get placedGen() { return gen; }, get moving() { return !!frameReq; }, get arrowing() { return arrowing; }, measure: (fn) => { measures.add(fn); return () => measures.delete(fn); }, get y() { return readY(); }, get vw() { return VW; }, get vh() { return VH; } };
 })();

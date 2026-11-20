@@ -42,7 +42,6 @@ main > .stop.pinned { display: block; padding: 0; min-height: 0; }
 #posters .po-m { margin-top: 6px; }
 #posters .po-d { margin-top: 20px; }
 #posters #po-big { margin-top: 28px; }
-#posters .steps { margin-top: 16px; }
 
 /* ---------- III Films: the monitor and the timeline ---------- */
 .fr { position: relative; width: calc(100 * var(--u)); height: calc(62.5 * var(--u)); }
@@ -50,11 +49,10 @@ main > .stop.pinned { display: block; padding: 0; min-height: 0; }
 .fr-text { left: calc(10 * var(--u)); top: calc(8 * var(--u)); width: calc(22 * var(--u)); }
 .fr-text .go svg { width: 14px; height: 14px; }
 .fr-mon { left: calc(36 * var(--u)); top: calc(6.4 * var(--u)); width: calc(54 * var(--u)); display: grid; gap: calc(0.8 * var(--u)); }
-/* the monitor: every film's frame in one cell; the current one shows, the next dissolves in at the cut */
+/* the monitor: every film's frame in one cell; the current one shows, the next blooms in at the cut (SM.bloom) */
 .fr-screen { position: relative; aspect-ratio: 16 / 9; display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); overflow: hidden; background: #000;
   box-shadow: 0 0 calc(7 * var(--u)) calc(0.8 * var(--u)) rgb(255 241 201 / 0.09); }
-.fr-frame { grid-area: 1 / 1; display: block; width: 100%; height: 100%; visibility: hidden; transform-origin: 50% 45%;
-  -webkit-mask-repeat: repeat; mask-repeat: repeat; }
+.fr-frame { position: relative; grid-area: 1 / 1; display: block; width: 100%; height: 100%; visibility: hidden; transform-origin: 50% 45%; }
 .fr-frame img { width: 100%; height: 100%; object-fit: cover; }
 /* the timecode counts with the scroll; each digit keeps its own width so the line never jitters */
 .fr-tc { display: flex; justify-content: end; align-items: baseline; gap: 12px; font: 400 16px/1 var(--lab); color: var(--text); }
@@ -102,6 +100,8 @@ main > .stop.products { --a-ink: #b9a2ff; }
 .acts .go { margin-top: 0; }
 .acts .live { font-size: 18px; color: var(--text); }
 .acts .live svg { width: 15px; height: 15px; }
+/* the film's picture is what blooms in a handover, so it is a box of its own for the rim of moonlight over it */
+.a-film picture { display: block; position: relative; }
 .a-film img { display: block; width: 100%; height: auto; box-shadow: 0 calc(1.6 * var(--u)) calc(4 * var(--u)) rgb(0 0 0 / 0.6); }
 .a-film figcaption { position: absolute; left: 0; top: calc(100% + 4px); }
 .a-pause { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font: 400 16px/1 var(--lab); color: var(--text); }

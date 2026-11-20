@@ -41,9 +41,6 @@
 .cp-by { position: absolute; z-index: 2; left: 0; right: 0; top: calc(var(--band) + 6svh + 31vw); margin: 0; padding: 0 8vw; text-align: center; font: italic 400 18px/1.35 "Redaction", Georgia, serif; color: var(--mark); text-wrap: balance; }
 .loading .pl-by { opacity: 0; }
 
-@media (prefers-reduced-motion: reduce) {
-  .cast-ph { display: none !important; }
-}
 
 /* the six rooms' names beside the points of the star (spell-proto.js), set the way a star chart names its stars */
 .sp-names { position: absolute; inset: 0; z-index: 5; pointer-events: none; display: none; }
@@ -52,4 +49,3 @@
   font: italic 400 clamp(18px, calc(1.6 * var(--u)), 24px) / 1 "Redaction", Georgia, serif; color: #fff1c9; }
 .cp-stage .sp-names span { font-size: 18px; padding: 0 8px; }
 .quiet .sp-names { display: none; }
-@media (prefers-reduced-motion: reduce) { .sp-names { display: none !important; } }

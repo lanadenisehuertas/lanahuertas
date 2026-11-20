@@ -1,7 +1,7 @@
 /* Prototype: the magic layer (see magic-proto.css). Loads after every other script. */
 (() => {
   const { $, $$ } = SM, root = document.documentElement;
-  const still = () => SM.quiet() || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const arrow = `<svg viewBox="0 0 26 14" aria-hidden="true"><path d="M1 7h23M18.5 1.5L24 7l-5.5 5.5"/></svg>`;
@@ -22,6 +22,8 @@
     const word = $(".veil-word", veil), moon = $(".veil-moon", veil);
     word.innerHTML = [...word.textContent].map((c) => `<span>${c === " " ? "&nbsp;" : c}</span>`).join("");
     const letters = $$("span", word), jobs = [document.fonts?.ready || Promise.resolve()];
+    // the room is built a moment after the first frame (room-proto.js), and says when it and its pictures are there
+    if (SM.roomReady) jobs.push(SM.roomReady);
     // the pictures on the first screen: the room's, when it opens the page, and the moon's stop's own (not those that
     // wait to be scrolled near, which would hold the veil until its five seconds are up)
     $$(".room-intro img, #moon img").filter((im) => im.loading !== "lazy").forEach((im) => jobs.push(im.complete ? Promise.resolve() : new Promise((r) => { im.addEventListener("load", r, { once: true }); im.addEventListener("error", r, { once: true }); })));
@@ -204,10 +206,57 @@
     const set = () => {
       const k = stops.indexOf(SM.stop), n = k > 0 ? stops[k + 1] : null;
       btn.hidden = !n; btn._sp = false;
-      if (n) { btn.dataset.to = n.id; btn.innerHTML = `<span class="long">Skip to </span>${(n.dataset.label || "").replace(/^[IVX]+\s+/, "")} ${arrow}`; }
+      if (n) { btn.dataset.to = n.id; btn.innerHTML = `<span class="long">Skip to</span>${(n.dataset.label || "").replace(/^[IVX]+\s+/, "").trim()}${arrow}`; }
     };
     SM.onStop?.(set); set();
     btn.addEventListener("click", (e) => SM.travel(btn.dataset.to, { x: e.clientX, y: e.clientY }));
+  }
+  /* ================================================================ the name catches the light
+     Pointing at the big name wakes the letters under the pointer: the nearest switch into the coarse 1-bit cut of the
+     type, catch the moonlight and lift; their neighbours lift a little; and all of them spring back once the pointer
+     has gone. A tap on a touch screen sends one ripple of the same along the name. Only classes change, and only when
+     a letter's state does: the lift is a transform, and the coarse letter is drawn over the smooth one in its place
+     (magic-proto.css), so nothing is laid out again while the pointer moves. The name is not a control, so the keyboard
+     passes it by as before, and its aria-label still gives the whole name. */
+  const nameEl = $("#name"), nameRest = nameEl && $(".n-rest", nameEl);
+  if (nameEl && nameRest) {
+    let chs = null, at = null, atY = NaN, fs = 100, ripT = [];
+    const letters = () => chs || (chs = (nameRest._ch || $$(".ch", nameRest)).map((c) => { c.dataset.c = c.textContent; return c; }));
+    // where each letter's middle is: read when the pointer comes in, and again only if the page has scrolled since
+    const measure = () => {
+      fs = parseFloat(getComputedStyle(nameEl).fontSize) || 100;
+      at = letters().map((c) => { const r = c.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
+      atY = SM.y;
+    };
+    const state = (c, st) => { if (c._nm !== st) { c._nm = st; c.classList.toggle("nm-up", st === 1); c.classList.toggle("nm-px", st === 2); } };
+    const calm = () => { at = null; if (chs) chs.forEach((c) => state(c, 0)); };
+    const asleep = () => still() || nameRest.classList.contains("gone") || $("#board")?.classList.contains("leave");
+    const near = (x, y) => {
+      if (asleep()) return calm();
+      if (!at || atY !== SM.y) measure();
+      letters().forEach((c, i) => {
+        // distance in ems of the name, a line's height counting for a little more than a letter's width
+        const d = Math.hypot((x - at[i][0]) / fs, (y - at[i][1]) / (fs * 1.6)), st = d < 0.3 ? 2 : d < 0.8 ? 1 : 0;
+        // a letter that has just caught the light throws a few pixels of it
+        if (st === 2 && c._nm !== 2) { spark(at[i][0], at[i][1] - fs * 0.38, 12, false); spark(at[i][0] + fs * 0.12, at[i][1] - fs * 0.3, 9, true); }
+        state(c, st);
+      });
+    };
+    nameEl.addEventListener("pointermove", (e) => { if (e.pointerType !== "touch") near(e.clientX, e.clientY); }, { passive: true });
+    nameEl.addEventListener("pointerleave", calm, { passive: true });
+    // a tap (not a swipe, which scrolls and so is no click) ripples the name once, a letter at a time, each as short
+    // as a hover's
+    let tapType = "";
+    nameEl.addEventListener("pointerdown", (e) => { tapType = e.pointerType; }, { passive: true });
+    nameEl.addEventListener("click", () => {
+      if (tapType !== "touch" || asleep()) return;
+      ripT.forEach(clearTimeout); ripT = [];
+      measure();
+      letters().forEach((c, i) => {
+        ripT.push(setTimeout(() => { state(c, 2); if (i % 3 === 0) spark(at[i][0], at[i][1] - fs * 0.38, 12, true); }, i * 45));
+        ripT.push(setTimeout(() => state(c, 0), i * 45 + 260));
+      });
+    });
   }
   retint();
 })();

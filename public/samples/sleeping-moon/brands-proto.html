@@ -33,7 +33,7 @@
   }, true);
 })();
 </script>
-<script>document.documentElement.classList.add("js"); try { if (localStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
+<script>document.documentElement.classList.add("js"); try { localStorage.removeItem("quiet"); if (sessionStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
 <script src="/samples/sleeping-moon/data.js"></script>
 </head>
 <body class="past brand-page" data-route="always">

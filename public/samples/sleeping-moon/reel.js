@@ -1,11 +1,15 @@
 /* The reel: one thing at a time as you scroll, each in its own world.
 
    The stop is tall and its stage sticks to the window. Scrolling moves a number q from 0 to n-1. Plate floor(q)
-   is shown; part way through each step the next plate comes in over it through a dither of big tiles whose
-   coverage follows the scroll, so one world dissolves into the next in the Bayer order, and back again when you
-   scroll back. While a plate is shown it keeps drifting a little with the scroll (--f), so no scroll is ever a
-   dead one. Each plate is its thing's own world: its ground colour, its ink, and its backdrop cut into flat tones.
-   Brands and products use it.
+   is shown; part way through each step the next plate takes over from it, each part of the plate in its own way, all
+   moved by the same scroll and going back when you scroll back:
+     the pictures (data-bloom) bloom: the old ones break into moonlight cells from their centres out, then the new
+       ones bloom in from theirs, in coarse square cells behind a rim of pale glints (SM.bloom, in moon.js);
+     the words leave letter by letter, lifting and fading, and the next plate's come in letter by letter, its title
+       spelled out of runes first (SM.letters, below);
+     the world, its ground, its backdrop and its light, blends smoothly from one to the next.
+   While a plate is shown it keeps drifting a little with the scroll (--f), so no scroll is ever a dead one. Each plate
+   is its thing's own world: its ground colour, its ink, and its backdrop cut into flat tones. Brands and products use it.
 
    SM.reel(stop, items, { step, stack, onChange, onScrub })
    item: { name, ground, ink, backdrop, board(i, n): html, setup(plate, item, i) } */
@@ -23,6 +27,79 @@
   SM.world = (a, b) => (lum(a) <= lum(b) ? { ground: a, ink: b } : { ground: b, ink: a });
   const clamp = (v) => Math.min(1, Math.max(0, v));
   const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+  const sm = (t) => { t = clamp(t); return t * t * (3 - 2 * t); };
+  /** write a custom property only when its value changes */
+  const put = (el, name, v) => { if (el["_" + name] !== v) { el["_" + name] = v; v === null ? el.style.removeProperty(name) : el.style.setProperty(name, v); } };
+
+  /* ================================================================ the words' handover
+     A column of words (.pk-text) is split once, as it first takes part in a handover: the title into letters (the same
+     .ch letters words-proto.js lights under the pointer, so it reuses them), each short line into words of letters,
+     a long line into words, and anything else (links, the steps) is kept whole. Each piece gets --k, its place in the
+     reading order from 0 to 1, the title taking the first third. Two numbers then move them all (reel.css):
+       --lv, 0 to 1, how far the words have left: each letter in turn lifts and fades;
+       --en, 0 to 1, how far the words have come: each letter in turn drops into place, and the title's letters
+         show a rune until they are nearly in (runes(), written here only when a letter's rune changes).
+     The text itself is never changed, so screen readers, and the scripts that read a title back, see the same words.
+     A column whose words are replaced (a caption that moves on) is split again the next time it is asked. */
+  const RUNES = ["☾", "☽", "✶", "✧", "⋆", "ᚱ", "ᛟ", "ᚦ", "ᛉ", "ᚠ", "◇", "✦", "ᛃ", "ᛗ"];
+  const LONG = 110;   // a line longer than this goes word by word
+  const TITLE = 0.3, BLOCK = 8;
+  const letters = (box) => {
+    if (!box) return null;
+    let st = box._hw;
+    if (st && st.count === box.childElementCount && st.parts.every((p) => p.el.firstChild === p.first)) return st;
+    const kids = [...box.children], parts = [];
+    let rest = 0;
+    for (const el of kids) {
+      // a piece split before and not changed since keeps what it was
+      const was = el._hwp && el.firstChild === el._hwp.first ? el._hwp : null;
+      const text = was ? was.text : el.textContent.trim().replace(/\s+/g, " ");
+      const plain = was ? was.kind !== "block" : text && !el.children.length && !el.matches("a, button");
+      const title = plain && el.matches(".pk-name");
+      const kind = title ? "title" : plain ? (text.length > LONG ? "words" : "line") : "block";
+      const w = kind === "block" ? BLOCK : text.length;
+      if (kind !== "title") rest += w;
+      parts.push({ el, kind, text, w });
+    }
+    let at = 0;
+    const kOf = (w) => { const k = TITLE + ((1 - TITLE) * at) / Math.max(1, rest); at += w; return k.toFixed(3); };
+    for (const p of parts) {
+      const { el, kind, text } = p;
+      if (kind === "block") { el.classList.add("hw"); el.style.setProperty("--k", kOf(p.w)); p.first = el.firstChild; el._hwp = { kind, text, first: p.first }; continue; }
+      const ws = text.split(" ");
+      if (kind === "title") {
+        const n = text.replace(/ /g, "").length;
+        let j = 0;
+        el.innerHTML = ws.map((w) => `<span style="white-space:nowrap">${[...w].map((c) => `<span class="ch lt" style="--k:${((TITLE * j++) / Math.max(1, n)).toFixed(3)}">${esc(c)}</span>`).join("")}</span>`).join(" ");
+        el._ch = $$(".ch", el); el.classList.add("wl");
+      } else if (kind === "line") {
+        el.innerHTML = ws.map((w) => `<span class="wd">${[...w].map((c) => `<span class="lt" style="--k:${kOf(1)}">${esc(c)}</span>`).join("")}</span>`).join(" ");
+        el._wd = $$(".wd", el);
+      } else {
+        el.innerHTML = ws.map((w) => `<span class="wd lt" style="--k:${kOf(w.length + 1)}">${esc(w)}</span>`).join(" ");
+        el._wd = $$(".wd", el);
+      }
+      p.first = el.firstChild;
+      el._hwp = { kind, text, first: p.first };
+    }
+    st = box._hw = { count: box.childElementCount, parts, title: parts.find((p) => p.kind === "title")?.el, en: -1 };
+    return st;
+  };
+  /** the title's letters: hidden, then a rune that changes as the scroll moves, then the letter */
+  const runes = (box, en) => {
+    const st = box?._hw;
+    if (!st?.title?._ch) return;
+    const E = Math.round(en * 200);
+    if (st.en === E) return;
+    st.en = E;
+    const ch = st.title._ch, n = ch.length;
+    ch.forEach((c, j) => {
+      const k = (TITLE * j) / Math.max(1, n), rune = !SM.quiet() && en < 1 && en < k * 0.62 + 0.3;
+      const g = rune ? RUNES[(j * 5 + Math.floor(en * 48)) % RUNES.length] : "";
+      if (c._g !== g) { c._g = g; if (g) { c.dataset.g = g; c.classList.add("rn"); } else c.classList.remove("rn"); }
+    });
+  };
+  SM.letters = { prep: letters, runes };
 
   SM.reel = (stop, items, opts = {}) => {
     const n = items.length, STEP = opts.step || 0.55;
@@ -51,7 +128,7 @@
     };
 
     /* the window's masthead and foot take the colours of the world behind them (SM.band, in moon.js, asks the stop
-       under each band for its tone): blended from one world to the next as the scroll dissolves one into the other,
+       under each band for its tone): blended from one world to the next as the scroll hands one over to the other,
        or, stacked, the world of the plate under the band */
     const tones = items.map((it) => SM.tone({ ground: it.ground, ink: it.ink, text: "#ece6ff", mark: "#fff1c9", rule: mix(it.ground, it.ink, 0.55) }));
     let tone = null;
@@ -73,14 +150,35 @@
       if (SM.stop === stop) SM.say();
       opts.onChange?.(i, el);
     };
-    /** a plate's arrival (0 to 1: its work rises and wakes), its drift (-1 to 1: how far the scroll is through it) and
-        its words (0 to 1): the words leave before the dissolve begins and come back once it has nearly ended, so two
-        sets of words are never seen through each other */
-    const pose = (el, a, f, w) => {
-      const A = a.toFixed(3), F = f.toFixed(3), W = w.toFixed(3);
-      if (el._a !== A) { el._a = A; el.style.setProperty("--a", A); $$("[data-wake]", el).forEach((p) => SM.bitmap(p)?.setFloor(a)); }
+    /** a plate's arrival (0 to 1: its work rises), its drift (-1 to 1: how far the scroll is through it), its words'
+        arrival with the stop (0 to 1) and how far its pictures have woken (0 to 1, from their lilac sleep) */
+    const pose = (el, a, f, w, wake) => {
+      const A = a.toFixed(3), F = f.toFixed(3), W = w.toFixed(3), K = wake.toFixed(3);
+      if (el._a !== A) { el._a = A; el.style.setProperty("--a", A); }
+      if (el._wk !== K) { el._wk = K; $$("[data-wake]", el).forEach((p) => SM.bitmap(p)?.setFloor(wake)); }
       if (el._f !== F) { el._f = F; el.style.setProperty("--f", F); }
       if (el._w !== W) { el._w = W; el.style.setProperty("--w", W); }
+    };
+    /** the pictures that bloom, in the order they bloom */
+    const picsOf = (el) => el._pics || (el._pics = $$("[data-bloom]", el));
+    /** a plate's part in the handover: its pictures at s (0 not there, 1 whole, 2 gone), each a little after the one
+        before; its words leaving (lv) or coming (en); its world's backdrop and light (g, with the fall over the
+        backdrop at ga); its ground (sky: a colour, or "clear" while the plate is coming in over the last) */
+    const hand = (el, s, snap, lv, en, g, ga, sky) => {
+      const ps = picsOf(el), m = Math.max(1, ps.length - 1);
+      ps.forEach((p, j) => {
+        const d = j / m;
+        const v = s <= 1 ? clamp((s - d * 0.3) / 0.7) : 1 + clamp((s - 1 - d * 0.2) / 0.8);
+        SM.bloom(p, v, snap);
+      });
+      if (lv > 0 || en < 1) SM.letters.prep($(".pk-text", el));
+      put(el, "--lv", lv ? lv.toFixed(3) : null);
+      put(el, "--en", en < 1 ? en.toFixed(3) : null);
+      SM.letters.runes($(".pk-text", el), en);
+      put(el, "--g", g < 1 ? g.toFixed(3) : null);
+      put(el, "--ga", ga < 1 ? ga.toFixed(3) : null);
+      put(el, "--sky", sky === "clear" ? "transparent" : sky);
+      put(el, "--gn", sky === "clear" && g < 1 ? g.toFixed(3) : null);   // the corners: the old stay, the new come in over them
     };
 
     const update = () => {
@@ -92,10 +190,13 @@
       if (opts.stack?.matches) {
         for (let k = 0; k < n; k++) make(k);
         plates.forEach((el, k) => {
-          el.style.visibility = ""; el.style.maskImage = el.style.webkitMaskImage = "none"; el._ml = null;
-          el.classList.add("now"); el.inert = false;
+          if (!el._stacked) {
+            el._stacked = true; el._shown = undefined;
+            el.style.visibility = ""; el.classList.add("now"); el.inert = false;
+            hand(el, 1, true, 0, 1, 1, 1, null);
+          }
           const r = el.getBoundingClientRect(), a = quiet ? 1 : easeOut(clamp((SM.vh - r.top) / (SM.vh * 0.7)));
-          pose(el, a, 0, a);
+          pose(el, a, 0, a, a);
         });
         return;
       }
@@ -106,18 +207,30 @@
       const cover = base >= n - 1 ? 0 : clamp((frac - 0.58) / 0.36);
       for (let k = base - 1; k <= base + 2; k++) make(k);
       const first = quiet ? 1 : easeOut(clamp(w.arrive / 0.8));   // the first plate's work rises as the stop comes in
+      /* the handover, over the cover: the old pictures break up over its first half and the new ones bloom over its
+         second, overlapping through the middle, one breaking into sparks as the other blooms; the old words leave over
+         the first half and the new ones come from just before the middle; the world blends all the way through. Quiet
+         mode cuts it all at the middle */
+      const cut = cover >= 0.5 ? 1 : 0;
+      const out = quiet ? cut : clamp(cover / 0.6), inn = quiet ? cut : clamp((cover - 0.3) / 0.7);
+      const lv = quiet ? cut : clamp(cover / 0.5), en = quiet ? cut : clamp((cover - 0.42) / 0.58);
       plates.forEach((el, k) => {
         if (!el) return;
-        const c = k === base ? 1 : k === base + 1 ? cover : 0;
-        SM.applyMask(el, c);
-        if (c <= 0) return;
-        const a = quiet ? 1 : k === base ? (k === 0 ? first : 1) : easeOut(cover);
-        const f = quiet ? 0 : k === base ? frac * 1.4 : (frac - 1) * 1.4;
-        const sm = (t) => { t = clamp(t); return t * t * (3 - 2 * t); };
-        // the words hand over at the middle of the cover, the old ones out just before it and the new ones in just after,
-        // so wherever the scroll rests the picture on show has its own words at full strength
-        const w = quiet ? 1 : k === base ? (1 - sm((cover - 0.3) / 0.2)) * (k === 0 ? first : 1) : sm((cover - 0.5) / 0.25);
-        pose(el, a, Math.max(-1, Math.min(1, f)), w);
+        const role = k === base ? "base" : k === base + 1 && cover > 0 ? "next" : "off";
+        const was = el._shown, shown = role !== "off";
+        if (was !== shown) { el._shown = shown; el.style.visibility = shown ? "visible" : "hidden"; }
+        if (!shown) return;
+        // a plate no one could see a moment ago takes its place at once; the one on show steps through every stage
+        const snap = !was;
+        if (role === "base") {
+          const blend = quiet ? cut : sm(cover);
+          hand(el, 1 + out, snap, lv, 1, 1 - (quiet ? cut : sm(cover / 0.6)), 1, cover > 0 ? mix(items[k].ground, items[k + 1].ground, blend) : null);
+          const a = k === 0 ? first : 1;
+          pose(el, a, quiet ? 0 : Math.max(-1, Math.min(1, frac * 1.4)), k === 0 ? first : 1, a);
+        } else {
+          hand(el, inn, snap, 0, en, quiet ? cut : sm((cover - 0.35) / 0.65), quiet ? cut : sm((cover - 0.3) / 0.7), "clear");
+          pose(el, quiet ? 1 : easeOut(inn), quiet ? 0 : Math.max(-1, (frac - 1) * 1.4), 1, 1);
+        }
       });
       tone = cover > 0 ? SM.blend(tones[base], tones[base + 1], cover) : tones[base];
       setCurrent(cover > 0.5 ? base + 1 : base);
@@ -130,7 +243,7 @@
     // next scroll makes only the current one current again
     opts.stack?.addEventListener?.("change", () => {
       setHeight(); buildAll();
-      plates.forEach((el) => { if (el) { el._ml = null; el._a = el._f = el._w = null; if (!opts.stack.matches) { el.classList.remove("now"); el.inert = true; } } });
+      plates.forEach((el) => { if (el) { el._stacked = false; el._shown = undefined; el._a = el._f = el._w = el._wk = null; if (!opts.stack.matches) { el.classList.remove("now"); el.inert = true; } } });
       if (!opts.stack.matches) cur = -1;
     });
 
@@ -171,7 +284,7 @@
       /* the row is laid out here, in board units (reel.css: 56.5u wide, 32u tall, 1.4u gaps): a piece stands at full
          height when it fits; one that does not shares a column with the next at half height; what still does not fit
          goes last, where fit() hides it on a desktop and the phone's scrolling row shows it */
-      const piece = ([src, , w, h], k) => `<button class="s-piece" type="button" data-k="${k + 1}" style="--d:${k};aspect-ratio:${w} / ${h}" aria-label="Open piece ${k + 2} of ${N} large"><img src="${src}" width="${w}" height="${h}" alt="" loading="lazy"></button>`;
+      const piece = ([src, , w, h], k) => `<button class="s-piece" type="button" data-k="${k + 1}" data-bloom style="--d:${k};aspect-ratio:${w} / ${h}" aria-label="Open piece ${k + 2} of ${N} large"><img src="${src}" width="${w}" height="${h}" alt="" loading="lazy"></button>`;
       const RW = 56.5, RH = 32, G = 1.4, HALF = (RH - G) / 2;
       const units = [], rest = [];
       let x = (RH * kw) / kh + G, col = null;
@@ -198,7 +311,7 @@
           <div class="s-row">
             <button class="pk-card" type="button" style="aspect-ratio:${kw} / ${kh}" aria-label="Open ${esc(b.name)}'s key visual large">
               <span class="pk-in">
-                <span class="pk-win pic box" data-kind="photo" data-enter="manual" data-still data-wake data-cell="1.4"><img class="full" loading="lazy" src="${kvs}" width="${kw}" height="${kh}" alt="${esc(b.name)}, the key visual"></span>
+                <span class="pk-win pic box" data-kind="photo" data-enter="manual" data-still data-wake data-cell="1.4" data-bloom="0.5 0.96"><img class="full" loading="lazy" src="${kvs}" width="${kw}" height="${kh}" alt="${esc(b.name)}, the key visual"></span>
               </span>
             </button>
             ${row}

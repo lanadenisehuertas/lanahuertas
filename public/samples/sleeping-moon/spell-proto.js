@@ -11,7 +11,7 @@
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const lin = (a, b, v) => clamp((v - a) / (b - a));
   const sm = (a, b, v) => SM.smooth(lin(a, b, v));
-  const still = () => SM.quiet() || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const CAST = 1.15;                      // screens of scroll the casting takes, before the moon starts to rise
   const INK = "#b9a2ff", DIM = "rgba(185,162,255,0.42)", GOLD = "#fff1c9";

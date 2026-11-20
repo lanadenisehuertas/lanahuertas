@@ -49,3 +49,6 @@ AGENTS.md
 .codex-scratch/
 __pycache__/
 .superpowers/
+
+scripts/moon/out/
+scripts/moon/before/

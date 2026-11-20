@@ -59,6 +59,20 @@
 .sl { display: inline-block; }
 :is(a, button):hover > .sw .sl, :is(a, button):focus-visible > .sw .sl { animation: sl 340ms var(--enter) calc(var(--i) * 20ms) both; }
 @keyframes sl { 0% { transform: none; } 40% { transform: translate3d(0, -0.2em, 0); color: var(--mark); } 100% { transform: none; } }
+/* ---------- the name catches the light (magic-proto.js): the letters under the pointer switch into the coarse 1-bit cut
+   in moonlight and lift, their neighbours lift a little, and they spring back when the pointer goes. The coarse letter is
+   drawn over the smooth one in the same place, and the smooth one is hidden while it shows (a hard switch, never both at
+   once); only the lift's transform and what is painted change. The door's own word and the way out through a door are
+   left as they were. */
+.n-rest .ch { position: relative; transition: transform 360ms var(--enter), opacity 240ms linear, translate 420ms var(--pop); }
+.n-rest .ch::after { content: attr(data-c); position: absolute; left: 50%; top: 0; translate: -50% 0; visibility: hidden;
+  font-family: "Redaction 35", Georgia, serif; color: var(--mark); pointer-events: none; }
+.n-rest .ch.nm-up { translate: 0 -0.045em; transition-duration: 360ms, 240ms, 160ms; }
+/* a woken letter is drawn over its neighbours, whose dark halos would otherwise bite into it */
+.n-rest .ch.nm-px { z-index: 1; translate: 0 -0.09em; visibility: hidden; transition-duration: 360ms, 240ms, 140ms; }
+.n-rest:not(.gone) .ch.nm-px::after { visibility: visible; }
+.leave .n-rest .ch.nm-px::after { visibility: hidden; }
+.quiet .n-rest .ch { translate: none; }
 /* headings the scroll writes: letters come up as the page arrives */
 .wtype .ch { opacity: 0.18; transition: opacity 160ms linear; }
 .wtype .ch.w { opacity: 1; }
@@ -150,8 +164,6 @@ body:has(#talk.current) .foot::before { opacity: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   .tg, .pl-cue i, .pl-title.cast .ch, .pl-line.cast, dialog.atlas[open] { animation: none; }
-  .spk-layer, .comet, .motes { display: none; }
-  .wtype .ch { opacity: 1; }
   :is(a, button):hover > .sw .sl, :is(a, button):focus-visible > .sw .sl { animation: none; }
   .veil.out { animation: none; opacity: 0; }
 }

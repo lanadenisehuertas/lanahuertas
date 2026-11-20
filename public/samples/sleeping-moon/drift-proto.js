@@ -4,7 +4,7 @@
    --lx, --ly and --w on the element, which the idle animations read. */
 (() => {
   const { $$ } = SM;
-  const still = () => SM.quiet() || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   let seed = 3;
   const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;

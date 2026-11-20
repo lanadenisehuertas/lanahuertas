@@ -162,46 +162,66 @@
   }
 
   /* ================================================================ VI Contact: first light.
-     The moon that was asleep over the name at the top of the night now sets behind the ground at dawn.
-     Above it: the big "Let's talk", and the address set large across the moon, the way the name
-     crosses it on the first screen. On the ground: the links, a way back to the top, and the sign-off. */
+     The night ends on one scene. On the left, the big "Let's talk", the address with its copy button, and the two
+     profiles. In the middle, the envelope, whose letter is the form (dawn-proto.js writes it). On the right, the last
+     stars, the visitors' own (dawn-proto.js too). Behind the envelope the sun comes up over a pixel horizon, and the six
+     door objects stand on its hills, three on each side; under them, on the ground, the way back to the moon. */
   if ($("#m-talk")) {
     const mount = $("#m-talk");
     const ADDR = "lanadenisehuertas@gmail.com";
     const ext = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3L3 13"/></svg>`;
+    // the six door objects come back at dawn, three on each side of the sun, each a link back to its room; the
+    // letter's own object goes to the address
+    const SIX = [["brands", "Brands", 420, 271], ["posters", "Posters", 216, 420], ["films", "Films", 420, 382], ["products", "Products", 213, 420], ["about", "About", 320, 420], ["contact", "Write to me", 420, 351]];
+    const sixA = ([k, n, w, h]) => `<a href="${k === "contact" ? "#t-mail" : "#" + k}" aria-label="${n}"><span class="pic" data-kind="paint" data-lift="1" style="--ar:${w} / ${h}"><img class="full" src="art/c_${k}.webp" width="${w}" height="${h}" alt="" loading="lazy"></span></a>`;
     mount.innerHTML = `<div class="dawnboard">
-      <span class="pic orn t-moth l" data-kind="line" data-still><img class="full" src="art/e_moth.webp" width="744" height="396" alt=""></span>
-      <span class="pic orn t-moth r" data-kind="line" data-still><img class="full" src="art/e_moth.webp" width="744" height="396" alt=""></span>
-      <div class="env" id="env">
-        <img class="env-back" src="art/env-back.webp" width="815" height="1035" alt="" loading="lazy">
-        <div class="letter">
-          <h2 class="t-big">Let's talk</h2>
-          <p class="t-line">Open for UI/UX, brand and motion work. Replies in two days.</p>
-          <a class="t-addr" href="mailto:${ADDR}">${ADDR}</a>
-          <button class="go" type="button" id="t-copy">Copy the address</button>
-        </div>
-        <img class="env-front" src="art/env-front.webp" width="815" height="1035" alt="" loading="lazy">
-      </div>
-      <div class="t-ground">
-        <span class="pic orn t-lily l" data-kind="line" data-still><img class="full" src="art/e_lily.webp" width="457" height="904" alt=""></span>
-        <span class="pic orn t-lily r" data-kind="line" data-still><img class="full" src="art/e_lily.webp" width="457" height="904" alt=""></span>
+      <div class="t-head">
+        <h2 class="t-big">Let's talk</h2>
+        <p class="t-mail" id="t-mail"><a class="t-addr" href="mailto:${ADDR}">${ADDR}</a><button class="go" type="button" id="t-copy">Copy the address</button></p>
         <nav class="t-links" aria-label="Elsewhere">
           <a class="go" href="https://www.linkedin.com/in/lana-denise-huertas/" target="_blank" rel="noopener">LinkedIn ${ext}<span class="vh"> (opens a new tab)</span></a>
-          <a class="go" href="#moon" id="t-top">Back to the moon</a>
           <a class="go" href="https://github.com/lanadenisehuertas/" target="_blank" rel="noopener">GitHub ${ext}<span class="vh"> (opens a new tab)</span></a>
         </nav>
-        <p class="t-made">Made in Manila by Lana Huertas, 2026</p>
       </div>
+      <div class="env" id="env">
+        <img class="env-back" src="art/env-back.webp" width="815" height="1035" alt="" loading="lazy">
+        <div class="letter"></div>
+        <img class="env-front" src="art/env-front.webp" width="815" height="1035" alt="" loading="lazy">
+      </div>
+      <div class="t-dawn">
+        <canvas class="t-sun" aria-hidden="true"></canvas>
+        <canvas class="t-hills" aria-hidden="true"></canvas>
+        <nav class="t-six" aria-label="The rooms, awake">${SIX.map(sixA).join("")}</nav>
+      </div>
+      <p class="t-back"><a class="go" href="#moon" id="t-top">Back to the moon</a></p>
     </div>`;
     /* the letter rises out of the envelope as the dawn comes up the window, and sinks back if you scroll back */
     const env = $("#env"), talk = $("#talk");
+    // the six come back awake, in colour, one after another as the dawn settles; they are made here so the scrub below
+    // can set their floors, and they load when the contact stop is within a screen
+    const sixBms = SM.pictures($(".t-six", mount));
+    SM.whenNear(mount, () => sixBms.forEach((b) => b.load().then(() => { b.show = 1; b.draw(); }).catch(() => {})));
     SM.scrub(() => {
       const w = SM.where(talk);
       if (!w.near) return;
       const v = SM.quiet() ? 1 : SM.smooth(Math.min(1, Math.max(0, (w.arrive - 0.35) / 0.55))), V = v.toFixed(3);
-      if (env._v !== V) { env._v = V; env.style.setProperty("--up", V); }
+      if (env._v !== V) {
+        env._v = V; env.style.setProperty("--up", V);
+        sixBms.forEach((b, k) => b.setFloor(SM.quiet() ? 1 : Math.max(0, Math.min(1, v * 1.6 - k * 0.1))));
+      }
     });
     SM.pictures(mount);
+    // each of the six is a link back to its room: the five rooms travel there through the iris, and the letter's own
+    // object brings the address line to the middle of the window. A first tap on a phone only wakes the picture.
+    $$(".t-six a", mount).forEach((a) => {
+      SM.wakeable(a, { line: a.getAttribute("aria-label") });
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (a.hash === "#t-mail") { $(".t-mail", mount)?.scrollIntoView({ block: "center", behavior: SM.quiet() ? "auto" : "smooth" }); return; }
+        const r = a.getBoundingClientRect();
+        SM.travel(a.hash.slice(1), { x: r.left + r.width / 2, y: r.top + r.height / 2 });
+      });
+    });
     $$(".type", mount).forEach(SM.type);
     const copy = $("#t-copy");
     let t = 0;
