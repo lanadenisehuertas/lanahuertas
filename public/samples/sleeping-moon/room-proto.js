@@ -32,8 +32,9 @@
   const bell = (x) => (x > 0 && x < 1 ? Math.sin(Math.PI * x) : 0);
   const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
 
-  /* the beats, in screens of scroll through the room (the stage holds for SPAN screens) */
-  const SPAN = 5;
+  /* the beats, in screens of scroll through the room (the stage holds for five screens; SPAN is where the room is done
+     with: on phones a little past the five, as the night opens while the stage goes on up the page with the moon's stop) */
+  let SPAN = 5;
   /* paced so that each beat takes 0.8 to 1 screen of scroll once warped, as the rest of the page does: the opening, the
      six rising and flying, the star drawn, the push to the window, the landing */
   const BEAT = { cout: [4.0, 4.3], mout: [4.2, 4.5], rise: [1.2, 2.23], name: [0.8, 1.15], lift: 1.85, stagger: 0.1, fly: 0.55, draw: [2.32, 2.98], push: [2.98, 3.82], land: [3.82, 4.65] };
@@ -89,10 +90,11 @@
       name: { top: 150, role: 36 },
       cams: [{ x: 0, y: 40, z: 150, pitch: -3 }, { x: 40, y: 48, z: -220, pitch: -2.5 }],
       ring: { x: 40, y: 50, z: -560, r: 200, out: -2200 },
-      // the moon's stop comes up from below on phones and reaches the top at 5 screens: the circle and the moon land at
-      // the moon's resting place first, then the night opens over the last tenth of a screen as the stop arrives under
-      // them, and they hand over to its own moon in the same place
-      beat: { push: [2.98, 3.95], land: [3.95, 4.85], night: [4.88, 4.99], cout: [4.88, 4.98], mout: [4.9, 4.99] },
+      // the moon's stop comes up from below on phones, under the night, and reaches the top at 5 screens, where the stage
+      // lets go and goes on up the page with it. The circle and the moon land at the moon's resting place first, and the
+      // night opens only once the stage and the stop move as one: so the room's moon lies on the stop's own moon and goes
+      // up the page with it while the circle dissolves, and nothing ever stands still over the page as it scrolls under
+      beat: { push: [2.98, 3.95], land: [3.95, 4.85], night: [5.0, 5.2], cout: [5.0, 5.16], mout: [5.04, 5.2] },
       items: [
         ["window", "window", 290, 40, 300, -992],
         ["about", "about", 150, 270, 20, -982],
@@ -285,10 +287,12 @@
     // a phone on its side keeps the phone's page (the moon's stop in one column, so the phone's beats and landing), but
     // its screen is wide, so it is given the wide room, which fills it, rather than the tall one standing small in the middle
     built = key; set = SETS[key === "side" ? "wide" : key]; B = { ...BEAT, ...(key === "wide" ? {} : SETS.tall.beat) }; P = set.lens || 2400;
+    SPAN = key === "wide" ? 5 : 5.22;
+    stageSize();
     const { w: vw, h: vh } = set.view, r = set.ring;
     // the planes' drawing density (PK, above): about 2.4 device pixels for each pixel the view shows at rest, never more
     // than full size and never under a third
-    PK = Math.round(Math.min(1, Math.max(0.33, (Math.min(SM.vw / vw, SM.vh / vh) * 2.4) / (devicePixelRatio || 1))) * 100) / 100;
+    PK = Math.round(Math.min(1, Math.max(0.33, (Math.min(SW / vw, SH / vh) * 2.4) / (devicePixelRatio || 1))) * 100) / 100;
     pos = {};
     for (const [id, art, w, x, by, z] of set.items) {
       const h = (w * IMG[art][1]) / IMG[art][0];
@@ -377,9 +381,19 @@
 
   /* ------------------------------------------------------------------ fitting the view to the screen; one size of cell */
   let kv = 1;
+  /* the stage's own size, and the screen the scroll through the room is counted in. On phones the stage is as tall as
+     the screen with the browser's bars tucked away (100lvh, room-proto.css), so it always covers the whole screen, while
+     the scroll is counted in the screen with the bars out (svh), which never changes as the bars come and go: so the
+     beats fall at the same places of the page whatever the bars do, and the moon's stop reaches the top exactly at five */
+  let SW = 0, SH = 0, UNIT = 0;
+  const stageSize = () => {
+    SW = host.clientWidth || SM.vw; SH = host.clientHeight || SM.vh;
+    UNIT = (sec.offsetHeight - host.offsetHeight) / 5 || SM.vh;
+  };
   const fit = () => {
     const { w: vw, h: vh } = set.view;
-    kv = Math.min(SM.vw / vw, SM.vh / vh);
+    stageSize();
+    kv = Math.min(SW / vw, SH / vh);
     view.style.transform = `translate(-50%,-50%) scale(${kv.toFixed(4)})`;
     // every bitmap's cells come out one size on screen, as coarse as the board's at the nearest the camera brings it
     const U = SM.u();
@@ -489,9 +503,10 @@
     // still coming up under the room, so the camera flies one straight line to it instead of rising and sinking with it
     if (!SM.COLUMN.matches) { const bd = rectNow(board), up = Math.max(0, rectNow(hero).top); return { cx: bd.left + 50 * U, cy: bd.top - up + 28.8 * U, R: 28 * U }; }
     // on phones the moon's stop is still below the fold while the circle flies: aim at where its moon will rest once the
-    // stop has come up to the top, and move with the stop over the last moments as the night opens onto it
+    // stop has come up to the top. That is a place on the stage, not on the screen: the stage is held at the top until the
+    // stop arrives there, and then goes on up the page with it, so its top and the stop's are one from then on
     const m = rectNow($("#moonpic")), top = rectNow(hero).top;
-    return { cx: m.left + m.width / 2, cy: m.top - top * (1 - sm(B.night[0], B.night[1], p)) + m.height / 2, R: m.width * 0.62 };
+    return { cx: m.left + m.width / 2, cy: m.top - top + m.height / 2, R: m.width * 0.62 };
   };
   /* where the board's moon sits once risen, and so where the room's moon must be in the room, at the circle's depth, to
      land on it: its centre and diameter in room units, and the scale things at that depth have at the end */
@@ -499,14 +514,14 @@
     const tg = target(), r = set.ring, sc = tg.R / (r.r * kv), m = $("#moonpic"), mr = rectNow(m);
     const ty = moonTy(m);
     let cx = mr.left + mr.width / 2, cy = mr.top + mr.height / 2 - ty;
-    if (SM.COLUMN.matches) cy -= rectNow(hero).top * (1 - sm(B.night[0], B.night[1], p));
+    if (SM.COLUMN.matches) cy -= rectNow(hero).top;
     else cy -= Math.max(0, rectNow(hero).top);
     return { sc, d: moonW(m) / (kv * sc), x: r.x + (cx - tg.cx) / (kv * sc), y: r.y + (cy - tg.cy) / (kv * sc) };
   };
   // where the camera must stand at the end, so the flown-out circle lands exactly on the board's circle
   const endCam = (tg) => {
     const r = set.ring, sc = tg.R / (r.r * kv);
-    return { x: r.x - (tg.cx - SM.vw / 2) / (kv * sc), y: r.y - (tg.cy - SM.vh / 2) / (kv * sc), z: r.out - P + P / sc };
+    return { x: r.x - (tg.cx - SW / 2) / (kv * sc), y: r.y - (tg.cy - SH / 2) / (kv * sc), z: r.out - P + P / sc };
   };
 
   /* the pointer moves the camera a little to the side and up or down (LOOK, in room units at its far end), so the near
@@ -528,7 +543,7 @@
     return s + WARP_A * s * (1 - x) * (1 - x);
   };
   // the room's section sits in the page's flow, so its place comes from the scroll and a measure kept between resizes
-  const scrollT = () => warp(-SM.where(sec).top / SM.vh);
+  const scrollT = () => warp(-SM.where(sec).top / (UNIT || SM.vh));
   const kick = () => { if (!raf && inView) { lastT = performance.now(); raf = requestAnimationFrame(loop); } };
   const loop = (now) => {
     raf = 0;

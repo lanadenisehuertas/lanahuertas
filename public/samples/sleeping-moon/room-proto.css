@@ -3,7 +3,17 @@
 /* the stage holds for five screens and its last screens lie over the moon's first: on wide screens the moon's board is
    already pinned under it by then (two screens of overlap), on phones it comes up from below (one) */
 .room-intro { position: relative; z-index: 10; height: 600svh; margin-bottom: -200svh; pointer-events: none; }
-@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .room-intro { margin-bottom: -100svh; } }
+/* on phones the stage is as tall as the screen with the browser's bars tucked away (100lvh), so no strip of the page ever
+   shows under it while the bars are hidden; the section is that much taller, and the moon's stop starts that much higher,
+   so the stage still holds for five screens with the bars out (svh) and lets go exactly as the stop reaches the top */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .room-intro { height: calc(500svh + 100lvh); margin-bottom: -100lvh; }
+  .room-intro .rm-stage { height: 100lvh; }
+}
+/* while the room's night is whole nothing behind it can be seen, so the stops after the moon's are not drawn at all,
+   nor the page's sky and its twinkling stars: their layers are let go, which leaves a phone the memory the room's camera
+   needs, also when the room is come back to from far down the page */
+.room-covers main > .stop:not(.hero), .room-covers .sky, .room-covers .tg { visibility: hidden; }
 /* the moon's board no longer opens with its own title, and the phone's separate spell stage is not needed */
 .has-study .hero.rising .prelude { display: none; }
 .has-study .cast-ph { display: none !important; }
