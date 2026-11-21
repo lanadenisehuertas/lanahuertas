@@ -93,6 +93,9 @@ main > .stop.reel { display: block; padding: 0; min-height: 0; }
   /* the row scrolls sideways only: a few pixels of height overflow made it take vertical swipes, so the page stuck */
   .s-row { order: -1; height: 42svh; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; gap: 10px; align-items: stretch; }
   .s-row::-webkit-scrollbar { display: none; }
+  /* paged (SM.pager), a sideways swipe across the brand's pictures goes to the next brand rather than scrolling them;
+     a tap on any of them opens all of the brand's pictures large, to swipe through there */
+  .paged .s-row { overflow-x: clip; touch-action: pan-y; }
   .s-piece[hidden] { display: block; }
   .s-col, .s-col[hidden] { display: contents; }
   .s-col .s-piece { height: auto; }

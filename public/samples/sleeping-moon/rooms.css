@@ -40,6 +40,7 @@ main > .stop.pinned { display: block; padding: 0; min-height: 0; }
 #posters .pk-text { gap: 0; }
 #posters .po-m { margin-top: 6px; }
 #posters .po-d { margin-top: 20px; }
+.po-text .steps { display: none; }
 #posters #po-big { margin-top: 28px; }
 
 /* ---------- III Films: the monitor and the timeline ---------- */
@@ -220,6 +221,13 @@ main > .stop.products { --a-ink: #b9a2ff; }
   .clip { min-width: 24px; }
   .clip .c-t { display: none; }
 
+  /* phones, paged (SM.pager): the posters' own arrows under their words; the apps stand in one place, each at its own
+     height, and only the one on show is seen, so the room is as tall as its tallest app rather than one screen */
+  .paged .po-text .steps { display: flex; margin-top: 14px; }
+  main > .stop.products.paged { height: auto !important; }
+  .products.paged .stage { display: grid; }
+  .products.paged .stage { align-items: start; }
+  .products.paged .reel-plate { grid-area: 1 / 1; align-self: start; }
   /* products: the four apps one under another, no sticking */
   main > .stop.products { height: auto !important; }
   .products .stage { position: relative; height: auto; overflow: visible; display: block; }

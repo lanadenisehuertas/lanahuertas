@@ -1253,6 +1253,54 @@ const SM = (() => {
     }
     $(".prev", box).disabled = i === 0; $(".next", box).disabled = i === n - 1;
   };
+  /* ====================================================================== the pager (phones)
+     On a phone, a room that shows one work at a time (brands, posters, films, products) does not play its works one
+     after another as the page scrolls past: it stands one screen tall (moon.css .paged), and a sideways swipe across
+     it, its arrows or its tabs take it from one work to the next. The room keeps its own handover (the blooms, the
+     letters, the worlds): the pager only gives it a position, q, which glides to the work asked for, in place of the
+     one the scroll would have given. rest is where in its step a work rests (a film rests a little way into its clip).
+     pager(stop, n, rest) returns { on, q, go(i, instant), at() } and keeps it on the stop as stop._pg. */
+  const PAGED = COLUMN;
+  const pager = (stop, n, rest = 0) => {
+    let from = rest, t0 = 0, dur = 1, raf = 0;
+    const pg = { q: rest, t: rest, n, get on() { return PAGED.matches; } };
+    stop._pg = pg;
+    const mark = () => { stop.classList.toggle("paged", PAGED.matches); gen++; kick(); };
+    mark(); PAGED.addEventListener("change", mark);
+    // the glide from one work to another: eased in and out, a little longer the further it goes
+    const step = (now) => {
+      if (!t0) t0 = now;
+      const k = Math.min(1, (now - t0) / dur), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(2 - 2 * k, 3) / 2;
+      pg.q = from + (pg.t - from) * e;
+      kick();
+      raf = k < 1 ? requestAnimationFrame(step) : 0;
+    };
+    pg.go = (i, instant) => {
+      const t = Math.max(0, Math.min(n - 1, i)) + rest;
+      cancelAnimationFrame(raf); raf = 0;
+      from = pg.q; pg.t = t; t0 = 0;
+      if (instant) { pg.q = t; kick(); return; }
+      dur = Math.min(1500, 700 + 220 * Math.max(0, Math.abs(t - from) - 1));
+      raf = requestAnimationFrame(step);
+    };
+    pg.at = () => Math.round(pg.t - rest);
+    // a swipe: a finger (or a mouse) moved mostly sideways by more than 40px goes one work on or back; an upright one
+    // is left to the page, which scrolls on past the room. A swipe is not also a tap on what it started on.
+    let sx = 0, sy = 0, id = null, swiped = false;
+    stop.addEventListener("pointerdown", (e) => {
+      if (!pg.on || e.button > 0 || e.target.closest(".a-track, input, textarea, select")) { id = null; return; }
+      id = e.pointerId; sx = e.clientX; sy = e.clientY; swiped = false;
+    }, { passive: true });
+    stop.addEventListener("pointerup", (e) => {
+      if (e.pointerId !== id) return;
+      id = null;
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.4) { swiped = true; setTimeout(() => (swiped = false), 350); pg.go(pg.at() + (dx < 0 ? 1 : -1)); }
+    }, { passive: true });
+    stop.addEventListener("pointercancel", () => (id = null), { passive: true });
+    stop.addEventListener("click", (e) => { if (swiped) { swiped = false; e.preventDefault(); e.stopPropagation(); } }, true);
+    return pg;
+  };
   /** a thin drawn arrow, for .arw buttons */
   const arrow = (dir) => `<svg viewBox="0 0 26 14" aria-hidden="true"><path d="${dir < 0 ? "M25 7H2M7.5 1.5L2 7l5.5 5.5" : "M1 7h23M18.5 1.5L24 7l-5.5 5.5"}"/></svg>`;
   addEventListener("pageshow", () => tick());
@@ -1273,5 +1321,5 @@ const SM = (() => {
     try { items[j].focus({ preventScroll: true }); } finally { arrowing = false; }
     go(j);
   });
-  return { $, $$, u, quiet, HOVER, COLUMN, Bitmap, pictures, bitmap, type, swap, say, go, glide, scrub, where, whenNear, smooth, bloom, band, tone, blend, travel, view, wakeable, arrows, stars, tick, moonSvg, start, arrow, corners, steps, setSteps, landing, onStop: (fn) => listeners.push(fn), get stop() { return current; }, get placedGen() { return gen; }, get moving() { return !!frameReq; }, get arrowing() { return arrowing; }, measure: (fn) => { measures.add(fn); return () => measures.delete(fn); }, get y() { return readY(); }, get vw() { return VW; }, get vh() { return VH; } };
+  return { $, $$, u, quiet, HOVER, COLUMN, Bitmap, pictures, bitmap, type, swap, say, go, glide, scrub, where, whenNear, smooth, bloom, band, tone, blend, travel, view, wakeable, arrows, stars, tick, moonSvg, start, arrow, corners, steps, setSteps, landing, pager, onStop: (fn) => listeners.push(fn), get stop() { return current; }, get placedGen() { return gen; }, get moving() { return !!frameReq; }, get arrowing() { return arrowing; }, measure: (fn) => { measures.add(fn); return () => measures.delete(fn); }, get y() { return readY(); }, get vw() { return VW; }, get vh() { return VH; } };
 })();

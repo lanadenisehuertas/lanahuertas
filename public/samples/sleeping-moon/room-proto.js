@@ -117,11 +117,42 @@
      a little softer, at about a fifth of the memory. A wide screen at ordinary density keeps them at full size. */
   let PK = 1;
   const PS = () => (PK < 1 ? ` scale(${(1 / PK).toFixed(4)})` : "");
-  const svg = (w, h, body) => `<svg viewBox="0 0 ${w} ${h}" width="${(w * PK).toFixed(1)}" height="${(h * PK).toFixed(1)}" aria-hidden="true">${body}</svg>`;
+  /* Every plane is a bitmap picture, not live drawing. A 3D layer that holds drawing is redrawn by iPhone Safari at the
+     size it takes on the screen, and as the camera pushes through the window the walls and the floor fill several
+     screens: drawn at that size at three times density they came to well over a gigabyte, and the tab crashed just
+     after the six gathered. A layer that is only a bitmap picture is handed to the graphics chip as it is and never
+     redrawn, however large it grows. So each plane's lines are drawn once into a bitmap (rasterize, below) and shown
+     as an <img> that carries the plane's own 3D transform, and the solid tone behind them is a plain coloured box,
+     which needs no drawing at all. svg() keeps a drawing (its viewBox, size and markup) and returns its number. */
+  let RAS = [];
+  const svg = (w, h, body, vb) => (RAS.push([vb || `0 0 ${w} ${h}`, w, h, body]), RAS.length - 1);
+  /** a plane's bitmap: an <img> of drawing k at PK of its size, with the plane's transform (scaled back up by PS) */
+  const pimg = (cls, k, tf) => `<img class="${cls}" data-ras="${k}" width="${Math.round(RAS[k][1] * PK)}" height="${Math.round(RAS[k][2] * PK)}" alt="" style="transform:${tf}${PS()}">`;
+  const blobs = [];
+  /** draws every registered drawing into a bitmap and gives it to its <img>; if the browser will not let a drawing be
+      read back from a canvas, the <img> shows the drawing itself, which looks the same */
+  const rasterize = () => {
+    while (blobs.length) URL.revokeObjectURL(blobs.pop());
+    $$("img[data-ras]", host).forEach((im) => {
+      const [vb, w, h, body] = RAS[+im.dataset.ras] || [];
+      if (!body) return;
+      const W = Math.max(1, Math.round(w * PK)), H = Math.max(1, Math.round(h * PK));
+      const src = new Image();
+      src.onload = () => {
+        try {
+          const c = document.createElement("canvas"); c.width = W; c.height = H;
+          c.getContext("2d").drawImage(src, 0, 0, W, H);
+          c.toBlob((b) => { if (!b) { im.src = src.src; return; } const u = URL.createObjectURL(b); blobs.push(u); im.src = u; });
+        } catch (_) { im.src = src.src; }
+      };
+      src.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" width="${W}" height="${H}">${body}</svg>`);
+    });
+  };
   /** one rail and a crown moulding along a wall w wide and h tall, dotted like the rules of the moon's board, so the room is drawn
       in the same hand as the page it flies to */
   const rail = (w, h) => `<path d="M0 ${h * 0.74}H${w}M0 18H${w}" stroke="${DIM}" stroke-width="4" stroke-dasharray="4 12" fill="none"/>`;
   const planes = (set) => {
+    RAS = [];
     const { w, h, back, front } = set.box, d = front - back, win = set.items.find((i) => i[0] === "window");
     const ww = win[2], wh = (ww * IMG.window[1]) / IMG.window[0], wx = win[3] + w / 2, wTop = win[4] - wh + h / 2;
     // the hole the window fills: a pointed arch a little inside its stone frame, so the frame always hides its edge and
@@ -157,8 +188,9 @@
       const body = `<path d="${c.line}" stroke="${INK}" stroke-width="3" fill="none"/><path d="${c.folds}" stroke="${DIM}" stroke-width="3" stroke-dasharray="4 10" fill="none"/>` +
         `<path d="${c.tieback}" stroke="${INK}" stroke-width="4" fill="none"/>`;
       const pivot = sgn < 0 ? bw - 40 : 40;
-      return `<div class="rm-pl rm-lines" style="transform:translate3d(${(x0 - w / 2).toFixed(1)}px,${(rodY - h / 2).toFixed(1)}px,${back + 1}px)${PS()}">` +
-        `<svg class="rm-drape${sgn < 0 ? "" : " rm-drape-r"}" viewBox="${x0.toFixed(1)} ${rodY} ${bw.toFixed(1)} ${bh}" width="${(bw * PK).toFixed(1)}" height="${(bh * PK).toFixed(1)}" style="transform-origin:${(pivot * PK).toFixed(0)}px 0" aria-hidden="true">${body}</svg></div>`;
+      const k = svg(bw, bh, body, `${x0.toFixed(1)} ${rodY} ${bw.toFixed(1)} ${bh}`);
+      return `<div class="rm-hang" style="transform:translate3d(${(x0 - w / 2).toFixed(1)}px,${(rodY - h / 2).toFixed(1)}px,${back + 1}px)${PS()}">` +
+        `<img class="rm-pl rm-lines rm-drape${sgn < 0 ? "" : " rm-drape-r"}" data-ras="${k}" width="${Math.round(bw * PK)}" height="${Math.round(bh * PK)}" alt="" style="transform-origin:${(pivot * PK).toFixed(0)}px 0"></div>`;
     };
     // the window's night: a pane just behind the glass with its own sky, so the window is never a dead black hole.
     // Stars twinkle, thin clouds drift across, now and then a star falls, and a haze of moonlight breathes low in the
@@ -190,7 +222,7 @@
     const motes = `<div class="rm-dust" style="width:${(ww * 1.5).toFixed(0)}px;height:${(h * 0.75).toFixed(0)}px;transform:translate3d(${(wx - ww * 0.75 - w / 2).toFixed(1)}px,${(-h * 0.3).toFixed(1)}px,${back + 380}px)">${dust}</div>`;
     // no stars on the wall itself: the night is only ever seen through the window's glass
     const backWall = svg(w, h, rail(w, h) + `<g stroke="${DIM}" stroke-width="3" stroke-dasharray="4 10" fill="none">${panels}</g>` + curtains + `<rect x="1.5" y="1.5" width="${w - 3}" height="${h - 3}" stroke="${INK}" stroke-width="3" fill="none"/>`);
-    const side = svg(d, h, `<rect width="${d}" height="${h}" fill="${SIDE}"/>${rail(d, h)}${edge(`M${d - 1.5} 0V${h}`)}`);
+    const side = svg(d, h, `${rail(d, h)}${edge(`M${d - 1.5} 0V${h}`)}`);
     // the floor: a few boards running away toward the window
     // the boards are laid across the room, parallel to the back wall, so the floor recedes in steps instead of running
     // to one vanishing point down the middle
@@ -199,21 +231,25 @@
     const ry = front - (back + 520), rug = `<g fill="none"><ellipse cx="${w / 2}" cy="${ry}" rx="430" ry="250" fill="${FLOOR}" stroke="${INK}" stroke-width="3"/>` +
       `<ellipse cx="${w / 2}" cy="${ry}" rx="380" ry="205" stroke="${DIM}" stroke-width="3" stroke-dasharray="4 10"/>` +
       `<ellipse cx="${w / 2}" cy="${ry}" rx="452" ry="272" stroke="${DIM}" stroke-width="6" stroke-dasharray="2 9"/></g>`;
-    const floor = svg(w, d, `<rect width="${w}" height="${d}" fill="${FLOOR}"/><path d="${boards}" stroke="${DIM}" stroke-width="4" stroke-dasharray="4 12" fill="none"/>${rug}${edge(`M0 ${d - 1.5}H${w}`)}`);
-    const ceil = svg(w, d, `<rect width="${w}" height="${d}" fill="${CEIL}"/>`);
+    const floor = svg(w, d, `<path d="${boards}" stroke="${DIM}" stroke-width="4" stroke-dasharray="4 12" fill="none"/>${rug}${edge(`M0 ${d - 1.5}H${w}`)}`);
+    const ceil = svg(w, d, "");
     // a plane with a tone of its own dims its lines under a shade of that same tone (a layer whose opacity alone changes,
     // so dimming never repaints the drawing); the back wall's lines have no fill of their own and simply fade
-    const at = (tf, html, tone) => `<div class="rm-pl${tone ? "" : " rm-lines"}" style="transform:${tf}${PS()}">${html}${tone ? `<i class="rm-shade" style="background:${tone}"></i>` : ""}</div>`;
+    // (now: the tone is a plain coloured box, and the lines a bitmap a hair in front of it, toward the inside of the room
+    // (dz), which dim by fading; a plain box is drawn by the graphics chip and costs no memory however large it grows)
+    const at = (tf, k, tone, dz = 0) => (tone ? `<i class="rm-pl rm-fill" style="width:${RAS[k][1]}px;height:${RAS[k][2]}px;background:${tone};transform:${tf}"></i>` : "") +
+      (RAS[k][3] ? pimg("rm-pl rm-lines", k, `${tf} translateZ(${dz}px)`) : "");
     // the floor and the ceiling are laid down from the front edge backwards; the side walls stand from the front edge back
-    return pane + `<div class="rm-pl rm-mask" style="transform:translate3d(${-w / 2}px,${-h / 2}px,${back - 1}px)${PS()}">${backFill}</div>` +
+    return pane + pimg("rm-pl rm-mask", backFill, `translate3d(${-w / 2}px,${-h / 2}px,${back - 1}px)`) +
       at(`translate3d(${-w / 2}px,${-h / 2}px,${back}px)`, backWall) + hang(L, -1) + hang(R, 1) + motes +
-      at(`translate3d(${-w / 2}px,${h / 2}px,${front}px) rotateX(-90deg)`, floor, FLOOR) +
-      `<div class="rm-beam" style="transform:translate3d(${-w / 2}px,${h / 2 - 1}px,${front}px) rotateX(-90deg)${PS()}">${svg(w, d,
+      // (each toned plane's lines sit 2px toward the inside: up from the floor, right of the left wall, left of the right)
+      at(`translate3d(${-w / 2}px,${h / 2}px,${front}px) rotateX(-90deg)`, floor, FLOOR, -2) +
+      pimg("rm-beam", svg(w, d,
         `<defs><linearGradient id="rmb" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#d9ccff" stop-opacity="0.34"/><stop offset="1" stop-color="#b9a2ff" stop-opacity="0"/></linearGradient></defs>` +
-        `<path d="M${wx - ww * 0.3} ${d}L${wx + ww * 0.3} ${d}L${wx + ww * 0.95} ${d - 1250}L${wx - ww * 0.95} ${d - 1250}z" fill="url(#rmb)"/>`)}</div>` +
+        `<path d="M${wx - ww * 0.3} ${d}L${wx + ww * 0.3} ${d}L${wx + ww * 0.95} ${d - 1250}L${wx - ww * 0.95} ${d - 1250}z" fill="url(#rmb)"/>`), `translate3d(${-w / 2}px,${h / 2 - 1}px,${front}px) rotateX(-90deg)`) +
       at(`translate3d(${-w / 2}px,${-h / 2}px,${front}px) rotateX(-90deg)`, ceil, CEIL) +
-      at(`translate3d(${-w / 2}px,${-h / 2}px,${front}px) rotateY(90deg)`, side, SIDE) +
-      at(`translate3d(${w / 2}px,${-h / 2}px,${front}px) rotateY(90deg)`, side, SIDE);
+      at(`translate3d(${-w / 2}px,${-h / 2}px,${front}px) rotateY(90deg)`, side, SIDE, 2) +
+      at(`translate3d(${w / 2}px,${-h / 2}px,${front}px) rotateY(90deg)`, side, SIDE, -2);
   };
 
   /* ------------------------------------------------------------------ building the room */
@@ -271,7 +307,7 @@
     const bs = r.r * 0.8;
     host.innerHTML = `<div class="rm-view" aria-hidden="true" style="width:${vw}px;height:${vh}px;perspective:${P}px">
         <div class="rm-world">
-          <div class="rm-sky"><canvas></canvas></div>
+          <img class="rm-sky" width="1600" height="1000" alt="">
           <div class="rm-moon"><span class="pic moon" data-kind="moon" data-enter="manual" data-still><img class="full" src="art/moon-asleep.webp" width="640" height="640" alt=""></span></div>
           ${planes(set)}
           ${set.items.map(piece).join("")}
@@ -304,7 +340,7 @@
       shades: $$(".rm-shade", host),
       room: [...$$(".rm-leaf", host).filter((el) => el.dataset.id !== "window"), $(".rm-dust", host)].filter(Boolean),
     };
-    drawSky();
+    rasterize(); drawSky();
     for (const [id] of set.items) if (!SIX.includes(id)) place(els[id], pos[id], 0);
     pics = SM.pictures(host);
     loads = pics.map((b) => b.load().then(() => b.setShow(1)).catch(() => {}));
@@ -325,7 +361,7 @@
   /** the night beyond the window: a far plane of sparse stars, kept as single pixels, the room's one wide bitmap. Its
       canvas is drawn at one pixel a cell and stretched five times by CSS (room-proto.css), unsmoothed */
   const drawSky = () => {
-    const cv = $(".rm-sky canvas", host), g = cv.getContext("2d");
+    const cv = document.createElement("canvas"), g = cv.getContext("2d");
     cv.width = 1600; cv.height = 1000;
     let s = 5; const rnd = () => ((s = (s * 16807) % 2147483647) - 1) / 2147483646;
     for (let i = 0; i < 380; i++) {
@@ -334,6 +370,9 @@
       g.fillRect(x, y, 1, 1);
       if (b > 0.97) { g.fillRect(x - 1, y, 3, 1); g.fillRect(x, y - 1, 1, 3); }
     }
+    // shown as a bitmap picture, which the graphics chip enlarges as it is (see rasterize)
+    const im = $(".rm-sky", host);
+    cv.toBlob((b) => { if (!b || !im) return; const u = URL.createObjectURL(b); blobs.push(u); im.src = u; });
   };
 
   /* ------------------------------------------------------------------ fitting the view to the screen; one size of cell */

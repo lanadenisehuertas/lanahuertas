@@ -195,6 +195,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .arw[disabled] { opacity: 0.28; pointer-events: none; }
 /* the one control every room uses: "3 of 12" and the two arrows */
 .steps { display: flex; align-items: center; gap: 12px; }
+/* phones: a room that shows one work at a time stands one screen tall and is paged by a sideways swipe, its arrows
+   and its tabs (SM.pager, moon.js), not by the scroll; a swipe across it is the room's, an upright one scrolls the page */
+main > .stop.paged { height: 100svh !important; }
+.stop.paged .stage { touch-action: pan-y; }
 .steps .count { color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
 /* the counter's stars, drawn as pixel crosses like the rest of the night: passed ones lit, the current one with long
    arms in the moon's cream, those to come faint */

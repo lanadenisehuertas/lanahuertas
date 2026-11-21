@@ -142,9 +142,13 @@
   SM.reel = (stop, items, opts = {}) => {
     const n = items.length, STEP = opts.step || 0.85;
     const stage = $(".stage", stop);
+    /* on a phone the reel is paged (SM.pager): one screen tall, moved by swipe, arrows and tabs rather than the scroll;
+       opts.paged "all" builds every plate at once, for a room whose plates stand in one place at their own height */
+    const pg = opts.paged ? SM.pager(stop, n) : null;
+    const stacked = () => !!opts.stack?.matches && !pg?.on;
     stop.dataset.ground = items[0].ground; stop.dataset.ink = items[0].ink;   // the travel iris arrives in the first world's colours
     // half a screen more than the plates need, so the last one rests whole before the stop moves on
-    const setHeight = () => (stop.style.height = opts.stack?.matches ? "" : `calc(${((n - 1) * STEP + 1.5).toFixed(3)} * 100svh)`);
+    const setHeight = () => (stop.style.height = stacked() ? "" : `calc(${((n - 1) * STEP + 1.5).toFixed(3)} * 100svh)`);
     setHeight();
     const plates = new Array(n).fill(null);
     let cur = -1;
@@ -174,7 +178,7 @@
     const tones = items.map((it) => SM.tone({ ground: it.ground, ink: it.ink, text: "#ece6ff", mark: "#fff1c9", rule: mix(it.ground, it.ink, 0.55) }));
     let tone = null;
     stop._tone = (y) => {
-      if (!opts.stack?.matches) return tone || tones[Math.max(0, cur)];
+      if (!stacked()) return tone || tones[Math.max(0, cur)];
       let k = 0;
       plates.forEach((el, j) => { if (el && el.getBoundingClientRect().top <= y) k = j; });
       return tones[k];
@@ -257,7 +261,7 @@
       if (!w.near) return;
       /* opts.stack (a media query): while it matches, every plate is built and shown one under another, each
          arriving as it comes into the window */
-      if (opts.stack?.matches) {
+      if (stacked()) {
         for (let k = 0; k < n; k++) make(k);
         plates.forEach((el, k) => {
           if (!el._stacked) {
@@ -271,9 +275,10 @@
         });
         return;
       }
-      const vh = w.vh, q = Math.min(n - 1, Math.max(0, -w.top / (STEP * vh)));
+      const vh = w.vh, q = pg?.on ? pg.q : Math.min(n - 1, Math.max(0, -w.top / (STEP * vh)));
       const base = Math.min(n - 1, Math.floor(q)), frac = q - base;
       const cover = base >= n - 1 ? 0 : clamp((frac - COVER[0]) / COVER[1]);
+      if (pg?.on && opts.paged === "all") for (let k = 0; k < n; k++) make(k);
       for (let k = base - 1; k <= base + 2; k++) make(k);
       const first = easeOut(clamp(w.arrive / 0.8));   // the first plate's work rises as the stop comes in
       /* the handover, over the cover: the new pictures bloom in over the old over its first part, and only then do the
@@ -306,13 +311,13 @@
     };
     SM.scrub(update);
     // stacked, every plate is in the page from the start, so nothing below the stop moves when the later ones are built
-    const buildAll = () => { if (opts.stack?.matches) for (let k = 0; k < n; k++) make(k); };
+    const buildAll = () => { if (stacked()) for (let k = 0; k < n; k++) make(k); };
     // when the stack is left (a phone turned to landscape, a window widened), every plate goes back to waiting, so the
     // next scroll makes only the current one current again
     opts.stack?.addEventListener?.("change", () => {
       setHeight(); buildAll();
-      plates.forEach((el) => { if (el) { el._stacked = false; el._shown = undefined; el._wk = null; el._dirty = true; if (!opts.stack.matches) { el.classList.remove("now"); el.inert = true; } } });
-      if (!opts.stack.matches) cur = -1;
+      plates.forEach((el) => { if (el) { el._stacked = false; el._shown = undefined; el._wk = null; el._dirty = true; if (!stacked()) { el.classList.remove("now"); el.inert = true; } } });
+      if (!stacked()) cur = -1;
     });
     // a new window size changes the unit the drift is written in
     addEventListener("resize", () => plates.forEach((el) => { if (el) el._dirty = true; }));
@@ -320,7 +325,8 @@
     /** travel to item i */
     const jump = (i, instant) => {
       i = Math.min(n - 1, Math.max(0, i));
-      if (opts.stack?.matches) { make(i); plates[i].scrollIntoView({ block: "start", behavior: instant || SM.quiet() ? "auto" : "smooth" }); return; }
+      if (pg?.on) { pg.go(i, instant); return; }
+      if (stacked()) { make(i); plates[i].scrollIntoView({ block: "start", behavior: instant || SM.quiet() ? "auto" : "smooth" }); return; }
       SM.glide(stop.getBoundingClientRect().top + scrollY + i * STEP * SM.vh + (i ? 2 : 0), instant);
     };
     addEventListener("keydown", (e) => {
@@ -413,7 +419,7 @@
           new ResizeObserver((es) => { const w = Math.round(es[0].contentRect.width); if (w !== fitW) { fitW = w; refit(); } }).observe(strip);
         },
       };
-    }), { step: 0.85, onMake: () => aimSoon(), onScrub: (q) => lift(q), onChange: (i) => tint(i) });
+    }), { step: 0.85, paged: true, onMake: () => aimSoon(), onScrub: (q) => lift(q), onChange: (i) => tint(i) });
 
     /* the holder: one packet per brand standing behind a carved rail, on the ground under the work; it stays while
        the worlds change */

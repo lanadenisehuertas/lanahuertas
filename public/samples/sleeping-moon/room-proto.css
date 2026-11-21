@@ -37,7 +37,9 @@
    small texture for it. It must never be laid out at the stretched size: a 3D plane of 8000 by 5000 px becomes a layer
    that large, which a phone at three times density cannot hold, and the page then fails to open */
 .rm-sky { width: 1600px; height: 1000px; transform: translate3d(-800px, -500px, -3400px) scale(5); }
-.rm-sky canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+img.rm-sky { display: block; image-rendering: pixelated; }
+/* the planes are bitmap pictures, each carrying its own 3D transform (room-proto.js) */
+img.rm-pl, img.rm-beam, .rm-hang img { display: block; max-width: none; }
 
 /* the circle: a square plane; its rings are drawn smooth on the canvas (only its runes are small bitmaps), with a soft moonlit halo behind them and a
    bloom of light at each point that flares as a thing arrives there and again as the circle lands */

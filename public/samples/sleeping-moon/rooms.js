@@ -55,6 +55,7 @@
         <h3 class="pk-name po-t"></h3>
         <p class="pk-meta po-m"></p>
         <button class="go" type="button" id="po-big">See it large</button>
+        ${SM.steps("poster")}
       </div>
     </div>`;
     const room = $(".po", pm), glow = $(".po-glow", pm), win = $(".po-win", pm), track = $(".po-track", pm), hangs = $$(".po-hang", pm), focus = $(".po-focus", pm), words = $(".po-text", pm), line = $(".po-line", pm);
@@ -63,12 +64,15 @@
     SM.corners(room);
     // half a screen more than the line needs, so the last poster rests in place before the room moves on
     const reheight = pin(posters, () => (n - 1) * STEP + 1.5);
+    // on a phone the line is moved by swipe, arrows and pegs, not by the scroll (SM.pager)
+    const pg = SM.pager(posters, n);
     let cur = -1, cx = [], focusX = 0;
     const caption = (i) => {
       cur = i;
       const p = P[i];
       $(".po-t", pm).textContent = p.t;
       $(".po-m", pm).textContent = meta(p);
+      SM.setSteps(words, i, n);
       hangs.forEach((h, k) => { h.tabIndex = k === i ? 0 : -1; h.setAttribute("aria-current", String(k === i)); h.setAttribute("aria-label", `${P[k].t}, ${k + 1} of ${n}${k === i ? ". Open it large" : ". Bring it to the middle"}`); });
       // the pegs are the room's pager (each a button with its poster's name), so the foot says nothing more here
       posters.dataset.hint = "";
@@ -93,7 +97,7 @@
       if (!w.near) return;
       if (!cx.length || !cx[0]) layout();
       if (!cx.length) return;
-      const q = Math.min(n - 1, Math.max(0, -w.top / (STEP * w.vh)));
+      const q = pg.on ? pg.q : Math.min(n - 1, Math.max(0, -w.top / (STEP * w.vh)));
       const base = Math.min(n - 1, Math.floor(q)), frac = q - base;
       // the line rests with a poster in the middle for most of a step and moves on in between, so the scroll mostly
       // stops on a whole poster with its words
@@ -121,7 +125,9 @@
       if (i !== cur) caption(i);
     };
     SM.scrub(update);
-    const jump = (k, instant) => SM.glide(at(posters, Math.max(0, Math.min(n - 1, k)), STEP), instant);
+    const jump = (k, instant) => (pg.on ? pg.go(k, instant) : SM.glide(at(posters, Math.max(0, Math.min(n - 1, k)), STEP), instant));
+    $(".prev", words).addEventListener("click", () => jump(cur - 1));
+    $(".next", words).addEventListener("click", () => jump(cur + 1));
     (SM.rooms ||= {}).posters = { jump };
     hangs.forEach((h, k) => {
       h.addEventListener("click", () => (k === cur ? SM.view(list, k) : jump(k)));
@@ -178,6 +184,8 @@
     const bms = SM.pictures(fm);
     SM.corners(room);
     const reheight = pin(films, () => n * STEP + 1);
+    // on a phone the timeline is moved by swipe, its arrows and its clips, not by the scroll; a film rests a little way in (SM.pager)
+    const pg = SM.pager(films, n, 0.3);
     let cur = -1, seg = [];
     const caption = (i) => {
       cur = i;
@@ -224,7 +232,7 @@
       if (!w.near) return;
       if (!seg.length) layout();
       if (!seg.length) return;
-      const q = Math.min(n - 0.0001, Math.max(0, -w.top / (STEP * w.vh)));
+      const q = pg.on ? pg.q : Math.min(n - 0.0001, Math.max(0, -w.top / (STEP * w.vh)));
       const base = Math.floor(q), frac = q - base, g = seg[base];
       head.style.transform = `translate3d(${(g.x0 + frac * (g.x1 - g.x0) - 1).toFixed(1)}px, 0, 0)`;
       tc.textContent = tcs(starts[base] + frac * secs[base]);
@@ -254,7 +262,7 @@
     // visibility from the monitor that holds it, so a hidden rule on the frame itself would keep the monitor black
     frames.forEach((f) => SM.bloom(f, 0, true));
     SM.scrub(update);
-    const jump = (k, instant) => SM.glide(films.getBoundingClientRect().top + scrollY + (Math.max(0, Math.min(n - 1, k)) + 0.3) * STEP * SM.vh, instant);
+    const jump = (k, instant) => (pg.on ? pg.go(k, instant) : SM.glide(films.getBoundingClientRect().top + scrollY + (Math.max(0, Math.min(n - 1, k)) + 0.3) * STEP * SM.vh, instant));
     (SM.rooms ||= {}).films = { jump };
     clips.forEach((c, k) => {
       c.addEventListener("click", () => jump(k));
@@ -460,7 +468,7 @@
           play();
         },
       };
-    }), { step: 0.85, stack: narrow, onScrub: (q) => (atQ = q), onChange: (i) => { play(); stage.style.setProperty("--ink", SM.world(A[i].ground, A[i].ink).ink); stage.style.setProperty("--ground", SM.world(A[i].ground, A[i].ink).ground); } });
+    }), { step: 0.85, stack: narrow, paged: "all", onScrub: (q) => (atQ = q), onChange: (i) => { play(); stage.style.setProperty("--ink", SM.world(A[i].ground, A[i].ink).ink); stage.style.setProperty("--ground", SM.world(A[i].ground, A[i].ink).ground); } });
     $("#quiet")?.addEventListener("click", play);
 
     /* the strip of screens follows the scroll: --p runs from 0 as a plate arrives to 1 as it leaves (its own pass through
@@ -476,7 +484,8 @@
         if (!box) return;
         if (!box._measured) { box._measured = true; measure(); }
         let p;
-        if (narrow.matches) { const r = box.getBoundingClientRect(); p = clamp((SM.vh * 0.9 - r.top) / (SM.vh * 0.9)); }
+        // on a phone the strip waits at its start and is slid by hand (slide, below), not carried by the scroll
+        if (narrow.matches) p = 0;
         // the first plate is whole from the start, so its strip waits there; a later one starts as it comes in over the last
         else { const k = pl._k ?? 0; p = k ? clamp((atQ - k + 0.25) / 1.2) : clamp((atQ - 0.1) / 0.85); }
         // a screen that has the keyboard's focus is brought into view, whatever the scroll says
