@@ -33,10 +33,11 @@
 .room-intro.lifted .rm-six { pointer-events: none; }
 
 /* the night beyond the window, far behind the back wall */
-/* the far sky's canvas has one pixel for each of its cells (1600 by 1000, room-proto.js) and is stretched by CSS to the
-   plane's full size, five times over and unsmoothed, so its cells stay square and hard-edged while the browser keeps
-   only the small canvas, never a layer the plane's size */
-.rm-sky { width: 8000px; height: 5000px; transform: translate3d(-800px, -500px, -3400px); }
+/* the far sky is laid out at its canvas's own size (1600 by 1000, one pixel for each cell, room-proto.js) and scaled up
+   five times from the plane's top left, unsmoothed, so its cells stay square and hard-edged while the browser keeps one
+   small texture for it. It must never be laid out at the stretched size: a 3D plane of 8000 by 5000 px becomes a layer
+   that large, which a phone at three times density cannot hold, and the page then fails to open */
+.rm-sky { width: 1600px; height: 1000px; transform: translate3d(-800px, -500px, -3400px) scale(5); }
 .rm-sky canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 
 /* the circle: a square plane; its rings are drawn smooth on the canvas (only its runes are small bitmaps), with a soft moonlit halo behind them and a
