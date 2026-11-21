@@ -60,7 +60,8 @@
   new MutationObserver(() => { clearTimeout(mo); mo = setTimeout(adopt, 120); }).observe(document.querySelector("main"), { childList: true, subtree: true });
 
   /* the wind and the pull */
-  let lastY = scrollY, vel = 0, px = -1e4, py = -1e4, raf = 0;
+  // (the engine's kept scroll position: reading scrollY here would lay out the page while it is still being built)
+  let lastY = SM.y, vel = 0, px = -1e4, py = -1e4, raf = 0;
   const kick = () => { if (!raf && !still()) raf = requestAnimationFrame(frame); };
   /* while the page moves, its own frame measures (SM.measure, before anything is written) and a scrub moves things; the
      frame here runs only to let things settle once the page is still, or to follow the pointer */

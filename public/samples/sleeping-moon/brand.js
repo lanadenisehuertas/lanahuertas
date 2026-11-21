@@ -11,7 +11,7 @@
   const longDate = (d) => String(d).replace(/^([A-Z][a-z]{2})\b/, (m) => MONTHS[m] || m);
   /** ["A", "B", "C"] as "A, B and C" */
   const and = (a) => a.map(esc).join(", ").replace(/, ([^,]*)$/, " and $1");
-  const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+  const lower = (s) => (/^[A-Z][a-z]/.test(s) ? s.charAt(0).toLowerCase() + s.slice(1) : s);   // keeps acronyms such as DP whole
 
   const b = BRAND, n = DATA.brands.length;
   const prev = DATA.brands[(BRAND_AT + n - 1) % n], next = DATA.brands[(BRAND_AT + 1) % n];
@@ -49,7 +49,7 @@
       </div>
       <div class="b-work">
         <div class="b-glow" aria-hidden="true" style="--glow:${b.ink}"></div>
-        <button class="kv" type="button" id="kv" style="--a:${(kW / kH).toFixed(4)}" aria-label="Open ${esc(b.name)}'s key visual large">
+        <button class="kv" type="button" id="kv" style="--a:${(kW / kH).toFixed(4)}" aria-label="Open the ${esc(b.name)} key visual large">
           <span class="pic" data-kind="photo" data-main><img class="full" src="${kSrc}" srcset="${srcsetOf(kSrc, kW)}" sizes="${kvSizes(kW / kH, 48)}" width="${kW}" height="${kH}" alt="${esc(b.name)}, the key visual" fetchpriority="high"></span></button>
       </div>
     </div>

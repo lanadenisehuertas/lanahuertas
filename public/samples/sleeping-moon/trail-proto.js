@@ -42,7 +42,10 @@
   /* the runes: tiny bitmaps, one string per row (a crescent, a cross, a rune and a star), drawn in whole CSS pixels */
   const GLYPHS = [["01110", "11000", "10000", "11000", "01110"], ["00100", "00100", "11111", "00100", "00100"], ["10001", "01010", "00100", "01010", "10001"], ["01110", "10101", "11111", "10101", "01110"]]
     .map((g) => g.flatMap((row, y) => [...row].map((c, x) => (c === "1" ? [x - 2, y - 2] : null)).filter(Boolean)));
-  recolour(); SM.onStop?.(recolour);
+  // the page opens on the night's own colours, which are the ones above, so the first sprites are made from them
+  // without asking the page for its style (that would lay the whole page out while it is still being built); each
+  // stop that is reached after that gives its own
+  sprites = pal.map((c) => [sprite(c, 0), sprite(c, 1)]); SM.onStop?.(recolour);
 
   /* the pool: kind 0 soft dot, 1 four-point glint, 2 bitmap rune, 3 the big flash of a click */
   const N = 700, P = Array.from({ length: N }, () => ({ on: false, x: 0, y: 0, vx: 0, vy: 0, age: 0, life: 0, s: 1, k: 0, g: 0, c: 0, ph: 0 }));

@@ -12,7 +12,7 @@
   const MONTHS = { Jan: "January", Feb: "February", Mar: "March", Apr: "April", May: "May", Jun: "June", Jul: "July", Aug: "August", Sep: "September", Oct: "October", Nov: "November", Dec: "December" };
   const longDate = (d) => String(d).replace(/^([A-Z][a-z]{2})\b/, (m) => MONTHS[m] || m);
   const and = (a) => a.map(esc).join(", ").replace(/, ([^,]*)$/, " and $1");
-  const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+  const lower = (s) => (/^[A-Z][a-z]/.test(s) ? s.charAt(0).toLowerCase() + s.slice(1) : s);   // keeps acronyms such as DP whole
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const ext = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3L3 13"/></svg>`;
   const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -54,7 +54,7 @@
         </div>
         <div class="b-work">
           <div class="b-glow" aria-hidden="true" style="--glow:${b.ink}"></div>
-          <button class="kv" type="button" data-k="${k}" data-i="0" style="--a:${(kW / kH).toFixed(4)}" aria-label="Open ${esc(b.name)}'s key visual large">
+          <button class="kv" type="button" data-k="${k}" data-i="0" style="--a:${(kW / kH).toFixed(4)}" aria-label="Open the ${esc(b.name)} key visual large">
             <span class="pic" data-kind="photo" data-main><img class="full" src="${kSrc}" srcset="${srcsetOf(kSrc, kW)}" sizes="${first ? "" : "auto, "}${kvSizes(kW / kH, 46)}" width="${kW}" height="${kH}" alt="${esc(b.name)}, the key visual" ${first ? 'fetchpriority="high"' : 'loading="lazy" decoding="async"'}></span></button>
         </div>
         <div class="b-text b-info">

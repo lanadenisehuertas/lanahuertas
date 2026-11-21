@@ -186,7 +186,7 @@
       $(".fr-t", fm).textContent = f.t;
       $(".fr-role", fm).textContent = `${f.role}, ${f.d} long`;
       SM.setSteps(fm, i, n);
-      const w = $("#fr-watch"); w.href = f.url; w.setAttribute("aria-label", `Watch ${f.t} on Google Drive (opens in a new tab)`);
+      const w = $("#fr-watch"); w.href = f.url; w.setAttribute("aria-label", `Watch it: ${f.t}, on Google Drive (opens in a new tab)`);   // the name starts with the words the link shows, so speaking them finds it
       clips.forEach((c, k) => { c.tabIndex = k === i ? 0 : -1; c.setAttribute("aria-current", String(k === i)); });
       films.dataset.hint = i < n - 1 ? `Next on the timeline: ${F[i + 1].t}` : `${f.t} is the last cut.`;
       if (SM.stop === films) SM.say();

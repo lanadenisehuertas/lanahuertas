@@ -16,28 +16,17 @@
 <meta property="og:description" content="Lana Huertas designs brands, posters, films and product screens in Manila, and builds some of them in code.">
 <meta property="og:image" content="https://portfolio-lanahuertas.vercel.app/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500&display=swap">
+<link rel="preload" href="/samples/sleeping-moon/fonts/atkinson-next-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/samples/brand/fonts/Redaction35-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<!-- the veil waits for the smooth cut and its italic too (magic-proto.js), so they are fetched with the coarse one -->
+<link rel="preload" href="/samples/brand/fonts/Redaction-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/samples/brand/fonts/Redaction-Italic.woff2" as="font" type="font/woff2" crossorigin>
 <!-- relative, like the images themselves, so the preload and the image are one request at "/" and at this file's own address -->
 <link rel="preload" href="art/moon-asleep.webp" as="image">
 <link rel="preload" href="art/room/desk-line.webp" as="image" fetchpriority="high">
-<link rel="stylesheet" href="/samples/sleeping-moon/moon.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/journey.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/reel.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/rooms.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/stops.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/dawn-proto.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/magic-proto.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/spell-proto.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/room-proto.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/depth-proto.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/trail-proto.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/drift-proto.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/words-proto.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/about-proto.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/fix-proto.css">
+<!-- build:css moon.css journey.css reel.css rooms.css stops.css dawn-proto.css magic-proto.css spell-proto.css room-proto.css depth-proto.css trail-proto.css drift-proto.css words-proto.css about-proto.css fix-proto.css -->
+<link rel="stylesheet" href="/samples/sleeping-moon/dist/40ece566.css">
+<!-- /build -->
 <script>
 /* Phones: the address bar slides away and back as you scroll, which changes innerHeight and fires "resize" on nearly
    every swipe. The rooms are measured against innerHeight, so they would jump and the pictures would be redrawn each
@@ -101,10 +90,12 @@
       <div class="stars" aria-hidden="true"></div>
       <svg class="chart" viewBox="0 0 100 62.5" preserveAspectRatio="none" aria-hidden="true"></svg>
 
-      <span class="pic orn o-tl" data-kind="line" data-enter="manual"><img class="full" src="art/e_moth.webp" width="744" height="396" alt=""></span>
-      <span class="pic orn o-tr" data-kind="line" data-enter="manual"><img class="full" src="art/e_lily.webp" width="457" height="904" alt=""></span>
-      <span class="pic orn o-bl" data-kind="line" data-enter="manual"><img class="full" src="art/e_lily.webp" width="457" height="904" alt=""></span>
-      <span class="pic orn o-br" data-kind="line" data-enter="manual"><img class="full" src="art/e_moth.webp" width="744" height="396" alt=""></span>
+      <!-- the corner flowers and moths are hidden on phones, so they wait to be near before they are fetched (the doors'
+           pictures are not cut smaller: the room at the start of the page shows the same files, larger) -->
+      <span class="pic orn o-tl" data-kind="line" data-enter="manual"><img class="full" src="art/e_moth.webp" width="744" height="396" alt="" loading="lazy"></span>
+      <span class="pic orn o-tr" data-kind="line" data-enter="manual"><img class="full" src="art/e_lily.webp" width="457" height="904" alt="" loading="lazy"></span>
+      <span class="pic orn o-bl" data-kind="line" data-enter="manual"><img class="full" src="art/e_lily.webp" width="457" height="904" alt="" loading="lazy"></span>
+      <span class="pic orn o-br" data-kind="line" data-enter="manual"><img class="full" src="art/e_moth.webp" width="744" height="396" alt="" loading="lazy"></span>
 
       <!-- one 1-bit group: black is nothing, lilac is ink -->
       <div class="xor">
@@ -179,22 +170,8 @@
   </section>
 </main>
 
-<script src="/samples/sleeping-moon/data.js"></script>
-<script src="/samples/sleeping-moon/moon.js"></script>
-<script src="/samples/sleeping-moon/journey.js"></script>
-<script src="/samples/sleeping-moon/reel.js"></script>
-<script src="/samples/sleeping-moon/rooms.js"></script>
-<script src="/samples/sleeping-moon/stops.js"></script>
-<script src="/samples/sleeping-moon/dawn-proto.js"></script>
-<script src="/samples/sleeping-moon/spell-proto.js"></script>
-<script src="/samples/sleeping-moon/room-proto.js"></script>
-<script src="/samples/sleeping-moon/depth-proto.js"></script>
-<script src="/samples/sleeping-moon/magic-proto.js"></script>
-<script src="/samples/sleeping-moon/trail-proto.js"></script>
-<script src="/samples/sleeping-moon/drift-proto.js"></script>
-<script src="/samples/sleeping-moon/words-proto.js"></script>
-<script src="/samples/sleeping-moon/about-proto.js"></script>
-<script src="/samples/sleeping-moon/fix-proto.js"></script>
-<script src="/samples/sleeping-moon/desc-proto.js"></script>
+<!-- build:js data.js moon.js journey.js | reel.js rooms.js stops.js | dawn-proto.js spell-proto.js room-proto.js depth-proto.js | magic-proto.js trail-proto.js drift-proto.js words-proto.js | about-proto.js fix-proto.js desc-proto.js -->
+<script src="/samples/sleeping-moon/dist/f48226db.js"></script><script src="/samples/sleeping-moon/dist/ffdf8011.js"></script><script src="/samples/sleeping-moon/dist/e6629b7f.js"></script><script src="/samples/sleeping-moon/dist/eead790f.js"></script><script src="/samples/sleeping-moon/dist/10d86cbb.js"></script>
+<!-- /build -->
 </body>
 </html>

@@ -504,6 +504,7 @@ const SM = (() => {
      they read costs no extra layout; each gets the frame's time, which every other frame callback also gets */
   const measures = new Set();
   const runMeasures = (now) => measures.forEach((fn) => { try { fn(now); } catch (e) { console.error(e); } });
+  let mainEl = null;
   const frameLoop = (now) => {
     frameReq = 0;
     if (gliding) {
@@ -519,6 +520,11 @@ const SM = (() => {
       }
     } else sy = target = readY();
     readY();
+    // the stops' places are measured again here, in the read pass, whenever something has changed size since the last
+    // frame, so that a scrub asking where a stop is (where, rectOf) finds them kept instead of laying the page out after
+    // the writes of the scrubs before it
+    const first = (mainEl ||= document.querySelector("main"))?.firstElementChild;
+    if (first) rectOf(first);
     runMeasures(now);
     runScrubs();
     if (gliding) frameReq = requestAnimationFrame(frameLoop);
@@ -975,7 +981,9 @@ const SM = (() => {
     sky();
     $$(".stop").forEach((s) => { if (!stops.includes(s)) { stops.push(s); so.observe(s); } });
     $$(".type").forEach(type);
-    past(); tick();
+    // (a page with the room intro marks itself past, room-proto.js, so the page is not laid out here for nothing)
+    if (document.body.dataset.route !== "room") past();
+    tick();
   };
   document.readyState === "loading" ? addEventListener("DOMContentLoaded", start) : start();
   /* coming back. The page builds much of its own height after it has loaded (the rooms set how long they are, the type

@@ -19,7 +19,7 @@
   const { $, $$ } = SM;
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   /** ["Logo", "Key visual", "Merch"] as "logo, key visual and merch" */
-  const list2 = (a) => a.map((r) => esc(r.charAt(0).toLowerCase() + r.slice(1))).join(", ").replace(/, ([^,]*)$/, " and $1");
+  const list2 = (a) => a.map((r) => esc(/^[A-Z][a-z]/.test(r) ? r.charAt(0).toLowerCase() + r.slice(1) : r)).join(", ").replace(/, ([^,]*)$/, " and $1");
   const MONTHS = { Jan: "January", Feb: "February", Mar: "March", Apr: "April", May: "May", Jun: "June", Jul: "July", Aug: "August", Sep: "September", Oct: "October", Nov: "November", Dec: "December" };
   const longDate = (d) => String(d).replace(/^([A-Z][a-z]{2})\b/, (m) => MONTHS[m] || m);
   const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -377,12 +377,12 @@
             <h3 class="pk-name display">${esc(b.name)}</h3>
             <p class="pk-meta">${esc(b.org)}, ${esc(longDate(b.date))}</p>
             <p class="pk-tag">${esc(b.tag)}</p>
-            <p class="say">${esc(b.roles.map((r, k) => (k ? r.charAt(0).toLowerCase() + r.slice(1) : r)).join(", "))}</p>
+            <p class="say">${esc(b.roles.map((r, k) => (k && /^[A-Z][a-z]/.test(r) ? r.charAt(0).toLowerCase() + r.slice(1) : r)).join(", "))}</p>
             <a class="go" href="brand.html?b=${b.slug}">See all ${N} pieces</a>
             ${SM.steps("brand")}
           </div>
           <div class="s-row">
-            <button class="pk-card" type="button" style="aspect-ratio:${kw} / ${kh}" aria-label="Open ${esc(b.name)}'s key visual large">
+            <button class="pk-card" type="button" style="aspect-ratio:${kw} / ${kh}" aria-label="Open the ${esc(b.name)} key visual large">
               <span class="pk-in">
                 <span class="pk-win pic box" data-kind="photo" data-enter="manual" data-still data-wake data-cell="1.4" data-bloom="0.5 0.96"><img class="full" loading="lazy" src="${kvs}" width="${kw}" height="${kh}" alt="${esc(b.name)}, the key visual"></span>
               </span>

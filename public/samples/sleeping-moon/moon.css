@@ -9,6 +9,15 @@
 @font-face { font-family: "Redaction"; font-style: italic; src: url("../brand/fonts/Redaction-Italic.woff2") format("woff2"); font-display: swap; }
 @font-face { font-family: "Redaction 35"; src: url("../brand/fonts/Redaction35-Regular.woff2") format("woff2"); font-display: swap; }
 @font-face { font-family: "Redaction 70"; src: url("../brand/fonts/Redaction70-Regular.woff2") format("woff2"); font-display: swap; }
+/* Atkinson Hyperlegible Next is served from the site itself (fonts/, the files Google Fonts serves for weights 400 and
+   500: one variable file per alphabet), so no stylesheet from another server holds up the first paint. Until it has
+   come, the text is set in a local Arial scaled to its width and line height ("Atkinson fallback"), so the swap does
+   not move anything. */
+@font-face { font-family: "Atkinson Hyperlegible Next"; font-style: normal; font-weight: 400 500; font-display: swap; src: url("fonts/atkinson-next-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Atkinson Hyperlegible Next"; font-style: normal; font-weight: 400 500; font-display: swap; src: url("fonts/atkinson-next-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Atkinson fallback"; src: local("Arial"), local("ArialMT"), local("Liberation Sans"); size-adjust: 99.34%; ascent-override: 99.05%; descent-override: 31.81%; line-gap-override: 0%; }
 
 /* Type: Redaction for everything that is a name, a title or a voice; its coarse cuts for labels (35) and for nav
    words while they sleep (70); Atkinson Hyperlegible Next for reading. Nothing else. */
@@ -24,7 +33,7 @@
   --display-awake: "Redaction", Georgia, serif;             /* awake: the smooth cut */
   --lab: "Redaction 35", "Redaction", Georgia, serif;       /* labels, 16px and up */
   --drowsy: "Redaction 70", "Redaction", Georgia, serif;    /* nav words, asleep */
-  --body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", "Atkinson fallback", system-ui, sans-serif;
 }
 /* the five colours are typed, so the masthead and foot can cross-fade when the world behind them changes (moon.js band) */
 @property --ground { syntax: "<color>"; inherits: true; initial-value: #000; }

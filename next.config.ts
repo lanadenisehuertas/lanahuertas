@@ -28,7 +28,12 @@ const nextConfig: NextConfig = {
   // pictures, films, loops and fonts are cached for a week; their names are not hashed, so they are not immutable
   async headers() {
     const week = [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }];
+    // the bundles (scripts/moon/build.mjs) are named by their content, so a changed bundle always has a new name and
+    // each one can be kept for a year without being asked about again
+    const year = [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }];
     return [
+      { source: `${MOON}/dist/:path*`, headers: year },
+      { source: `${MOON}/fonts/:path*`, headers: week },
       { source: `${MOON}/art/:path*`, headers: week },
       { source: `${MOON}/loops/:path*`, headers: week },
       { source: "/samples/brand/fonts/:path*", headers: week },

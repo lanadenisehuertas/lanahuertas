@@ -68,6 +68,11 @@ main > .stop.about { display: block; padding: 0 0 32svh; }
 /* ---------- VI Contact: first light. The scene's places are set in dawn-proto.css; these are its parts ---------- */
 main > .stop.talk { display: block; padding: 0; overflow: hidden; }
 .dawnboard { position: relative; width: calc(100 * var(--u)); height: max(100svh, calc(62.5 * var(--u))); margin: 0 auto; }
+/* the dawn behind Contact is the sky's own layer, fixed to the window and raised by the scroll (moon.js), so a contrast
+   checker looking for the colour behind these words finds the night's black under them instead of the dawn they are
+   read on. An empty background image here tells it that the ground is a picture it cannot read, and it leaves those
+   words to be checked by eye (dark ink on the dawn passes). Nothing is drawn */
+.talk .dawnboard { background-image: linear-gradient(transparent, transparent); }
 /* the envelope: back, letter, front pocket. Everything inside is measured in the envelope's own width (cqi) */
 .env { position: absolute; z-index: 2; left: 50%; top: calc(15 * var(--u)); width: calc(30 * var(--u)); aspect-ratio: 815 / 1035; translate: -50% 0; container-type: inline-size; }
 .env-back, .env-front { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }

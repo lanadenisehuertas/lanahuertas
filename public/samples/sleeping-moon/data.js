@@ -121,7 +121,7 @@ const DATA = {
   {
    "slug": "neostalgia",
    "name": "NEOSTALGIA",
-   "org": "CS Expo 2026",
+   "org": "CS Expo",
    "date": "2026",
    "tag": "Retro-futurism for a computer science expo.",
    "brief": "Full identity for a computer science expo: logo, stickers, 50+ team DPs.",
@@ -204,7 +204,7 @@ const DATA = {
    "name": "Tabitayo",
    "org": "Client",
    "date": "2026",
-   "tag": "“Anong table ko?” — answered in seconds.",
+   "tag": "“Anong table ko?” Answered in seconds.",
    "brief": "Seat-finder launch. Scan, find your name, walk to your seat.",
    "roles": [
     "Brand identity",
@@ -264,7 +264,7 @@ const DATA = {
    "name": "Rock of Aces 6.0",
    "org": "FEU Tech SCC",
    "date": "2025",
-   "tag": "Hot pink, loud on purpose.",
+   "tag": "Hot pink, as loud as the bands.",
    "brief": "Sixth annual band competition, Technoweek 2025.",
    "roles": [
     "Event branding",
@@ -958,7 +958,7 @@ const DATA = {
    "tag": "Calmer clinical screening",
    "year": "2025 to 2026",
    "kind": "desk",
-   "p": "A desktop app that reads typing rhythm and mouse movement to support clinician-guided mental health screening. It flags; it does not diagnose.",
+   "p": "A desktop app that reads typing rhythm and mouse movement to support clinician-guided mental health screening. It flags patterns for the clinician and never diagnoses.",
    "role": "Lead UI/UX, backend, project manager",
    "stack": [
     "Electron",

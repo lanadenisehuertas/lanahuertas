@@ -6,18 +6,15 @@
 <title>Ten brands, in full, by Lana Huertas</title>
 <meta name="description" content="Ten brand identities by Lana Huertas, each with its key visual, every piece made for it and its palette.">
 <meta name="theme-color" content="#000000">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500&display=swap">
+<link rel="preload" href="/samples/sleeping-moon/fonts/atkinson-next-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/samples/brand/fonts/Redaction35-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <!-- the smooth cut and its italic set the brand's name and tagline on the first screen; fetched early, so the text
      is not set again in them once it has been laid out -->
 <link rel="preload" href="/samples/brand/fonts/Redaction-Italic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/samples/brand/fonts/Redaction-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/samples/sleeping-moon/moon.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/reel.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/brand.css">
-<link rel="stylesheet" href="/samples/sleeping-moon/brands-proto.css">
+<!-- build:css moon.css reel.css brand.css brands-proto.css -->
+<link rel="stylesheet" href="/samples/sleeping-moon/dist/2a1583ec.css">
+<!-- /build -->
 <script>
 /* Phones: the address bar slides away and back as you scroll, which changes innerHeight and fires "resize" on nearly
    every swipe. The rooms are measured against innerHeight, so they would jump and the pictures would be redrawn each
@@ -38,7 +35,9 @@
 })();
 </script>
 <script>document.documentElement.classList.add("js"); try { localStorage.removeItem("quiet"); if (sessionStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
-<script src="/samples/sleeping-moon/data.js"></script>
+<!-- build:js data.js -->
+<script src="/samples/sleeping-moon/dist/b1dd962c.js"></script>
+<!-- /build -->
 <script>
 /* The pictures come in smaller copies (art/w, made by scripts/moon/variants.py at these widths, never wider than the
    picture itself), so a phone fetches a picture at the size it shows it. srcsetOf(src, width) lists the copies and the
@@ -97,7 +96,8 @@ function kvSizes(a, h) {
   </noscript>
 </main>
 
-<script src="/samples/sleeping-moon/moon.js"></script>
-<script src="/samples/sleeping-moon/brands-proto.js"></script>
+<!-- build:js moon.js | brands-proto.js -->
+<script src="/samples/sleeping-moon/dist/07c732d2.js"></script><script src="/samples/sleeping-moon/dist/ac23edd4.js"></script>
+<!-- /build -->
 </body>
 </html>

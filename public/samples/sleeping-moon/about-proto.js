@@ -178,7 +178,20 @@
         // a line in the hold keeps its place in the held statement, which does not change as the statement sticks
         if (it.hold) it.o = r.top - meTop;
         it.P = null;
-        if (!it.pen) continue;
+        it.lx = false;
+      }
+    };
+    /* each letter's place in its line, for the lines with a pen: read for a line only once it is within a few screens of
+       the window (and again after the page has changed size), so the read pass never walks the letters of every line
+       on the page at once, which it did on every change of size while the page was being built. A line is read in the
+       same read pass that first finds it near, before any scrub that could draw its pen */
+    const pens = () => {
+      const y = SM.y, H = SM.vh;
+      for (const it of items) {
+        if (!it.pen || it.lx) continue;
+        const near = it.hold ? holdTop < y + 3 * H && holdTop + holdH > y - 2 * H : it.top < y + 3 * H && it.top > y - 3 * H;
+        if (!near) continue;
+        it.lx = true;
         for (const c of it.el._ch) {
           let x = c.offsetLeft, t = c.offsetTop;
           for (let p = c.offsetParent; p && p !== it.el && it.el.contains(p); p = p.offsetParent) { x += p.offsetLeft; t += p.offsetTop; }
@@ -240,9 +253,11 @@
         if (it.pen._o !== O) { it.pen._o = O; it.pen.style.opacity = O; }
       }
     };
-    place(); run();
+    // the first places are read in the next frame's read pass and the letters set by its scrub, not here while the page
+    // is still being built, where reading them would lay the whole page out an extra time (the letters are whole until
+    // then, and the page is still under the veil)
     SM.measure(() => {
-      place();
+      place(); pens();
       if (sparks.length) { for (const c of sparks.slice(0, 6)) { const r = c.getBoundingClientRect(); SM.sparkle?.(r.left + r.width / 2, r.top + r.height * 0.4, c.parentNode.classList.contains("em") ? 4 : 2); } sparks = []; }
     });
     SM.scrub(run);
@@ -547,7 +562,8 @@
       sparks.forEach((s, k) => { const o = q ? "1" : (0.25 + 0.75 * (0.5 + 0.5 * Math.sin(SM.y / 85 + k * 2.3))).toFixed(2); if (s._o !== o) { s._o = o; s.style.opacity = o; } });
       fadeTag();
     };
-    board(); SM.scrub(board);
+    // (first drawn by the next frame, after its read pass, so the page is not laid out here while it is being built)
+    SM.scrub(board);
   });
 
   /* ---------------------------------------------------------------- films: a silent loop on the monitor */

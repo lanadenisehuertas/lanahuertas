@@ -17,7 +17,7 @@
   if ($("#m-about")) {
     const mount = $("#m-about");
     // the statement in the almanac's voice (Lana chose it 2026-11-17)
-    const headline = "I make the pictures people remember a brand by: posters, packets, films and apps.", kicker = "Tell me what yours should wake up as.";
+    const headline = "I make the pictures people remember a brand by: posters, key visuals, films and apps.", kicker = "Tell me what yours should wake up as.";
     /* each entry in keywords: what and where, when, and a few points; the facts from the live About */
     const YEARS = [
       ["2026", [
@@ -50,7 +50,7 @@
       ["Design", "UI/UX principles, design systems, typography and visual hierarchy, brand identity, print and digital design, Figma, Photoshop, Illustrator and Canva."],
       ["Programming", "Python, JavaScript and TypeScript, Kotlin for Android, Java, PHP, Next.js and Tailwind CSS."],
       ["Backend and data", "Supabase, REST API design, Git and GitHub, Electron, PyInstaller, multivariate anomaly detection, Hotelling's T² and EWMA baselines."],
-      ["Video editing", "Premiere Pro, After Effects, motion graphics, color grading, export and compression."],
+      ["Video editing", "Premiere Pro, After Effects, motion graphics, colour grading, export and compression."],
       ["Social media", "Facebook, Instagram, TikTok, X (Twitter), content calendars, organic growth and engagement, copywriting and adapting to each brand's voice."],
       ["Ways of working", "Project management, cross-team and remote coordination, scheduling and digital asset management."],
       ["AI tools", "ChatGPT and Claude, for research, brainstorming and workflow."],
