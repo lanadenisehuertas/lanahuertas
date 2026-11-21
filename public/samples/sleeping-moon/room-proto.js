@@ -109,7 +109,15 @@
   // the room's surfaces are night, not nothing: the back wall a little lighter than the side walls, the floor and the
   // ceiling darkest, so the room has volume before a single line is drawn
   const WALL = "#0d0a24", SIDE = "#08061a", FLOOR = "#060414", CEIL = "#040310";
-  const svg = (w, h, body) => `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">${body}</svg>`;
+  /* How finely the planes are drawn. Each wall, the floor and the ceiling is a 3D layer the browser keeps whole in
+     memory, at the screen's pixel density: at three times density a 1700 by 1200 floor is 73MB, and with its shade and
+     the other walls the room came to well over half a gigabyte, which an iPhone tab cannot hold (the tab crashed a
+     couple of seconds into the scroll, when the shades joined in). So on a dense small screen each plane is laid out
+     smaller (PK of its size) and scaled back up by its own 3D transform (PS): the room looks the same and its lines are
+     a little softer, at about a fifth of the memory. A wide screen at ordinary density keeps them at full size. */
+  let PK = 1;
+  const PS = () => (PK < 1 ? ` scale(${(1 / PK).toFixed(4)})` : "");
+  const svg = (w, h, body) => `<svg viewBox="0 0 ${w} ${h}" width="${(w * PK).toFixed(1)}" height="${(h * PK).toFixed(1)}" aria-hidden="true">${body}</svg>`;
   /** one rail and a crown moulding along a wall w wide and h tall, dotted like the rules of the moon's board, so the room is drawn
       in the same hand as the page it flies to */
   const rail = (w, h) => `<path d="M0 ${h * 0.74}H${w}M0 18H${w}" stroke="${DIM}" stroke-width="4" stroke-dasharray="4 12" fill="none"/>`;
@@ -149,8 +157,8 @@
       const body = `<path d="${c.line}" stroke="${INK}" stroke-width="3" fill="none"/><path d="${c.folds}" stroke="${DIM}" stroke-width="3" stroke-dasharray="4 10" fill="none"/>` +
         `<path d="${c.tieback}" stroke="${INK}" stroke-width="4" fill="none"/>`;
       const pivot = sgn < 0 ? bw - 40 : 40;
-      return `<div class="rm-pl rm-lines" style="transform:translate3d(${(x0 - w / 2).toFixed(1)}px,${(rodY - h / 2).toFixed(1)}px,${back + 1}px)">` +
-        `<svg class="rm-drape${sgn < 0 ? "" : " rm-drape-r"}" viewBox="${x0.toFixed(1)} ${rodY} ${bw.toFixed(1)} ${bh}" width="${bw.toFixed(1)}" height="${bh}" style="transform-origin:${pivot.toFixed(0)}px 0" aria-hidden="true">${body}</svg></div>`;
+      return `<div class="rm-pl rm-lines" style="transform:translate3d(${(x0 - w / 2).toFixed(1)}px,${(rodY - h / 2).toFixed(1)}px,${back + 1}px)${PS()}">` +
+        `<svg class="rm-drape${sgn < 0 ? "" : " rm-drape-r"}" viewBox="${x0.toFixed(1)} ${rodY} ${bw.toFixed(1)} ${bh}" width="${(bw * PK).toFixed(1)}" height="${(bh * PK).toFixed(1)}" style="transform-origin:${(pivot * PK).toFixed(0)}px 0" aria-hidden="true">${body}</svg></div>`;
     };
     // the window's night: a pane just behind the glass with its own sky, so the window is never a dead black hole.
     // Stars twinkle, thin clouds drift across, now and then a star falls, and a haze of moonlight breathes low in the
@@ -195,12 +203,12 @@
     const ceil = svg(w, d, `<rect width="${w}" height="${d}" fill="${CEIL}"/>`);
     // a plane with a tone of its own dims its lines under a shade of that same tone (a layer whose opacity alone changes,
     // so dimming never repaints the drawing); the back wall's lines have no fill of their own and simply fade
-    const at = (tf, html, tone) => `<div class="rm-pl${tone ? "" : " rm-lines"}" style="transform:${tf}">${html}${tone ? `<i class="rm-shade" style="background:${tone}"></i>` : ""}</div>`;
+    const at = (tf, html, tone) => `<div class="rm-pl${tone ? "" : " rm-lines"}" style="transform:${tf}${PS()}">${html}${tone ? `<i class="rm-shade" style="background:${tone}"></i>` : ""}</div>`;
     // the floor and the ceiling are laid down from the front edge backwards; the side walls stand from the front edge back
-    return pane + `<div class="rm-pl rm-mask" style="transform:translate3d(${-w / 2}px,${-h / 2}px,${back - 1}px)">${backFill}</div>` +
+    return pane + `<div class="rm-pl rm-mask" style="transform:translate3d(${-w / 2}px,${-h / 2}px,${back - 1}px)${PS()}">${backFill}</div>` +
       at(`translate3d(${-w / 2}px,${-h / 2}px,${back}px)`, backWall) + hang(L, -1) + hang(R, 1) + motes +
       at(`translate3d(${-w / 2}px,${h / 2}px,${front}px) rotateX(-90deg)`, floor, FLOOR) +
-      `<div class="rm-beam" style="transform:translate3d(${-w / 2}px,${h / 2 - 1}px,${front}px) rotateX(-90deg)">${svg(w, d,
+      `<div class="rm-beam" style="transform:translate3d(${-w / 2}px,${h / 2 - 1}px,${front}px) rotateX(-90deg)${PS()}">${svg(w, d,
         `<defs><linearGradient id="rmb" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#d9ccff" stop-opacity="0.34"/><stop offset="1" stop-color="#b9a2ff" stop-opacity="0"/></linearGradient></defs>` +
         `<path d="M${wx - ww * 0.3} ${d}L${wx + ww * 0.3} ${d}L${wx + ww * 0.95} ${d - 1250}L${wx - ww * 0.95} ${d - 1250}z" fill="url(#rmb)"/>`)}</div>` +
       at(`translate3d(${-w / 2}px,${-h / 2}px,${front}px) rotateX(-90deg)`, ceil, CEIL) +
@@ -242,6 +250,9 @@
     // its screen is wide, so it is given the wide room, which fills it, rather than the tall one standing small in the middle
     built = key; set = SETS[key === "side" ? "wide" : key]; B = { ...BEAT, ...(key === "wide" ? {} : SETS.tall.beat) }; P = set.lens || 2400;
     const { w: vw, h: vh } = set.view, r = set.ring;
+    // the planes' drawing density (PK, above): about 2.4 device pixels for each pixel the view shows at rest, never more
+    // than full size and never under a third
+    PK = Math.round(Math.min(1, Math.max(0.33, (Math.min(SM.vw / vw, SM.vh / vh) * 2.4) / (devicePixelRatio || 1))) * 100) / 100;
     pos = {};
     for (const [id, art, w, x, by, z] of set.items) {
       const h = (w * IMG[art][1]) / IMG[art][0];

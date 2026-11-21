@@ -485,12 +485,67 @@
           const travel = parseFloat(box.style.getPropertyValue("--travel")) || 0;
           if (travel > 0) p = clamp((fx.offsetLeft + fx.offsetWidth / 2 - box.clientWidth / 2) / travel);
         }
+        // the visitor's own slide is added to where the scroll has the strip (slide, below)
+        if (box._u) { const t = box._t || 1; box._u = Math.max(-p * t, Math.min((1 - p) * t, box._u)); p = clamp(p + box._u / t); }
         // written on the strip, not its box, so only the strip and its screens are restyled
         const P = p.toFixed(3), tr = box._tr || (box._tr = $(".a-track", box));
         if (box._p !== P) { box._p = P; tr.style.setProperty("--p", P); }
       });
     };
     SM.scrub(drive);
+    /* The strip can also be slid by hand: a finger swiped sideways across it (the page still scrolls up and down under a
+       vertical swipe), a mouse dragged along it, or a trackpad's sideways scroll. The slide is kept as an offset from
+       where the scroll has the strip, so scrolling still carries it on, and it is held inside the strip's two ends. A
+       swipe let go while moving glides on a little and settles. A drag that moved is not also a click on a screen. */
+    const slide = (box) => {
+      const track = $(".a-track", box);
+      if (!track || track._slide) return;
+      track._slide = true;
+      let id = null, x0 = 0, u0 = 0, lastX = 0, lastT = 0, v = 0, moved = false, fling = 0;
+      const travel = () => (box._t = parseFloat(box.style.getPropertyValue("--travel")) || 0);
+      const set = (u) => { box._u = u; requestAnimationFrame(drive); };
+      track.addEventListener("pointerdown", (e) => {
+        if (e.button > 0 || travel() <= 0) return;
+        cancelAnimationFrame(fling);
+        id = e.pointerId; x0 = lastX = e.clientX; lastT = e.timeStamp; u0 = box._u || 0; v = 0; moved = false;
+      });
+      track.addEventListener("pointermove", (e) => {
+        if (e.pointerId !== id) return;
+        const dx = e.clientX - x0;
+        if (!moved && Math.abs(dx) > 6) { moved = true; track.classList.add("sliding"); try { track.setPointerCapture(id); } catch (_) {} }
+        if (!moved) return;
+        const dt = Math.max(1, e.timeStamp - lastT);
+        v = 0.8 * ((lastX - e.clientX) / dt) + 0.2 * v; lastX = e.clientX; lastT = e.timeStamp;
+        set(u0 - dx);
+      });
+      const end = (e) => {
+        if (e.pointerId !== id) return;
+        id = null; track.classList.remove("sliding");
+        if (!moved || e.type === "pointercancel") return;
+        // the glide after a swipe: the release speed (px a millisecond) dies away over about half a second
+        let last = performance.now();
+        const go = (now) => {
+          const dt = Math.min(32, now - last); last = now;
+          v *= Math.pow(0.994, dt);
+          if (Math.abs(v) < 0.02) return;
+          set((box._u || 0) + v * dt);
+          fling = requestAnimationFrame(go);
+        };
+        fling = requestAnimationFrame(go);
+      };
+      track.addEventListener("pointerup", end);
+      track.addEventListener("pointercancel", end);
+      // a drag that moved the strip does not open the screen under the pointer
+      track.addEventListener("click", (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+      track.addEventListener("dragstart", (e) => e.preventDefault());
+      // a trackpad's sideways scroll slides it too (a mostly upright one is left to the page)
+      track.addEventListener("wheel", (e) => {
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || travel() <= 0) return;
+        cancelAnimationFrame(fling);
+        set((box._u || 0) + e.deltaX);
+      }, { passive: true });
+    };
+    $$(".a-shots", products).forEach(slide);
     products.addEventListener("focusin", (e) => { if (e.target.closest(".a-shots")) requestAnimationFrame(drive); });
     addEventListener("resize", () => requestAnimationFrame(measure));
     addEventListener("load", measure);

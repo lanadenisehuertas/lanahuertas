@@ -126,6 +126,13 @@ main > .stop.products { --a-ink: #b9a2ff; }
 .a-track { list-style: none; margin: 0; padding: 0; display: flex; align-items: flex-start; gap: calc(1.6 * var(--u)); width: max-content;
   translate: calc(var(--p, 0) * var(--travel, 0px) * -1) 0; will-change: translate; }
 .a-track li { flex: none; width: calc(22 * var(--u)); pointer-events: auto; }
+/* the strip slides by hand as well as with the scroll (rooms.js): a sideways swipe is the strip's, an upright one still
+   scrolls the page; a mouse sees a hand that grips while it drags */
+.a-track { touch-action: pan-y; cursor: grab; pointer-events: auto; }
+.a-track.sliding { cursor: grabbing; }
+.a-track.sliding .a-shot { pointer-events: none; }
+.a-track img { -webkit-user-drag: none; user-select: none; }
+.phone .a-track { cursor: auto; }
 .a-shot { display: block; width: 100%; padding: 0; border-radius: calc(0.4 * var(--u)); overflow: hidden; cursor: zoom-in;
   box-shadow: 0 calc(0.8 * var(--u)) calc(2.4 * var(--u)) rgb(0 0 0 / 0.55); transition: translate 160ms var(--pop); }
 .a-shot img { display: block; width: 100%; height: auto; }
