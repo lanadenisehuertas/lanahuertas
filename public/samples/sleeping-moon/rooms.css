@@ -33,7 +33,6 @@ main > .stop.pinned { display: block; padding: 0; min-height: 0; }
    line and not as holes in the page; pointing at one brings it forward */
 .po-hang:not([aria-current="true"]) .po-sheet { opacity: 0.42; transition: opacity 200ms linear; }
 .po-hang:not([aria-current="true"]):is(:hover, .on, :focus-visible) .po-sheet { opacity: 1; }
-.quiet .po-hang .po-sheet { opacity: 1; }
 .po-hang:focus-visible .po-sheet { outline: 2px solid var(--mark); outline-offset: 6px; }
 .po-text { left: calc(10 * var(--u)); top: calc(20 * var(--u)); width: calc(19 * var(--u)); z-index: 2; }
 /* The poster's words are grouped by space instead of one even gap. Who it was for sits tight under the title, the
@@ -149,7 +148,6 @@ main > .stop.products { --a-ink: #b9a2ff; }
 .phone .a-track li:nth-child(even) { translate: 0 calc((var(--p, 0) - 0.5) * 6 * var(--u) + 5 * var(--u)); }
 .phone .a-track:has(li:only-child) { grid-template-columns: calc(11 * var(--u)); }
 .phone .a-shot { border-radius: calc(1.2 * var(--u)); }
-.quiet .a-shot { transition: none; }
 
 /* the working pieces */
 .a-try { display: grid; gap: 12px; align-content: start; color: var(--text); }
@@ -183,7 +181,6 @@ main > .stop.products { --a-ink: #b9a2ff; }
 .dl-debts i { display: block; height: 100%; background: var(--a-ink); transform-origin: 0 50%; transition: transform 200ms var(--enter); }
 .dl-debts em { font: italic 400 18px/1.2 "Redaction", Georgia, serif; color: var(--mark); }
 
-.quiet .po-sheet, .quiet .clip-pic { transition: none; }
 
 /* ---------- phones and upright tablets ---------- */
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
@@ -199,6 +196,11 @@ main > .stop.products { --a-ink: #b9a2ff; }
   .po-glow { left: 0; right: 0; width: auto; top: var(--band); height: 70svh; }
   .po-text { left: 16px; right: 16px; width: auto; top: calc(var(--band) + var(--ph) + 13vw + 36px); }
   .po-text .pk-name { font-size: 28px; }
+  /* on a short phone the poster gives up some height, so the words under it end above the next-room link */
+  @media (max-aspect-ratio: 1/1) and (max-height: 720px) {
+    .po { --ph: min(38svh, 96vw); }
+    #posters .po-d { margin-top: 12px; }
+  }
   /* films: the monitor on top, the words under it, the timeline at the foot */
   .fr { width: 100%; height: 100svh; }
   .fr-mon { left: 16px; right: 16px; width: auto; top: calc(var(--band) + 12px); }

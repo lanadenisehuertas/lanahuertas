@@ -93,19 +93,18 @@
       if (!w.near) return;
       if (!cx.length || !cx[0]) layout();
       if (!cx.length) return;
-      const quiet = SM.quiet();
       const q = Math.min(n - 1, Math.max(0, -w.top / (STEP * w.vh)));
       const base = Math.min(n - 1, Math.floor(q)), frac = q - base;
       // the line rests with a poster in the middle for most of a step and moves on in between, so the scroll mostly
       // stops on a whole poster with its words
-      const e = quiet ? Math.round(frac) : SM.smooth(clamp((frac - 0.3) / 0.4)), qe = base + e;
+      const e = SM.smooth(clamp((frac - 0.3) / 0.4)), qe = base + e;
       const nx = base < n - 1 ? cx[base + 1] : cx[base];
       track.style.transform = `translate3d(${(focusX - (cx[base] + (nx - cx[base]) * e)).toFixed(1)}px, 0, 0)`;
       hangs.forEach((h, k) => {
         const d = k - qe, ad = Math.abs(d);
         if (ad > 2.6 && h._far) return;
         h._far = ad > 2.6;
-        const s = 1 - Math.min(1, ad) * 0.12, r = quiet ? 0 : Math.max(-1, Math.min(1, d)) * 3.4;
+        const s = 1 - Math.min(1, ad) * 0.12, r = Math.max(-1, Math.min(1, d)) * 3.4;
         // a poster is wholly awake (no dither left) while the line rests on it, and only falls asleep once it moves away
         const wake = 1 - SM.smooth(clamp((ad - 0.3) / 0.55));
         h.style.transform = `rotate(${r.toFixed(2)}deg) scale(${s.toFixed(3)})`;
@@ -141,7 +140,7 @@
   }
 
   /* ================================================================ III Films: the edit
-     An editor's timeline. The ten films lie end to end on V1, each as long as it runs, with the sound under them on
+     An editor's timeline. The eleven films lie end to end on V1, each as long as it runs, with the sound under them on
      A1 and a ruler of minutes above. The stop is pinned; scrolling plays the timeline: the playhead runs along it,
      the timecode counts, and the frame of the film under the playhead fills the monitor, pushing in slowly as the
      film runs. At each cut the next film's frame blooms in over it in moonlight cells.
@@ -168,7 +167,7 @@
         <div class="tl-g" aria-hidden="true"><span></span><span>V1</span><span>A1</span></div>
         <div class="lanes">
           <div class="ruler" aria-hidden="true"></div>
-          <div class="track" role="group" aria-label="The ten films on a timeline. Arrow keys move the playhead from one to the next.">${F.map((f, i) => `<button class="clip" type="button" data-i="${i}" tabindex="${i ? -1 : 0}" style="flex-grow:${secs[i]}" aria-label="${esc(f.t)}, ${f.d}">
+          <div class="track" role="group" aria-label="The eleven films on a timeline. Arrow keys move the playhead from one to the next.">${F.map((f, i) => `<button class="clip" type="button" data-i="${i}" tabindex="${i ? -1 : 0}" style="flex-grow:${secs[i]}" aria-label="${esc(f.t)}, ${f.d}">
             <span class="pic box clip-pic" data-kind="photo" data-cell="1.6"><img class="full" src="${f.img[0]}" width="${f.img[1]}" height="${f.img[2]}" alt="" loading="lazy"></span><span class="c-t" aria-hidden="true">${esc(f.t)}</span></button>`).join("")}</div>
           <svg class="wave" aria-hidden="true"></svg>
           <span class="playhead" aria-hidden="true"></span>
@@ -225,7 +224,6 @@
       if (!w.near) return;
       if (!seg.length) layout();
       if (!seg.length) return;
-      const quiet = SM.quiet();
       const q = Math.min(n - 0.0001, Math.max(0, -w.top / (STEP * w.vh)));
       const base = Math.floor(q), frac = q - base, g = seg[base];
       head.style.transform = `translate3d(${(g.x0 + frac * (g.x1 - g.x0) - 1).toFixed(1)}px, 0, 0)`;
@@ -238,14 +236,14 @@
         const c = k === base ? 1 : k === base + 1 ? cover : 0;
         SM.bloom(f, c, k !== base + 1);
         if (c <= 0) return;
-        const p = quiet ? 0 : k === base ? frac : 0;
+        const p = k === base ? frac : 0;
         f.style.transform = `scale(${(1.02 + p * 0.07).toFixed(4)})`;
       });
       clips.forEach((c, k) => bms[k]?.setFloor(k === base ? 1 : k === base + 1 ? cover : 0));
       if (base !== cur) caption(base);
       // the words: this film's leave letter by letter as the next frame blooms, and the next film's come in after the
       // cut, its title spelled out of runes (SM.letters, in reel.js). Quiet mode changes them at the cut
-      const lv = quiet || base >= n - 1 ? 0 : clamp((frac - 0.7) / 0.26), en = quiet || base === 0 ? 1 : clamp(frac / 0.2);
+      const lv = base >= n - 1 ? 0 : clamp((frac - 0.7) / 0.26), en = base === 0 ? 1 : clamp(frac / 0.2);
       SM.letters.drive(words, 1, lv, en);
       SM.letters.runes(words, en);
     };
@@ -316,9 +314,11 @@
       const v = $(".a-land-v", pl);
       if (v) {
         const go = on && close && !paused && !SM.quiet();
-        if (go && !v.src) v.src = v.dataset.src;
+        if (go && !v.getAttribute("src")) v.src = v.dataset.src;
         if (go && v.paused) v.play().catch(() => {});
-        else if (!go && !v.paused) v.pause();
+        // a recording that stops lets its file go, so at most one keeps a media player alive (a phone closes a page
+        // that holds many); its poster shows again in the meantime
+        else if (!go && v.getAttribute("src")) { v.pause(); v.removeAttribute("src"); v.load(); }
       }
       const b = $(".a-pause", pl);
       b.setAttribute("aria-pressed", String(paused));
@@ -479,7 +479,6 @@
         if (narrow.matches) { const r = box.getBoundingClientRect(); p = clamp((SM.vh * 0.9 - r.top) / (SM.vh * 0.9)); }
         // the first plate is whole from the start, so its strip waits there; a later one starts as it comes in over the last
         else { const k = pl._k ?? 0; p = k ? clamp((atQ - k + 0.25) / 1.2) : clamp((atQ - 0.1) / 0.85); }
-        if (SM.quiet()) p = 0;
         // a screen that has the keyboard's focus is brought into view, whatever the scroll says
         const fx = box.contains(document.activeElement) && document.activeElement.closest("li");
         if (fx && !narrow.matches) {

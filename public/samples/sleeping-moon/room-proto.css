@@ -4,13 +4,12 @@
    already pinned under it by then (two screens of overlap), on phones it comes up from below (one) */
 .room-intro { position: relative; z-index: 10; height: 600svh; margin-bottom: -200svh; pointer-events: none; }
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .room-intro { margin-bottom: -100svh; } }
-.quiet .room-intro { display: none; }
 /* the moon's board no longer opens with its own title, and the phone's separate spell stage is not needed */
 .has-study .hero.rising .prelude { display: none; }
-.has-study:not(.quiet) .cast-ph { display: none !important; }
+.has-study .cast-ph { display: none !important; }
 /* while the room shows the name and the role, the masthead does not repeat the role */
-/* (not in quiet mode, where there is no room, even if the switch is thrown while the room is on screen) */
-:root:not(.quiet) .in-room #sub { visibility: hidden; }
+/* (quiet mode keeps the room, as it keeps every scroll-driven scene) */
+.in-room #sub { visibility: hidden; }
 
 .rm-stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 /* the view: a fixed-size box scaled to the screen; its perspective is the camera's lens */

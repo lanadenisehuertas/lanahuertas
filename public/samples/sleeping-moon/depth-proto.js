@@ -34,7 +34,7 @@
       if (!raf) raf = requestAnimationFrame(ease);
     }, { passive: true });
     // the sky rests while the room's night hides it (room-proto.js)
-    SM.scrub(() => { if (!still() && !document.documentElement.classList.contains("room-covers")) place(); });
+    SM.scrub(() => { if (!document.documentElement.classList.contains("room-covers")) place(); });
     place();
   };
   document.readyState === "loading" ? addEventListener("DOMContentLoaded", setup) : setup();

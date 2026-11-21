@@ -18,7 +18,6 @@
 .veil.out { animation: veil-out 280ms cubic-bezier(0.23, 1, 0.32, 1) both; pointer-events: none; }
 @keyframes veil-out { to { opacity: 0; visibility: hidden; } }
 .loading body { overflow: hidden; }
-.quiet .veil.out { animation: none; opacity: 0; }
 
 /* ---------- the first screen: the title is cast letter by letter once the veil lifts; a mote shows the way down ---------- */
 .loading .pl-title .ch, .loading .pl-line { opacity: 0; }
@@ -72,7 +71,6 @@
 .n-rest .ch.nm-px { z-index: 1; translate: 0 -0.09em; visibility: hidden; transition-duration: 360ms, 240ms, 140ms; }
 .n-rest:not(.gone) .ch.nm-px::after { visibility: visible; }
 .leave .n-rest .ch.nm-px::after { visibility: hidden; }
-.quiet .n-rest .ch { translate: none; }
 /* headings the scroll writes: letters come up as the page arrives */
 .wtype .ch { opacity: 0.18; transition: opacity 160ms linear; }
 .wtype .ch.w { opacity: 1; }
@@ -127,7 +125,6 @@ dialog.atlas[open] { animation: at-in 200ms linear both; }
 }
 .quiet .tg, .quiet .pl-cue i { animation: none; }
 .quiet .spk-layer, .quiet .comet, .quiet .motes { display: none; }
-.quiet .wtype .ch { opacity: 1; }
 /* ---------- fit: the chrome never wraps, and nothing important sits under the bands ---------- */
 .issue, .tools, .tools > * { white-space: nowrap; }
 /* the nav already marks the room, so the masthead's own room label goes; "Manila, 2026" is said in the first frame and

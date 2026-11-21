@@ -23,7 +23,7 @@ main > .stop.reel { display: block; padding: 0; min-height: 0; }
 .backdrop.pic { line-height: 0; }
 .backdrop .full { width: 100%; height: 100%; object-fit: cover; }
 .js .backdrop.pic .full { opacity: 0 !important; }
-.js .backdrop.pic .bm, .quiet .backdrop.pic .bm { display: block; opacity: 1 !important; }
+.js .backdrop.pic .bm { display: block; opacity: 1 !important; }
 .r-fall { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 .r-board { position: relative; width: calc(100 * var(--u)); height: calc(62.5 * var(--u)); }
 .r-board > * { position: absolute; }
@@ -81,7 +81,6 @@ main > .stop.reel { display: block; padding: 0; min-height: 0; }
 .h-pk.on { translate: 0 calc(-1.4 * var(--u)); z-index: 3; }
 .h-name { position: absolute; left: 50%; bottom: calc(100% + 8px); translate: -50% 0; white-space: nowrap; font: italic 400 17px/1 "Redaction", Georgia, serif; color: var(--mark); opacity: 0; }
 .h-pk.on .h-name { opacity: 1; }
-.quiet .h-pk, .quiet .s-piece { transition: none; }
 
 /* ---------- phones and upright tablets: the plate as one column, the holder at the foot ---------- */
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {

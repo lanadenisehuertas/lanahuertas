@@ -26,6 +26,7 @@
  "self-portrait": "A short video essay about how women are talked about and how that language sinks in. Posts and comments stack up as cards until the frame is almost unreadable, then clear for one italic line, and it ends on women from my own life.",
  "workout-series": "Fitness series shot in a spin studio. Each exercise has a named lower third listing its benefits, and the script title has a soft glow so it reads over the moving picture.",
  "vb-hand-signals": "A referee's hand-signal guide styled like a sports-game broadcast: a rounded frame, clean white staging and a bubble callout for each correct signal.",
+ "siyensikula": "Our class's entry to Siyensikula, a science film contest, on genetic engineering. I co-wrote the script and edited it with two classmates: a DNA strand builds the title, then two hosts walk through its kinds and uses with kinetic labels set into each shot.",
  "breaking-barriers": "Documentary essay on Geraldine Roman, the first transgender woman elected to the Philippine Congress. It cuts between interviews, maps and Pride march footage, with torn-paper title cards between chapters. My longest edit, with the most archival research."
 };
 

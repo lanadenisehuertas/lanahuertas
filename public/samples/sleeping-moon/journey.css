@@ -76,7 +76,6 @@
 .tile:hover, .tile.on { transform: translateY(-6px); }
 .tile.on .label { color: var(--mark); }
 
-.quiet .board, .quiet .door, .quiet .tile { transition: none; }
 
 /* ---------- phones and upright tablets ---------- */
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
@@ -97,7 +96,11 @@
   .tile .label { white-space: normal; }
 }
 
-/* phones turned sideways: the name is held to the window's height too, so both its lines fit on the short screen */
+/* phones turned sideways: there is width to spare and little height, so the name runs on one line under a smaller
+   moon, and the moon and the whole name fit on the screen together when the page arrives */
 @media (max-height: 500px) and (min-aspect-ratio: 1/1) {
-  .name { font-size: min(25vw, 150px, 22svh); margin-top: max(-12vw, -70px, -6svh); }
+  .xor { padding-top: 12px; }
+  .moon { width: min(76vw, 46svh); }
+  .name { font-size: min(13vw, 120px, 21svh); margin-top: max(-6vw, -40px, -5svh); white-space: nowrap; }
+  .name .n-rest > span { display: inline; }
 }

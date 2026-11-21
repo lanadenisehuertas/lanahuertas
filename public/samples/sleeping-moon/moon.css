@@ -226,12 +226,11 @@ dialog.viewer[open] { display: grid; grid-template-rows: 1fr auto; }
 .viewer .prev { left: 22px; } .viewer .next { right: 22px; }
 
 
-/* ---------- quiet mode and reduced motion: everything awake, no lantern ---------- */
-.quiet .pic .full, .js .pic.plain .full { opacity: 1; }
-.quiet .pic .bm, .quiet .lantern { display: none; }
-.quiet .type .ch { font-family: var(--display-awake); }
-.quiet .wipe-in, .quiet .wipe-out { animation: none; }
-.quiet * { transition-duration: 0.01ms !important; }
+/* ---------- quiet mode ---------- */
+/* quiet mode (the visitor's own switch) stills only what moves by itself: the drifting ornaments, twinkles, sparks,
+   comets, the pointer's trail, the pointer's lean and the film loops. The 1-bit drawings, the room, every scene the
+   scroll drives and every reply to a hover or a click stay exactly as they are, so the design is the same */
+.js .pic.plain .full { opacity: 1; }
 
 /* ---------- phones and upright tablets: one column ---------- */
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {

@@ -299,9 +299,8 @@
     loads = pics.map((b) => b.load().then(() => b.setShow(1)).catch(() => {}));
     awake.forEach((id) => SM.bitmap(els[id])?.wakeUp(0));
     SIX.forEach((id) => {
-      els[id].addEventListener("pointerenter", (e) => { if (e.pointerType !== "touch" && !still()) wake(id); });
+      els[id].addEventListener("pointerenter", (e) => { if (e.pointerType !== "touch") wake(id); });
       els[id].addEventListener("pointerdown", () => {
-        if (still()) return;
         wake(id);
         // a tap shows the room's name for a moment, as pointing at it does
         els[id].classList.add("named"); clearTimeout(els[id]._nt); els[id]._nt = setTimeout(() => els[id].classList.remove("named"), 1800);
@@ -725,7 +724,7 @@
   const cover = (on) => { if (covering !== on) { covering = on; root.classList.toggle("room-covers", on); } };
   let ready = false, loads = [];
   const run = () => {
-    if (still() || !SM.where(sec).h) {   // the section's height as the scroll keeps it, so no layout each frame
+    if (!SM.where(sec).h) {   // the section's height as the scroll keeps it, so no layout each frame
       if (spoke) { spoke = false; hero.dataset.hint = REST; SM.say(); document.body.classList.remove("in-room"); inRoom = false; }
       inView = false; cover(false); return;
     }

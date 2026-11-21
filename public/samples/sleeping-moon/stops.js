@@ -107,14 +107,14 @@
        (the skills list is folded away, and comes in as it is opened, about-proto.js) */
     const rise = [...$$(".me-say > p", mount), $(".idx-h", mount)];
     SM.scrub(() => {
-      const vh = SM.vh, quiet = SM.quiet();
+      const vh = SM.vh;
       // each line's place in the page is measured once and again only when the page changes size (SM.placedGen),
       // so this does not lay the page out every frame
       rise.forEach((el) => {
         if (el._gen !== SM.placedGen || el._w !== SM.vw) { el._gen = SM.placedGen; el._w = SM.vw; el._top = el.getBoundingClientRect().top + scrollY; }
         const r = { top: el._top - SM.y };
         if (r.top > vh * 1.6 && el._v === "0.000") return;
-        const v = quiet ? 1 : SM.smooth(Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.42)))), V = v.toFixed(3);
+        const v = SM.smooth(Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.42)))), V = v.toFixed(3);
         if (el._v !== V) { el._v = V; el.style.setProperty("--in", V); }
       });
     });
@@ -158,7 +158,7 @@
       const now = Math.round(at);
       if (now !== yi) { yi = now; smalls.forEach((m, j) => (j === now ? m.setAttribute("aria-current", "true") : m.removeAttribute("aria-current"))); }
       yrs.forEach((el) => {
-        const v = SM.quiet() ? 1 : SM.smooth(Math.min(1, Math.max(0, (SM.vh - at0(el)) / (SM.vh * 0.5))));
+        const v = SM.smooth(Math.min(1, Math.max(0, (SM.vh - at0(el)) / (SM.vh * 0.5))));
         const V = v.toFixed(3);
         if (el._v !== V) { el._v = V; el.style.setProperty("--in", V); }
       });
@@ -208,10 +208,10 @@
     SM.scrub(() => {
       const w = SM.where(talk);
       if (!w.near) return;
-      const v = SM.quiet() ? 1 : SM.smooth(Math.min(1, Math.max(0, (w.arrive - 0.3) / 0.65))), V = v.toFixed(3);
+      const v = SM.smooth(Math.min(1, Math.max(0, (w.arrive - 0.3) / 0.65))), V = v.toFixed(3);
       if (env._v !== V) {
         env._v = V; env.style.setProperty("--up", V);
-        sixBms.forEach((b, k) => b.setFloor(SM.quiet() ? 1 : Math.max(0, Math.min(1, v * 1.6 - k * 0.1))));
+        sixBms.forEach((b, k) => b.setFloor(Math.max(0, Math.min(1, v * 1.6 - k * 0.1))));
       }
     });
     SM.pictures(mount);
@@ -244,7 +244,7 @@
       }
       clearTimeout(t);
       copy.textContent = ok ? "Copied" : "Copy the address";
-      if (ok && !SM.quiet()) copy.animate([{ transform: "scale(1)" }, { transform: "scale(0.97)" }, { transform: "scale(1)" }], { duration: 220, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
+      if (ok) copy.animate([{ transform: "scale(1)" }, { transform: "scale(0.97)" }, { transform: "scale(1)" }], { duration: 220, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
       SM.say(ok ? "Copied" : `The address is ${ADDR}`);
       t = setTimeout(() => { copy.textContent = "Copy the address"; SM.say(); }, ok ? 2000 : 4000);
     });

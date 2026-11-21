@@ -307,12 +307,12 @@ const SM = (() => {
       cancelAnimationFrame(this.timers[prop]); clearTimeout(this.timers[prop + "d"]);
       return new Promise((done) => {
         const start = () => {
-          if (quiet() || ms <= 0) { this[prop] = target; this.draw(); return done(); }
+          if (ms <= 0) { this[prop] = target; this.draw(); return done(); }
           const from = this[prop], t0 = performance.now();
           const step = (now) => { const k = Math.min(1, (now - t0) / ms); this[prop] = from + (target - from) * k; this.draw(); if (k < 1) this.timers[prop] = requestAnimationFrame(step); else done(); };
           this.timers[prop] = requestAnimationFrame(step);
         };
-        delay && !quiet() ? (this.timers[prop + "d"] = setTimeout(start, delay)) : start();
+        delay ? (this.timers[prop + "d"] = setTimeout(start, delay)) : start();
       });
     }
     /** bitmap to colour, then the sharp picture takes over */
@@ -432,7 +432,7 @@ const SM = (() => {
   /** which letters the pointer's circle reaches: only reads the page. null when there is no pointer on it (phones, or
       the pointer gone), when nothing needs measuring and lit letters are only put out */
   const lettersAt = () => {
-    const active = !quiet() && HOVER && pointerIn, R = u() * 3.4;
+    const active = HOVER && pointerIn, R = u() * 3.4;
     if (!active) return null;
     const hit = [];
     for (const el of typed) {
@@ -483,7 +483,7 @@ const SM = (() => {
   /** replace what a box shows with a short fade: old child out, new child in */
   const swap = (box, next) => {
     const old = box.firstElementChild;
-    if (quiet() || !old) { box.replaceChildren(next); return; }
+    if (!old) { box.replaceChildren(next); return; }
     old.classList.remove("wipe-in"); old.classList.add("wipe-out");
     next.classList.add("wipe-in");
     box.append(next);
@@ -493,9 +493,10 @@ const SM = (() => {
 
 
   /* ====================================================================== scroll
-     1. The wheel glides. A wheel or trackpad turn moves a target; the page eases toward it a little every frame,
-        so scrolling never jumps a notch at a time. Desktop pointers only: keyboard, scrollbar, touch, quiet mode and
-        reduced motion keep the browser's own scrolling.
+     1. The wheel is the browser's own. The page once eased toward a wheel target itself, frame by frame, but that
+        put every step of the scroll on the page's own thread, so any heavy frame held the scroll up and the page felt
+        heavy; the browser scrolls on its own thread and already smooths the wheel. glide() still eases the moves the
+        page makes itself (a link, an arrow), with the browser's smooth scrolling.
      2. Scrubbing. Everything that moves with the scroll registers a function with scrub(); all of them run once a
         frame while the page moves, and once after a resize. Nothing that the scroll moves runs on a timer, so it
         moves exactly as far as you scroll and goes back when you scroll back. */
@@ -504,7 +505,7 @@ const SM = (() => {
   // (sy and target are set from the page's own position before either is used: see frameLoop, glide and the wheel)
   let sy = 0, target = 0, gliding = false, lastT = 0, frameReq = 0;
   const maxY = () => Math.max(0, document.documentElement.scrollHeight - VH);
-  const smoothOn = () => HOVER && !quiet();
+  const smoothOn = () => false;
   /* the scroll position is read from the browser only once after the page has moved, and kept until it moves again:
      reading scrollY after a style has been written makes the browser restyle and lay out the page on the spot, so
      every scrub that asked for it would pay for a fresh layout. It is first read when first asked for, not as this
@@ -560,8 +561,10 @@ const SM = (() => {
     if (v === undefined) { v = /(auto|scroll)/.test(getComputedStyle(n).overflowY); scrollable.set(n, v); }
     return v;
   };
-  addEventListener("wheel", (e) => {
-    if (!smoothOn() || e.ctrlKey || e.defaultPrevented) return;
+  // (not even listened to while the browser scrolls: a wheel listener that may cancel the scroll makes the browser
+  // wait for the page before every step of it)
+  if (smoothOn()) addEventListener("wheel", (e) => {
+    if (e.ctrlKey || e.defaultPrevented) return;
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
     if (document.querySelector("dialog[open]") || document.body.classList.contains("menu-open") || travelling) return;
     // a box inside the page that can still scroll that way keeps the wheel
@@ -831,13 +834,12 @@ const SM = (() => {
     }
     if (chasing.size) again();
   });
-  /** el's picture at s: 0 not there, 1 whole, 2 gone. snap goes straight there (for a picture no one can see). Quiet
-      mode cuts at the middle of each half. */
+  /** el's picture at s: 0 not there, 1 whole, 2 gone. snap goes straight there (for a picture no one can see). */
   const bloom = (el, s, snap) => {
     if (!el._bw) { el._bw = true; bloomRO.observe(el); }
-    const B = BLOOM, q = quiet(), S = q ? (s < 0.5 ? 0 : s < 1.5 ? B : 2 * B) : Math.round(Math.min(2, Math.max(0, s)) * B);
+    const B = BLOOM, S = Math.round(Math.min(2, Math.max(0, s)) * B);
     el._bt = S;
-    if (el._bs == null || snap || q || Math.abs(S - el._bs) <= 2) {
+    if (el._bs == null || snap || Math.abs(S - el._bs) <= 2) {
       if (el._bs !== S) { el._bs = S; paintBloom(el, S); }
       chasing.delete(el);
       return;
@@ -1053,7 +1055,7 @@ const SM = (() => {
     const el = document.getElementById(id);
     if (!el) return Promise.resolve();
     const jump = () => { glide(landing(el), true); history.replaceState(null, "", "#" + id); opts.onJump?.(); };
-    if (quiet() || travelling) { if (!travelling) jump(); return Promise.resolve(); }
+    if (travelling) return Promise.resolve();
     travelling = true;
     if (!iris) { iris = document.createElement("canvas"); iris.className = "iris"; iris.setAttribute("aria-hidden", "true"); document.body.append(iris); }
     const dpr = Math.min(2, devicePixelRatio || 1), W = VW, H = VH;
@@ -1140,11 +1142,10 @@ const SM = (() => {
 
   /* ====================================================================== viewer: SM.view([{ src, w, h, alt, cap }], index) */
   let box, items = [], at = 0, opener = null;
-  /** a picture someone asked for blooms in over a third of a second (at once in quiet mode). It is a click, not the
+  /** a picture someone asked for blooms in over a third of a second. It is a click, not the
       scroll, so its size is read here, and every step is drawn as it comes */
   const reveal = (el, ms = 340) => {
     if (!el) return;
-    if (quiet()) { bloom(el, 1, true); return; }
     const r = el.getBoundingClientRect();
     sizeBloom(el, r.width, r.height);
     const t0 = performance.now();

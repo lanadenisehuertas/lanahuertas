@@ -28,7 +28,7 @@
   /* the moon opens its eyes when someone moves the pointer, and closes them after a quiet minute */
   const stir = () => {
     clearTimeout(doze);
-    if (!eyes && !leaving && !SM.quiet()) { eyes = true; moon.setFace(1, 320); }
+    if (!eyes && !leaving) { eyes = true; moon.setFace(1, 320); }
     doze = setTimeout(() => { eyes = false; if (!awake && !leaving) moon.setFace(0, 420); }, 60000);
   };
   if (SM.HOVER) hero.addEventListener("pointermove", (e) => e.pointerType !== "touch" && stir(), { passive: true });
@@ -50,7 +50,6 @@
   function enter(d) {
     const id = d.dataset.stop;
     if (leaving) return;
-    if (SM.quiet()) { SM.travel(id); return; }
     leaving = true;
     const r = d.getBoundingClientRect(), b = board.getBoundingClientRect();
     const cx = r.left + r.width / 2, cy = r.top + r.height / 2, vx = SM.vw / 2, vy = SM.vh / 2;
@@ -128,7 +127,7 @@
     setRisen(p > 0.86);
   };
   const setRising = () => {
-    rising = !SM.quiet() && !COLUMN.matches;
+    rising = !COLUMN.matches;
     hero.classList.toggle("rising", rising);
     if (rising && !risen) { hero.dataset.hint = hint.rising; if (SM.stop === hero) SM.say(); }
     if (!rising) { moonEl.style.transform = horizon.style.transform = prelude.style.transform = prelude.style.opacity = ""; board.style.removeProperty("--rp"); setRisen(true); doors.forEach((d) => SM.bitmap(d).to("show", 1, 0)); }

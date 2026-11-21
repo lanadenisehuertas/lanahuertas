@@ -207,15 +207,14 @@
     // handful of letters change (and are restyled) in any one frame
     const Q = 24;
     const run = () => {
-      const y = SM.y, H = SM.vh, calm = still(), held = !!holdEl?.isConnected && !SM.COLUMN.matches;
+      const y = SM.y, H = SM.vh, held = !!holdEl?.isConnected && !SM.COLUMN.matches;
       // the hold: the statement comes up the window, sticks while the hold passes, then goes on up. Each of its lines
       // is written as it comes up, from the window's foot to 72% of the way down, or only to where it sits when a jump
       // lands on About when that is lower, so every line is whole by then
       const d = holdTop - y, meTop = d > 0 ? d : Math.min(0, d + holdH - H), holdNear = held && holdTop < y + 2 * H && holdTop + holdH > y - H;
       for (const it of items) {
         let P;
-        if (calm) P = 9;
-        else if (it.hold && held) {
+        if (it.hold && held) {
           if (!holdNear) continue;
           const end = Math.max(H * (1 - it.span), it.o + Math.max(0, landAt));
           P = (H - (meTop + it.o)) / Math.max(1, H - end);
@@ -240,7 +239,7 @@
           if (it.runes) { const g = F > 0 && F < 0.45 ? RUNES[(c._r + ((F * 16) | 0)) % RUNES.length] : c._g; if (g && c._g !== g) { c._g = g; c.dataset.g = g; } }
           if (it.px) { const s = F < 0.5 ? "70" : "35"; if (c._s !== s) { c._s = s; c.dataset.s = s; } }
         }
-        if (!it.pen || calm) continue;
+        if (!it.pen) continue;
         // the caret sits after the last letter typed; the quill's nib on the letter being inked, as far across it as
         // the ink has come
         const c = ch[Math.max(0, front)];
@@ -280,7 +279,7 @@
       const from = anim ? fold.offsetHeight : open ? 0 : inner.offsetHeight;
       anim?.cancel(); anim = null;
       fold.removeAttribute("hidden");
-      if (cut || still()) { fold.classList.remove("moving"); fold.hidden = !open; return; }
+      if (cut) { fold.classList.remove("moving"); fold.hidden = !open; return; }
       const to = open ? inner.offsetHeight : 0;
       fold.classList.add("moving");
       anim = fold.animate([{ height: `${from}px`, opacity: open ? 0 : 1 }, { height: `${to}px`, opacity: open ? 1 : 0 }], { duration: 260, easing: "cubic-bezier(0.3, 0.7, 0.3, 1)" });
@@ -468,7 +467,7 @@
       // been scrolled into view, which the engine's kept position has not caught up with yet)
       tagAt = { y: scrollY, up: y + h - T, down: Bt - y };
       const who = k < 0 ? `g${g}` : k;
-      if (told !== who && !still()) say.animate([{ opacity: 0, translate: "0 6px" }, { opacity: 1, translate: "0 0" }], { duration: 220, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
+      if (told !== who) say.animate([{ opacity: 0, translate: "0 6px" }, { opacity: 1, translate: "0 0" }], { duration: 220, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
       told = who;
       tagO = ""; fadeTag();
     };
@@ -478,7 +477,7 @@
     const fadeTag = () => {
       if (!tagAt) return;
       const d = SM.y - tagAt.y, room = d > 0 ? tagAt.up : tagAt.down, from = Math.max(0, room - SM.vh * 0.25);
-      const o = still() ? (Math.abs(d) < room ? 1 : 0) : 1 - SM.smooth(clamp((Math.abs(d) - from) / (SM.vh * 0.5)));
+      const o = 1 - SM.smooth(clamp((Math.abs(d) - from) / (SM.vh * 0.5)));
       const s = o < 0.01 ? "0" : (Math.round(o * 50) / 50).toString();
       if (s !== tagO) {
         tagO = s; tag.style.opacity = s; tag.style.visibility = s === "0" ? "hidden" : "visible";
@@ -534,13 +533,13 @@
     let boardRead = null;
     SM.measure(() => { boardRead = boardAt(); });
     const board = () => {
-      const { w, pics } = boardRead || boardAt(), q = still(); boardRead = null;
+      const { w, pics } = boardRead || boardAt(); boardRead = null;
       if (!w.near) return;
       const vb = SM.COLUMN.matches ? "0 0 100 196" : "0 0 100 62.5";
       if (svg.getAttribute("viewBox") !== vb) svg.setAttribute("viewBox", vb);
       // no pointer to wake them: each icon wakes into its colours as the scroll carries it across the middle of the screen
       if (!SM.HOVER) bms.forEach((b, i) => {
-        const r = pics[i], f = q ? 0 : SM.smooth(clamp(1 - Math.abs((r.top + r.height / 2) / w.vh - 0.5) / 0.16));
+        const r = pics[i], f = SM.smooth(clamp(1 - Math.abs((r.top + r.height / 2) / w.vh - 0.5) / 0.16));
         b.setFloor(f); if (tiles[i]._lit !== f > 0.5) { tiles[i]._lit = f > 0.5; tiles[i].classList.toggle("lit", f > 0.5); }
       });
       const t = q ? 1 : clamp((w.vh - w.top) / (w.vh * 1.1));   // 0 as the board comes in, 1 a little after its top reaches the top
@@ -569,7 +568,7 @@
   /* ---------------------------------------------------------------- films: a silent loop on the monitor */
   when(() => $$(".fr-frame").length, () => {
     // every film has a five-second silent loop, cut from the film itself (960 by 540, about 300 KB each)
-    const LOOPS = new Set(["breaking-barriers", "solar-system-song", "horror-trailer", "basick-math", "nobody-mitski", "brenia-18", "arduino-trailer", "self-portrait", "workout-series", "vb-hand-signals"]);
+    const LOOPS = new Set(["breaking-barriers", "solar-system-song", "horror-trailer", "basick-math", "nobody-mitski", "brenia-18", "arduino-trailer", "self-portrait", "workout-series", "vb-hand-signals", "siyensikula"]);
     const films = DATA.films || [], frames = $$(".fr-frame");
     const vids = frames.map((f, i) => {
       const id = films[f.dataset.i != null ? +f.dataset.i : i]?.id;
@@ -579,8 +578,13 @@
       v.dataset.src = `loops/films/${id}.mp4`;
       return { f, v, ok: null };
     });
-    // films without a loop keep their still frame
-    vids.forEach((x) => { if (!x) return; x.ok = true; x.v.src = x.v.dataset.src; x.f.append(x.v); x.v.addEventListener("error", () => { x.ok = false; x.v.remove(); }); });
+    // films without a loop keep their still frame. Only the loop on the monitor holds its file: every other video
+    // element stays empty, because each video given a source keeps a media player alive, and ten of them at once
+    // were enough to make a phone close the page
+    vids.forEach((x) => { if (!x) return; x.ok = true; x.f.append(x.v); x.v.addEventListener("error", () => { if (x.v.getAttribute("src")) { x.ok = false; x.v.remove(); } }); });
+    const start = (x) => { clearTimeout(x.off); if (!x.v.getAttribute("src")) x.v.src = x.v.dataset.src; x.v.currentTime = 0; x.v.play().then(() => playing === x && x.v.classList.add("on")).catch(() => {}); };
+    // a loop that leaves fades out first (about-proto.css), then lets its file go
+    const stop = (x) => { x.v.pause(); x.v.classList.remove("on"); clearTimeout(x.off); x.off = setTimeout(() => { if (playing !== x) { x.v.removeAttribute("src"); x.v.load(); } }, 450); };
     let playing = null, shown, near = false;
     const filmsEl = $("#films");
     // the film under the playhead is the first frame the monitor shows in full; which one that is gets read in the
@@ -590,12 +594,13 @@
       shown = near ? vids.find((y) => y && y.ok && getComputedStyle(y.f).visibility === "visible") || null : null;
     });
     const pick = () => {
-      if (!near) { if (playing) { playing.v.pause(); playing.v.classList.remove("on"); playing = null; } return; }
+      if (!near) { if (playing) { const was = playing; playing = null; stop(was); } return; }
       const x = shown;
       if (x === undefined || x === playing) return;
-      if (playing) { playing.v.pause(); playing.v.classList.remove("on"); }
+      const was = playing;
       playing = x || null;
-      if (playing) { playing.v.currentTime = 0; playing.v.play().then(() => playing?.v.classList.add("on")).catch(() => {}); }
+      if (was) stop(was);
+      if (playing) start(playing);
     };
     SM.scrub(pick);
   });

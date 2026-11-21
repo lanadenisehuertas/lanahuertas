@@ -22,5 +22,3 @@ main { --wg: var(--mark, #fff1c9); }
 .wd.w2 { color: var(--wg); translate: 0 -2px; text-shadow: 0 0 10px color-mix(in srgb, var(--wg) 45%, transparent); transition-duration: 120ms; }
 #talk .wd.w2 { text-shadow: none; }
 
-/* quiet mode keeps only the colour (the system's reduced-motion setting does not) */
-.quiet .wd.w2, .quiet .wl .ch { translate: none !important; }

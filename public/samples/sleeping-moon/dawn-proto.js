@@ -259,13 +259,13 @@
     return boxEl._top - SM.y;
   };
   SM.scrub(() => {
-    const top = skyAt(), vh = SM.vh, q = SM.quiet();
+    const top = skyAt(), vh = SM.vh;
     if (top > vh * 2 || top < -vh * 2) return;
     // they come out as their field of sky rises from the foot of the window to its upper half
-    const p = q ? 2 : (vh * 0.95 - top) / (vh * 0.6), stars = $$(".vs-star", boxEl), n = stars.length;
+    const p = (vh * 0.95 - top) / (vh * 0.6), stars = $$(".vs-star", boxEl), n = stars.length;
     stars.forEach((s, i) => {
       const k = list.indexOf(s._v), o = clamp((p * 1.15 - (k / n) * 0.95) / 0.1);
-      const tw = q || o < 1 ? 1 : 0.8 + 0.2 * Math.sin(SM.y / 70 + i * 1.7);
+      const tw = o < 1 ? 1 : 0.8 + 0.2 * Math.sin(SM.y / 70 + i * 1.7);
       s.style.setProperty("--o", (o * tw).toFixed(3));
     });
   });
@@ -516,19 +516,19 @@
   SM.scrub(() => {
     if (!geo) return;
     if (drawn?.g !== geo) { drawn = { g: geo, ...lay(geo) }; sunAt = -1; sixAt = []; }
-    const top = geo.top - SM.y, vh = SM.vh, q = SM.quiet();
+    const top = geo.top - SM.y, vh = SM.vh;
     if (top > vh * 1.5 || top + geo.H < -vh) return;
     // how far up the sun is, 0 to 1: as the scene arrives on wide screens (its horizon is near the window's foot), and
     // as the horizon itself comes up the window in the column
     const w = SM.where(end);
     // (over about seven tenths of a screen of scroll on wide screens; in the column from the horizon's box a third of a
     // screen under the window to the page's end, at least six tenths of a screen, so the sun is whole at the end)
-    const v = q ? 1 : SM.smooth(geo.col ? clamp((vh * 1.35 - top) / Math.max(vh * 0.6, vh * 1.35 - geo.last)) : clamp((w.arrive - 0.3) / 0.7));
+    const v = SM.smooth(geo.col ? clamp((vh * 1.35 - top) / Math.max(vh * 0.6, vh * 1.35 - geo.last)) : clamp((w.arrive - 0.3) / 0.7));
     const off = Math.round((1 - v) * (drawn.sh - 1)) * drawn.cell;
     if (off !== sunAt) { sunAt = off; sunC.style.transform = `translate3d(0, ${off}px, 0)`; boxEl.style.setProperty("--night", (1 - 0.7 * v).toFixed(2)); }
     // the six come down onto their steps one after another, a cell at a time, the two nearest the sun first
     drawn.order.forEach((i, n) => {
-      const o = q ? 1 : SM.smooth(clamp(v * 1.7 - n * 0.12)), d = -Math.round((1 - o) * 4) * drawn.cell;
+      const o = SM.smooth(clamp(v * 1.7 - n * 0.12)), d = -Math.round((1 - o) * 4) * drawn.cell;
       if (sixAt[i] !== d) { sixAt[i] = d; sixAs[i].style.transform = d ? `translate3d(0, ${d}px, 0)` : ""; }
     });
     // the moths fly up to the light as it rises, from a few cells lower and further out, a cell at a time

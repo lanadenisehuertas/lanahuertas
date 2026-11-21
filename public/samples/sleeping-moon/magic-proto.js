@@ -16,7 +16,7 @@
     plLine?.classList.add("cast");
     if (!veil) return;
     veil.classList.add("out");
-    setTimeout(() => veil.remove(), still() ? 0 : 280);
+    setTimeout(() => veil.remove(), 280);
   };
   if (veil) {
     const word = $(".veil-word", veil), moon = $(".veil-moon", veil);
@@ -151,7 +151,7 @@
   const writtenAt = () => written.map((h) => {
     const r = h.getBoundingClientRect(), H = SM.vh;
     if (r.top > H * 1.2 || r.bottom < -H * 0.2) return -1;
-    return Math.round((still() ? 1 : clamp((H * 0.96 - r.top) / (H * 0.42))) * h._ch.length);
+    return Math.round(clamp((H * 0.96 - r.top) / (H * 0.42)) * h._ch.length);
   });
   let writtenRead = null;
   SM.measure(() => { writtenRead = writtenAt(); });
@@ -242,7 +242,7 @@
     };
     const state = (c, st) => { if (c._nm !== st) { c._nm = st; c.classList.toggle("nm-up", st === 1); c.classList.toggle("nm-px", st === 2); } };
     const calm = () => { at = null; if (chs) chs.forEach((c) => state(c, 0)); };
-    const asleep = () => still() || nameRest.classList.contains("gone") || $("#board")?.classList.contains("leave");
+    const asleep = () => nameRest.classList.contains("gone") || $("#board")?.classList.contains("leave");
     const near = (x, y) => {
       if (asleep()) return calm();
       if (!at || atY !== SM.y) measure();

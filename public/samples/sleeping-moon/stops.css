@@ -41,9 +41,6 @@ main > .stop.about { display: block; padding: 0 0 32svh; }
 .mo-y { font: 400 16px/1 var(--lab); }
 .mo.on { translate: 0 -3px; }
 .mo[aria-current] { color: var(--mark); }
-/* in quiet mode too the year moons stay drawn as bitmaps, since their phase is what they say */
-.quiet .cal .pic .bm { display: block; }
-.quiet .cal .pic:not(.awake) .full { opacity: 0; }
 .yrs { list-style: none; display: grid; gap: calc(9 * var(--u)); padding: calc(10 * var(--u)) 0 calc(14 * var(--u)); }
 /* every year keeps at least a stretch of scroll of its own, so a year with one entry holds the calendar as long as the
    reader needs to take it in, instead of rolling straight on to the next */
@@ -89,7 +86,6 @@ main > .stop.talk { display: block; padding: 0; overflow: hidden; }
 .t-addr:hover { color: #5b3fc4; }
 .t-links svg path { fill: none; stroke: currentColor; stroke-width: 1.4; }
 .t-links svg { width: 14px; height: 14px; }
-.quiet .mo { transition: none; }
 /* the statement and the index come up as the scroll brings them into the window (stops.js) */
 .me-say > p, .idx-h, .idx-text p { --in: 1; opacity: var(--in); transform: translate3d(0, calc((1 - var(--in)) * 2.4 * var(--u)), 0); }
 

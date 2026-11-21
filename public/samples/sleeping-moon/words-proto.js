@@ -7,7 +7,6 @@
 (() => {
   const { $$ } = SM;
   // the About statement itself is written in stops.js, in the almanac's voice
-  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
   const LIFT = ".pk-name, .yr-n, .cal-h, .idx-h, #about .display, .e-t, #talk h2, #talk h3, .al-q";
@@ -31,7 +30,7 @@
   /* ---------------------------------------------------------------- the decode */
   const RUNES = ["☾", "☽", "✶", "✧", "⋆", "ᚱ", "ᛟ", "ᚦ", "ᛉ", "ᚠ", "◇", "✦", "ᛃ", "ᛗ"];
   const decode = (el, DUR = 420) => {
-    if (still() || !split(el) || el._dec) return;
+    if (!split(el) || el._dec) return;
     const ch = el._ch, n = ch.length, t0 = performance.now();
     el._dec = true;
     const step = (now) => {
@@ -102,14 +101,13 @@
   function frame() {
     raf = 0;
     let busy = false;
-    const calm = still();
     // letters of headings within reach of the pointer, plus any still settling: first every read, then every write
     const live = near.filter((el) => el.isConnected && el._ch);
     const boxes = live.map((el) => { placeLetters(el); return el.getBoundingClientRect(); });
     live.forEach((el, n) => {
       const e = boxes[n];
       for (const c of el._ch) {
-        const d = Math.hypot(e.left + c._cx - px, e.top + c._cy - py), k = calm ? 0 : clamp(1 - d / R, 0, 1);
+        const d = Math.hypot(e.left + c._cx - px, e.top + c._cy - py), k = clamp(1 - d / R, 0, 1);
         const target = -k * k * Math.min(10, c._h * 0.14);
         c._y = (c._y || 0) + (target - (c._y || 0)) * 0.25;
         if (Math.abs(target - c._y) > 0.05) busy = true; else c._y = target;

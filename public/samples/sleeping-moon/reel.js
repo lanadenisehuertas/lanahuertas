@@ -128,7 +128,7 @@
     st.en = E;
     const ch = st.title._ch, n = ch.length;
     ch.forEach((c, j) => {
-      const k = (TITLE * j) / Math.max(1, n), rune = !SM.quiet() && en < 1 && en < k * 0.62 + 0.3;
+      const k = (TITLE * j) / Math.max(1, n), rune = en < 1 && en < k * 0.62 + 0.3;
       const g = rune ? RUNES[(j * 5 + Math.floor(en * 48)) % RUNES.length] : "";
       if (c._g !== g) { c._g = g; if (g) { c.dataset.g = g; c.classList.add("rn"); } else c.classList.remove("rn"); }
     });
@@ -255,7 +255,6 @@
     const update = () => {
       const w = SM.where(stop);
       if (!w.near) return;
-      const quiet = SM.quiet();
       /* opts.stack (a media query): while it matches, every plate is built and shown one under another, each
          arriving as it comes into the window */
       if (opts.stack?.matches) {
@@ -266,7 +265,7 @@
             el.style.visibility = ""; el.classList.add("now"); el.inert = false;
             hand(el, 1, true, 0, 1, 1, 1, null);
           }
-          const r = el.getBoundingClientRect(), a = quiet ? 1 : easeOut(clamp((SM.vh - r.top) / (SM.vh * 0.7)));
+          const r = el.getBoundingClientRect(), a = easeOut(clamp((SM.vh - r.top) / (SM.vh * 0.7)));
           pose(el, a, 0, a, a);
           if (el._dirty) { el._dirty = false; paint(el); }
         });
@@ -276,14 +275,12 @@
       const base = Math.min(n - 1, Math.floor(q)), frac = q - base;
       const cover = base >= n - 1 ? 0 : clamp((frac - COVER[0]) / COVER[1]);
       for (let k = base - 1; k <= base + 2; k++) make(k);
-      const first = quiet ? 1 : easeOut(clamp(w.arrive / 0.8));   // the first plate's work rises as the stop comes in
+      const first = easeOut(clamp(w.arrive / 0.8));   // the first plate's work rises as the stop comes in
       /* the handover, over the cover: the new pictures bloom in over the old over its first part, and only then do the
          old ones break up, under them, so the work is never gone from the screen; the old words leave over the first
-         half and the new ones come from a little before the middle; the world blends all the way through. Quiet mode
-         cuts it all at the middle */
-      const cut = cover >= 0.5 ? 1 : 0;
-      const inn = quiet ? cut : clamp(cover / 0.62), out = quiet ? cut : clamp((cover - 0.38) / 0.62);
-      const lv = quiet ? cut : clamp(cover / 0.5), en = quiet ? cut : clamp((cover - 0.4) / 0.6);
+         half and the new ones come from a little before the middle; the world blends all the way through */
+      const inn = clamp(cover / 0.62), out = clamp((cover - 0.38) / 0.62);
+      const lv = clamp(cover / 0.5), en = clamp((cover - 0.4) / 0.6);
       plates.forEach((el, k) => {
         if (!el) return;
         const role = k === base ? "base" : k === base + 1 && cover > 0 ? "next" : "off";
@@ -293,13 +290,13 @@
         // a plate no one could see a moment ago takes its place at once; the one on show steps through every stage
         const snap = !was;
         if (role === "base") {
-          const blend = quiet ? cut : sm(cover);
-          hand(el, 1 + out, snap, lv, 1, 1 - (quiet ? cut : sm(cover / 0.7)), 1, cover > 0 ? mix(items[k].ground, items[k + 1].ground, blend) : null);
+          const blend = sm(cover);
+          hand(el, 1 + out, snap, lv, 1, 1 - sm(cover / 0.7), 1, cover > 0 ? mix(items[k].ground, items[k + 1].ground, blend) : null);
           const a = k === 0 ? first : 1;
-          pose(el, a, quiet ? 0 : Math.max(-1, Math.min(1, frac * 1.4)), k === 0 ? first : 1, a);
+          pose(el, a, Math.max(-1, Math.min(1, frac * 1.4)), k === 0 ? first : 1, a);
         } else {
-          hand(el, inn, snap, 0, en, quiet ? cut : sm((cover - 0.1) / 0.6), quiet ? cut : sm((cover - 0.1) / 0.7), "clear");
-          pose(el, quiet ? 1 : easeOut(inn), quiet ? 0 : Math.max(-1, (frac - 1) * 1.4), 1, 1);
+          hand(el, inn, snap, 0, en, sm((cover - 0.1) / 0.6), sm((cover - 0.1) / 0.7), "clear");
+          pose(el, easeOut(inn), Math.max(-1, (frac - 1) * 1.4), 1, 1);
         }
         if (el._dirty) { el._dirty = false; paint(el); }
       });
@@ -463,7 +460,7 @@
        neighbours part way, the rest asleep in the rail */
     function lift(q) {
       pks.forEach((b, k) => {
-        const v = SM.quiet() ? (Math.round(q) === k ? 1 : 0) : Math.max(0, 1 - Math.abs(q - k) * 1.25);
+        const v = Math.max(0, 1 - Math.abs(q - k) * 1.25);
         const V = v.toFixed(3);
         if (b._v === V) return;
         b._v = V;
