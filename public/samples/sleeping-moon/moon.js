@@ -81,15 +81,15 @@ const SM = (() => {
   /* Pictures that have loaded are built one after another, each in a task of its own between frames, never several in
      one go: a build reads the picture's size and its pixels, and when a scroll brings many pictures near at once,
      building them all together held up the frames of that scroll for a long moment. A task builds what it can in a few
-     milliseconds (at least one picture) and leaves the rest to the next. */
+     milliseconds (at least one part of a picture: a build comes in parts, see steps) and leaves the rest to the next. */
   const queued = [];
   let builder = 0;
   const buildSoon = (bm) => new Promise((done, fail) => { queued.push([bm, done, fail]); if (!builder) builder = setTimeout(buildSome, 0); });
   const buildSome = () => {
     const t0 = performance.now();
     while (queued.length) {
-      const [bm, done, fail] = queued.shift();
-      try { bm.build(); done(); } catch (e) { fail(e); }
+      const job = queued[0], [bm, done, fail] = job;
+      try { job.it = job.it || bm.steps(); if (job.it.next().done) { queued.shift(); done(); } } catch (e) { queued.shift(); fail(e); }
       if (performance.now() - t0 > 4) break;
     }
     builder = queued.length ? setTimeout(buildSome, 0) : 0;
@@ -190,10 +190,16 @@ const SM = (() => {
     }
     /** work out the canvas for the picture's current size on screen: fine enough to look smooth when the browser scales
         it up, coarse enough (about thirty thousand pixels) to redraw every frame the scroll moves it */
-    build() {
+    build() { const it = this.steps(); while (!it.next().done); }
+    /** the build in parts: the picture's measures and its first image's cells, then its second image's cells (a moon has
+        two), then the rest. The queue (buildSome) gives each part a task of its own, so a big picture never holds a
+        frame up for long; build() runs them all at once. Nothing the picture shows changes until the last part, which
+        puts it all in place together, and a part left over from a build that a newer one has overtaken puts nothing */
+    *steps() {
       if (!this.imgs) return;
       const w = this.full.offsetWidth, h = this.full.offsetHeight;
       if (!w || !h) return;
+      const gen = (this.gen = (this.gen || 0) + 1), left = this.full.offsetLeft, top = this.full.offsetTop;
       const cs = getComputedStyle(this.pic);
       this.ink = rgb(cs.getPropertyValue("--ink") || "#b9a2ff");
       this.paper = this.kind === "photo" || this.kind === "paint" ? rgb(cs.getPropertyValue("--ground") || "#0c0620") : null;
@@ -202,9 +208,6 @@ const SM = (() => {
       const cell = this.bits ? Math.max(2, Math.round(u() * (w > u() * 22 ? 0.28 : 0.14) * (parseFloat(this.pic.dataset.cell) || 1)))
         : Math.max(1.5, Math.sqrt((w * h) / 32000));
       const cols = Math.max(12, Math.round(w / cell)), rows = Math.max(12, Math.round(h / cell));
-      Object.assign(this.canvas.style, { left: this.full.offsetLeft + "px", top: this.full.offsetTop + "px", width: w + "px", height: h + "px" });
-      this.canvas.width = cols; this.canvas.height = rows;
-      this.cols = cols; this.rows = rows;
       /* the front's cells: on a bitmap, its own cells; on a smooth picture, squares about as big as a bitmap's cells
          (half a u), so the light comes in as hard square cells on photos and the moon too. Each cell
          turns at its own threshold, its place in an 8 x 8 Bayer pattern, and keeps a fixed chance of glinting */
@@ -215,9 +218,16 @@ const SM = (() => {
         thr[i] = (B8[(by & 7) * 8 + (bx & 7)] + 0.5) / 64;
         seam[i] = cellHash(bx, by, 7);
       }
+      const a = this.cells(this.imgs[0], cols, rows);
+      yield;
+      const b = this.imgs[1] ? this.cells(this.imgs[1], cols, rows) : null;
+      if (b) yield;
+      if (this.gen !== gen) return;
+      Object.assign(this.canvas.style, { left: left + "px", top: top + "px", width: w + "px", height: h + "px" });
+      this.canvas.width = cols; this.canvas.height = rows;
+      this.cols = cols; this.rows = rows;
       this.blk = blk; this.thr = thr; this.seam = seam;
-      this.a = this.cells(this.imgs[0], cols, rows);
-      this.b = this.imgs[1] ? this.cells(this.imgs[1], cols, rows) : null;
+      this.a = a; this.b = b;
       // the order the cells turn in: outward from the picture's middle, and from where the pointer came in, if it did
       this.ord = this.orderFrom(0.5, 0.5);
       this.pord = this.origin ? this.orderFrom(this.origin[0], this.origin[1]) : null;
@@ -491,13 +501,15 @@ const SM = (() => {
         moves exactly as far as you scroll and goes back when you scroll back. */
   const scrubs = new Set();
   let travelling = false;
-  let sy = scrollY, target = scrollY, gliding = false, lastT = 0, frameReq = 0;
+  // (sy and target are set from the page's own position before either is used: see frameLoop, glide and the wheel)
+  let sy = 0, target = 0, gliding = false, lastT = 0, frameReq = 0;
   const maxY = () => Math.max(0, document.documentElement.scrollHeight - VH);
   const smoothOn = () => HOVER && !quiet();
   /* the scroll position is read from the browser only once after the page has moved, and kept until it moves again:
      reading scrollY after a style has been written makes the browser restyle and lay out the page on the spot, so
-     every scrub that asked for it would pay for a fresh layout */
-  let lastY = scrollY, moved = false;
+     every scrub that asked for it would pay for a fresh layout. It is first read when first asked for, not as this
+     script runs: on a phone, reading it while the page is still loading lays the whole page out once more */
+  let lastY = 0, moved = true;
   const readY = () => { if (moved) { moved = false; lastY = scrollY; } return lastY; };
   const runScrubs = () => scrubs.forEach((fn) => { try { fn(); } catch (e) { console.error(e); } });
   /* measures: functions that only read the page, run each frame the page moves before any scrub writes, so whatever
@@ -945,7 +957,10 @@ const SM = (() => {
       layer._cell = cell;
       const W = 64, lift = Array.from({ length: W }, (_, k) => 3.2 + 1.6 * Math.sin((2 * Math.PI * 2 * k) / W + 0.7) + 1.0 * Math.sin((2 * Math.PI * 5 * k) / W + 2.1));
       const c = document.createElement("canvas"); c.width = cell * W; c.height = H;
-      const x = c.getContext("2d"); x.fillStyle = "#000";
+      // the tile is drawn in plain memory rather than on the graphics card (willReadFrequently), because it is read
+      // straight back out as an image: reading a card's canvas waits for everything the card has queued, which on the
+      // first frames, while the room is being drawn, held the page still for a long moment
+      const x = c.getContext("2d", { willReadFrequently: true }); x.fillStyle = "#000";
       const loose = (k, r) => { let h = (k * 374761393 + r * 668265263) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967295; };
       for (let k = 0; k < W; k++) {
         const top = Math.round(lift[k]);

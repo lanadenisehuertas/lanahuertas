@@ -22,7 +22,9 @@
 <link rel="preload" href="/samples/brand/fonts/Redaction-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/samples/brand/fonts/Redaction-Italic.woff2" as="font" type="font/woff2" crossorigin>
 <!-- relative, like the images themselves, so the preload and the image are one request at "/" and at this file's own address -->
-<link rel="preload" href="art/moon-asleep.webp" as="image">
+<!-- the moon and the six doors are asked for at low priority: they are first seen only after the room, so the desk, the
+     type and the scripts come first, and the veil still waits for all of them (magic-proto.js) -->
+<link rel="preload" href="art/moon-asleep.webp" as="image" fetchpriority="low">
 <link rel="preload" href="art/room/desk-line.webp" as="image" fetchpriority="high">
 <!-- build:css moon.css journey.css reel.css rooms.css stops.css dawn-proto.css magic-proto.css spell-proto.css room-proto.css depth-proto.css trail-proto.css drift-proto.css words-proto.css about-proto.css fix-proto.css -->
 <link rel="stylesheet" href="/samples/sleeping-moon/dist/40ece566.css">
@@ -37,10 +39,16 @@
   const d = Object.getOwnPropertyDescriptor(window, "innerHeight") || Object.getOwnPropertyDescriptor(Window.prototype, "innerHeight");
   if (!d || !d.get || !d.configurable) return;
   const real = () => d.get.call(window);
-  let w = innerWidth, h = real();
+  // the width is kept the same way: on a phone, asking the browser for either measure makes it lay the whole page out
+  // first, so while the page loads, each script that asked would wait for a layout the next frame does again anyway.
+  // The kept width is the real one, taken afresh at every resize, so it never differs from what the browser would say
+  const dw = Object.getOwnPropertyDescriptor(window, "innerWidth") || Object.getOwnPropertyDescriptor(Window.prototype, "innerWidth");
+  const realW = dw && dw.get && dw.configurable ? () => dw.get.call(window) : null;
+  let w = realW ? realW() : innerWidth, h = real();
   try { Object.defineProperty(window, "innerHeight", { configurable: true, get: () => h }); } catch (e) { return; }
+  if (realW) try { Object.defineProperty(window, "innerWidth", { configurable: true, get: () => w }); } catch (e) {}
   addEventListener("resize", (e) => {
-    const nw = innerWidth, nh = real();
+    const nw = realW ? realW() : innerWidth, nh = real();
     if (nw !== w || Math.abs(nh - h) > 160) { w = nw; h = nh; return; }
     e.stopImmediatePropagation();
   }, true);
@@ -100,34 +108,34 @@
       <!-- one 1-bit group: black is nothing, lilac is ink -->
       <div class="xor">
         <div class="pic moon" id="moonpic" data-kind="moon" data-alt="art/moon-awake.webp" data-enter="manual">
-          <img class="full" src="art/moon-asleep.webp" width="640" height="640" alt="">
+          <img class="full" src="art/moon-asleep.webp" width="640" height="640" alt="" fetchpriority="low">
         </div>
         <h1 class="name display" id="name" aria-label="Lana Huertas"><span class="n-rest type" aria-hidden="true">Lana Huertas</span><span class="n-door" id="door" aria-hidden="true"></span></h1>
       </div>
 
       <nav class="doors" id="doors" aria-label="Lana's work">
         <a class="door" href="#brands" data-stop="brands" data-door="Brands" data-line="Ten brands, each with a page of its own." style="--dx: -34.8; --cy: 12.2">
-          <span class="pic" data-enter="manual"><img class="full" src="art/c_brands.webp" width="520" height="336" alt=""></span>
+          <span class="pic" data-enter="manual"><img class="full" src="art/c_brands.webp" width="520" height="336" alt="" fetchpriority="low"></span>
           <span class="label"><i aria-hidden="true">I</i>Brands</span>
         </a>
         <a class="door" href="#posters" data-stop="posters" data-door="Posters" data-line="Eight one-off posters." style="--dx: -34.8; --cy: 25.4">
-          <span class="pic" data-enter="manual"><img class="full" src="art/c_posters.webp" width="267" height="520" alt=""></span>
+          <span class="pic" data-enter="manual"><img class="full" src="art/c_posters.webp" width="267" height="520" alt="" fetchpriority="low"></span>
           <span class="label"><i aria-hidden="true">II</i>Posters</span>
         </a>
         <a class="door" href="#films" data-stop="films" data-door="Films" data-line="Ten films and edits." style="--dx: -34.8; --cy: 38.6">
-          <span class="pic" data-enter="manual"><img class="full" src="art/c_films.webp" width="520" height="473" alt=""></span>
+          <span class="pic" data-enter="manual"><img class="full" src="art/c_films.webp" width="520" height="473" alt="" fetchpriority="low"></span>
           <span class="label"><i aria-hidden="true">III</i>Films</span>
         </a>
         <a class="door" href="#products" data-stop="products" data-door="Products" data-line="Four apps I designed and built." style="--dx: 34.8; --cy: 12.2">
-          <span class="pic" data-enter="manual"><img class="full" src="art/c_products.webp" width="264" height="520" alt=""></span>
+          <span class="pic" data-enter="manual"><img class="full" src="art/c_products.webp" width="264" height="520" alt="" fetchpriority="low"></span>
           <span class="label"><i aria-hidden="true">IV</i>Products</span>
         </a>
         <a class="door" href="#about" data-stop="about" data-door="About" data-line="Who I am and where I have worked." style="--dx: 34.8; --cy: 25.4">
-          <span class="pic" data-enter="manual"><img class="full" src="art/c_about.webp" width="396" height="520" alt=""></span>
+          <span class="pic" data-enter="manual"><img class="full" src="art/c_about.webp" width="396" height="520" alt="" fetchpriority="low"></span>
           <span class="label"><i aria-hidden="true">V</i>About</span>
         </a>
         <a class="door" href="#talk" data-stop="talk" data-door="Contact" data-line="Write to me. I reply within two days." style="--dx: 34.8; --cy: 38.6">
-          <span class="pic" data-enter="manual"><img class="full" src="art/c_contact.webp" width="520" height="434" alt=""></span>
+          <span class="pic" data-enter="manual"><img class="full" src="art/c_contact.webp" width="520" height="434" alt="" fetchpriority="low"></span>
           <span class="label"><i aria-hidden="true">VI</i>Contact</span>
         </a>
       </nav>
@@ -171,7 +179,7 @@
 </main>
 
 <!-- build:js data.js moon.js journey.js | reel.js rooms.js stops.js | dawn-proto.js spell-proto.js room-proto.js depth-proto.js | magic-proto.js trail-proto.js drift-proto.js words-proto.js | about-proto.js fix-proto.js desc-proto.js -->
-<script src="/samples/sleeping-moon/dist/f48226db.js"></script><script src="/samples/sleeping-moon/dist/ffdf8011.js"></script><script src="/samples/sleeping-moon/dist/e6629b7f.js"></script><script src="/samples/sleeping-moon/dist/eead790f.js"></script><script src="/samples/sleeping-moon/dist/10d86cbb.js"></script>
+<script src="/samples/sleeping-moon/dist/e3fd8da7.js"></script><script src="/samples/sleeping-moon/dist/ffdf8011.js"></script><script src="/samples/sleeping-moon/dist/e6629b7f.js"></script><script src="/samples/sleeping-moon/dist/4b0f7b74.js"></script><script src="/samples/sleeping-moon/dist/10d86cbb.js"></script>
 <!-- /build -->
 </body>
 </html>

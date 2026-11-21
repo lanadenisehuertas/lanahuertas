@@ -33,12 +33,16 @@
     // the pictures on the first screen: the room's, when it opens the page, and the moon's stop's own (not those that
     // wait to be scrolled near, which would hold the veil until its five seconds are up)
     $$(".room-intro img, #moon img").filter((im) => im.loading !== "lazy").forEach((im) => jobs.push(im.complete ? Promise.resolve() : new Promise((r) => { im.addEventListener("load", r, { once: true }); im.addEventListener("error", r, { once: true }); })));
-    let got = 0, shown = 0, t0 = performance.now(), gone = false, lastF = -1;
+    let got = 0, shown = 0, t0 = performance.now(), gone = false, lastF = -1, last = 0;
     jobs.forEach((j) => j.then(() => got++, () => got++));
     const step = (now) => {
       if (gone) return;
       const goal = now > 5000 || now - t0 > 5000 ? 1 : got / jobs.length;      // never hold anyone longer than five seconds
-      shown += (goal - shown) * 0.14;
+      // the moon fills a seventh of the way each frame at sixty frames a second; when the page is busy loading and frames
+      // come further apart, each frame goes as far as the frames it missed would have, so the veil is not held longer
+      // than it needs to be (never less than a seventh, so on a faster screen it fills as it always has)
+      const dt = last ? Math.min(100, now - last) : 16.7; last = now;
+      shown += (goal - shown) * Math.max(0.14, 1 - Math.pow(0.86, dt / 16.7));
       if (goal === 1 && shown > 0.985) shown = 1;
       const f = Math.round(shown * 12) / 12;
       if (f !== lastF) { lastF = f; moon.innerHTML = SM.moonSvg(Math.max(0.04, f)); letters.forEach((l, i) => l.classList.toggle("lit", i < Math.round(shown * letters.length))); }
