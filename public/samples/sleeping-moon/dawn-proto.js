@@ -29,8 +29,8 @@
     <form class="vs-make" hidden novalidate aria-label="Leave a star or a moon">
       <fieldset><legend>Star or moon</legend><div class="opts shapes"></div></fieldset>
       <fieldset><legend>Colour</legend><div class="opts swatches"></div></fieldset>
-      <label class="fld"><span class="lr"><span class="l">Name</span><span class="err" id="s-err-name"></span></span><input name="name" maxlength="24" autocomplete="given-name" required aria-describedby="s-err-name"></label>
-      <label class="fld"><span class="lr"><span class="l">Note (optional)</span><span class="more" id="s-more">90 left</span></span><input name="note" maxlength="90" aria-describedby="s-more"></label>
+      <label class="fld"><span class="lr"><span class="l">Name</span><span class="err" id="s-err-name" aria-live="polite"></span></span><input name="name" maxlength="24" autocomplete="given-name" required aria-describedby="s-err-name"></label>
+      <label class="fld"><span class="lr"><span class="l">Note (optional)</span><span class="err" id="s-err-note" aria-live="polite"></span><span class="more" id="s-more">90 left</span></span><input name="note" maxlength="90" aria-describedby="s-err-note s-more"></label>
       <div class="row"><button class="btn" type="submit">Leave it</button><button class="btn quiet vs-cancel" type="button">Not now</button></div>
     </form>`;
   /* The stars come after the letter in the reading order: first the words and the address, then the letter, then the
@@ -39,7 +39,7 @@
   $(".env", board).insertAdjacentHTML("afterend", `
     <div class="ls">
       <h2 class="end-h" id="vs-h">The last stars</h2>
-      <p class="end-line vs-line" aria-live="polite"><span class="vs-count">0</span> left by visitors</p>
+      <p class="end-line vs-line" aria-live="polite">Only Lana's and Peanut's so far.</p>
       <button class="btn vs-open" type="button">Leave yours ${arrow}</button>
     </div>
     <div class="vs-skybox" role="group" aria-labelledby="vs-h">
@@ -49,6 +49,9 @@
 
   /* ---------- the letter: a private message (the live site sends these through formsubmit.co) ---------- */
   const write = $(".write", end), done = $(".w-done", end);
+  // the answer to a letter is written on the envelope's front, under its flap: anything under Send on the letter
+  // itself would sit inside the pocket, out of sight
+  $(".env-front", board).after(done);
   const field = (name) => write.elements[name];
   const RULES = {
     name: (v) => (v ? "" : "Add your name."),
@@ -94,6 +97,50 @@
     }
   });
 
+  /* The message grows with what is written, from its height at rest (three lines, two on the smallest envelopes,
+     dawn-proto.css) as far as the letter has room, and then it scrolls. On wide screens the letter stands in the
+     envelope, so its room is first what is left above the front edge of the pocket, and then what the letter can
+     still rise out of the envelope before it meets the masthead (--lift, stops.css). In the phone's column the letter
+     is as tall as what is on it, so the message grows to eight lines. Its height is worked out only as the visitor
+     writes, at a resize, and when the letter is sent, never in a scrub. */
+  const msg = field("message"), sendB = $("[type=submit]", write), envEl = $(".env", board), mast = $(".mast");
+  let room = null, liftAt = 0;
+  const roomOf = () => {
+    msg.style.height = "";
+    const cs = getComputedStyle(msg), L = parseFloat(cs.lineHeight) || 24, rest = msg.offsetHeight, frame = rest - msg.clientHeight;
+    const pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    const r = { gen: SM.placedGen, vw: SM.vw, rest, frame, flat: Infinity, max: Math.max(rest, Math.round(8 * L + pad + frame)) };
+    if (SM.COLUMN.matches) return r;
+    // in the envelope's own measure: the risen letter's top, and how far the message's line and Send can each come
+    // down before the pocket's front edge covers them (the edge falls from three quarters of the envelope's width at
+    // its middle, about 0.633 of a pixel for every pixel out to the side, so the line is covered first at its ends)
+    const w = envEl.clientWidth, top = letter.offsetTop - 0.7 * w, edge = (half) => 0.75 * w - 0.633 * half;
+    const send = edge(sendB.offsetWidth / 2) - 6 - (top + sendB.offsetTop + sendB.offsetHeight / 2 + 14);
+    const line = edge(w / 2 - letter.offsetLeft - msg.offsetLeft) - 4 - (top + msg.offsetTop + rest);
+    const rise = Math.max(0, envEl.offsetTop + top - (mast ? mast.getBoundingClientRect().bottom : 48) - 10);
+    r.flat = rest + Math.max(0, Math.min(send, line));
+    r.max = Math.max(rest, Math.min(r.max, Math.round(r.flat + rise)));
+    return r;
+  };
+  const fit = () => {
+    // the field's line holds its place while the field is measured, so the page under it never jumps
+    const fl = msg.parentElement; fl.style.minHeight = fl.offsetHeight + "px";
+    if (!room || room.gen !== SM.placedGen || room.vw !== SM.vw) room = roomOf();
+    let h = room.rest, need = 0;
+    if (msg.value) { msg.style.height = "0px"; need = msg.scrollHeight + room.frame; h = Math.min(room.max, Math.max(room.rest, need)); }
+    msg.style.height = msg.value ? `${h}px` : "";
+    msg.classList.toggle("over", need > h + 1 && msg.scrollTop > 2);
+    fl.style.minHeight = "";
+    const lift = Math.max(0, Math.round(h - room.flat));
+    if (lift !== liftAt) { liftAt = lift; letter.style.setProperty("--lift", `${lift}px`); }
+  };
+  msg.addEventListener("input", fit);
+  // the top edge fades only while lines are scrolled away above it
+  msg.addEventListener("scroll", () => msg.classList.toggle("over", msg.scrollTop > 2), { passive: true });
+  write.addEventListener("reset", () => requestAnimationFrame(fit));
+  let fitFrame = 0;
+  addEventListener("resize", () => { room = null; if ((msg.value || liftAt) && !fitFrame) fitFrame = requestAnimationFrame(() => { fitFrame = 0; fit(); }); });
+
   /* ---------- the last stars: two fields of sky, side by side. A star's x runs 0 to 1 across both ---------- */
   const zones = $$(".vs-sky", end), note = $(".vs-note", end), make = $(".vs-make", end), line = $(".vs-line", end), openBtn = $(".vs-open", end), boxEl = $(".vs-skybox", end);
   const zoneOf = (x) => (x < 0.5 ? 0 : 1), local = (x) => (x - zoneOf(x) * 0.5) * 2;
@@ -125,11 +172,14 @@
     { name: "Lana", note: "Thank you for staying until morning.", kind: "full", color: "lilac", x: 0.3, y: 0.34, seed: true },
     { name: "Peanut", note: "meow (she says hi)", kind: "crescent", color: "peach", x: 0.38, y: 0.5, seed: true },
   ];
+  // the moths fly over corners of the sky (see the moths below), so no star is put there: on wide screens the top
+  // left corner, in the phone's column the two lower corners
+  const mothOver = (x, y) => (SM.COLUMN.matches ? (x < 0.22 || x > 0.78) && y > 0.75 : x < 0.12 && y < 0.34);
   const spot = (id) => {
     let h = 2166136261; for (const ch of String(id)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
     const a = (h >>> 0) / 4294967296, b = (Math.imul(h, 2654435761) >>> 0) / 4294967296;
     let x = 0.02 + a * 0.96, y = 0.04 + b * 0.92;
-    for (let k = 0; k < 12 && list.some((v) => Math.hypot(v.x - x, (v.y - y) * 0.55) < 0.06); k++) { x = 0.02 + ((x + 0.37) % 0.96); y = 0.04 + ((y + 0.53) % 0.92); }
+    for (let k = 0; k < 12 && (mothOver(x, y) || list.some((v) => Math.hypot(v.x - x, (v.y - y) * 0.55) < 0.06)); k++) { x = 0.02 + ((x + 0.37) % 0.96); y = 0.04 + ((y + 0.53) % 0.92); }
     return { x, y };
   };
   const starEl = (v) => {
@@ -142,10 +192,12 @@
     b.innerHTML = `<span class="sp-w">${sprite(v.kind)}</span>`; b._v = v;
     return b;
   };
-  // how many visitors have left one, or an invitation while there are none yet
+  // how many visitors have left one. Lana's and Peanut's are always in the sky, so the line never says the sky is empty;
+  // while no visitor has left one it says whose the two are (the button under it already asks for yours)
   const count = () => {
     const n = list.filter((v) => !v.seed).length, ln = $(".vs-line", end);
-    if (ln && !end.classList.contains("making")) ln.innerHTML = n ? `<span class="vs-count">${n}</span> left by visitors` : "None from visitors yet. Leave the first.";
+    if (ln && !end.classList.contains("making")) ln.innerHTML = !n ? "Only Lana's and Peanut's so far."
+      : `<span class="vs-count">${n}</span> left by ${n === 1 ? "a visitor" : "visitors"}, with Lana's and Peanut's.`;
   };
   list.forEach((v) => zones[zoneOf(v.x)].append(starEl(v)));
   // the night's own stars, small and pale, are still out among them, and fade as the sun comes up (the scrub below
@@ -159,7 +211,9 @@
   fetch("/api/garden", { headers: { Accept: "application/json" } }).then((r) => r.json()).then((d) => {
     if (!d || !d.live || !Array.isArray(d.flowers)) return;
     d.flowers.slice().reverse().forEach((f) => {
-      if (!f || !f.name) return;
+      // the guestbook sends Lana's and Peanut's along with the visitors' (their ids start "seed-"); they are already
+      // in the sky above, so they are left out here and never counted as a visitor's
+      if (!f || !f.name || String(f.id || "").startsWith("seed-")) return;
       const v = { name: String(f.name), note: String(f.note || ""), kind: FROM_KIND[f.kind] || "star", color: FROM_COL[f.color] || "lilac", ...spot(f.id || f.name + f.t) };
       list.push(v); zones[zoneOf(v.x)].append(starEl(v));
     });
@@ -239,58 +293,73 @@
     let best = null, far = -1;   // start it somewhere free: the emptiest of a few tries
     for (let k = 0; k < 24; k++) {
       const x = 0.04 + rnd() * 0.92, y = 0.12 + rnd() * 0.76, d = Math.min(...list.map((v) => Math.hypot(v.x - x, v.y - y)));
-      if (d > far) { far = d; best = { x, y }; }
+      if (d > far && !mothOver(x, y)) { far = d; best = { x, y }; }
     }
     place(best.x, best.y);
     $("input", shapes).focus({ preventScroll: true });
   };
   let openedAt = 0;
-  const close = (keep) => { making = false; end.classList.remove("making"); openBtn.hidden = false; make.hidden = true; newEl.hidden = true; write.hidden = false; if (!keep) count(); openBtn.focus({ preventScroll: true }); };
+  const close = (keep) => { making = false; end.classList.remove("making"); fixed(nameIn, errName); fixed(noteIn, errNote); openBtn.hidden = false; make.hidden = true; newEl.hidden = true; write.hidden = false; if (!keep) count(); openBtn.focus({ preventScroll: true }); };
   openBtn.addEventListener("click", open);
   $(".vs-cancel", make).addEventListener("click", () => close());
-  make.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  // Escape puts the maker away wherever the focus is: a click on the sky leaves it on the page itself, outside the
+  // maker, and it must still close then
+  addEventListener("keydown", (e) => { if (e.key === "Escape" && making && !e.defaultPrevented) { e.preventDefault(); close(); } });
   zones.forEach((z, k) => z.addEventListener("pointerdown", (e) => {
     if (!making || e.target.closest(".vs-star")) return;
     const r = z.getBoundingClientRect();
     place(k * 0.5 + clamp((e.clientX - r.left) / r.width, 0.02, 0.98) * 0.5, (e.clientY - r.top) / r.height);
+    // the focus goes to the star just placed, so the arrow keys can still nudge it and Tab goes on to the maker
+    requestAnimationFrame(() => newEl.focus({ preventScroll: true }));
   }));
   newEl.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") return close();
     const s = e.shiftKey ? 0.06 : 0.02, m = { ArrowLeft: [-s / 2, 0], ArrowRight: [s / 2, 0], ArrowUp: [0, -s], ArrowDown: [0, s] }[e.key];
     if (m) { e.preventDefault(); place(pos.x + m[0], pos.y + m[1]); }
   });
   addEventListener("resize", () => making && place(pos.x, pos.y));
   const nameIn = make.elements.name, noteIn = make.elements.note, more = $("#s-more");
   noteIn.addEventListener("input", () => { more.textContent = `${90 - noteIn.value.length} left`; });
-  nameIn.addEventListener("input", () => { if (nameIn.value.trim()) { $("#s-err-name").textContent = ""; nameIn.removeAttribute("aria-invalid"); } });
+  const errName = $("#s-err-name"), errNote = $("#s-err-note");
+  const fixed = (inp, err) => { if (err.textContent) { err.textContent = ""; inp.removeAttribute("aria-invalid"); } };
+  nameIn.addEventListener("input", () => nameIn.value.trim() && fixed(nameIn, errName));
+  noteIn.addEventListener("input", () => fixed(noteIn, errNote));
+  // the guestbook is shared with the garden, so its answers speak of flowers and planting; here they are said in
+  // the sky's words
+  const FAIL = "The sky couldn't be reached. Try again in a bit.";
+  const skyWords = (m) => (/couldn't be reached|^offline$/.test(m) ? FAIL : m.replace(/can't be planted/g, "can't go in the sky")
+    .replace(/\bplanted\b/g, "left").replace(/\bplant\b/g, "leave").replace(/\bflowers\b/g, "stars").replace(/\bflower\b/g, "star").replace(/\bgarden\b/g, "sky"));
   make.addEventListener("submit", (e) => {
     e.preventDefault();
     const name = nameIn.value.trim();
-    if (!name) { $("#s-err-name").textContent = "Add your name."; nameIn.setAttribute("aria-invalid", "true"); nameIn.focus(); return; }
+    if (!name) { errName.textContent = "Add your name."; nameIn.setAttribute("aria-invalid", "true"); nameIn.focus(); return; }
     const sub = $("[type=submit]", make);
     if (sub.disabled) return;
-    sub.disabled = true; sub.textContent = "Leaving it"; $("#s-err-name").textContent = "";
+    sub.disabled = true; sub.textContent = "Leaving it"; errName.textContent = ""; errNote.textContent = "";
     const picked = pick(), note = noteIn.value.trim();
+    // a request that hangs is given up after fifteen seconds, so the button never stays on "Leaving it"
+    const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), 15000);
     fetch("/api/garden", {
-      method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
+      method: "POST", signal: ctrl.signal, headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({ name, note, kind: TO_KIND[picked.kind], color: TO_COL[picked.color], website: "", elapsed: Math.round(performance.now() - openedAt) }),
     }).then(async (r) => {
       const d = await r.json().catch(() => ({}));
       if (!r.ok || !d.ok) {
-        $("#s-err-name").textContent = d.error && d.error !== "offline" ? d.error : "The sky couldn't be reached. Try again in a bit.";
-        if (d.field === "name") { nameIn.setAttribute("aria-invalid", "true"); nameIn.focus(); }
+        // the answer is said beside the field it is about (the name when it is about neither), and read out
+        const onNote = d.field === "note", inp = onNote ? noteIn : nameIn;
+        (onNote ? errNote : errName).textContent = d.error ? skyWords(String(d.error)) : FAIL;
+        if (d.field) { inp.setAttribute("aria-invalid", "true"); inp.focus(); }
         return;
       }
       const v = { name, note, ...picked, ...pos, mine: true };
       list.push(v); const b = starEl(v); b.style.setProperty("--o", 1); zones[zoneOf(v.x)].insertBefore(b, null);
       make.reset(); more.textContent = "90 left";
       close(true); count();
-      line.textContent = d.status === "pending" ? "Thank you! Yours goes up for everyone once it has been read." : "Yours is up. Thank you!";
+      line.textContent = d.status === "pending" ? "Thank you. Yours shows for everyone once Lana has read it." : "Yours is up. Thank you.";
       openBtn.firstChild.textContent = "Leave another ";
       show(b);
       document.dispatchEvent(new CustomEvent("sm:burst", { detail: b }));
-    }).catch(() => { $("#s-err-name").textContent = "The sky couldn't be reached. Try again in a bit."; })
-      .finally(() => { sub.disabled = false; sub.textContent = "Leave it"; });
+    }).catch(() => { errName.textContent = FAIL; })
+      .finally(() => { clearTimeout(timer); sub.disabled = false; sub.textContent = "Leave it"; });
   });
 
   /* ---------- first light: the sun comes up behind the envelope, over a horizon of square cells ----------
@@ -302,6 +371,14 @@
   const dawn = $(".t-dawn", board), env = $(".env", board);
   if (!dawn) return;
   const sunC = $(".t-sun", dawn), hillC = $(".t-hills", dawn), sixAs = $$(".t-six a", dawn);
+  /* the moths and the lilies of the night come back at dawn, line drawings asleep in 1-bit like the night's corners:
+     a moth over each of the sun's shoulders, drawn up towards it as it rises, and a lily standing on each side of the
+     scene, in the near field on wide screens and on the hills either side of the sun in the column. They are only
+     ornament: nothing reads them out, and a click passes through them */
+  const orn = (k, src, w, h) => `<span class="pic orn t-${k}" data-kind="line" data-still aria-hidden="true"><img class="full" src="art/${src}" width="${w}" height="${h}" alt="" loading="lazy"></span>`;
+  dawn.insertAdjacentHTML("beforeend", [["moth l", "e_moth.webp", 744, 396], ["moth r", "e_moth.webp", 744, 396], ["lily l", "e_lily.webp", 457, 904], ["lily r", "e_lily.webp", 457, 904]].map((a) => orn(...a)).join(""));
+  SM.pictures(dawn);
+  const moths = $$(".t-moth", dawn), lilies = $$(".t-lily", dawn);
   const SUN = "#ffcf73", SUN_PALE = "#ffe3a6", HILL = "#bfa3da", HILL_FAR = "#d3bde8", FIELD = "#b99dd7", FIELD_NEAR = "#b398d3";
   // what the layout needs, read in the page's own read pass (SM.measure) and only when the page has changed size;
   // the scrub then draws and places from it, so it never reads layout itself
@@ -316,9 +393,12 @@
     // horizon's box for the six to stand on the ground in front of it. A whole number of cells down, so the hills and
     // the sun share one grid
     const floor = Math.round((col ? H - sixH - 12 * cell : env.offsetTop + env.offsetHeight * 0.84 - dawn.offsetTop) / cell) * cell;
-    const envW = env.offsetWidth;
+    const envW = env.offsetWidth, envTop = env.offsetTop - dawn.offsetTop;
+    const size = (el) => ({ w: el.offsetWidth, h: el.offsetHeight }), mothS = size(moths[0]), lilyS = size(lilies[0]);
     const r = dawn.getBoundingClientRect();
-    return { col, u, W, H, cell, floor, envW, six, top: r.top + SM.y, gen: SM.placedGen, vw: SM.vw };
+    // where the horizon's box stands in the window once the page is scrolled to its end
+    const last = r.top + SM.y - Math.max(0, document.documentElement.scrollHeight - innerHeight);
+    return { col, u, W, H, cell, floor, envW, envTop, mothS, lilyS, six, top: r.top + SM.y, last, gen: SM.placedGen, vw: SM.vw };
   };
   SM.measure(() => { if (!geo || geo.gen !== SM.placedGen || geo.vw !== SM.vw) geo = read() || geo; });
 
@@ -398,9 +478,34 @@
       a.style.left = `${Math.round(xs[i])}px`;
       a.style.top = `${col ? H - 4 * cell - g.six[i].h : floorRow * cell - steps[i].h * cell - g.six[i].h}px`;
     });
+    /* the lilies: on wide screens in the near field, under the outer two of each three, their stems a few cells into
+       the ground; in the column on the hills beyond the tips of the sun's rays, rooted a cell into the slope */
+    const { mothS, lilyS } = g, put = (el, x, y) => { el.style.left = `${Math.round(x)}px`; el.style.top = `${Math.round(y)}px`; };
+    lilies.forEach((el, k) => {
+      const s = k ? 1 : -1;
+      if (col) {
+        const cx = W / 2 + s * Math.max(r1 * cell + lilyS.w * 0.75, W / 2 - 12 - lilyS.w / 2);
+        put(el, cx - lilyS.w / 2, (floorRow - rise(cx) + 1) * cell - lilyS.h);
+      } else {
+        const cx = W / 2 + s * (g.envW / 2 + 9.5 * u);
+        put(el, cx - lilyS.w / 2, Math.min(H - 2 * cell, (floorRow + 21) * cell) - lilyS.h);
+      }
+    });
+    /* the moths: on wide screens one in the gap between the words and the letter, over the sun's left shoulder, and
+       one high beside the letter's right edge, at the corner of the sky (where no visitor's star is put); in the column
+       one over each lily. Where each one settles once the sun is up; the scrub brings them there */
+    const mothAt = moths.map((el, k) => {
+      const s = k ? 1 : -1;
+      if (col) {
+        const cx = W / 2 + s * (W / 2 - 12 - mothS.w / 2 - 10);
+        return { x: cx - mothS.w / 2, y: (floorRow - rise(cx)) * cell - lilyS.h - mothS.h - 14 };
+      }
+      return k ? { x: W / 2 + g.envW / 2 + 1.2 * u, y: g.envTop - 0.22 * g.envW } : { x: W / 2 - g.envW / 2 - 2.4 * u - mothS.w, y: g.envTop - 0.02 * g.envW };
+    });
+    moths.forEach((el, k) => put(el, mothAt[k].x, mothAt[k].y));
     return { sh, cell, order: col ? [0, 1, 2, 3, 4, 5] : [2, 3, 1, 4, 0, 5] };
   };
-  let sunAt = -1, sixAt = [];
+  let sunAt = -1, sixAt = [], mothsAt = "";
   SM.scrub(() => {
     if (!geo) return;
     if (drawn?.g !== geo) { drawn = { g: geo, ...lay(geo) }; sunAt = -1; sixAt = []; }
@@ -409,7 +514,9 @@
     // how far up the sun is, 0 to 1: as the scene arrives on wide screens (its horizon is near the window's foot), and
     // as the horizon itself comes up the window in the column
     const w = SM.where(end);
-    const v = q ? 1 : SM.smooth(geo.col ? clamp((vh * 0.98 - top) / (vh * 0.5)) : clamp((w.arrive - 0.4) / 0.6));
+    // (over about seven tenths of a screen of scroll on wide screens; in the column from the horizon's box a third of a
+    // screen under the window to the page's end, at least six tenths of a screen, so the sun is whole at the end)
+    const v = q ? 1 : SM.smooth(geo.col ? clamp((vh * 1.35 - top) / Math.max(vh * 0.6, vh * 1.35 - geo.last)) : clamp((w.arrive - 0.3) / 0.7));
     const off = Math.round((1 - v) * (drawn.sh - 1)) * drawn.cell;
     if (off !== sunAt) { sunAt = off; sunC.style.transform = `translate3d(0, ${off}px, 0)`; boxEl.style.setProperty("--night", (1 - 0.7 * v).toFixed(2)); }
     // the six come down onto their steps one after another, a cell at a time, the two nearest the sun first
@@ -417,5 +524,11 @@
       const o = q ? 1 : SM.smooth(clamp(v * 1.7 - n * 0.12)), d = -Math.round((1 - o) * 4) * drawn.cell;
       if (sixAt[i] !== d) { sixAt[i] = d; sixAs[i].style.transform = d ? `translate3d(0, ${d}px, 0)` : ""; }
     });
+    // the moths fly up to the light as it rises, from a few cells lower and further out, a cell at a time
+    const m = Math.round((1 - v) * 6), key = `${m}`;
+    if (key !== mothsAt) {
+      mothsAt = key;
+      moths.forEach((el, k) => { el.style.transform = m ? `translate3d(${(k ? 1 : -1) * m * 0.5 * drawn.cell}px, ${m * drawn.cell}px, 0)` : ""; });
+    }
   });
 })();

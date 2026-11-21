@@ -34,7 +34,7 @@
      clicking another draws the line to it. */
   const pm = $("#m-posters"), posters = $("#posters");
   if (pm && typeof DATA !== "undefined") {
-    const P = DATA.posters, n = P.length, STEP = 0.55;
+    const P = DATA.posters, n = P.length, STEP = 0.85;
     // who it was for and the year, without the year again when the title already ends with it ("CS Night 2026")
     // the year is added only when neither the title nor the maker already says it ("CS Expo 2026, 2026")
     const meta = (p) => (String(p.t).includes(String(p.y)) || String(p.m).includes(String(p.y)) ? p.m : `${p.m}, ${p.y}`);
@@ -57,7 +57,7 @@
         <button class="go" type="button" id="po-big">See it large</button>
       </div>
     </div>`;
-    const room = $(".po", pm), win = $(".po-win", pm), track = $(".po-track", pm), hangs = $$(".po-hang", pm), focus = $(".po-focus", pm), words = $(".po-text", pm), line = $(".po-line", pm);
+    const room = $(".po", pm), glow = $(".po-glow", pm), win = $(".po-win", pm), track = $(".po-track", pm), hangs = $$(".po-hang", pm), focus = $(".po-focus", pm), words = $(".po-text", pm), line = $(".po-line", pm);
     const bms = SM.pictures(pm).filter((b) => b.pic.classList.contains("po-sheet"));
     SM.whenNear(pm, () => bms.forEach((b) => b.load().then(() => b.setShow(1)).catch(() => {})));
     SM.corners(room);
@@ -112,11 +112,12 @@
         h.style.opacity = (0.5 + 0.5 * wake).toFixed(3);   // the ones asleep step back
         bms[k].setFloor(wake);
       });
-      room.style.setProperty("--glow", base < n - 1 ? mix(P[base].ink, P[base + 1].ink, e) : P[base].ink);
-      // the words go out as the line moves and come back with the next poster's
+      // the light's colour is set on the light alone: set on the room, every element in it would be restyled each frame
+      const gc = base < n - 1 ? mix(P[base].ink, P[base + 1].ink, e) : P[base].ink;
+      if (glow._c !== gc) { glow._c = gc; glow.style.setProperty("--glow", gc); }
+      // the words go out as the line moves and come back with the next poster's, one line after another (SM.letters)
       const t = Math.abs(qe - Math.round(qe));
-      // the caption's lines go and come back one after another (reel.css, .pk-text > *), driven by --w
-      words.style.setProperty("--w", (1 - SM.smooth(clamp((t - 0.16) / 0.24))).toFixed(3));
+      SM.letters.drive(words, 1 - SM.smooth(clamp((t - 0.16) / 0.24)));
       const i = Math.round(qe);
       if (i !== cur) caption(i);
     };
@@ -147,7 +148,7 @@
      Clicking a clip moves the playhead to it. */
   const fm = $("#m-films"), films = $("#films");
   if (fm && typeof DATA !== "undefined") {
-    const F = DATA.films, n = F.length, STEP = 0.6;
+    const F = DATA.films, n = F.length, STEP = 0.85;
     const secs = F.map((f) => { const [m, s] = f.d.split(":").map(Number); return m * 60 + s; });
     const starts = secs.map((_, i) => secs.slice(0, i).reduce((a, b) => a + b, 0)), total = starts[n - 1] + secs[n - 1];
     const tcs = (t) => { const s = Math.floor(t), f = Math.min(23, Math.floor((t - s) * 24)); return `${two(Math.floor(s / 3600))}:${two(Math.floor(s / 60) % 60)}:${two(s % 60)}:${two(f)}`; };
@@ -229,9 +230,10 @@
       const base = Math.floor(q), frac = q - base, g = seg[base];
       head.style.transform = `translate3d(${(g.x0 + frac * (g.x1 - g.x0) - 1).toFixed(1)}px, 0, 0)`;
       tc.textContent = tcs(starts[base] + frac * secs[base]);
-      // the monitor: this film's frame, pushing in as it runs; over the last third the next one blooms in over it in
-      // moonlight cells (SM.bloom). Only that one steps through its stages: the rest are under it or not there
-      const cover = base < n - 1 ? clamp((frac - 0.68) / 0.32) : 0;
+      // the monitor: this film's frame, pushing in as it runs; near the end of its step the next one blooms in over it in
+      // moonlight cells (SM.bloom), over about a fifth of a screen. Only that one steps through its stages: the rest are
+      // under it or not there
+      const cover = base < n - 1 ? clamp((frac - 0.72) / 0.24) : 0;
       frames.forEach((f, k) => {
         const c = k === base ? 1 : k === base + 1 ? cover : 0;
         SM.bloom(f, c, k !== base + 1);
@@ -243,11 +245,8 @@
       if (base !== cur) caption(base);
       // the words: this film's leave letter by letter as the next frame blooms, and the next film's come in after the
       // cut, its title spelled out of runes (SM.letters, in reel.js). Quiet mode changes them at the cut
-      const lv = quiet || base >= n - 1 ? 0 : clamp((frac - 0.62) / 0.3), en = quiet || base === 0 ? 1 : clamp(frac / 0.24);
-      if (lv > 0 || en < 1) SM.letters.prep(words);
-      const LV = lv ? lv.toFixed(3) : "", EN = en < 1 ? en.toFixed(3) : "";
-      if (words._lv !== LV) { words._lv = LV; LV ? words.style.setProperty("--lv", LV) : words.style.removeProperty("--lv"); }
-      if (words._en !== EN) { words._en = EN; EN ? words.style.setProperty("--en", EN) : words.style.removeProperty("--en"); }
+      const lv = quiet || base >= n - 1 ? 0 : clamp((frac - 0.7) / 0.26), en = quiet || base === 0 ? 1 : clamp(frac / 0.2);
+      SM.letters.drive(words, 1, lv, en);
       SM.letters.runes(words, en);
     };
     // each film's light blooms from its own point on the frame
@@ -458,7 +457,7 @@
           play();
         },
       };
-    }), { step: 0.95, stack: narrow, onScrub: (q) => (atQ = q), onChange: (i) => { play(); stage.style.setProperty("--ink", SM.world(A[i].ground, A[i].ink).ink); stage.style.setProperty("--ground", SM.world(A[i].ground, A[i].ink).ground); } });
+    }), { step: 0.85, stack: narrow, onScrub: (q) => (atQ = q), onChange: (i) => { play(); stage.style.setProperty("--ink", SM.world(A[i].ground, A[i].ink).ink); stage.style.setProperty("--ground", SM.world(A[i].ground, A[i].ink).ground); } });
     $("#quiet")?.addEventListener("click", play);
 
     /* the strip of screens follows the scroll: --p runs from 0 as a plate arrives to 1 as it leaves (its own pass through
@@ -484,8 +483,9 @@
           const travel = parseFloat(box.style.getPropertyValue("--travel")) || 0;
           if (travel > 0) p = clamp((fx.offsetLeft + fx.offsetWidth / 2 - box.clientWidth / 2) / travel);
         }
-        const P = p.toFixed(3);
-        if (box._p !== P) { box._p = P; box.style.setProperty("--p", P); }
+        // written on the strip, not its box, so only the strip and its screens are restyled
+        const P = p.toFixed(3), tr = box._tr || (box._tr = $(".a-track", box));
+        if (box._p !== P) { box._p = P; tr.style.setProperty("--p", P); }
       });
     };
     SM.scrub(drive);

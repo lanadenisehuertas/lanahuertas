@@ -1,9 +1,7 @@
 /* Prototype: every brand on one page (brands-proto.js). Built on brand.css. */
-/* the backdrops of all ten lie stacked; the brand being read shows its own, crossing over as the scroll changes brand */
-.b-world .backdrop { opacity: 0; transition: opacity 700ms linear; }
-.b-world .backdrop.on { opacity: 1; }
-.quiet .b-world .backdrop { transition: none; }
-body { transition: background-color 500ms linear; }
+/* the backdrops of all ten lie stacked; the brand being read shows its own, crossing over as the scroll brings the next
+   brand up the window (brands-proto.js sets each one's opacity from the scroll) */
+.b-world .b-back { position: absolute; inset: 0; opacity: 0; }
 
 /* the names of all ten at the top, a line of links to jump to any one of them */
 .b-index { width: calc(100 * var(--u)); margin: 0 auto; padding: calc(var(--band) + 6 * var(--u)) calc(10 * var(--u)) calc(2 * var(--u)); }
@@ -24,7 +22,7 @@ main .b-one > .b-stop { min-height: 0; padding: 0; place-items: start center; }
 .b-spread .b-head { grid-area: head; padding-top: 0; gap: calc(0.7 * var(--u)); }
 .b-spread .b-info { grid-area: info; padding-top: 0; }
 .b-spread .b-work { grid-area: work; align-self: start; justify-items: center; }
-.b-spread .kv .pic .full { max-height: min(calc(46 * var(--u)), calc(100svh - 2 * var(--band) - 9 * var(--u))); }
+.b-spread .kv { --kvh: min(calc(46 * var(--u)), calc(100svh - 2 * var(--band) - 9 * var(--u))); }
 .b-rest { grid-area: rest; display: grid; gap: calc(1.1 * var(--u)); margin-top: calc(1.4 * var(--u)); }
 .b-rest-h { color: var(--ink); }
 .b-long .b-name { font-size: clamp(32px, calc(3.3 * var(--u)), 52px); }
@@ -102,7 +100,7 @@ main > .b-end { padding-top: calc(4 * var(--u)); }
   .b-spread { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "head" "work" "info" "rest";
     row-gap: 20px; padding: calc(var(--band) + 28px) 16px 36px; }
   .b-spread .b-work { justify-items: center; }
-  .b-spread .kv .pic .full { max-height: 62svh; }
+  .b-spread .kv { --kvh: 62svh; }
   .b-rest { gap: 12px; margin-top: 8px; }
   .b-spread .b-wall { --gap: 12px; --hmax: 70vw; }
   main > .b-end { padding-top: 16px; padding-bottom: calc(var(--band) + 96px); }

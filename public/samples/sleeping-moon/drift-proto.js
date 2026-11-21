@@ -1,9 +1,12 @@
 /* Prototype: everything alive (see drift-proto.css). Three kinds of motion, layered:
    idle life (CSS, always on), the scroll's wind (things lag and lean while the page moves, then settle), and the
    pointer's pull (pictures lean towards it). Other scripts own each element's transform; this only ever writes
-   --lx, --ly and --w on the element, which the idle animations read. */
+   --lx, --ly and --w on the element, which the idle animations read.
+   The corner ornaments (the moths and the lilies) and the letter at dawn keep their idle loop alone, at sizes fixed in
+   the style sheet, and are never written to while the page moves: the letter holds the whole form, which every write
+   would restyle, and the ornaments are too many and too small for the wind to be worth a write a frame. */
 (() => {
-  const { $$ } = SM;
+  const { $$ } = SM, root = document.documentElement;
   const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   let seed = 3;
@@ -15,13 +18,11 @@
      The films on the editor's timeline stay still too: the owner wanted only minimal movement there, which their own
      small lift on hover and under the playhead already gives. */
   const KINDS = [
-    { sel: ".pic.orn", how: (el) => (/moth/.test(el.querySelector("img")?.src || "") ? "moth" : "lily"), depth: 1.6 },
-    { sel: ".t-lily", how: () => "lily", depth: 1.4 },
-    { sel: ".t-moth", how: () => "moth", depth: 1.4 },
+    { sel: ".pic.orn", how: (el) => (/moth/.test(el.querySelector("img")?.src || "") ? "orn-moth" : "orn-lily"), calm: true },
     { sel: ".door > .pic", how: () => "bob", a: [3, 6], t: [4.2, 6.4], depth: 1 },
     { sel: ".pic.moon", how: () => "breathe", r: [0.8, 0.8], t: [9, 9], depth: 0.5 },
     { sel: ".a-phone", how: () => "bob", a: [4, 6], t: [5, 7], depth: 1 },
-    { sel: "#talk .env", how: () => "sway", r: [0.5, 0.7], t: [7, 9], depth: 0.5 },
+    { sel: "#talk .env", how: () => "env", t: [7, 9], calm: true },
     { sel: ".vs-star .sp-w", how: () => "moth-lite", a: [1.5, 2.5], t: [5, 9], depth: 0.4 },
   ];
   const range = (r, d) => (r ? r[0] + rnd() * (r[1] - r[0]) : d);
@@ -31,22 +32,25 @@
   const vis = new Set();
   const io = new IntersectionObserver((es) => es.forEach((e) => {
     const it = e.target._dr;
-    if (e.isIntersecting) { vis.add(it); e.target.classList.remove("dr-off"); }
+    if (e.isIntersecting) { if (!it.calm) vis.add(it); e.target.classList.remove("dr-off"); }
     else { vis.delete(it); e.target.classList.add("dr-off"); }
   }), { rootMargin: "120px 0px" });
   const adopt = () => {
     KINDS.forEach((k) => $$(k.sel).forEach((el) => {
-      if (el._dr || el.closest("#brands, #posters")) return;
+      // the room's own moon (room-proto.js) is moved by the room's camera, never by the wind
+      if (el._dr || el.closest("#brands, #posters, .room-intro")) return;
       const how = k.how(el), st = el.style;
-      el._dr = { el, depth: k.depth, rot: how !== "bob" && how !== "moth" && how !== "moth-lite", lx: 0, ly: 0, w: 0, tx: 0, ty: 0, tw: 0 };
+      el._dr = { el, calm: !!k.calm, hero: !!el.closest("#moon"), depth: k.depth, rot: how !== "bob" && how !== "moth" && how !== "moth-lite", lx: 0, ly: 0, w: 0, tx: 0, ty: 0, tw: 0 };
       st.setProperty("--d", `${(-rnd() * 8).toFixed(2)}s`);
-      if (how === "moth") { el.classList.add("dr-moth"); st.setProperty("--a", `${range([5, 9]).toFixed(1)}px`); st.setProperty("--t", `${range([7, 11]).toFixed(1)}s`); st.setProperty("--f", `${Math.round(range([700, 1100]))}ms`); }
+      // one loop each, on the transform's own parts, at a size fixed in the style sheet, which the browser runs alone
+      if (k.calm) { el.classList.add("dr-" + how); st.setProperty("--t", `${range(k.t || (how === "orn-moth" ? [7, 11] : [5, 8])).toFixed(1)}s`); }
+      else if (how === "moth") { el.classList.add("dr-moth"); st.setProperty("--a", `${range([5, 9]).toFixed(1)}px`); st.setProperty("--t", `${range([7, 11]).toFixed(1)}s`); st.setProperty("--f", `${Math.round(range([700, 1100]))}ms`); }
       else if (how === "moth-lite") { el.classList.add("dr-float"); st.setProperty("--a", `${range(k.a).toFixed(1)}px`); st.setProperty("--t", `${range(k.t).toFixed(1)}s`); }
       else if (how === "lily") { el.classList.add("dr-sway", "lily"); st.setProperty("--r", `${range([1.2, 2.6]).toFixed(2)}deg`); st.setProperty("--t", `${range([5, 8]).toFixed(1)}s`); }
       else if (how === "bob") { el.classList.add("dr-bob"); st.setProperty("--a", `${range(k.a).toFixed(1)}px`); st.setProperty("--t", `${range(k.t).toFixed(1)}s`); }
       else { el.classList.add(how === "breathe" ? "dr-breathe" : "dr-sway"); st.setProperty("--r", `${range(k.r).toFixed(2)}deg`); st.setProperty("--t", `${range(k.t).toFixed(1)}s`); }
       el.classList.add("dr-off");
-      items.push(el._dr);
+      if (!k.calm) items.push(el._dr);
       io.observe(el);
     }));
   };
@@ -76,12 +80,14 @@
   }
   /** what is showing and, for the pointer's pull, where it is: only reads the page */
   function nearNow() {
-    const H = SM.vh, near = [], pull = SM.HOVER && !SM.COLUMN.matches && px > -1e3;
+    const H = SM.vh, near = [], pull = SM.HOVER && !SM.COLUMN.matches && px > -1e3, covered = root.classList.contains("room-covers");
     // read everything first, then write, so the page is laid out once a frame. Only the pointer's pull needs to know
     // where things are; without it (phones, or the pointer gone) what is showing comes from the observer alone, and
     // nothing is measured
     for (const it of vis) {
       if (!it.el.isConnected) { vis.delete(it); continue; }
+      // the moon's stop, while the room's night still hides it whole, is left as it is
+      if (covered && it.hero) continue;
       if (!pull) { near.push([it, null]); continue; }
       const r = it.el.getBoundingClientRect();
       if (r.bottom < -100 || r.top > H + 100 || !r.width) continue;

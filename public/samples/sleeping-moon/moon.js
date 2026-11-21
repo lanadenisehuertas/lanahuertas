@@ -5,16 +5,18 @@
      bitmaps, ink on the ground in an 8 x 8 Bayer dither with crisp square cells fixed to the picture;
      photos of the work and the moon (photo, moon) sleep as a smooth lilac duotone, their lightness laid between the
      stop's ground and its ink, so no large area is ever dithered.
-   Waking, the colour comes in as a sweep of moonlight from the top left down across the picture. On a bitmap the cells
-   at the front turn one by one, each when the front's light passes its Bayer threshold; on a smooth picture the front
-   is feathered, and a sparse seam of square cells glints along it while it moves.
+   Waking, the colour spreads out from the middle of the picture (or from where the pointer came in), and goes back in
+   toward it as the picture falls asleep. The front is never a smooth ring: it is made of square cells, a bitmap's own
+   or, on a smooth picture, squares about as big, each turning when the light passes its Bayer threshold, with a little
+   noise of its own and a few loose cells running ahead; on a smooth picture a sparse few glint pale lilac just before
+   they turn.
    What the canvas shows is decided by:
      show     how much of the picture has come in (the entrance, once)
      wake     how much of the whole picture has turned to colour, from pointing at it
      floor    how much has turned to colour from the scroll: a picture wakes as far
               as the scroll has brought it in, and goes back to sleep as it leaves
      face     for a picture with two faces, how much of the second face is in
-   All of them travel along the same sweep, so the picture changes in one soft front, never in a scatter of pixels. */
+   All of them travel outward along the same order, so the picture changes in one front of cells, never in noise. */
 const SM = (() => {
   const root = document.documentElement;
   const HOVER = matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -37,6 +39,13 @@ const SM = (() => {
 
   const B8 = [0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22,
     3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21];
+  /** a cell's own fixed chance, 0 to 1, from its column, its row and a salt: the same on every load */
+  const cellHash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 1274126177) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); h = Math.imul(h ^ (h >>> 16), 2246822519); return ((h ^ (h >>> 15)) >>> 0) / 4294967296; };
+  /** how much light a cell at place t in the order has when a picture's show, wake or face is at p: 0 until the front
+      reaches it, 1 a short way behind the front (WF of the order), so the cells along the front turn by their Bayer
+      thresholds within a narrow band, a hard edge with a row of loose cells ahead of it */
+  const WF = 0.16;
+  const ramp = (p, t) => { const q = (p * (1 + WF) - t) / WF; return q <= 0 ? 0 : q >= 1 ? 1 : q; };
   /* a scatter of stars, a few of which twinkle: those that twinkle in step share one of three layers (.tg-0 to .tg-2 in
      magic-proto.css) and the layer's opacity is what changes, so the browser runs three animations however many stars
      there are. group(i) gives the layer of the i-th star counting from 1, or -1 for a steady one; a twinkling star
@@ -53,12 +62,13 @@ const SM = (() => {
      be done, the image element is the fallback. */
   const viaElement = (src) => { const im = new Image(); im.src = src; return im.decode().then(() => im); };
   /* el, if given, is the page's own image of the same file: it is let finish first, so the file is fetched once and the
-     copy here comes from the browser's cache */
+     copy here comes from the browser's cache. An image with a srcset is fetched as the copy the browser chose for it
+     (currentSrc), so a smaller copy is not followed by the full-size file. */
   // (a lazy image in a hidden box never loads, so the wait is cut off after a moment and the file fetched anyway)
   const settled = (el) => (!el || el.complete ? Promise.resolve() : new Promise((r) => { el.addEventListener("load", r, { once: true }); el.addEventListener("error", r, { once: true }); setTimeout(r, 2500); }));
   const loadImage = (src, el) => {
     if (!window.createImageBitmap || !window.fetch) return viaElement(src);
-    return settled(el).then(() => fetch(src, { cache: "force-cache" })).then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); }).then((b) => createImageBitmap(b)).then((bmp) => {
+    return settled(el).then(() => fetch((el && el.currentSrc) || src, { cache: "force-cache" })).then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); }).then((b) => createImageBitmap(b)).then((bmp) => {
       const k = Math.min(1, 640 / Math.max(bmp.width, bmp.height));
       if (k >= 1) return bmp;
       return createImageBitmap(bmp, { resizeWidth: Math.round(bmp.width * k), resizeHeight: Math.round(bmp.height * k), resizeQuality: "high" })
@@ -94,7 +104,7 @@ const SM = (() => {
       this.kind = pic.dataset.kind || "paint";   // paint: shape from the image's alpha · photo: the whole box · line: engraving · moon: a disc
       this.bits = this.kind === "paint" || this.kind === "line";   // drawn objects sleep as 1-bit bitmaps
       this.canvas.classList.toggle("bits", this.bits);
-      this.show = 0; this.wake = 0; this.floor = 0; this.face = 0; this.lr = 0; this.lx = 0; this.ly = 0;
+      this.show = 0; this.wake = 0; this.floor = 0; this.face = 0; this.origin = null;
       this.phase = pic.dataset.phase ? +pic.dataset.phase : 1;   // a moon's lit part: 1 full, 0.5 half, 0 new
       this.timers = {};
       all.add(this);
@@ -195,84 +205,90 @@ const SM = (() => {
       Object.assign(this.canvas.style, { left: this.full.offsetLeft + "px", top: this.full.offsetTop + "px", width: w + "px", height: h + "px" });
       this.canvas.width = cols; this.canvas.height = rows;
       this.cols = cols; this.rows = rows;
-      // the sweep: where each point sits on the way from the top left to the bottom right, with a slow ripple so the
-      // front of the light is never a ruled line
-      const sweep = new Float32Array(cols * rows);
-      let lo = Infinity, hi = -Infinity;
+      /* the front's cells: on a bitmap, its own cells; on a smooth picture, squares about as big as a bitmap's cells
+         (half a u), so the light comes in as hard square cells on photos and the moon too. Each cell
+         turns at its own threshold, its place in an 8 x 8 Bayer pattern, and keeps a fixed chance of glinting */
+      const blk = this.bits ? 1 : Math.max(1, Math.round(Math.max(6, u() * 0.5) / cell));
+      const n = cols * rows, thr = new Float32Array(n), seam = new Float32Array(n);
       for (let y = 0, i = 0; y < rows; y++) for (let x = 0; x < cols; x++, i++) {
-        const fx = x / cols, fy = y / rows, t = 0.62 * fy + 0.38 * fx + 0.035 * Math.sin(fx * 7.1 + fy * 3.3) + 0.02 * Math.sin(fy * 11.7 - fx * 4.2);
-        sweep[i] = t; if (t < lo) lo = t; if (t > hi) hi = t;
+        const bx = (x / blk) | 0, by = (y / blk) | 0;
+        thr[i] = (B8[(by & 7) * 8 + (bx & 7)] + 0.5) / 64;
+        seam[i] = cellHash(bx, by, 7);
       }
-      for (let i = 0; i < sweep.length; i++) sweep[i] = (sweep[i] - lo) / (hi - lo);
-      this.sweep = sweep;
-      // the seam's cells: squares about six CSS pixels across, each with a fixed chance, so the glints stand still on
-      // the picture and only the front decides which of them show
-      const blk = Math.max(2, Math.round(6 / cell)), seam = new Float32Array(cols * rows);
-      for (let y = 0, i = 0; y < rows; y++) for (let x = 0; x < cols; x++, i++) {
-        let h = (((x / blk) | 0) * 374761393 + ((y / blk) | 0) * 668265263) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177);
-        seam[i] = ((h ^ (h >>> 16)) >>> 0) / 4294967295;
-      }
-      this.seam = seam;
+      this.blk = blk; this.thr = thr; this.seam = seam;
       this.a = this.cells(this.imgs[0], cols, rows);
       this.b = this.imgs[1] ? this.cells(this.imgs[1], cols, rows) : null;
+      // the order the cells turn in: outward from the picture's middle, and from where the pointer came in, if it did
+      this.ord = this.orderFrom(0.5, 0.5);
+      this.pord = this.origin ? this.orderFrom(this.origin[0], this.origin[1]) : null;
       this.image = this.ctx.createImageData(cols, rows);
       this.draw();
+    }
+    /** each cell's place in the order the light reaches it, 0 first to 1 last: how far its cell is from the point
+        (ox, oy), as fractions of the picture, measured against the farthest cell of the picture's own shape, so the
+        front reaches the shape's edge just as the wake completes, on a disc as on a wide picture. A little noise of
+        each cell's own breaks the circle, and a few cells sit a step early: the loose cells that run ahead of it */
+    orderFrom(ox, oy) {
+      const { cols, rows, blk, a } = this, n = cols * rows, o = new Float32Array(n);
+      const X = ox * cols, Y = oy * rows, half = blk / 2, isIn = this.bits ? (i) => a.inside[i] : (i) => a.wake[i * 4 + 3] > 0;
+      let far = 1;
+      for (let y = 0, i = 0; y < rows; y++) for (let x = 0; x < cols; x++, i++) {
+        if (!isIn(i)) continue;
+        const d = Math.hypot(((x / blk) | 0) * blk + half - X, ((y / blk) | 0) * blk + half - Y);
+        if (d > far) far = d;
+      }
+      let lo = Infinity, hi = -Infinity;
+      for (let y = 0, i = 0; y < rows; y++) for (let x = 0; x < cols; x++, i++) {
+        const bx = (x / blk) | 0, by = (y / blk) | 0;
+        let v = Math.min(1, Math.hypot(bx * blk + half - X, by * blk + half - Y) / far) * 0.9 + cellHash(bx, by, 3) * 0.1;
+        if (cellHash(bx, by, 5) < 0.05) v -= 0.1;
+        o[i] = v;
+        if (isIn(i)) { if (v < lo) lo = v; if (v > hi) hi = v; }
+      }
+      if (!(hi > lo)) { lo = 0; hi = 1; }
+      for (let i = 0; i < n; i++) o[i] = Math.min(1, Math.max(0, (o[i] - lo) / (hi - lo)));
+      return o;
     }
     draw() {
       if (!this.image) return;
       if (this.bits) return this.drawBits();
-      const { cols, rows, a, b, show, face, lx, ly, lr, phase, sweep, seam } = this, px = this.image.data, wake = Math.max(this.wake, this.floor);
-      const F = 0.24, ramp = (p, t) => { const q = (p * (1 + F) - t) / F; return q <= 0 ? 0 : q >= 1 ? 1 : q * q * (3 - 2 * q); };
-      const soft = lr ? lr * 0.35 : 1;
+      /* a smooth picture: its cells (blk canvas pixels square) are each asleep (the duotone) or awake (the picture),
+         never a blend of the two, so the front is a scatter of hard square cells, never a feathered ring. A few cells
+         just short of turning glint pale lilac: the sparkle at the edge of the light */
+      const { cols, rows, a, b, show, face, phase, ord, thr, seam, wake, floor } = this, px = this.image.data, wo = this.pord || ord;
       for (let y = 0, i = 0; y < rows; y++) {
-        const dy = y + 0.5 - ly, ny = (y + 0.5) / rows - 0.5, edge = (2 * phase - 1) * Math.sqrt(Math.max(0, 0.25 - ny * ny));   // the terminator
+        const ny = (y + 0.5) / rows - 0.5, edge = (2 * phase - 1) * Math.sqrt(Math.max(0, 0.25 - ny * ny));   // the terminator
         for (let x = 0; x < cols; x++, i++) {
-          const j = i * 4, t = sweep[i];
-          let al = ramp(show, t);
-          if (al > 0 && phase < 1) { const q = (edge - ((x + 0.5) / cols - 0.5)) * cols * 0.6 + 0.5; al *= q <= 0 ? 0 : q >= 1 ? 1 : q; }
-          if (al <= 0) { px[j + 3] = 0; continue; }
-          let wk = ramp(wake, t);
-          if (lr && wk < 1) { const dx = x + 0.5 - lx, r = Math.sqrt(dx * dx + dy * dy), q = (lr - r) / soft; if (q > wk) wk = q >= 1 ? 1 : q; }
-          const fk = b ? ramp(face, t) : 0;
-          let r, g, bl, al2;
-          if (fk <= 0 || fk >= 1) {
-            const L = fk >= 1 ? b : a, S = L.sleep, W = L.wake, sk = 1 - wk;
-            r = S[j] * sk + W[j] * wk; g = S[j + 1] * sk + W[j + 1] * wk; bl = S[j + 2] * sk + W[j + 2] * wk; al2 = S[j + 3] * sk + W[j + 3] * wk;
-          } else {
-            const sk = 1 - wk, fa = 1 - fk;
-            const ra = a.sleep[j] * sk + a.wake[j] * wk, ga = a.sleep[j + 1] * sk + a.wake[j + 1] * wk, ba = a.sleep[j + 2] * sk + a.wake[j + 2] * wk, aa = a.sleep[j + 3] * sk + a.wake[j + 3] * wk;
-            const rb = b.sleep[j] * sk + b.wake[j] * wk, gb = b.sleep[j + 1] * sk + b.wake[j + 1] * wk, bb = b.sleep[j + 2] * sk + b.wake[j + 2] * wk, ab = b.sleep[j + 3] * sk + b.wake[j + 3] * wk;
-            r = ra * fa + rb * fk; g = ga * fa + gb * fk; bl = ba * fa + bb * fk; al2 = aa * fa + ab * fk;
-          }
-          // the seam: where the light is half way in, a few of the square cells glint pale lilac
-          if (wk > 0.04 && wk < 0.96) {
-            const m = 4 * wk * (1 - wk);
-            if (seam[i] < m * m * m * 0.4) { r += (232 - r) * 0.7; g += (222 - g) * 0.7; bl += (255 - bl) * 0.7; }
-          }
-          px[j] = r; px[j + 1] = g; px[j + 2] = bl; px[j + 3] = al2 * al;
+          const j = i * 4, t = ord[i], th = thr[i];
+          if (ramp(show, t) <= th) { px[j + 3] = 0; continue; }
+          let al = 1;
+          if (phase < 1) { const q = (edge - ((x + 0.5) / cols - 0.5)) * cols * 0.6 + 0.5; al = q <= 0 ? 0 : q >= 1 ? 1 : q; if (al <= 0) { px[j + 3] = 0; continue; } }
+          const L = b && ramp(face, t) > th ? b : a;
+          let wk = floor ? ramp(floor, t) : 0;
+          if (wake) { const w2 = ramp(wake, wo[i]); if (w2 > wk) wk = w2; }
+          if (wk > th) { const W = L.wake; px[j] = W[j]; px[j + 1] = W[j + 1]; px[j + 2] = W[j + 2]; px[j + 3] = W[j + 3] * al; continue; }
+          const S = L.sleep;
+          if (wk > 0 && wk > th - 0.22 && seam[i] < 0.3) { px[j] = S[j] + (236 - S[j]) * 0.75; px[j + 1] = S[j + 1] + (226 - S[j + 1]) * 0.75; px[j + 2] = S[j + 2] + (255 - S[j + 2]) * 0.75; }
+          else { px[j] = S[j]; px[j + 1] = S[j + 1]; px[j + 2] = S[j + 2]; }
+          px[j + 3] = S[j + 3] * al;
         }
       }
       this.ctx.putImageData(this.image, 0, 0);
     }
     /** a bitmap's frame: every cell is either asleep (ink, ground or nothing) or awake (its colour), never between. A cell
-        turns when the sweep's light at it passes its Bayer threshold, so the front breaks up cell by cell */
+        turns when the light spreading out to it passes its Bayer threshold, so the front breaks up cell by cell */
     drawBits() {
-      const { cols, rows, a, b, show, face, lx, ly, lr, sweep, ink, paper } = this, px = this.image.data, wake = Math.max(this.wake, this.floor);
-      const F = 0.24, ramp = (p, t) => { const q = (p * (1 + F) - t) / F; return q <= 0 ? 0 : q >= 1 ? 1 : q * q * (3 - 2 * q); };
-      const soft = lr ? lr * 0.35 : 1;
-      for (let y = 0, i = 0; y < rows; y++) {
-        const dy = y + 0.5 - ly, row = (y & 7) * 8;
-        for (let x = 0; x < cols; x++, i++) {
-          const j = i * 4, t = sweep[i], th = (B8[row + (x & 7)] + 0.5) / 64;
-          const s = b && ramp(face, t) > th ? b : a;
-          if (!s.inside[i] || ramp(show, t) <= th) { px[j + 3] = 0; continue; }
-          let wk = ramp(wake, t);
-          if (lr && wk < 1) { const dx = x + 0.5 - lx, q = (lr - Math.sqrt(dx * dx + dy * dy)) / soft; if (q > wk) wk = q >= 1 ? 1 : q; }
-          if (wk > th) { px[j] = s.col[j]; px[j + 1] = s.col[j + 1]; px[j + 2] = s.col[j + 2]; px[j + 3] = 255; }
-          else if (s.on[i]) { px[j] = ink[0]; px[j + 1] = ink[1]; px[j + 2] = ink[2]; px[j + 3] = 255; }
-          else if (paper) { px[j] = paper[0]; px[j + 1] = paper[1]; px[j + 2] = paper[2]; px[j + 3] = 255; }
-          else px[j + 3] = 0;
-        }
+      const { cols, rows, a, b, show, face, ord, thr, ink, paper, wake, floor } = this, px = this.image.data, wo = this.pord || ord;
+      for (let i = 0, n = cols * rows; i < n; i++) {
+        const j = i * 4, t = ord[i], th = thr[i];
+        const s = b && ramp(face, t) > th ? b : a;
+        if (!s.inside[i] || ramp(show, t) <= th) { px[j + 3] = 0; continue; }
+        let wk = floor ? ramp(floor, t) : 0;
+        if (wake) { const w2 = ramp(wake, wo[i]); if (w2 > wk) wk = w2; }
+        if (wk > th) { px[j] = s.col[j]; px[j + 1] = s.col[j + 1]; px[j + 2] = s.col[j + 2]; px[j + 3] = 255; }
+        else if (s.on[i]) { px[j] = ink[0]; px[j + 1] = ink[1]; px[j + 2] = ink[2]; px[j + 3] = 255; }
+        else if (paper) { px[j] = paper[0]; px[j + 1] = paper[1]; px[j + 2] = paper[2]; px[j + 3] = 255; }
+        else px[j + 3] = 0;
       }
       this.ctx.putImageData(this.image, 0, 0);
     }
@@ -290,17 +306,29 @@ const SM = (() => {
       });
     }
     /** bitmap to colour, then the sharp picture takes over */
-    async wakeUp(ms = 300, delay = 0) {
+    /* at: where the pointer came in, as fractions of the picture, if it did */
+    async wakeUp(ms = 300, delay = 0, at) {
       clearTimeout(this.timers.rest); this.awake = true; this.pic.classList.add("woken");
       try { await this.load(); } catch { this.pic.classList.add("plain"); return; }
+      this.aim(at);
       await this.to("wake", 1, ms, delay); this.sync();
+    }
+    /** where the light spreads from: from the point the pointer came in at, drawn halfway to the middle so the far side
+        is not left waiting; a round picture (the moon, data-round) and a wake with no pointer spread from the middle.
+        A picture still part awake keeps the point it has, so its light never jumps; it goes back to sleep toward it */
+    aim(at) {
+      if (this.wake > 0 || !this.ord) return;
+      const round = this.kind === "moon" || this.pic.hasAttribute("data-round"), c = (v) => Math.min(1, Math.max(0, v));
+      const o = at && !round ? [0.5 + (c(at[0]) - 0.5) * 0.5, 0.5 + (c(at[1]) - 0.5) * 0.5] : null;
+      if (String(o) === String(this.origin)) return;
+      this.origin = o; this.pord = o ? this.orderFrom(o[0], o[1]) : null;
     }
     sleep(ms = 200) { clearTimeout(this.timers.rest); this.awake = false; this.pic.classList.remove("woken"); if (this.floor < 1) this.pic.classList.remove("awake"); return this.to("wake", 0, ms); }
     /** once revealed, a picture stays in colour after the pointer leaves, then dissolves back into its bitmap */
     rest(hold = 60000, ms = 900) { clearTimeout(this.timers.rest); this.timers.rest = setTimeout(() => this.sleep(ms), hold); }
     /** the sharp picture shows only while the bitmap is all colour */
     sync() { this.pic.classList.toggle("awake", Math.max(this.wake, this.floor) >= 1); }
-    /** set by the scroll, every frame it moves: in steps of 1/64, fine enough that the sweep glides */
+    /** set by the scroll, every frame it moves: in steps of 1/64, fine enough that the front glides */
     setFloor(v) {
       v = Math.round(Math.min(1, Math.max(0, v)) * 64) / 64;
       if (v === this.floor) return;
@@ -365,7 +393,9 @@ const SM = (() => {
     const b = new Bitmap(p); io.observe(p);
     // a picture that is not part of a link or button wakes under the pointer by itself, and stays revealed for a minute after
     if (!p.closest("a, button") && !p.hasAttribute("data-still")) {
-      p.addEventListener("pointerenter", (e) => e.pointerType !== "touch" && b.wakeUp(320));
+      // the light spreads from where the pointer came in (read once, at the moment it comes in)
+      const at = (e) => { const r = p.getBoundingClientRect(); return r.width && r.height ? [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height] : null; };
+      p.addEventListener("pointerenter", (e) => e.pointerType !== "touch" && b.wakeUp(320, 0, at(e)));
       p.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") b.rest(); });
       // on a touch screen a tap does what hovering does: the picture wakes and stays awake for a while. The wake waits for
       // the finger to lift in place, so a swipe that starts on a picture only scrolls: the browser cancels the pointer
@@ -377,7 +407,7 @@ const SM = (() => {
       p.addEventListener("pointercancel", () => { down = null; }, { passive: true });
       p.addEventListener("pointerup", (e) => {
         const d = down; down = null;
-        if (d && d.id === e.pointerId && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 10) { b.wakeUp(320); b.rest(); }
+        if (d && d.id === e.pointerId && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 10) { b.wakeUp(320, 0, at(e)); b.rest(); }
       }, { passive: true });
     }
     return b;
@@ -593,17 +623,21 @@ const SM = (() => {
      wakes in, and only the picture: its words and its world hand over in their own ways (reel.js). Each cell has its
      place in the order from how far it is from the bloom's centre, broken up by a little noise of its own; near the
      centre the cells turn in blocks of four by four, then two by two, then one by one, so the bloom starts coarse and
-     refines as it spreads. Just ahead of the front runs a rim of pale moonlight cells, lavender at the picture's side
-     and gold at the leading edge, with a few loose gold cells strayed beyond it, like a spell catching the light.
-     Going, a picture breaks the same way: from the centre out, through the rim, into a few last sparks.
+     refines as it spreads. Just ahead of the front a few cells sparkle: small squares of pale moonlight, a third of a
+     cell across, lavender at the picture's side and gold at the leading edge, with a few loose ones strayed beyond.
+     Going, a picture breaks the same way: from the centre out, past a few last sparks.
 
-     bloom(el, s, snap): s runs from 0 (not there) through 1 (whole) to 2 (gone). The picture is cut by a mask, an SVG of
-     the cells (so every edge is hard at any size), and the rim is a child <i> over it with an SVG of its own. The masks
-     for each picture size are made once per step and kept, and made ahead while the page is idle. A picture's size comes
+     bloom(el, s, snap): s runs from 0 (not there) through 1 (whole) to 2 (gone). The picture is cut by a mask, a tiny
+     one-bit image with one pixel to a cell (a BMP, written here byte by byte, white where the picture shows), scaled up
+     with its pixels kept square (image-rendering: pixelated on the picture while it is cut, given back to everything
+     inside it in moon.css), so every edge is hard at any size and the browser only scales a small bitmap. An SVG mask
+     had to be built as a document of its own at every step, and a PNG had to be compressed, each costing more than the
+     rest of the frame. The sparkles are drawn on a small canvas over the picture, three canvas pixels to a cell. The
+     steps for each picture size are made once and kept, and made ahead while the page is idle. A picture's size comes
      from a ResizeObserver, so nothing is read from the page while the scroll moves it. data-bloom="x y" (fractions of
      the picture) puts the centre where the light should come from; otherwise each picture has its own. */
-  const BLOOM = 32, RIM = 0.1, LOOSE = 0.8;
-  const bloomHash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 1274126177) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); h = Math.imul(h ^ (h >>> 16), 2246822519); return ((h ^ (h >>> 15)) >>> 0) / 4294967296; };
+  const BLOOM = 64, RIM = 0.08, LOOSE = 0.7;
+  const bloomHash = cellHash;
   const bloomCell = () => Math.max(14, Math.round(u() * 1.15));
   /* a grid: every cell's place in the order (0 first to 1 last), and whether it may stray ahead of the rim */
   const grids = new Map(), warmQueue = [];
@@ -616,15 +650,15 @@ const SM = (() => {
     const small = Math.min(cols, rows), dist = (x, y) => Math.hypot(x - ox, y - oy) / far;
     let lo = Infinity, hi = -Infinity;
     for (let y = 0, i = 0; y < rows; y++) for (let x = 0; x < cols; x++, i++) {
-      // the block a cell turns with: four by four near the centre, two by two further out, then alone
+      // the block a cell turns with: four by four right at the centre, two by two further out, then alone
       let b = 1;
-      if (small >= 14 && dist((((x >> 2) << 2) + 2), (((y >> 2) << 2) + 2)) < 0.3) b = 4;
-      else if (small >= 6 && dist((((x >> 1) << 1) + 1), (((y >> 1) << 1) + 1)) < 0.6) b = 2;
+      if (small >= 14 && dist((((x >> 2) << 2) + 2), (((y >> 2) << 2) + 2)) < 0.16) b = 4;
+      else if (small >= 6 && dist((((x >> 1) << 1) + 1), (((y >> 1) << 1) + 1)) < 0.45) b = 2;
       const bx = Math.floor(x / b) * b, by = Math.floor(y / b) * b;
-      const v = dist(bx + b / 2, by + b / 2) * 0.78 + bloomHash(bx, by, b) * 0.22;
+      const v = dist(bx + b / 2, by + b / 2) * 0.8 + bloomHash(bx, by, b) * 0.2;
       o[i] = v; if (v < lo) lo = v; if (v > hi) hi = v;
-      loose[i] = bloomHash(x, y, 9) < 0.14 ? 1 : 0;
-      spark[i] = bloomHash(x, y, 11);   // each cell's own chance of catching the light in the rim, so the rim is a scatter of single cells
+      loose[i] = bloomHash(x, y, 9) < 0.08 ? 1 : 0;
+      spark[i] = bloomHash(x, y, 11);   // each cell's own chance of sparkling at the front, so the sparkles are a scatter of single cells
     }
     for (let i = 0; i < n; i++) o[i] = ((o[i] - lo) / Math.max(1e-6, hi - lo)) * 0.9999;
     g = { key, cols, rows, o, loose, spark, lv: new Map() };
@@ -634,50 +668,46 @@ const SM = (() => {
     warmQueue.push(g); warmSoon();
     return g;
   };
-  /* one step of a grid, as CSS: the mask and the rim. S runs from 1 to BLOOM - 1 coming in, BLOOM + 1 to 2 BLOOM - 1 going */
-  const svgUrl = (g, body) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${g.cols} ${g.rows}" preserveAspectRatio="none" shape-rendering="crispEdges">${body}</svg>`)}")`;
+  /* a one-bit BMP of w x h pixels as a CSS url(), white where on(i) (i counts across each row from the top left) and
+     black elsewhere; used as a luminance mask. A BMP needs no compression, so it is written in a moment */
+  const bmpUrl = (w, h, on) => {
+    const row = ((w + 31) >> 5) << 2, size = 62 + row * h, b = new Uint8Array(size), v = new DataView(b.buffer);
+    b[0] = 66; b[1] = 77; v.setUint32(2, size, true); v.setUint32(10, 62, true);
+    v.setUint32(14, 40, true); v.setInt32(18, w, true); v.setInt32(22, -h, true); v.setUint16(26, 1, true); v.setUint16(28, 1, true);
+    v.setUint32(34, row * h, true); v.setUint32(46, 2, true);
+    b[58] = b[59] = b[60] = 255;   // the palette: 0 black, 1 white
+    for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i++) if (on(i)) b[62 + y * row + (x >> 3)] |= 128 >> (x & 7);
+    let str = "";
+    for (let i = 0; i < size; i += 4096) str += String.fromCharCode.apply(null, b.subarray(i, i + 4096));
+    return `url("data:image/bmp;base64,${btoa(str)}")`;
+  };
+  /* one step of a grid: the mask, as CSS, and the sparkles, as a list of cells (each cell's index times two, plus one
+     for a gold one). S runs from 1 to BLOOM - 1 coming in, BLOOM + 1 to 2 BLOOM - 1 going */
   const bloomStep = (g, S) => {
     let st = g.lv.get(S);
     if (st) return st;
-    const going = S > BLOOM, L = going ? S - BLOOM : S, { cols, rows, o, loose, spark } = g;
+    const going = S > BLOOM, L = going ? S - BLOOM : S, { cols, rows, o, loose, spark } = g, n = cols * rows;
     // the front: coming in, the picture is every cell before it; going, every cell after its rim
     const t = going ? -RIM + ((1 + RIM * (1 + LOOSE)) * L) / BLOOM : -RIM * (1 + LOOSE) + ((1 + RIM * (1 + LOOSE)) * L) / BLOOM;
-    /* 0 nothing, 1 the picture, 2 the rim's lavender, 3 its gold. In the rim a cell catches the light by its own chance,
-       more often the nearer it is to the picture, so the rim is a thin scatter of single cells, never a solid band */
+    /* 0 nothing, 1 the picture, 2 the picture with a lavender sparkle, 3 with a gold one. At the front a cell sparkles
+       by its own chance, more often the nearer it is to the picture, so the sparkles are a light scatter, never a band */
     const kind = (i) => {
       const v = o[i];
       if (going) {
         if (v >= t + RIM) return 1;
-        if (v >= t) { const f = (v - t) / RIM; return spark[i] < 0.22 + 0.36 * f ? (f > 0.45 ? 2 : 3) : 1; }
+        if (v >= t) { const f = (v - t) / RIM; return spark[i] < 0.08 + 0.22 * f ? (f > 0.45 ? 2 : 3) : 1; }
         return v >= t - RIM * LOOSE && loose[i] ? 3 : 0;
       }
       if (v < t) return 1;
-      if (v < t + RIM) { const f = (v - t) / RIM; return spark[i] < 0.58 - 0.36 * f ? (f < 0.45 ? 2 : 3) : 0; }
+      if (v < t + RIM) { const f = (v - t) / RIM; return spark[i] < 0.34 - 0.24 * f ? (f < 0.45 ? 2 : 3) : 0; }
       return v < t + RIM * (1 + LOOSE) && loose[i] ? 3 : 0;
     };
-    // each row's runs of one kind as one rectangle: the shown cells for the mask, the two pale ones for the rim
-    let m = "", lav = "", gold = "";
-    const ks = new Uint8Array(cols);
-    for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < cols; x++) ks[x] = kind(y * cols + x);
-      for (let x = 0; x < cols;) {
-        const k = ks[x];
-        if (!k) { x++; continue; }
-        let e = x + 1;
-        while (e < cols && ks[e]) e++;
-        m += `M${x} ${y}h${e - x}v1h${x - e}z`;
-        for (let a = x; a < e;) {
-          const kk = ks[a];
-          let b = a + 1;
-          while (b < e && ks[b] === kk) b++;
-          if (kk === 2) lav += `M${a} ${y}h${b - a}v1h${a - b}z`; else if (kk === 3) gold += `M${a} ${y}h${b - a}v1h${a - b}z`;
-          a = b;
-        }
-        x = e;
-      }
-    }
-    st = { mask: m ? svgUrl(g, `<path d="${m}"/>`) : "hide",
-      rim: lav || gold ? svgUrl(g, `${lav ? `<path fill="#c9b6ff" d="${lav}"/>` : ""}${gold ? `<path fill="#fff1c9" d="${gold}"/>` : ""}`) : "" };
+    const ks = new Uint8Array(n);
+    let shown = 0, lit = 0;
+    for (let i = 0; i < n; i++) { const k = (ks[i] = kind(i)); if (k) shown++; if (k > 1) lit++; }
+    let rim = null;
+    if (lit) { rim = new Int32Array(lit); for (let i = 0, k = 0; i < n; i++) if (ks[i] > 1) rim[k++] = i * 2 + (ks[i] === 3 ? 1 : 0); }
+    st = { mask: shown ? bmpUrl(cols, rows, (i) => ks[i]) : "hide", rim };
     g.lv.set(S, st);
     return st;
   };
@@ -715,49 +745,67 @@ const SM = (() => {
   };
   const paintBloom = (el, S, again) => {
     const st = el.style;
-    let vis = true, mask = "none", rim = "";
+    let vis = true, mask = "none", rim = null;
     if (S <= 0 || S >= 2 * BLOOM) vis = false;
     else if (S !== BLOOM) {
       // until the picture's size is known it simply cuts over at the middle of its coming or going
       if (!el._bg) vis = S < BLOOM ? S >= BLOOM / 2 : S < BLOOM * 1.5;
       else { const s = bloomStep(el._bg, S); if (s.mask === "hide") vis = false; else { mask = s.mask; rim = s.rim; } }
     }
-    const v = vis ? "visible" : "hidden";
+    // a shown picture takes its visibility from what holds it, not "visible": a plate the reel has hidden must hide its
+    // pictures too, even one left part way through its bloom when a fast fling went by
+    const v = vis ? "" : "hidden";
     if (el._bv !== v) { el._bv = v; st.visibility = v; }
     if (el._bk !== mask || again) {
       el._bk = mask;
       st.webkitMaskImage = st.maskImage = mask;
-      if (mask !== "none") { st.webkitMaskSize = st.maskSize = "100% 100%"; st.webkitMaskRepeat = st.maskRepeat = "no-repeat"; }
+      // the mask's pixels stay square as it is scaled up (moon.css gives everything inside the picture back its own smoothing)
+      st.imageRendering = mask !== "none" ? "pixelated" : "";
+      if (mask !== "none") { st.maskMode = "luminance"; st.webkitMaskSize = st.maskSize = "100% 100%"; st.webkitMaskRepeat = st.maskRepeat = "no-repeat"; }
     }
     if (el._br !== rim || again) {
       el._br = rim;
       let gl = el._gl;
       if (rim && (!gl || gl.parentNode !== el)) {
-        gl = el._gl = gl || Object.assign(document.createElement("i"), { className: "glint" });
+        gl = el._gl = gl || Object.assign(document.createElement("canvas"), { className: "glint" });
         gl.setAttribute("aria-hidden", "true");
-        gl.style.cssText = "position:absolute;inset:0;z-index:6;pointer-events:none;background:no-repeat 0 0 / 100% 100%";
+        gl.style.cssText = "position:absolute;left:0;top:0;width:100%;height:100%;z-index:6;pointer-events:none;image-rendering:pixelated";
         el.append(gl);
       }
-      if (gl) { gl.style.backgroundImage = rim || "none"; gl.style.display = rim ? "block" : "none"; }
+      if (gl) {
+        gl.style.display = rim ? "block" : "none";
+        if (rim) {
+          const g = el._bg, W = g.cols * 3, H = g.rows * 3;
+          if (gl.width !== W || gl.height !== H) { gl.width = W; gl.height = H; }
+          const x = gl.getContext("2d");
+          x.clearRect(0, 0, W, H);
+          // each sparkle is the middle pixel of its cell's three by three, so it is a third of a cell across
+          for (let gold = 0; gold < 2; gold++) {
+            x.fillStyle = gold ? "rgb(255 241 201 / 0.96)" : "rgb(201 182 255 / 0.9)";
+            for (let k = 0; k < rim.length; k++) {
+              if ((rim[k] & 1) !== gold) continue;
+              const i = rim[k] >> 1;
+              x.fillRect((i % g.cols) * 3 + 1, ((i / g.cols) | 0) * 3 + 1, 1, 1);
+            }
+          }
+        }
+      }
     }
   };
-  /* hold frames: a bloom never jumps. However fast the page is flung, the picture steps toward the scroll's step one
-     step a frame (two when frames are slow), so every stage is on screen for a moment and nothing is skipped; a slow
-     scroll is followed exactly. The steps are taken in the page's own frame, among the scrubs, after the frame's read
-     pass: a frame of their own would write before the page's frame reads the scroll, and make it lay the page out on
-     the spot. While a picture is still catching up, the page's frame is asked for again. */
-  const HOLD = 16, chasing = new Set();
+  /* a bloom never jumps: however fast the page is flung, the picture closes a third of the way to the scroll's step
+     each frame (at least one step), so a fling catches up within a few frames with the stages between shown in passing,
+     and a slow scroll, a step or two a frame, is followed exactly. The steps are taken in the page's own frame, among
+     the scrubs, after the frame's read pass: a frame of their own would write before the page's frame reads the scroll,
+     and make it lay the page out on the spot. While a picture is still catching up, the page's frame is asked for again. */
+  const chasing = new Set();
   // while the page glides its frame asks for the next one itself, so asking here too would run it twice a frame
   const again = () => { if (!gliding) kick(); };
   scrub(() => {
     if (!chasing.size) return;
-    const now = performance.now();
     for (const el of chasing) {
       const d = el._bt - el._bs;
       if (!d) { chasing.delete(el); continue; }
-      if (now - el._bt0 < HOLD - 2) continue;
-      el._bs += Math.sign(d) * Math.min(Math.abs(d), Math.min(2, Math.max(1, Math.floor((now - el._bt0) / HOLD))));
-      el._bt0 = now;
+      el._bs += Math.sign(d) * Math.max(1, Math.ceil(Math.abs(d) / 3));
       paintBloom(el, el._bs);
       if (el._bs === el._bt) chasing.delete(el);
     }
@@ -769,9 +817,9 @@ const SM = (() => {
     if (!el._bw) { el._bw = true; bloomRO.observe(el); }
     const B = BLOOM, q = quiet(), S = q ? (s < 0.5 ? 0 : s < 1.5 ? B : 2 * B) : Math.round(Math.min(2, Math.max(0, s)) * B);
     el._bt = S;
-    if (el._bs == null || snap || q || Math.abs(S - el._bs) <= 1) {
+    if (el._bs == null || snap || q || Math.abs(S - el._bs) <= 2) {
       if (el._bs !== S) { el._bs = S; paintBloom(el, S); }
-      chasing.delete(el); el._bt0 = performance.now();
+      chasing.delete(el);
       return;
     }
     chasing.add(el); again();
@@ -930,6 +978,37 @@ const SM = (() => {
     past(); tick();
   };
   document.readyState === "loading" ? addEventListener("DOMContentLoaded", start) : start();
+  /* coming back. The page builds much of its own height after it has loaded (the rooms set how long they are, the type
+     comes in), so the browser's own return to the old place lands short, and a #stop in the address would send it to
+     that stop's top. Instead, the place is kept as the stop the window's top was in and how far into it, when the page
+     is left; coming back (or reloading), the page is put there again under the veil, and again each time more of it is
+     built, until it is all there or the visitor moves it. A page kept whole by the browser comes back as it was. */
+  try { history.scrollRestoration = "manual"; } catch (e) {}
+  const PLACE = "place:" + location.pathname;
+  addEventListener("pagehide", () => {
+    let at = null, top = 0;
+    for (const s of stops) { const r = s.getBoundingClientRect(); if (r.top <= 0 && r.bottom > 0) { at = s; top = r.top; break; } }
+    try { sessionStorage.setItem(PLACE, JSON.stringify({ y: scrollY, id: at?.id || "", off: -top })); } catch (e) {}
+  });
+  const comeBack = () => {
+    const how = performance.getEntriesByType?.("navigation")[0]?.type;
+    let place = null;
+    if (how === "back_forward" || how === "reload") try { place = JSON.parse(sessionStorage.getItem(PLACE) || "null"); } catch (e) {}
+    if (!place) return;
+    const put = () => {
+      if (!place) return;
+      const s = place.id && document.getElementById(place.id);
+      glide(s ? s.getBoundingClientRect().top + scrollY + place.off : place.y, true);
+    };
+    const leave = () => { place = null; MOVES.forEach((t) => removeEventListener(t, leave, true)); };
+    const MOVES = ["wheel", "touchstart", "keydown", "pointerdown"];
+    MOVES.forEach((t) => addEventListener(t, leave, { capture: true, passive: true }));
+    put(); requestAnimationFrame(put);
+    const built = [new Promise((r) => (document.readyState === "complete" ? r() : addEventListener("load", r, { once: true }))), document.fonts?.ready, SM.roomReady].filter(Boolean);
+    built.forEach((p) => p.then(put, put));
+    Promise.all(built.map((p) => p.catch(() => {}))).then(() => requestAnimationFrame(() => { put(); leave(); }));
+  };
+  document.readyState === "loading" ? addEventListener("DOMContentLoaded", comeBack) : setTimeout(comeBack);
   /** travel to a stop */
   /** where a stop is arrived at: its top, or for data-land="end" its last screen */
   const landing = (el) => el.getBoundingClientRect().top + scrollY + (el.dataset.land === "end" ? Math.max(0, el.offsetHeight - VH) : 0);
@@ -1049,7 +1128,7 @@ const SM = (() => {
   };
   const showItem = (i) => {
     at = (i + items.length) % items.length; const it = items[at];
-    $("figure", box).innerHTML = `<img src="${it.src}" width="${it.w}" height="${it.h}" alt="${it.alt || ""}">`;
+    $("figure", box).innerHTML = `<img src="${it.src}" width="${it.w}" height="${it.h}" alt="${it.alt || ""}" draggable="false">`;
     reveal($("figure", box));
     $(".bar b", box).textContent = it.cap || ""; $(".bar span", box).textContent = items.length > 1 ? `${at + 1} of ${items.length}` : "";
     $$(".prev, .next", box).forEach((b) => (b.hidden = items.length < 2));
@@ -1062,12 +1141,34 @@ const SM = (() => {
       $(".x", box).addEventListener("click", () => box.close());
       $(".prev", box).addEventListener("click", () => showItem(at - 1));
       $(".next", box).addEventListener("click", () => showItem(at + 1));
-      box.addEventListener("click", (e) => (e.target === box || e.target.tagName === "FIGURE") && box.close());
-      box.addEventListener("keydown", (e) => { if (e.key === "ArrowLeft") showItem(at - 1); if (e.key === "ArrowRight") showItem(at + 1); });
-      box.addEventListener("close", () => opener?.focus());
+      // a swipe across the picture goes to the next or the one before; the click that ends a swipe does not close the viewer
+      let down = null, swiped = false;
+      box.addEventListener("pointerdown", (e) => { down = e.isPrimary ? { x: e.clientX, y: e.clientY } : null; swiped = false; });
+      box.addEventListener("pointerup", (e) => {
+        if (!down || items.length < 2) return;
+        const dx = e.clientX - down.x, dy = e.clientY - down.y; down = null;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.4) { swiped = true; showItem(at + (dx < 0 ? 1 : -1)); }
+      });
+      box.addEventListener("click", (e) => { if (swiped) { swiped = false; return; } if (e.target === box || e.target.tagName === "FIGURE") box.close(); });
+      box.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") showItem(at - 1); if (e.key === "ArrowRight") showItem(at + 1);
+        // Tab goes round the viewer's own buttons and never out of it to the page or the browser behind
+        if (e.key === "Tab") {
+          const bs = $$("button", box).filter((b) => !b.hidden), k = bs.indexOf(document.activeElement);
+          if (!bs.length) return;
+          e.preventDefault();
+          bs[(k < 0 ? (e.shiftKey ? bs.length - 1 : 0) : k + (e.shiftKey ? -1 : 1) + bs.length) % bs.length].focus();
+        }
+      });
+      box.addEventListener("close", () => opener?.isConnected && opener.focus({ preventScroll: true }));
     }
-    items = list; opener = document.activeElement; showItem(i); box.showModal();
+    // the focus goes back to what opened the viewer: the thing that was clicked, or else whatever had the focus (a
+    // browser that does not focus a button when it is clicked would otherwise send the focus back to the page's top)
+    const hit = lastClick && performance.now() - lastClick.t < 600 ? lastClick.el.closest("button, a[href], [tabindex]") : null;
+    items = list; opener = hit || document.activeElement; showItem(i); box.showModal();
   };
+  let lastClick = null;
+  addEventListener("click", (e) => { if (e.target instanceof Element) lastClick = { el: e.target, t: performance.now() }; }, true);
 
   /* ====================================================================== waking an item: hover, focus, tap */
   /** el wakes while hovered or focused; on a touch screen the first tap wakes it and the second activates it.

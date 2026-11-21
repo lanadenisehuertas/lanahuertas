@@ -72,11 +72,12 @@ main > .stop.talk { display: block; padding: 0; overflow: hidden; }
 .env { position: absolute; z-index: 2; left: 50%; top: calc(15 * var(--u)); width: calc(30 * var(--u)); aspect-ratio: 815 / 1035; translate: -50% 0; container-type: inline-size; }
 .env-back, .env-front { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .env-back { z-index: 0; } .env-front { z-index: 2; }
-/* --up (stops.js, from the scroll): the letter rises out of the envelope as the dawn comes up the window */
+/* --up (stops.js, from the scroll): the letter rises out of the envelope as the dawn comes up the window; --lift
+   (dawn-proto.js) draws it a little further out while a long message needs the room */
 .env { --up: 0; }
 .letter { position: absolute; z-index: 1; left: 9cqi; top: 46cqi; width: 82cqi; height: 104cqi; padding: 7cqi 7cqi 0; display: grid; align-content: start; justify-items: start; gap: 3.2cqi;
   background: linear-gradient(#fffaf1, #fbefdf); color: #2b1470; box-shadow: 0 2cqi 6cqi rgb(80 40 90 / 0.22); rotate: calc(-1.2deg * var(--up));
-  transform: translate3d(0, calc(var(--up) * -70cqi), 0); }
+  transform: translate3d(0, calc(var(--up) * (-70cqi - var(--lift, 0px))), 0); }
 .t-big { font: 400 clamp(56px, calc(8.2 * var(--u)), 144px) / 0.86 var(--display-awake); letter-spacing: -0.02em; color: #2b1470; }
 .t-addr { font: italic 400 clamp(20px, calc(1.8 * var(--u)), 28px) / 1.1 "Redaction", Georgia, serif; color: #2b1470; white-space: nowrap;
   text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }

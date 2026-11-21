@@ -1,15 +1,17 @@
 /* The reel: one thing at a time as you scroll, each in its own world.
 
    The stop is tall and its stage sticks to the window. Scrolling moves a number q from 0 to n-1. Plate floor(q)
-   is shown; part way through each step the next plate takes over from it, each part of the plate in its own way, all
+   is shown; near the end of each step the next plate takes over from it, each part of the plate in its own way, all
    moved by the same scroll and going back when you scroll back:
-     the pictures (data-bloom) bloom: the old ones break into moonlight cells from their centres out, then the new
-       ones bloom in from theirs, in coarse square cells behind a rim of pale glints (SM.bloom, in moon.js);
+     the pictures (data-bloom) bloom: the new ones bloom in over the old from their centres, in coarse square cells
+       behind a few pale sparkles, and the old ones break up under them after (SM.bloom, in moon.js), so there is
+       always a picture there;
      the words leave letter by letter, lifting and fading, and the next plate's come in letter by letter, its title
        spelled out of runes first (SM.letters, below);
      the world, its ground, its backdrop and its light, blends smoothly from one to the next.
-   While a plate is shown it keeps drifting a little with the scroll (--f), so no scroll is ever a dead one. Each plate
-   is its thing's own world: its ground colour, its ink, and its backdrop cut into flat tones. Brands and products use it.
+   While a plate is shown it keeps drifting a little with the scroll, so no scroll is ever a dead one. Each plate is its
+   thing's own world: its ground colour, its ink, and its backdrop cut into flat tones. Brands and products use it.
+   Every value the scroll moves is written straight onto the element it moves, and only when it changes (see reel.css).
 
    SM.reel(stop, items, { step, stack, onChange, onScrub })
    item: { name, ground, ink, backdrop, board(i, n): html, setup(plate, item, i) } */
@@ -28,26 +30,31 @@
   const clamp = (v) => Math.min(1, Math.max(0, v));
   const easeOut = (t) => 1 - Math.pow(1 - t, 3);
   const sm = (t) => { t = clamp(t); return t * t * (3 - 2 * t); };
-  /** write a custom property only when its value changes */
-  const put = (el, name, v) => { if (el["_" + name] !== v) { el["_" + name] = v; v === null ? el.style.removeProperty(name) : el.style.setProperty(name, v); } };
+  /** write one style property of an element only when its value changes ("" gives it back to the stylesheet) */
+  const set = (el, prop, v) => { const c = el._sv || (el._sv = {}); if (c[prop] !== v) { c[prop] = v; el.style[prop] = v; } };
 
   /* ================================================================ the words' handover
      A column of words (.pk-text) is split once, as it first takes part in a handover: the title into letters (the same
      .ch letters words-proto.js lights under the pointer, so it reuses them), each short line into words of letters,
-     a long line into words, and anything else (links, the steps) is kept whole. Each piece gets --k, its place in the
-     reading order from 0 to 1, the title taking the first third. Two numbers then move them all (reel.css):
-       --lv, 0 to 1, how far the words have left: each letter in turn lifts and fades;
-       --en, 0 to 1, how far the words have come: each letter in turn drops into place, and the title's letters
-         show a rune until they are nearly in (runes(), written here only when a letter's rune changes).
-     The text itself is never changed, so screen readers, and the scripts that read a title back, see the same words.
-     A column whose words are replaced (a caption that moves on) is split again the next time it is asked. */
+     a long line and an italic one into words (single letters would break the italic's kerning), and anything else
+     (links, the steps) is kept whole. Each piece has k, its place in the reading order from 0 to 1, the title taking
+     the first third. drive(box, w, lv, en) then moves them:
+       w, 0 to 1, how far the column has arrived with its plate: its lines come in one after another;
+       lv, 0 to 1, how far the words have left: each letter in turn lifts and fades;
+       en, 0 to 1, how far the words have come: each letter in turn drops into place, and the title's letters show a
+         rune until they are nearly in (runes(), written only when a letter's rune changes).
+     Each line's and each letter's opacity and offset are written on it, and only when they change, so a frame restyles
+     the few letters that moved, never the whole column. The text itself is never changed, so screen readers, and the
+     scripts that read a title back, see the same words. A column whose words are replaced (a caption that moves on) is
+     split again the next time a handover asks for it. */
   const RUNES = ["☾", "☽", "✶", "✧", "⋆", "ᚱ", "ᛟ", "ᚦ", "ᛉ", "ᚠ", "◇", "✦", "ᛃ", "ᛗ"];
   const LONG = 110;   // a line longer than this goes word by word
   const TITLE = 0.3, BLOCK = 8;
+  const fresh = (box, st) => st && st.count === box.childElementCount && st.parts.every((p) => p.el.firstChild === p.first);
   const letters = (box) => {
     if (!box) return null;
     let st = box._hw;
-    if (st && st.count === box.childElementCount && st.parts.every((p) => p.el.firstChild === p.first)) return st;
+    if (fresh(box, st)) return st;
     const kids = [...box.children], parts = [];
     let rest = 0;
     for (const el of kids) {
@@ -56,34 +63,61 @@
       const text = was ? was.text : el.textContent.trim().replace(/\s+/g, " ");
       const plain = was ? was.kind !== "block" : text && !el.children.length && !el.matches("a, button");
       const title = plain && el.matches(".pk-name");
-      const kind = title ? "title" : plain ? (text.length > LONG ? "words" : "line") : "block";
+      const kind = title ? "title" : plain ? (text.length > LONG || el.matches(".pk-tag") ? "words" : "line") : "block";
       const w = kind === "block" ? BLOCK : text.length;
       if (kind !== "title") rest += w;
       parts.push({ el, kind, text, w });
     }
     let at = 0;
-    const kOf = (w) => { const k = TITLE + ((1 - TITLE) * at) / Math.max(1, rest); at += w; return k.toFixed(3); };
+    const kOf = (w) => { const k = TITLE + ((1 - TITLE) * at) / Math.max(1, rest); at += w; return k; };
     for (const p of parts) {
       const { el, kind, text } = p;
-      if (kind === "block") { el.classList.add("hw"); el.style.setProperty("--k", kOf(p.w)); p.first = el.firstChild; el._hwp = { kind, text, first: p.first }; continue; }
-      const ws = text.split(" ");
+      if (kind === "block") { el.classList.add("hw"); el._hwp = { kind, text, first: (p.first = el.firstChild), k: kOf(p.w) }; continue; }
+      const ws = text.split(" "), lts = [];
       if (kind === "title") {
         const n = text.replace(/ /g, "").length;
         let j = 0;
-        el.innerHTML = ws.map((w) => `<span style="white-space:nowrap">${[...w].map((c) => `<span class="ch lt" style="--k:${((TITLE * j++) / Math.max(1, n)).toFixed(3)}">${esc(c)}</span>`).join("")}</span>`).join(" ");
+        el.innerHTML = ws.map((w) => `<span style="white-space:nowrap">${[...w].map((c) => `<span class="ch lt">${esc(c)}</span>`).join("")}</span>`).join(" ");
         el._ch = $$(".ch", el); el.classList.add("wl");
+        el._ch.forEach((c) => lts.push({ el: c, k: (TITLE * j++) / Math.max(1, n) }));
       } else if (kind === "line") {
-        el.innerHTML = ws.map((w) => `<span class="wd">${[...w].map((c) => `<span class="lt" style="--k:${kOf(1)}">${esc(c)}</span>`).join("")}</span>`).join(" ");
+        el.innerHTML = ws.map((w) => `<span class="wd">${[...w].map((c) => `<span class="lt">${esc(c)}</span>`).join("")}</span>`).join(" ");
         el._wd = $$(".wd", el);
+        $$(".lt", el).forEach((c) => lts.push({ el: c, k: kOf(1) }));
       } else {
-        el.innerHTML = ws.map((w) => `<span class="wd lt" style="--k:${kOf(w.length + 1)}">${esc(w)}</span>`).join(" ");
+        el.innerHTML = ws.map((w) => `<span class="wd lt">${esc(w)}</span>`).join(" ");
         el._wd = $$(".wd", el);
+        el._wd.forEach((c, i) => lts.push({ el: c, k: kOf(ws[i].length + 1) }));
       }
-      p.first = el.firstChild;
-      el._hwp = { kind, text, first: p.first };
+      el._hwp = { kind, text, first: (p.first = el.firstChild), lts };
     }
     st = box._hw = { count: box.childElementCount, parts, title: parts.find((p) => p.kind === "title")?.el, en: -1 };
     return st;
+  };
+  /** how far a piece at place k has left (lv) or come (en) */
+  const lvAt = (lv, k) => clamp((lv - k * 0.62) / 0.38), enAt = (en, k) => clamp((en - k * 0.62) / 0.38);
+  /** move a column of words: w its arrival, lv how far its words have left, en how far they have come (see above) */
+  const drive = (box, w = 1, lv = 0, en = 1) => {
+    if (!box) return;
+    const moving = lv > 0 || en < 1;
+    // the column is split only for a handover; one split before keeps being driven back to rest until its words change
+    const st = moving ? letters(box) : fresh(box, box._hw) ? box._hw : null;
+    const kids = box.children;
+    for (let i = 0; i < kids.length; i++) {
+      const el = kids[i], p = st ? el._hwp : null, o = clamp((w - Math.min(i, 6) * 0.08) / 0.45);
+      let op = o, ty = (1 - o) * 10;
+      if (p && p.kind === "block") { const l = lvAt(lv, p.k), e = enAt(en, p.k); op *= (1 - l) * e; ty += l * -10 + (1 - e) * 8; }
+      set(el, "opacity", op >= 0.999 ? "" : op.toFixed(3));
+      set(el, "translate", Math.abs(ty) < 0.05 ? "" : `0 ${ty.toFixed(1)}px`);
+      if (!p || !p.lts) continue;
+      for (const L of p.lts) {
+        // in steps of a twentieth and of a fiftieth of an em, finer than the eye follows, so a letter is restyled only
+        // when it visibly moves
+        const l = lvAt(lv, L.k), e = enAt(en, L.k), a = Math.round((1 - l) * e * 20) / 20, y = Math.round((l * -0.6 + (1 - e) * 0.35) * 50) / 50;
+        set(L.el, "opacity", a >= 1 ? "" : String(a));
+        set(L.el, "transform", y === 0 ? "" : `translate3d(0, ${y}em, 0)`);
+      }
+    }
   };
   /** the title's letters: hidden, then a rune that changes as the scroll moves, then the letter */
   const runes = (box, en) => {
@@ -99,10 +133,14 @@
       if (c._g !== g) { c._g = g; if (g) { c.dataset.g = g; c.classList.add("rn"); } else c.classList.remove("rn"); }
     });
   };
-  SM.letters = { prep: letters, runes };
+  SM.letters = { prep: letters, runes, drive };
 
+  /* the moment of a step at which the next plate takes over, and how long it takes, as fractions of the step: the
+     handover runs over about a fifth of a screen, and the rest of the step is the thing alone and whole, so wherever
+     the scroll rests the work is resolved */
+  const COVER = [0.64, 0.26];
   SM.reel = (stop, items, opts = {}) => {
-    const n = items.length, STEP = opts.step || 0.55;
+    const n = items.length, STEP = opts.step || 0.85;
     const stage = $(".stage", stop);
     stop.dataset.ground = items[0].ground; stop.dataset.ink = items[0].ink;   // the travel iris arrives in the first world's colours
     // half a screen more than the plates need, so the last one rests whole before the stop moves on
@@ -119,12 +157,15 @@
       el.className = "reel-plate"; el.dataset.i = i; el.inert = true;
       el.style.cssText = `--ground:${it.ground};--ink:${it.ink};--text:#ece6ff;--mark:#fff1c9;--rule:${mix(it.ground, it.ink, 0.55)};z-index:${i + 1};visibility:hidden`;
       el.setAttribute("aria-label", `${it.name}, ${i + 1} of ${n}`);
-      el.innerHTML = `${it.backdrop ? `<span class="backdrop pic box" data-kind="photo" data-enter="manual" data-still data-flat data-cell="3" style="--ink:${mix(it.ground, it.ink, 0.2)};--pos:50% 50%" aria-hidden="true"><img class="full" loading="lazy" src="${it.backdrop}" width="1536" height="1024" alt=""></span>` : ""}${it.board(i, n)}`;
+      el.innerHTML = `${it.backdrop ? `<span class="backdrop pic box" data-kind="photo" data-enter="manual" data-still data-flat data-cell="3" style="--ink:${mix(it.ground, it.ink, 0.2)};--pos:50% 50%" aria-hidden="true"><img class="full" loading="lazy" src="${it.backdrop}" width="1536" height="1024" alt=""></span>` : ""}<i class="r-fall" aria-hidden="true"></i>${it.board(i, n)}`;
       stage.append(el);
       plates[i] = el;
+      el._ground = it.ground;
+      el._st = { a: 1, f: 0, w: 1, g: 1, ga: 1, gn: 1, sky: null, lv: 0, en: 1 };
       SM.pictures(el).forEach((bm) => bm.load().then(() => { bm.show = 1; bm.draw(); }).catch(() => {}));
       it.setup?.(el, it, i);
       opts.onMake?.(el, i);
+      paint(el);
     };
 
     /* the window's masthead and foot take the colours of the world behind them (SM.band, in moon.js, asks the stop
@@ -150,14 +191,48 @@
       if (SM.stop === stop) SM.say();
       opts.onChange?.(i, el);
     };
+    /* the fall of ground over a plate's backdrop, toward the words, in the colour c (#rrggbb) */
+    const fall = (c) => {
+      const [r, g, b] = hex(c), at = (o, p) => `rgb(${r} ${g} ${b} / ${o}) ${p}%`;
+      return `linear-gradient(90deg, ${at(1, 0)}, ${at(0.82, 26)}, ${at(0.18, 58)}, ${at(0, 80)}), linear-gradient(0deg, ${at(1, 0)}, ${at(0.6, 16)}, ${at(0, 34)})`;
+    };
+    /** write a plate's state onto the elements it moves: its arrival a (0 to 1, its work rises), its drift f (-1 to 1),
+        its words' arrival w, how much of its world is there g (its backdrop, its light, the film's caption), the fall of
+        ground over its backdrop ga, its corners gn, the colour its ground has blended to (sky: a colour, "clear" while
+        it comes in over the last, or null for its own), and its words' handover (lv, en) */
+    const paint = (el) => {
+      const s = el._st, U = SM.u(), q = el._q || (el._q = {
+        bd: $(".backdrop", el), fall: $(".r-fall", el), glow: $(".r-glow", el), text: $(".pk-text", el), pin: $(".pk-in", el),
+        pieces: $$(".s-piece", el).map((p, d) => [p, d]), cap: $(".a-film figcaption", el) });
+      const corners = q.corners || (q.corners = $(".corners", el));
+      const sky = s.sky === "clear" ? null : s.sky || el._ground;
+      set(el, "backgroundColor", s.sky === "clear" ? "transparent" : s.sky || "");
+      if (q.fall) { set(q.fall, "background", fall(sky || el._ground)); set(q.fall, "opacity", s.ga >= 1 ? "" : s.ga.toFixed(3)); }
+      if (q.bd) {
+        set(q.bd, "opacity", s.g >= 1 ? "" : s.g.toFixed(3));
+        set(q.bd, "transform", `translate3d(0, ${(s.f * -2.6 * U).toFixed(1)}px, 0) scale(${(1.04 + (1 - s.a) * 0.05).toFixed(4)})`);
+      }
+      if (q.glow) { const o = s.a * s.g; set(q.glow, "opacity", o >= 1 ? "" : o.toFixed(3)); }
+      if (q.cap) set(q.cap, "opacity", s.g >= 1 ? "" : s.g.toFixed(3));
+      if (corners) set(corners, "opacity", s.gn >= 1 ? "" : s.gn.toFixed(3));
+      if (q.text) set(q.text, "transform", `translate3d(0, ${((1 - s.a) * 3 * U + s.f * -0.8 * U).toFixed(1)}px, 0)`);
+      if (q.pin) {
+        const fx = q.pin._fx || 0, fy = q.pin._fy ?? 300;
+        set(q.pin, "transform", `translate3d(${(fx * (1 - s.a)).toFixed(1)}px, ${(fy * (1 - s.a) + s.f * -1.4 * U).toFixed(1)}px, 0) scale(${(0.5 + 0.5 * s.a).toFixed(4)})`);
+      }
+      for (const [p, d] of q.pieces) {
+        const pa = clamp((s.a - 0.3 - d * 0.12) / 0.4);
+        set(p, "transform", `translate3d(0, ${((1 - pa) * 3 * U + s.f * -1 * (1.8 + d * 0.6) * U).toFixed(1)}px, 0)`);
+      }
+      drive(q.text, s.w, s.lv, s.en);
+      if (q.text && (s.lv > 0 || s.en < 1 || q.text._hw)) runes(q.text, s.en);
+    };
     /** a plate's arrival (0 to 1: its work rises), its drift (-1 to 1: how far the scroll is through it), its words'
         arrival with the stop (0 to 1) and how far its pictures have woken (0 to 1, from their lilac sleep) */
     const pose = (el, a, f, w, wake) => {
-      const A = a.toFixed(3), F = f.toFixed(3), W = w.toFixed(3), K = wake.toFixed(3);
-      if (el._a !== A) { el._a = A; el.style.setProperty("--a", A); }
-      if (el._wk !== K) { el._wk = K; $$("[data-wake]", el).forEach((p) => SM.bitmap(p)?.setFloor(wake)); }
-      if (el._f !== F) { el._f = F; el.style.setProperty("--f", F); }
-      if (el._w !== W) { el._w = W; el.style.setProperty("--w", W); }
+      const s = el._st, A = +a.toFixed(3), F = +f.toFixed(3), W = +w.toFixed(3), K = wake.toFixed(3);
+      if (el._wk !== K) { el._wk = K; (el._wks || (el._wks = $$("[data-wake]", el))).forEach((p) => SM.bitmap(p)?.setFloor(wake)); }
+      if (s.a !== A || s.f !== F || s.w !== W) { s.a = A; s.f = F; s.w = W; el._dirty = true; }
     };
     /** the pictures that bloom, in the order they bloom */
     const picsOf = (el) => el._pics || (el._pics = $$("[data-bloom]", el));
@@ -168,17 +243,13 @@
       const ps = picsOf(el), m = Math.max(1, ps.length - 1);
       ps.forEach((p, j) => {
         const d = j / m;
-        const v = s <= 1 ? clamp((s - d * 0.3) / 0.7) : 1 + clamp((s - 1 - d * 0.2) / 0.8);
+        const v = s <= 1 ? clamp((s - d * 0.15) / 0.85) : 1 + clamp((s - 1 - d * 0.12) / 0.88);
         SM.bloom(p, v, snap);
       });
-      if (lv > 0 || en < 1) SM.letters.prep($(".pk-text", el));
-      put(el, "--lv", lv ? lv.toFixed(3) : null);
-      put(el, "--en", en < 1 ? en.toFixed(3) : null);
-      SM.letters.runes($(".pk-text", el), en);
-      put(el, "--g", g < 1 ? g.toFixed(3) : null);
-      put(el, "--ga", ga < 1 ? ga.toFixed(3) : null);
-      put(el, "--sky", sky === "clear" ? "transparent" : sky);
-      put(el, "--gn", sky === "clear" && g < 1 ? g.toFixed(3) : null);   // the corners: the old stay, the new come in over them
+      const st = el._st, LV = +lv.toFixed(3), EN = +en.toFixed(3), G = +g.toFixed(3), GA = +ga.toFixed(3), GN = sky === "clear" ? G : 1;
+      if (st.lv !== LV || st.en !== EN || st.g !== G || st.ga !== GA || st.gn !== GN || st.sky !== sky) {
+        st.lv = LV; st.en = EN; st.g = G; st.ga = GA; st.gn = GN; st.sky = sky; el._dirty = true;   // the corners: the old stay, the new come in over them
+      }
     };
 
     const update = () => {
@@ -197,23 +268,22 @@
           }
           const r = el.getBoundingClientRect(), a = quiet ? 1 : easeOut(clamp((SM.vh - r.top) / (SM.vh * 0.7)));
           pose(el, a, 0, a, a);
+          if (el._dirty) { el._dirty = false; paint(el); }
         });
         return;
       }
       const vh = w.vh, q = Math.min(n - 1, Math.max(0, -w.top / (STEP * vh)));
       const base = Math.min(n - 1, Math.floor(q)), frac = q - base;
-      // most of a step is the thing alone and whole, so wherever the scroll rests the work is resolved; the next one
-      // comes in over the last stretch of the step (about a quarter of a screen, never a single turn of the wheel)
-      const cover = base >= n - 1 ? 0 : clamp((frac - 0.58) / 0.36);
+      const cover = base >= n - 1 ? 0 : clamp((frac - COVER[0]) / COVER[1]);
       for (let k = base - 1; k <= base + 2; k++) make(k);
       const first = quiet ? 1 : easeOut(clamp(w.arrive / 0.8));   // the first plate's work rises as the stop comes in
-      /* the handover, over the cover: the old pictures break up over its first half and the new ones bloom over its
-         second, overlapping through the middle, one breaking into sparks as the other blooms; the old words leave over
-         the first half and the new ones come from just before the middle; the world blends all the way through. Quiet
-         mode cuts it all at the middle */
+      /* the handover, over the cover: the new pictures bloom in over the old over its first part, and only then do the
+         old ones break up, under them, so the work is never gone from the screen; the old words leave over the first
+         half and the new ones come from a little before the middle; the world blends all the way through. Quiet mode
+         cuts it all at the middle */
       const cut = cover >= 0.5 ? 1 : 0;
-      const out = quiet ? cut : clamp(cover / 0.6), inn = quiet ? cut : clamp((cover - 0.3) / 0.7);
-      const lv = quiet ? cut : clamp(cover / 0.5), en = quiet ? cut : clamp((cover - 0.42) / 0.58);
+      const inn = quiet ? cut : clamp(cover / 0.62), out = quiet ? cut : clamp((cover - 0.38) / 0.62);
+      const lv = quiet ? cut : clamp(cover / 0.5), en = quiet ? cut : clamp((cover - 0.4) / 0.6);
       plates.forEach((el, k) => {
         if (!el) return;
         const role = k === base ? "base" : k === base + 1 && cover > 0 ? "next" : "off";
@@ -224,13 +294,14 @@
         const snap = !was;
         if (role === "base") {
           const blend = quiet ? cut : sm(cover);
-          hand(el, 1 + out, snap, lv, 1, 1 - (quiet ? cut : sm(cover / 0.6)), 1, cover > 0 ? mix(items[k].ground, items[k + 1].ground, blend) : null);
+          hand(el, 1 + out, snap, lv, 1, 1 - (quiet ? cut : sm(cover / 0.7)), 1, cover > 0 ? mix(items[k].ground, items[k + 1].ground, blend) : null);
           const a = k === 0 ? first : 1;
           pose(el, a, quiet ? 0 : Math.max(-1, Math.min(1, frac * 1.4)), k === 0 ? first : 1, a);
         } else {
-          hand(el, inn, snap, 0, en, quiet ? cut : sm((cover - 0.35) / 0.65), quiet ? cut : sm((cover - 0.3) / 0.7), "clear");
+          hand(el, inn, snap, 0, en, quiet ? cut : sm((cover - 0.1) / 0.6), quiet ? cut : sm((cover - 0.1) / 0.7), "clear");
           pose(el, quiet ? 1 : easeOut(inn), quiet ? 0 : Math.max(-1, (frac - 1) * 1.4), 1, 1);
         }
+        if (el._dirty) { el._dirty = false; paint(el); }
       });
       tone = cover > 0 ? SM.blend(tones[base], tones[base + 1], cover) : tones[base];
       setCurrent(cover > 0.5 ? base + 1 : base);
@@ -243,9 +314,11 @@
     // next scroll makes only the current one current again
     opts.stack?.addEventListener?.("change", () => {
       setHeight(); buildAll();
-      plates.forEach((el) => { if (el) { el._stacked = false; el._shown = undefined; el._a = el._f = el._w = el._wk = null; if (!opts.stack.matches) { el.classList.remove("now"); el.inert = true; } } });
+      plates.forEach((el) => { if (el) { el._stacked = false; el._shown = undefined; el._wk = null; el._dirty = true; if (!opts.stack.matches) { el.classList.remove("now"); el.inert = true; } } });
       if (!opts.stack.matches) cur = -1;
     });
+    // a new window size changes the unit the drift is written in
+    addEventListener("resize", () => plates.forEach((el) => { if (el) el._dirty = true; }));
 
     /** travel to item i */
     const jump = (i, instant) => {
@@ -262,7 +335,7 @@
     make(0); make(1); buildAll();
     setCurrent(0);
     (SM.rooms ||= {})[stop.id] = { jump };   // so anything on the page can go straight to one work
-    return { jump, get current() { return cur; }, plates };
+    return { jump, get current() { return cur; }, plates, repaint: (el) => paint(el) };
   };
 
   const first = (s) => { const m = s.match(/^.*?[.!?](\s|$)/); return (m ? m[0] : s).trim(); };
@@ -343,7 +416,7 @@
           new ResizeObserver((es) => { const w = Math.round(es[0].contentRect.width); if (w !== fitW) { fitW = w; refit(); } }).observe(strip);
         },
       };
-    }), { step: 0.65, onMake: () => aimSoon(), onScrub: (q) => lift(q), onChange: (i) => tint(i) });
+    }), { step: 0.85, onMake: () => aimSoon(), onScrub: (q) => lift(q), onChange: (i) => tint(i) });
 
     /* the holder: one packet per brand standing behind a carved rail, on the ground under the work; it stays while
        the worlds change */
@@ -376,11 +449,13 @@
         const c = $(".pk-card", pl).getBoundingClientRect(), p = pk.getBoundingClientRect();
         return c.width ? [card, c, p] : null;
       });
+      // the distances are kept on the picture and written into its rise with the plate's next pose
       got.forEach((g) => {
         if (!g) return;
         const [card, c, p] = g;
-        card.style.setProperty("--fx", (p.left + p.width / 2 - (c.left + c.width / 2)).toFixed(0) + "px");
-        card.style.setProperty("--fy", (p.top + p.height * 0.25 - c.bottom).toFixed(0) + "px");
+        card._fx = Math.round(p.left + p.width / 2 - (c.left + c.width / 2));
+        card._fy = Math.round(p.top + p.height * 0.25 - c.bottom);
+        room.repaint(card.closest(".reel-plate"));
       });
     }
     new ResizeObserver(aim).observe(stage);

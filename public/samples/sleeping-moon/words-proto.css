@@ -4,7 +4,11 @@ main { --wg: var(--mark, #fff1c9); }
 #talk { --wg: #5b3fc4; }
 
 /* headings and titles, split into letters: near the pointer they lift, catch the light and wake into the smooth cut */
-.wl .ch { display: inline-block; position: relative; transition: color 140ms linear; }
+/* (a letter is positioned only while something is laid over it, the decode's rune here and About's writing in
+   about-proto.css: a positioned element is a layer of its own, and a page of positioned letters makes every hit test
+   of the pointer slow) */
+.wl .ch { display: inline-block; transition: color 140ms linear; pointer-events: none; }
+.wl .ch.rn { position: relative; }
 .wl .ch.wk { font-family: var(--display-awake); color: var(--wg); }
 .wl.focus-lit .ch { font-family: var(--display-awake); color: var(--wg); }
 

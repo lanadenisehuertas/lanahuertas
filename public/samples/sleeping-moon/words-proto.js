@@ -6,10 +6,7 @@
    Links and buttons belong to magic-proto.js. */
 (() => {
   const { $$ } = SM;
-  /* the About statement, in the almanac's voice (Lana chose it 2026-11-17); set before the letters are split */
-  const meSay = document.querySelector(".me-say .display:not(.kick)"), meKick = document.querySelector(".me-say .display.kick");
-  if (meSay) meSay.textContent = "I make the pictures people remember a brand by: posters, packets, films and apps.";
-  if (meKick) meKick.textContent = "Tell me what yours should wake up as.";
+  // the About statement itself is written in stops.js, in the almanac's voice
   const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
@@ -93,23 +90,34 @@
   let px = -1e4, py = -1e4, raf = 0, near = [];
   const R = 120;
   const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+  /* where each letter sits in its heading (its middle, unlifted, and its height) is read once, and again only when the
+     page changes size; each frame then reads only the heading's own box, all of them before any letter is written,
+     so the lift never makes the browser lay the page out between letters */
+  const placeLetters = (el) => {
+    if (el._lg === SM.placedGen && el._lw === SM.vw) return;
+    el._lg = SM.placedGen; el._lw = SM.vw;
+    const e = el.getBoundingClientRect();
+    for (const c of el._ch) { const r = c.getBoundingClientRect(); c._cx = r.left + r.width / 2 - e.left; c._cy = r.top + r.height / 2 - (c._y || 0) - e.top; c._h = r.height; }
+  };
   function frame() {
     raf = 0;
     let busy = false;
     const calm = still();
-    // letters of headings within reach of the pointer, plus any still settling
-    for (const el of near) {
-      if (!el.isConnected || !el._ch) continue;
+    // letters of headings within reach of the pointer, plus any still settling: first every read, then every write
+    const live = near.filter((el) => el.isConnected && el._ch);
+    const boxes = live.map((el) => { placeLetters(el); return el.getBoundingClientRect(); });
+    live.forEach((el, n) => {
+      const e = boxes[n];
       for (const c of el._ch) {
-        const r = c.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2 - (c._y || 0);
-        const d = Math.hypot(cx - px, cy - py), k = calm ? 0 : clamp(1 - d / R, 0, 1);
-        const target = -k * k * Math.min(10, r.height * 0.14);
+        const d = Math.hypot(e.left + c._cx - px, e.top + c._cy - py), k = calm ? 0 : clamp(1 - d / R, 0, 1);
+        const target = -k * k * Math.min(10, c._h * 0.14);
         c._y = (c._y || 0) + (target - (c._y || 0)) * 0.25;
         if (Math.abs(target - c._y) > 0.05) busy = true; else c._y = target;
-        c.style.translate = Math.abs(c._y) < 0.05 ? "" : `0 ${c._y.toFixed(2)}px`;
-        c.classList.toggle("wk", d < R * 0.5);
+        const t = Math.abs(c._y) < 0.05 ? "" : `0 ${c._y.toFixed(2)}px`, wk = d < R * 0.5;
+        if (c._t !== t) { c._t = t; c.style.translate = t; }
+        if (c._wk !== wk) { c._wk = wk; c.classList.toggle("wk", wk); }
       }
-    }
+    });
     near = near.filter((el) => el._ch?.some((c) => c._y) || el._hot);
     if (busy) kick();
   }

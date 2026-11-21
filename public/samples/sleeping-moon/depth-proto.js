@@ -33,7 +33,8 @@
       tx = e.clientX / SM.vw - 0.5; ty = e.clientY / SM.vh - 0.5;
       if (!raf) raf = requestAnimationFrame(ease);
     }, { passive: true });
-    SM.scrub(() => { if (!still()) place(); });
+    // the sky rests while the room's night hides it (room-proto.js)
+    SM.scrub(() => { if (!still() && !document.documentElement.classList.contains("room-covers")) place(); });
     place();
   };
   document.readyState === "loading" ? addEventListener("DOMContentLoaded", setup) : setup();

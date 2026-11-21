@@ -26,12 +26,12 @@
   const world = { "--ground": b.ground, "--ink": b.ink, "--text": "#ece6ff", "--mark": "#fff1c9", "--rule": mix(b.ground, b.ink, 0.55) };
   Object.entries(world).forEach(([k, v]) => document.body.style.setProperty(k, v));
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", b.ground);
-  document.body.insertAdjacentHTML("afterbegin", `<div class="b-world" aria-hidden="true">${b.backdrop ? `<span class="backdrop pic box" data-kind="photo" data-enter="manual" data-still data-flat data-cell="3" style="--ink:${mix(b.ground, b.ink, 0.2)};--ground:${b.ground}"><img class="full" src="${b.backdrop}" width="1536" height="1024" alt=""></span>` : ""}</div>`);
+  document.body.insertAdjacentHTML("afterbegin", `<div class="b-world" aria-hidden="true">${b.backdrop ? `<span class="backdrop pic box" data-kind="photo" data-enter="manual" data-still data-flat data-cell="3" style="--ink:${mix(b.ground, b.ink, 0.2)};--ground:${b.ground}"><img class="full" src="${b.backdrop}" srcset="${variant(b.backdrop, 480)} 1x" width="1536" height="1024" alt="" decoding="async"></span>` : ""}</div>`);
 
   const near = (x, word) => {
     const [src, , w, h] = x.imgs[0];
     return `<a class="near" href="brand.html?b=${x.slug}" data-line="${esc(x.tag)}">
-      <span class="pic box" data-kind="photo" data-cell="1.4" style="aspect-ratio:${w} / ${h}"><img class="full" src="${src}" width="${w}" height="${h}" alt="" loading="lazy"></span>
+      <span class="pic box" data-kind="photo" data-cell="1.4" style="aspect-ratio:${w} / ${h}"><img class="full" src="${src}" srcset="${srcsetOf(src, w)}" sizes="auto, (max-width: 760px) 46vw, (max-aspect-ratio: 1/1) 46vw, 24vw" width="${w}" height="${h}" alt="" loading="lazy" decoding="async"></span>
       <span class="n-line"><i>${word}.</i> ${esc(x.name)}</span></a>`;
   };
 
@@ -45,12 +45,12 @@
         <p class="say">${esc(b.brief)}</p>
         <p class="say">${esc(b.roles.map((r, k) => (k ? lower(r) : r)).join(", "))}. In ${and(b.tools)}.</p>
         <div class="swatches">${b.palette.map((c) => `<button class="swatch" type="button" style="--c:${c}" data-hex="${c}" aria-label="Copy ${c}"><i></i>${c.toLowerCase()}</button>`).join("")}</div>
-        ${b.href ? `<a class="go" href="${b.href}" target="_blank" rel="noopener">See the campaign post ${ext}</a>` : ""}
+        ${b.href ? `<a class="go" href="${b.href}" target="_blank" rel="noopener">See the campaign post ${ext}<span class="vh"> (opens a new tab)</span></a>` : ""}
       </div>
       <div class="b-work">
         <div class="b-glow" aria-hidden="true" style="--glow:${b.ink}"></div>
-        <button class="kv" type="button" id="kv" aria-label="Open ${esc(b.name)}'s key visual large">
-          <span class="pic" data-kind="photo" data-main><img class="full" src="${kSrc}" width="${kW}" height="${kH}" alt="${esc(b.name)}, the key visual"></span></button>
+        <button class="kv" type="button" id="kv" style="--a:${(kW / kH).toFixed(4)}" aria-label="Open ${esc(b.name)}'s key visual large">
+          <span class="pic" data-kind="photo" data-main><img class="full" src="${kSrc}" srcset="${srcsetOf(kSrc, kW)}" sizes="${kvSizes(kW / kH, 48)}" width="${kW}" height="${kH}" alt="${esc(b.name)}, the key visual" fetchpriority="high"></span></button>
       </div>
     </div>
   </section>
@@ -58,7 +58,7 @@
     <h2 class="vh" id="sheet-h">More pieces from ${esc(b.name)}</h2>
     <div class="b-board b-sheet">
       <div class="b-wall">${rest.map(([src, , w, h], i) => `<button class="piece" type="button" data-i="${i + 1}" style="aspect-ratio:${w} / ${h}" aria-label="Open piece ${i + 2} of ${b.imgs.length} large">
-        <img src="${src}" width="${w}" height="${h}" alt="" loading="lazy"></button>`).join("")}</div>
+        <img src="${src}" srcset="${srcsetOf(src, w)}" sizes="auto, (max-width: 760px) 46vw, (max-aspect-ratio: 1/1) 46vw, 24vw" width="${w}" height="${h}" alt="" loading="lazy" decoding="async"></button>`).join("")}</div>
     </div>
   </section>` : ""}
   <section class="stop b-stop b-end" id="onward" data-label="I Brands" data-hint="Two more brands, either side of this one." aria-labelledby="onward-h">

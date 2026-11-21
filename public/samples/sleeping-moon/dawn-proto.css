@@ -27,6 +27,14 @@
 .t-dear { margin: 0 0 1cqi; font: italic 400 clamp(24px, 9cqi, 40px) / 1.1 "Redaction", Georgia, serif; color: #2b1470; }
 .letter .fld { margin-top: 1.8cqi; }
 .letter .fld input, .letter .fld textarea { padding: 3px 0 4px; font-size: 17px; line-height: 1.4; }
+/* the letter's lines sit closer on a small envelope, so the message keeps its three lines and Send stays in sight */
+.letter .write { gap: clamp(4px, calc(5.5cqi - 12px), 12px); }
+/* the message is three lines tall at rest (two on the smallest envelopes, whose pocket would cover a third) and grows
+   as it is written (dawn-proto.js); past its room it scrolls, and only then shows a thin scrollbar in the letter's ink */
+.letter .fld textarea { height: calc(3lh + 9px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
+@container (max-width: 340px) { .letter .fld textarea { height: calc(2lh + 9px); } }
+/* while lines are scrolled away above it, the one cut at its top edge fades out instead of ending in a hard slice */
+.letter .fld textarea.over { mask-image: linear-gradient(transparent 3px, #000 0.8lh); }
 .lr { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 /* name and email share a line on the letter; a field that needs fixing says so where its label was */
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
@@ -39,7 +47,9 @@
 .letter .vs-make { gap: 0; }
 .letter .vs-make fieldset { margin-top: 1cqi; }
 .letter .vs-make legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-.letter .opt { width: 42px; height: 42px; }
+.letter .opt { width: 44px; height: 44px; }
+/* a note the sky turns down says so where its counter was */
+.lr .err:not(:empty) ~ .more { display: none; }
 
 /* fields: words over a line, no boxes */
 .fld { display: block; }
@@ -47,6 +57,10 @@
 .fld input, .fld textarea { display: block; width: 100%; padding: 6px 0; border: 0; border-bottom: 2px solid var(--rule); border-radius: 0;
   background: transparent; color: var(--text); font: 400 18px/1.45 var(--body); resize: none; }
 .fld input:focus, .fld textarea:focus { outline: none; border-bottom-color: var(--ink); }
+/* the field being written in also draws its line a pixel heavier, so the focus reads at a glance; the field's box
+   (fixed for the message, and pulled back a pixel for the others) keeps its size, so nothing under it moves */
+.fld input:focus, .fld textarea:focus { border-bottom-width: 3px; }
+.fld input:focus { margin-bottom: -1px; }
 .fld input[aria-invalid="true"], .fld textarea[aria-invalid="true"] { border-bottom-style: dashed; border-bottom-color: var(--ink); }
 .fld .err, .fld .more { display: block; margin-top: 3px; font: 400 16px/1.35 var(--body); }
 .fld .err { color: var(--ink); }
@@ -59,6 +73,9 @@
 .write .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .w-done { margin: 0; font: italic 400 20px/1.35 "Redaction", Georgia, serif; color: var(--ink); }
 .w-done:empty { display: none; }
+/* the answer to a letter (sent, or not sent) is written across the envelope's front, under the point of its flap */
+.talk .w-done { position: absolute; z-index: 3; left: 15%; right: 15%; bottom: 15cqi; text-align: center; font-size: clamp(17px, 5.4cqi, 21px);
+  color: #2b1470; text-shadow: 0 0 6px #f6e6f0, 0 0 12px #f6e6f0; }
 
 /* ---------- the last stars: the sky is two fields side by side; the words for it sit right under them ---------- */
 .ls { position: absolute; z-index: 5; display: grid; justify-items: start; text-align: left; }
@@ -124,6 +141,11 @@
 .t-six a { position: absolute; z-index: 4; display: grid; place-items: end center; min-width: 44px; min-height: 44px; pointer-events: auto; }
 .t-six .pic { display: block; height: var(--six-h, 64px); width: auto; aspect-ratio: var(--ar, 1); }
 .t-six a:focus-visible { outline: 2px dotted var(--ink); outline-offset: 4px; }
+/* the moths and the lilies (placed by dawn-proto.js): the moths behind the hills, the lilies standing in front of them;
+   the left lily is mirrored, so the two lean towards the sun */
+.talk .t-moth { z-index: 2; width: calc(5.6 * var(--u)); }
+.talk .t-lily { z-index: 4; width: calc(4.4 * var(--u)); }
+.talk .t-lily.l { scale: -1 1; }
 /* the way back, on the ground */
 .t-back { margin: 0; z-index: 5; }
 .talk .t-back .go { color: #2b1470; }
@@ -159,6 +181,10 @@
 
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
   .talk { --six-h: 46px; }
+  /* the night's corner ornaments are left off phones (journey.css), but the dawn keeps its moths and lilies */
+  .talk .t-dawn .orn { display: block; }
+  .talk .t-moth { width: 56px; }
+  .talk .t-lily { width: 40px; }
   .t-head { position: relative; justify-items: center; text-align: center; width: 100%; }
   .talk .t-big { font-size: clamp(60px, 19vw, 110px); margin: 0 0 20px; }
   .t-mail { flex-direction: column; align-items: center; gap: 0; }
@@ -169,6 +195,8 @@
   .talk .env-back, .talk .env-front { inset: auto 0 0 0; height: auto; aspect-ratio: 815 / 1035; }
   .talk .letter { position: relative; left: auto; top: auto; width: 82cqi; height: auto; margin: 0 auto -52cqi; padding: 6cqi 6cqi 58cqi; transform: none; rotate: -1deg; text-align: left; }
   .letter .fld { margin-top: 10px; }
+  .letter .write { gap: 12px; }
+  .letter .fld textarea { height: calc(3lh + 9px); }
   .two { display: block; }
   .letter .send-row { justify-content: flex-start; margin-top: 12px; }
   /* the stars: their words, then their sky, the two fields side by side */

@@ -25,17 +25,24 @@
   const many = WORDS[N - 1] || String(N);
   // each brand has its own phase of the moon, waxing from a thin crescent for the first to full for the last
   const phase = (k) => SM.moonSvg((k + 1) / N);
+  // the brand the page opens at: the one the address names, or the first. Its key visual is fetched at once and first
+  // (the page's head has already asked for it); every other picture waits until the scroll brings it near
+  const opening = Math.max(0, B.findIndex((b) => b.slug === decodeURIComponent(location.hash.slice(1))));
 
-  /* the backdrops, one per brand, stacked behind the page; only the current one is seen */
+  /* the backdrops, one per brand, stacked behind the page. Each is made a picture, and fetched, only when its brand or
+     one beside it is being read (take), and then as its smaller copy: it is only ever seen as the coarse flat tones of
+     its canvas, which never need more than that. Each lies in a layer of its own the size of the window (.b-back), so
+     it can be made a picture alone and faded as a whole. They cross over with the scroll, as the next brand comes up
+     the window (the scrub). */
   document.body.insertAdjacentHTML("afterbegin", `<div class="b-world" aria-hidden="true">${B.map((b, k) => b.backdrop
-    ? `<span class="backdrop pic box" data-k="${k}" data-kind="photo" data-enter="manual" data-still data-flat data-cell="3" style="--ink:${mix(b.ground, b.ink, 0.2)};--ground:${b.ground}"><img class="full" src="${b.backdrop}" width="1536" height="1024" alt="" loading="lazy"></span>`
+    ? `<span class="b-back" data-k="${k}"><span class="backdrop pic box" data-kind="photo" data-enter="manual" data-still data-flat data-cell="3" style="--ink:${mix(b.ground, b.ink, 0.2)};--ground:${b.ground}"><img class="full" data-src="${b.backdrop}" width="1536" height="1024" alt="" decoding="async"></span></span>`
     : "").join("")}</div>`);
 
   /* one brand, one spread. The article carries its numeral, name and colours for SM.travel, which draws them in the
      iris on a jump from the index. A name with a long word (NEOSTALGIA) is set a size smaller, so it keeps to its
      column. */
   const brand = (b, k) => {
-    const [kSrc, , kW, kH] = b.imgs[0], rest = b.imgs.slice(1);
+    const [kSrc, , kW, kH] = b.imgs[0], rest = b.imgs.slice(1), first = k === opening;
     return `<article class="b-one" id="${b.slug}" data-k="${k}" data-label="${roman(k)} ${esc(b.name)}" data-ground="${b.ground}" data-ink="${b.ink}" aria-labelledby="bn-${b.slug}">
     <section class="stop b-stop" data-label="I Brands" data-hint="${rest.length ? "Open any piece to see it large." : `${esc(b.name)}, ${k + 1} of ${N}.`}">
       <div class="b-board b-spread${b.name.split(" ").some((w) => w.length > 9) ? " b-long" : ""}">
@@ -47,8 +54,8 @@
         </div>
         <div class="b-work">
           <div class="b-glow" aria-hidden="true" style="--glow:${b.ink}"></div>
-          <button class="kv" type="button" data-k="${k}" data-i="0" aria-label="Open ${esc(b.name)}'s key visual large">
-            <span class="pic" data-kind="photo" data-main><img class="full" src="${kSrc}" width="${kW}" height="${kH}" alt="${esc(b.name)}, the key visual" loading="${k ? "lazy" : "eager"}"></span></button>
+          <button class="kv" type="button" data-k="${k}" data-i="0" style="--a:${(kW / kH).toFixed(4)}" aria-label="Open ${esc(b.name)}'s key visual large">
+            <span class="pic" data-kind="photo" data-main><img class="full" src="${kSrc}" srcset="${srcsetOf(kSrc, kW)}" sizes="${first ? "" : "auto, "}${kvSizes(kW / kH, 46)}" width="${kW}" height="${kH}" alt="${esc(b.name)}, the key visual" ${first ? 'fetchpriority="high"' : 'loading="lazy" decoding="async"'}></span></button>
         </div>
         <div class="b-text b-info">
           <p class="say">${esc(b.brief)}</p>
@@ -59,7 +66,7 @@
         ${rest.length ? `<div class="b-rest">
           <p class="b-rest-h label">${rest.length === 1 ? "One more piece" : `${cap(WORDS[rest.length - 1] || String(rest.length))} more pieces`} from ${esc(b.name)}</p>
           <div class="b-wall">${rest.map(([src, , w, h], i) => `<button class="piece" type="button" data-k="${k}" data-i="${i + 1}" data-a="${(w / h).toFixed(4)}" style="aspect-ratio:${w} / ${h};--a:${(w / h).toFixed(4)}" aria-label="Open ${esc(b.name)}, piece ${i + 2} of ${b.imgs.length}, large">
-            <img src="${src}" width="${w}" height="${h}" alt="" loading="lazy"></button>`).join("")}</div>
+            <img src="${src}" srcset="${srcsetOf(src, w)}" sizes="auto, (max-width: 760px) 46vw, (max-aspect-ratio: 1/1) 46vw, 18vw" width="${w}" height="${h}" alt="" loading="lazy" decoding="async"></button>`).join("")}</div>
         </div>` : ""}
       </div>
     </section>
@@ -95,8 +102,7 @@
   const phases = $$(".b-phases a", nav), rows = $$(".b-list ol a", nav);
 
   /* the page takes the world of the brand nearest the middle of the window */
-  const arts = $$(".b-one"), backs = $$(".b-world .backdrop"), bms = new Map();
-  SM.pictures($(".b-world")).forEach((bm) => bms.set(+bm.pic.dataset.k, bm));
+  const arts = $$(".b-one"), backOf = B.map((b, k) => $(`.b-back[data-k="${k}"]`));
   let cur = -1;
   /* the address names the brand being read, but only once the page has loaded: a name written into it while the page
      is still loading is one the browser then scrolls to, which took a visitor who came without one past the index and
@@ -111,9 +117,13 @@
     Object.entries(w).forEach(([p, v]) => document.body.style.setProperty(p, v));
     $$(".b-stop", arts[k]).forEach((s) => Object.entries(w).forEach(([p, v]) => s.style.setProperty(p, v)));
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", B[k].ground);
-    // this backdrop and its neighbours are loaded; only this one is shown
-    [k - 1, k, k + 1].forEach((j) => { const bm = bms.get(j); if (bm && !bm._in) { bm._in = true; bm.load().then(() => { bm.show = 1; bm.draw(); }).catch(() => {}); } });
-    backs.forEach((el) => el.classList.toggle("on", +el.dataset.k === k));
+    // this backdrop and its neighbours are fetched (their smaller copy) and drawn, ready for the scroll to cross to
+    [k - 1, k, k + 1].forEach((j) => {
+      const layer = backOf[j], im = layer && $("img", layer);
+      if (!im || im.hasAttribute("src")) return;
+      im.srcset = `${variant(im.dataset.src, 480)} 1x`; im.src = im.dataset.src;
+      SM.pictures(layer).forEach((bm) => bm.load().then(() => { bm.show = 1; bm.draw(); }).catch(() => {}));
+    });
     name();
     // the index says which brand this is, lights its moon, and names the brands the arrows lead to
     phases.forEach((a, j) => a.setAttribute("aria-current", String(j === k)));
@@ -138,14 +148,31 @@
     const y = SM.y;
     tops = arts.map((a) => SM.where(a).top + y);
   });
+  /* the backdrops cross over with the scroll, never on a timer: a brand's own comes in over the last one's as its top
+     rises from the foot of the window to near its top, and is half in as the page takes its colours (at 45% of the
+     window). Scrolling back takes it out again the same way. The fall of ground colour over them crosses with it. */
+  const bw = $(".b-world");
+  const shown = new Array(N).fill(-1), into = new Array(N).fill(0);
   SM.scrub(() => {
-    const y = SM.y, mid = y + SM.vh * 0.45;
+    const y = SM.y, vh = SM.vh, mid = y + vh * 0.45;
     let k = 0;
     tops.forEach((t, j) => { if (t <= mid) k = j; });
     take(k);
-    const max = Math.max(1, tall - SM.vh), F = ((y / max) * 2 - 1).toFixed(3);
-    const bw = $(".b-world");
+    const max = Math.max(1, tall - vh), F = ((y / max) * 2 - 1).toFixed(3);
     if (bw._f !== F) { bw._f = F; bw.style.setProperty("--f", F); }
+    if (!tops.length) return;
+    let top = 0;
+    for (let j = 0; j < N; j++) {
+      into[j] = j ? SM.smooth(Math.min(1, Math.max(0, (y + vh * 0.95 - tops[j]) / (vh * 0.9)))) : 1;
+      if (into[j] > 0) top = j;
+    }
+    for (let j = 0; j < N; j++) {
+      // one wholly covered by the one over it is not drawn at all
+      const o = j < N - 1 && into[j + 1] >= 1 ? 0 : Math.round(into[j] * 100) / 100;
+      if (o !== shown[j] && backOf[j]) { shown[j] = o; backOf[j].style.opacity = o; }
+    }
+    const g = top && into[top] < 1 ? mix(B[top - 1].ground, B[top].ground, into[top]) : B[top].ground;
+    if (bw._g !== g) { bw._g = g; bw.style.setProperty("--ground", g); }
   });
 
   /* going to a brand. The one either side is reached by gliding down the page, so its world crosses over as it does

@@ -162,11 +162,8 @@ body:has(#talk.current) .foot::before { opacity: 0; }
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .foot::before { inset: -26px 0 calc(-1 * var(--edge)) 0; background: linear-gradient(transparent, var(--ground) 60%); } }
 .clip .c-t { text-overflow: ellipsis; }
 
-@media (prefers-reduced-motion: reduce) {
-  .tg, .pl-cue i, .pl-title.cast .ch, .pl-line.cast, dialog.atlas[open] { animation: none; }
-  :is(a, button):hover > .sw .sl, :is(a, button):focus-visible > .sw .sl { animation: none; }
-  .veil.out { animation: none; opacity: 0; }
-}
+/* the system's reduced-motion setting leaves all of this as it is: only the visitor's own quiet switch stills it, since
+   every motion here is small, short or follows the visitor's own hand (moon.js) */
 /* the description under each poster, film and app (desc-proto.js): body size, a short measure */
 .pk-text .w-desc { max-width: 40ch; font-size: 17px; line-height: 1.5; color: var(--text); text-wrap: pretty; }
 /* wide screens: the poster's words start higher, so a longer description still ends above the foot */

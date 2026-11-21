@@ -1,4 +1,4 @@
-/* Prototype: About (about-proto.js). What matters is marked, and "What I work with" holds while its entries arrive. */
+/* Prototype: About (about-proto.js). What matters is marked, and "What I work with" folds its list away under the board. */
 
 /* phones: the moon strip that rides the top of the window is solid night to its foot, so the years pass cleanly under it */
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
@@ -18,7 +18,7 @@
 .fx-runes .ch, .fx-pixel .ch { -webkit-text-fill-color: color-mix(in srgb, currentColor calc(clamp(0, (var(--f) - 0.62) * 3, 1) * 100%), transparent); }
 /* runes, then the pixel cut, then the smooth face: a rune flickers up in gold (about-proto.js turns it over with the
    scroll), the letter sets in the coarse 70 cut and then the 35, and resolves; it rises a little as it comes */
-.fx-runes .ch { transform: translate3d(0, calc((1 - var(--f)) * (1 - var(--f)) * 0.32em), 0); }
+.fx-runes .ch { transform: translate(0, calc((1 - var(--f)) * (1 - var(--f)) * 0.32em)); }
 .fx-runes .ch:not(.rn)::after { content: attr(data-g); left: 50%; translate: -50% 0; font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "Apple Symbols", var(--body);
   font-style: normal; color: var(--wg); text-shadow: 0 0 0.3em rgb(255 241 201 / 0.7); opacity: clamp(0, min(var(--f) * 9, (0.44 - var(--f)) * 6), 1); }
 .fx-runes .ch::before, .fx-pixel .ch::before { content: attr(data-c); font-family: "Redaction 70", "Redaction", Georgia, serif; font-style: normal;
@@ -27,13 +27,13 @@
 /* a word's hover decode (words-proto.js) still works on a written title */
 .fx .ch.rn { -webkit-text-fill-color: transparent; }
 /* the pixel cut, condensing: the letters start spread wide and a size up, in the coarse cut */
-.fx-pixel .ch { transform: translate3d(calc(var(--i) * (1 - var(--f)) * (1 - var(--f)) * 0.4em), 0, 0) scale(calc(1 + (1 - var(--f)) * 0.3)); }
+.fx-pixel .ch { transform: translate(calc(var(--i) * (1 - var(--f)) * (1 - var(--f)) * 0.4em), 0) scale(calc(1 + (1 - var(--f)) * 0.3)); }
 .fx-pixel .ch::before { opacity: clamp(0, min(var(--f) * 5, (0.92 - var(--f)) * 4), 1); }
 /* a breath drawn in: each word comes in with its letters set wide apart, warm, and its spacing closes up */
-.fx-breathe .ch { opacity: clamp(0, var(--f) * 1.8, 1); transform: translate3d(calc(var(--i) * (1 - var(--f)) * (1 - var(--f)) * 0.45em), 0, 0);
+.fx-breathe .ch { opacity: clamp(0, var(--f) * 1.8, 1); transform: translate(calc(var(--i) * (1 - var(--f)) * (1 - var(--f)) * 0.45em), 0);
   -webkit-text-fill-color: color-mix(in srgb, var(--wg) calc(clamp(0, 1 - var(--f), 1) * 90%), currentColor); }
 /* words rising one by one */
-.fx-rise .ch { opacity: clamp(0, var(--f) * 2, 1); transform: translate3d(0, calc((1 - var(--f)) * (1 - var(--f)) * 0.7em), 0); }
+.fx-rise .ch { opacity: clamp(0, var(--f) * 2, 1); transform: translate(0, calc((1 - var(--f)) * (1 - var(--f)) * 0.7em)); }
 /* the quill: each letter is inked from its left edge as the nib crosses it; the ink is wet and bright behind the nib
    and dries to the line's gold */
 .fx-ink .ch { --w: clamp(0, var(--f) / 0.35, 1); --wet: clamp(0, (1 - var(--f)) / 0.65, 1);
@@ -43,15 +43,15 @@
 .fx-type .ch { opacity: clamp(0, var(--f) * 50, 1); -webkit-text-fill-color: color-mix(in srgb, var(--wg) calc(clamp(0, 1 - var(--f), 1) * 100%), currentColor); }
 /* Peanut's line: each letter drops in from above, turning, as if batted into place */
 .fx-tumble .ch { opacity: clamp(0, var(--f) * 2.5, 1); transform-origin: 50% 90%;
-  transform: translate3d(0, calc((1 - var(--f)) * (1 - var(--f)) * -1em), 0) rotate(calc((1 - var(--f)) * var(--s) * 50deg)); }
+  transform: translate(0, calc((1 - var(--f)) * (1 - var(--f)) * -1em)) rotate(calc((1 - var(--f)) * var(--s) * 50deg)); }
 /* the odometer: the digit in the line keeps its place and the strip of digits over it rolls up to it */
 .fx-odo .ch { -webkit-text-fill-color: transparent; clip-path: inset(0 -0.3em); opacity: clamp(0, var(--f) * 5, 1); }
-.fx-odo .od-s { position: absolute; left: 0; top: 0; display: grid; transform: translate3d(0, calc(var(--f) * var(--k) * -1lh), 0); -webkit-text-fill-color: currentColor; }
+.fx-odo .od-s { position: absolute; left: 0; top: 0; display: grid; transform: translate(0, calc(var(--f) * var(--k) * -1lh)); -webkit-text-fill-color: currentColor; }
 .fx-odo .od-s b { font-weight: inherit; }
 /* key words (and the strong lines) ignite as they land: a flare of pale gold that settles to a soft glow */
 .fx .em .ch, .fx .ach .ch { --gl: calc(clamp(0, var(--f) * 2 - 1, 1) * max(0.3, 1 - (var(--f) - 0.88) * (var(--f) - 0.88) * 45));
   color: var(--mark); text-shadow: 0 0 calc(var(--gl) * 0.45em) rgb(255 241 201 / calc(var(--gl) * 0.8)); }
-.fx-runes .em .ch { transform: translate3d(0, calc((1 - var(--f)) * (1 - var(--f)) * 0.32em), 0) scale(calc(1 + clamp(0, 1 - (var(--f) - 0.86) * (var(--f) - 0.86) * 60, 1) * 0.12)); }
+.fx-runes .em .ch { transform: translate(0, calc((1 - var(--f)) * (1 - var(--f)) * 0.32em)) scale(calc(1 + clamp(0, 1 - (var(--f) - 0.86) * (var(--f) - 0.86) * 60, 1) * 0.12)); }
 /* the pens: a caret for typing, a little pixel quill for the ink, moved by the scroll (about-proto.js) */
 .fx-pen { position: absolute; left: 0; top: 0; pointer-events: none; opacity: 0; will-change: transform, opacity; }
 .fx-caret { width: 0.5em; height: 1.2em; margin-top: -0.6em; background: var(--wg); }
@@ -62,6 +62,18 @@
 /* the statement's lines and the years come in by their letters alone, so the whole-line rise (stops.js) is set aside */
 .me-say > p.fx, .tb .idx-h.fx, .idx-h.fx { opacity: 1; transform: none; }
 .cal .yr { opacity: 1; transform: none; }
+/* a letter once whole (about-proto.js marks it .d) keeps no transform, clip or overlay, so the thousands of letters
+   in About are plain text to the browser: no layer each, nothing for the pointer's hit test to work through. The
+   letters never take the pointer themselves (their line does, which is what the hover effects ask for), and only
+   2D transforms are used while they are written, since a 3D one would give every letter a layer of its own */
+.fx .ch { pointer-events: none; }
+.fx .ch:not(.d):not(.z), .fx-odo .ch { position: relative; }
+.fx .ch.d:not(.od) { transform: none !important; clip-path: none !important; }
+.fx .ch.d::before, .fx .ch.d:not(.rn)::after { content: none; }
+/* a letter not yet begun (.z) shows nothing in any of the hands, so it is simply hidden, with nothing of its writing
+   on it, rather than kept as an invisible layer of its own */
+.fx .ch.z { visibility: hidden; opacity: 1 !important; transform: none !important; clip-path: none !important; }
+.fx .ch.z::before, .fx .ch.z::after { content: none; }
 .quiet .fx .ch { --f: 1 !important; }
 .quiet .fx-pen { display: none; }
 
@@ -76,19 +88,19 @@
 /* the parts of a line worth catching at a glance */
 strong.ach { font-weight: 600; color: var(--mark); }
 
-/* the statement holds on screen while the pen writes it (wide screens; about-proto.js adds the wrapper) */
-.me-hold { height: 175svh; }
+/* the statement holds on screen for half a screen of scroll once it is written (wide screens; about-proto.js adds the
+   wrapper and writes it as it comes up) */
+.me-hold { height: 150svh; }
 .me-hold > .me { position: sticky; top: 0; height: 100svh; min-height: 0; }
 
-/* "What I work with" holds on screen while its entries come in one by one */
-main > .stop.about:has(.idx.hold) { padding-bottom: 8svh; }
-.idx.hold { display: block; height: 185svh; padding: 0; }
-.idx.hold .idx-pin { position: sticky; top: 0; height: 100svh; display: grid; grid-template-columns: calc(30 * var(--u)) minmax(0, 1fr); column-gap: calc(5 * var(--u));
-  align-content: center; align-items: start; padding: var(--band) calc(6 * var(--u)) 0; }
-.idx.hold .idx-text p { opacity: var(--k, 0); transform: translate3d(0, calc((1 - var(--k, 0)) * 2.4 * var(--u)), 0); }
-.idx.hold .idx-text p i { transition: color 600ms linear, text-shadow 600ms linear; }
-.idx.hold .idx-text p.now i { color: #fffaf0; text-shadow: 0 0 14px rgb(255 241 201 / 0.55); transition-duration: 120ms; }
-.quiet .idx.hold .idx-text p { opacity: 1; transform: none; }
+/* year by year at the page's even pace: each year takes about eight tenths of a screen of scroll, however few its
+   entries, so the moon turns over at the same pace as every other beat on the page (the last year is followed by the
+   board, so it keeps its own length) */
+.yrs > .yr:not(:last-child) { min-height: 68svh; }
+/* a year far from the window is not styled, laid out, painted or hit-tested at all until it comes near (it keeps the
+   size it was last seen at) */
+.yrs > .yr { content-visibility: auto; contain-intrinsic-size: auto 600px; }
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .yrs > .yr:not(:last-child) { min-height: calc(80svh - 64px); } }
 /* under the system's reduced-motion setting only the prize star's own little spin is stilled; the lines still come in
    with the scroll, which the visitor drives */
 @media (prefers-reduced-motion: reduce) { .yr-list li.prize.seen .e-t::before { animation: none; } }
@@ -117,22 +129,31 @@ main > .stop.about:has(.idx.hold) { padding-bottom: 8svh; }
 /* constellation names, set the way a star chart names them */
 .cn { position: absolute; left: calc(var(--x) * var(--u)); top: calc(var(--y) * var(--u)); margin: 0; font: italic 400 clamp(19px, calc(1.6 * var(--u)), 26px) / 1 "Redaction", Georgia, serif; color: var(--mark); }
 /* the list under the board no longer has its own heading: one column, the full width */
-.idx:not(:has(.idx-h)), .idx.hold:not(:has(.idx-h)) .idx-pin { grid-template-columns: minmax(0, 1fr); }
-.idx:not(:has(.idx-h)) { padding-top: calc(3 * var(--u)); }
+.idx:not(:has(.idx-h)) { grid-template-columns: minmax(0, 1fr); padding-top: calc(3 * var(--u)); }
+/* "All the skills, in words": the list is folded away under one quiet button, whose little moon is a crescent while
+   it is shut and full once it is open (about-proto.js grows the fold and fades the list in) */
+.idx-more { justify-self: start; }
+.idx-moon { position: relative; width: 14px; height: 14px; flex: none; border-radius: 50%; overflow: hidden; background: var(--mark); }
+.idx-moon::after { content: ""; position: absolute; inset: -1px; border-radius: 50%; background: var(--ground); translate: -40% 0; transition: translate 260ms var(--enter); }
+.idx-more[aria-expanded="true"] .idx-moon::after { translate: -110% 0; }
+.idx-fold.moving { overflow: hidden; }
+/* the colon after a group's name is for screen readers; on screen the name stands on its own line */
+.idx-stop { font-size: 0; }
+.idx-fold .idx-text { padding-top: calc(2.4 * var(--u)); }
+.quiet .idx-moon::after { transition: none; }
 /* the list as a catalogue across the whole width: each kind of work named large in gold, its tools under it */
 .idx .idx-text { columns: auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(4.4 * var(--u)) calc(4 * var(--u)); align-items: start; width: 100%; }
 .idx .idx-text p { margin: 0; font-size: 18px; line-height: 1.55; color: var(--text); text-wrap: pretty; }
 .idx .idx-text p i { display: block; margin: 0 0 calc(1 * var(--u)); font: italic 400 clamp(26px, calc(2.5 * var(--u)), 36px) / 1.05 "Redaction", Georgia, serif; color: var(--mark); white-space: nowrap; }
 /* seven kinds over four columns: the last one takes the space the row leaves */
 .idx .idx-text p:last-child:nth-child(4n + 3) { grid-column: span 2; }
-.idx.hold { height: 165svh; }
-.idx.hold .idx-pin { padding: var(--band) calc(6 * var(--u)) 0; }
 @media (max-width: 1100px) and (min-width: 761px) and (min-aspect-ratio: 1/1) { .idx .idx-text { grid-template-columns: repeat(3, minmax(0, 1fr)); } .idx .idx-text p:last-child:nth-child(n) { grid-column: auto; } }
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
   .idx .idx-text { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .idx .idx-text p:last-child:nth-child(n) { grid-column: auto; }
   .idx .idx-text p i { white-space: normal; }
   .idx .idx-text p i { font-size: 28px; margin-bottom: 6px; }
+  .idx-fold .idx-text { padding-top: 20px; }
 }
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
   .tb { width: 100%; height: calc(196 * var(--u)); margin-top: 48px; }
@@ -173,8 +194,16 @@ main > .stop.about:has(.idx.hold) { padding-bottom: 8svh; }
 .tb-hint { position: absolute; z-index: 2; left: calc(11 * var(--u)); top: calc(8.4 * var(--u) + clamp(30px, calc(3.4 * var(--u)), 52px) + 14px); margin: 0;
   max-width: calc(30 * var(--u)); font: 400 16px/1.4 var(--body); color: var(--text); }
 @media (prefers-reduced-motion: reduce) { .tb .cn, .tb-lines line { transition: none; } }
-/* phones keep the full skills list on show, and the tools sit in one column, so they need no label */
-@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .tb-tag, .tb-hits, .tb-hint { display: none; } }
+/* phones: a tool or a constellation's name is tapped (there are no bands along the lines to catch), the hint sits
+   under the heading across the board, and a tap on the label puts it away */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .tb-hits { display: none; }
+  .tb-hint { left: calc(8 * var(--u)); right: 16px; top: calc(10 * var(--u) + 36px); max-width: none; }
+  .tb-say { pointer-events: auto; }
+  .tb .grp { transition: opacity 200ms linear; }
+  .tb.telling .grp:not(:has(.tb-tag)) { opacity: 0.3; }
+}
+.quiet .tb .grp { transition: none; }
 
 /* films: a short silent loop plays on the monitor while its film is under the playhead */
 .fr-frame { position: relative; }

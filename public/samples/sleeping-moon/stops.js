@@ -16,11 +16,12 @@
      Text from lib/content.ts (the live About). */
   if ($("#m-about")) {
     const mount = $("#m-about");
-    const headline = "I build high-quality visual content and adaptable designs for brands that want to stand out.", kicker = "And I can do it for you, too.";
+    // the statement in the almanac's voice (Lana chose it 2026-11-17)
+    const headline = "I make the pictures people remember a brand by: posters, packets, films and apps.", kicker = "Tell me what yours should wake up as.";
     /* each entry in keywords: what and where, when, and a few points; the facts from the live About */
     const YEARS = [
       ["2026", [
-        { t: "UI/UX design intern, Eden Holdings Philippines", w: "August 2026 to now", p: ["Wireframes, user flows, Figma prototypes", "Design system and UI libraries", "AI-assisted research"] },
+        { t: "UI/UX design intern, Eden Holdings Philippines", w: "August 2026 to now", p: ["Wireframes, user flows and Figma prototypes", "Design system and UI libraries", "AI-assisted research"] },
         { t: "1st runner-up, ImaGnation: GCash Innovation Challenge", w: "2026", p: [] },
         { t: "PMI Project Management Ready", w: "March 2026", p: [] },
       ]],
@@ -29,29 +30,30 @@
         { t: "Android Development with Kotlin, LinkedIn Learning", w: "November 2025", p: [] },
       ]],
       ["2023", [
-        { t: "Computer Science, FEU Tech", w: "2023 to 2027", p: ["Software Engineering", "Elite Scholar and DOST scholar"] },
+        { t: "Computer Science, FEU Tech", w: "2023 to 2027", p: ["Software Engineering", "Elite Scholar and DOST Scholar"] },
         { t: "Creatives head, Student Coordinating Council and ACM FEU Tech", w: "2023 to 2025", p: ["Campus events and interschool competitions", "Instagram, Facebook and TikTok campaigns"] },
-        { t: "Freelance graphic designer and video editor", w: "2023 to 2026", p: ["Brand assets for clients", "Premiere Pro, After Effects, Canva templates"] },
+        { t: "Freelance graphic designer and video editor", w: "2023 to 2026", p: ["Brand assets for clients", "Premiere Pro, After Effects and Canva templates"] },
         { t: "Regional Science High School III, high honors", w: "2023", p: [] },
       ]],
       ["2022", [
         { t: "Editing head, CybeRS Robotics Club", w: "2022 to 2023", p: ["Co-founded it and built its identity", "Led a 10-member editing team"] },
       ]],
       ["2020", [
-        { t: "Multimedia editor, Lord Jesus Fellowship Church", w: "2020 to 2025", p: ["Weekly video and graphics", "Facebook, Instagram, YouTube"] },
+        { t: "Multimedia editor, Lord Jesus Fellowship Church", w: "2020 to 2025", p: ["Weekly videos and graphics", "Facebook, Instagram and YouTube"] },
       ]],
       ["2019", [
         { t: "First graphics and video edits", w: "2019 to 2023", p: ["School and community projects", "Where the Adobe habit started"] },
       ]],
     ];
+    /* each kind of work and its skills, written out whole (the same facts as the live About) */
     const SKILLS = [
-      ["Design", ["UI/UX principles", "design systems", "typography & visual hierarchy", "Figma", "Photoshop", "Illustrator", "Canva", "brand identity", "print & digital"]],
-      ["Programming", ["Python", "JavaScript/TypeScript", "Kotlin (Android)", "Java", "PHP", "Next.js", "Tailwind"]],
-      ["Backend & data", ["Supabase", "REST API design", "Hotelling's T²", "EWMA baselines", "multivariate anomaly detection", "Git/GitHub", "Electron", "PyInstaller"]],
-      ["Video editing", ["Premiere Pro", "After Effects", "motion graphics", "color grading", "export & compression"]],
-      ["Social media", ["Facebook", "Instagram", "TikTok", "X/Twitter", "content calendars", "organic growth & engagement", "copywriting", "brand voice adaptation"]],
-      ["Ways of working", ["project management", "cross-functional coordination", "remote team coordination", "scheduling", "digital asset management"]],
-      ["AI tools", ["ChatGPT", "Claude, for research, ideation and workflow"]],
+      ["Design", "UI/UX principles, design systems, typography and visual hierarchy, brand identity, print and digital design, Figma, Photoshop, Illustrator and Canva."],
+      ["Programming", "Python, JavaScript and TypeScript, Kotlin for Android, Java, PHP, Next.js and Tailwind CSS."],
+      ["Backend and data", "Supabase, REST API design, Git and GitHub, Electron, PyInstaller, multivariate anomaly detection, Hotelling's T² and EWMA baselines."],
+      ["Video editing", "Premiere Pro, After Effects, motion graphics, color grading, export and compression."],
+      ["Social media", "Facebook, Instagram, TikTok, X (Twitter), content calendars, organic growth and engagement, copywriting and adapting to each brand's voice."],
+      ["Ways of working", "Project management, cross-team and remote coordination, scheduling and digital asset management."],
+      ["AI tools", "ChatGPT and Claude, for research, brainstorming and workflow."],
     ];
     /* the years run forward, from 2019 to now, so the moon fills as you read: a thin crescent for the first year,
        full for 2026 */
@@ -95,13 +97,15 @@
 
     <section class="idx" aria-labelledby="idx-h">
       <h3 class="idx-h" id="idx-h">What I work with</h3>
-      <div class="idx-text">${SKILLS.map(([g, items]) => `<p><i>${g}.</i> ${esc(items.join(", ").replace(/, ([^,]*)$/, " and $1"))}.</p>`).join("")}</div>
+      <button class="go idx-more" type="button" aria-expanded="false" aria-controls="idx-fold"><span>All the skills, in words</span><i class="idx-moon" aria-hidden="true"></i></button>
+      <div class="idx-fold" id="idx-fold" hidden><div class="idx-text">${SKILLS.map(([g, line]) => `<p><i>${g}<span class="idx-stop">:</span></i> ${esc(line)}</p>`).join("")}</div></div>
     </section>`;
     SM.pictures(mount);
     SM.corners($("#me"));
 
-    /* the statement and the index come up as they reach the window, as far as the scroll has brought them */
-    const rise = [...$$(".me-say > p", mount), $(".idx-h", mount), ...$$(".idx-text p", mount)];
+    /* the statement and the index's heading come up as they reach the window, as far as the scroll has brought them
+       (the skills list is folded away, and comes in as it is opened, about-proto.js) */
+    const rise = [...$$(".me-say > p", mount), $(".idx-h", mount)];
     SM.scrub(() => {
       const vh = SM.vh, quiet = SM.quiet();
       // each line's place in the page is measured once and again only when the page changes size (SM.placedGen),
@@ -204,7 +208,7 @@
     SM.scrub(() => {
       const w = SM.where(talk);
       if (!w.near) return;
-      const v = SM.quiet() ? 1 : SM.smooth(Math.min(1, Math.max(0, (w.arrive - 0.35) / 0.55))), V = v.toFixed(3);
+      const v = SM.quiet() ? 1 : SM.smooth(Math.min(1, Math.max(0, (w.arrive - 0.3) / 0.65))), V = v.toFixed(3);
       if (env._v !== V) {
         env._v = V; env.style.setProperty("--up", V);
         sixBms.forEach((b, k) => b.setFloor(SM.quiet() ? 1 : Math.max(0, Math.min(1, v * 1.6 - k * 0.1))));
@@ -228,6 +232,16 @@
     copy.addEventListener("click", async () => {
       let ok = true;
       try { await navigator.clipboard.writeText(ADDR); } catch (e) { ok = false; }
+      // where the clipboard is closed to the page (an older browser, or a page not served securely), the address is
+      // copied the old way, through a hidden field; if even that fails, it is selected, ready to copy by hand
+      if (!ok) {
+        const f = Object.assign(document.createElement("textarea"), { value: ADDR, readOnly: true });
+        f.setAttribute("aria-hidden", "true"); f.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0";
+        document.body.append(f); f.select();
+        try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+        f.remove(); copy.focus({ preventScroll: true });
+        if (!ok) { const r = document.createRange(); r.selectNodeContents($(".t-addr", mount)); getSelection().removeAllRanges(); getSelection().addRange(r); }
+      }
       clearTimeout(t);
       copy.textContent = ok ? "Copied" : "Copy the address";
       if (ok && !SM.quiet()) copy.animate([{ transform: "scale(1)" }, { transform: "scale(0.97)" }, { transform: "scale(1)" }], { duration: 220, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });

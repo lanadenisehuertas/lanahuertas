@@ -22,8 +22,14 @@
     const word = $(".veil-word", veil), moon = $(".veil-moon", veil);
     word.innerHTML = [...word.textContent].map((c) => `<span>${c === " " ? "&nbsp;" : c}</span>`).join("");
     const letters = $$("span", word), jobs = [document.fonts?.ready || Promise.resolve()];
-    // the room is built a moment after the first frame (room-proto.js), and says when it and its pictures are there
-    if (SM.roomReady) jobs.push(SM.roomReady);
+    // the faces the first screen is set in, asked for by name and at once: the room's words are only made a moment
+    // after the first frame, when the browser's own list of fonts to fetch may already have settled, so waiting on that
+    // list alone could lift the veil before the room's type had come, and the words would change face in plain view
+    if (document.fonts?.load) ['400 30px "Redaction"', 'italic 400 30px "Redaction"', '400 30px "Redaction 35"', '400 17px "Atkinson Hyperlegible Next"']
+      .forEach((f) => jobs.push(document.fonts.load(f).catch(() => {})));
+    // the room is built a moment after the first frame (room-proto.js), and says when it and its pictures are there; any
+    // face it asked for on the way is waited for too
+    if (SM.roomReady) jobs.push(SM.roomReady.then(() => document.fonts?.ready));
     // the pictures on the first screen: the room's, when it opens the page, and the moon's stop's own (not those that
     // wait to be scrolled near, which would hold the veil until its five seconds are up)
     $$(".room-intro img, #moon img").filter((im) => im.loading !== "lazy").forEach((im) => jobs.push(im.complete ? Promise.resolve() : new Promise((r) => { im.addEventListener("load", r, { once: true }); im.addEventListener("error", r, { once: true }); })));
@@ -65,6 +71,8 @@
   if (SM.HOVER) addEventListener("pointermove", (e) => { if (e.pointerType === "touch" || still()) return; px = e.clientX / SM.vw - 0.5; py = e.clientY / SM.vh - 0.5; if (!lean) lean = requestAnimationFrame(leanLoop); }, { passive: true });
   SM.scrub(() => {
     if (still()) { if (field) field.style.transform = ""; return; }
+    // the sky and its comet rest while the room's night hides them (room-proto.js)
+    if (root.classList.contains("room-covers")) return;
     const U = SM.u(), y = SM.y, W = SM.vw, H = SM.vh;
     sway();
     // one comet for every screen and a half of scroll; it moves only as far as the scroll does

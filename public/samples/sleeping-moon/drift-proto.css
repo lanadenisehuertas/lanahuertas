@@ -22,13 +22,27 @@
 .dr-moth { animation: dr-flap var(--f, 900ms) steps(1, end) var(--d, 0s) infinite, dr-wander var(--t, 8s) ease-in-out var(--d, 0s) infinite; }
 .dr-float { animation: dr-wander var(--t, 8s) ease-in-out var(--d, 0s) infinite; }
 .dr-sway.lily, .dr-sway.t-lily { transform-origin: 50% 100%; }
-.dr-sway.env { transform-origin: 50% 100%; }
 
-/* off screen: the loop holds where it is until it comes back into view (drift-proto.js watches) */
-.dr-off { animation-play-state: paused !important; }
+/* the corner moths and lilies and the letter at dawn: one loop each, on translate, scale or rotate alone, at fixed
+   sizes, and nothing written to them while the page moves (drift-proto.js), so the browser runs each loop by itself.
+   A moth wanders a slow loop and beats its wings four times on the way round */
+@keyframes dr-orn-moth {
+  0%, 100% { translate: 0 0; scale: 1 1; } 6% { scale: 0.8 1; } 12% { scale: 1 1; }
+  25% { translate: 6px -6px; scale: 1 1; } 31% { scale: 0.8 1; } 37% { scale: 1 1; }
+  50% { translate: 2px 4px; scale: 1 1; } 56% { scale: 0.8 1; } 62% { scale: 1 1; }
+  75% { translate: -5px -2px; scale: 1 1; } 81% { scale: 0.8 1; } 87% { scale: 1 1; }
+}
+@keyframes dr-orn-lily { 0%, 100% { rotate: -1.8deg; } 50% { rotate: 1.8deg; } }
+@keyframes dr-env { 0%, 100% { rotate: -0.6deg; } 50% { rotate: 0.6deg; } }
+.dr-orn-moth { animation: dr-orn-moth var(--t, 9s) ease-in-out var(--d, 0s) infinite; }
+.dr-orn-lily { animation: dr-orn-lily var(--t, 6s) ease-in-out var(--d, 0s) infinite; transform-origin: 50% 100%; }
+.dr-env { animation: dr-env var(--t, 8s) ease-in-out var(--d, 0s) infinite; transform-origin: 50% 100%; }
 
-.quiet .dr-bob, .quiet .dr-sway, .quiet .dr-breathe, .quiet .dr-moth, .quiet .dr-float { animation: none; }
-@media (prefers-reduced-motion: reduce) { .dr-bob, .dr-sway, .dr-breathe, .dr-moth, .dr-float { animation: none; } }
+/* off screen: the loop holds where it is until it comes back into view (drift-proto.js watches); the moon's stop holds
+   its loops too while the room's night still hides it whole (room-proto.js) */
+.dr-off, .room-covers #moon :is(.dr-bob, .dr-sway, .dr-breathe, .dr-moth, .dr-float, .dr-orn-moth, .dr-orn-lily) { animation-play-state: paused !important; }
+
+.quiet :is(.dr-bob, .dr-sway, .dr-breathe, .dr-moth, .dr-float, .dr-orn-moth, .dr-orn-lily, .dr-env) { animation: none; }
 
 /* the letter holds still while someone writes in it or reaches for its button */
-#talk .env.dr-sway:hover, #talk .env.dr-sway:focus-within { animation-play-state: paused; }
+#talk .env.dr-env:hover, #talk .env.dr-env:focus-within { animation-play-state: paused; }

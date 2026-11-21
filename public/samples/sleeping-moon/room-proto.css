@@ -9,7 +9,8 @@
 .has-study .hero.rising .prelude { display: none; }
 .has-study:not(.quiet) .cast-ph { display: none !important; }
 /* while the room shows the name and the role, the masthead does not repeat the role */
-.in-room #sub { visibility: hidden; }
+/* (not in quiet mode, where there is no room, even if the switch is thrown while the room is on screen) */
+:root:not(.quiet) .in-room #sub { visibility: hidden; }
 
 .rm-stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 /* the view: a fixed-size box scaled to the screen; its perspective is the camera's lens */
@@ -25,7 +26,7 @@
    own element, so nothing else in the room is restyled) */
 .rm-shade { position: absolute; inset: 0; opacity: 0; pointer-events: none; will-change: opacity; }
 
-/* standing pictures turn about their own foot to face the camera */
+/* standing pictures stand on their own foot, facing the camera (which never turns, so they never need turning) */
 .rm-it { transform-origin: 50% 100%; }
 .rm-it .pic, .rm-it > img { display: block; width: 100%; height: auto; }
 .rm-six { transform-origin: 50% 50%; pointer-events: auto; cursor: pointer; will-change: transform; }
@@ -59,17 +60,22 @@
 .rm-flash { background: radial-gradient(ellipse 55% 60% at 50% 45%, rgb(255 241 201 / 0.7), rgb(185 162 255 / 0.35) 40%, rgb(185 162 255 / 0) 75%); }
 
 /* what Lana does, low in front of the room, with the scroll cue under it (the moon's stop owns the name) */
+/* if the italic has not come by the time the page is shown (the veil waits five seconds at most), the line is set in
+   Georgia's italic scaled to the italic's own measure (and set on the same baseline), so when the italic arrives the
+   letters change face where they stand and no word moves */
+@font-face { font-family: "Redaction room"; font-style: italic; src: local("Georgia Italic"), local("Georgia-Italic");
+  size-adjust: 94%; ascent-override: 95.7%; descent-override: 31.9%; line-gap-override: 0%; }
 .rm-words { position: absolute; left: 0; right: 0; display: grid; justify-items: center; padding: 0 4%; text-align: center; }
-.rm-role { margin: 0; font-family: "Redaction", Georgia, serif; font-style: italic; line-height: 1.3; color: var(--mark); text-shadow: 0 0 10px #000, 0 0 4px #000; }
-/* the role sleeps in the coarse 1-bit cut and wakes letter by letter into the smooth italic as the scroll carries the
-   light along it (room-proto.js). Each letter keeps the italic's own width from the first paint, and its sleeping glyph
+.rm-role { margin: 0; font-family: "Redaction", "Redaction room", Georgia, serif; font-style: italic; line-height: 1.3; color: var(--mark); text-shadow: 0 0 10px #000, 0 0 4px #000; }
+/* the role sleeps in a 1-bit cut (the finer one, 35, so it reads from the first frame) and wakes letter by letter into
+   the smooth italic as the scroll carries the light along it (room-proto.js). Each letter keeps the italic's own width from the first paint, and its sleeping glyph
    is drawn over that place, so waking changes only what is painted and never moves a word. A letter is either asleep
    (lilac, coarse), loose (it has caught the light, still coarse) or awake (the smooth italic): a hard front, no fade */
 .rm-l { display: block; }
 .rm-w { white-space: nowrap; }
 .rm-c { position: relative; visibility: hidden; }
 .rm-c::before { content: attr(data-c); position: absolute; left: 50%; top: 0; translate: -50% 0; visibility: visible;
-  font-family: "Redaction 70", "Redaction 35", Georgia, serif; font-style: normal; color: var(--ink); }
+  font-family: "Redaction 35", Georgia, serif; font-style: normal; color: var(--ink); }
 .rm-c.f::before { color: var(--mark); }
 .rm-c.w { visibility: visible; }
 .rm-c.w::before { visibility: hidden; }

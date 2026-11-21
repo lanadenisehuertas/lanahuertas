@@ -129,6 +129,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .pic.box { overflow: hidden; background: var(--ground); }
 .pic.box .full { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); }
 
+/* a picture cut by the bloom's mask has image-rendering: pixelated while it is cut (moon.js), so the mask's cells stay
+   square; what is inside it keeps its own smoothing */
+[data-bloom] *, dialog.viewer figure * { image-rendering: auto; }
+
 /* ---------- ornament ---------- */
 .orn { position: absolute; pointer-events: none; opacity: 0.8; }
 /* the moth and lily in the corners of every board: moth top left and bottom right, lily top right and bottom left */
@@ -197,7 +201,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 html:has(dialog.viewer[open]) { overflow: hidden; scrollbar-gutter: stable; }
 dialog.viewer { width: 100vw; height: 100vh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: rgb(0 0 0 / 0.96); color: #d9cfff; }
 dialog.viewer[open] { display: grid; grid-template-rows: 1fr auto; }
-.viewer figure { display: grid; place-items: center; min-height: 0; padding: 72px 96px 8px; }
+/* the picture takes a sideways swipe itself (moon.js turns it into the next or the one before) and leaves pinching to the browser */
+.viewer figure { display: grid; place-items: center; min-height: 0; padding: 72px 96px 8px; touch-action: pan-y pinch-zoom; }
 .viewer figure img { max-width: 100%; max-height: calc(100vh - 170px); width: auto; height: auto; }
 .viewer .bar { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 14px 20px 26px; font: 400 16px/1.2 var(--lab); color: #b9a2ff; }
 .viewer .bar b { font: 400 22px/1 "Redaction", Georgia, serif; color: #fff1c9; }
