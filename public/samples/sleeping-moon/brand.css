@@ -16,6 +16,8 @@
 /* ---------- the words ---------- */
 .b-text { display: grid; gap: calc(0.9 * var(--u)); align-content: start; padding-top: calc(2.1 * var(--u)); }
 .b-name { font-size: clamp(38px, calc(4.4 * var(--u)), 68px); }
+/* a name with a long word (NEOSTALGIA) is set a size smaller, so it keeps to its column */
+.b-long .b-name { font-size: clamp(32px, calc(3.3 * var(--u)), 52px); }
 .b-text .say { font-size: 17px; line-height: 1.5; color: var(--text); max-width: 46ch; }
 .b-text .go { justify-self: start; }
 .b-text .go svg { width: 14px; height: 14px; }
@@ -33,6 +35,10 @@
    (--a, width over height, set by the page) before the picture arrives, so nothing moves when it does */
 .kv { --kvh: calc(48 * var(--u)); position: relative; z-index: 1; display: block; width: min(100%, calc(var(--kvh) * var(--a, 1))); cursor: zoom-in; }
 .kv .pic .full { width: 100%; height: auto; }
+/* while the key visual sleeps, its photo lies under the canvas at a hundredth of its strength rather than none, which
+   no one can see but which lets the browser count it as painted when it arrives, as the canvas is. It is the same file
+   the canvas is drawn from, so nothing more is fetched */
+html.js:not(.quiet) .kv .pic:not(.awake):not(.plain) .full { opacity: 0.01; }
 
 /* ---------- the other pieces, each at its own shape, one height to a row ---------- */
 .b-sheet { grid-template-columns: minmax(0, 1fr); }

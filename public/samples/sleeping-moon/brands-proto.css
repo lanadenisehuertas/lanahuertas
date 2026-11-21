@@ -16,6 +16,10 @@
    and palette under the name, and its other pieces in a row across the foot. The board's top padding clears the
    masthead, so a brand reached from the index lands with its name in view. */
 main .b-one > .b-stop { min-height: 0; padding: 0; place-items: start center; }
+/* a brand far from the window is not laid out until the scroll brings it near: the page opens with one or two brands
+   to lay out rather than ten. It holds a place about a screen and a half tall until then, and once laid out it keeps
+   its real height (auto), so nothing above the window moves when you scroll back */
+.b-one { content-visibility: auto; contain-intrinsic-size: auto 160svh; }
 .b-spread { min-height: 0; grid-template-columns: calc(24 * var(--u)) minmax(0, 1fr); grid-template-rows: auto 1fr auto;
   grid-template-areas: "head work" "info work" "rest rest"; row-gap: calc(1.8 * var(--u));
   padding: calc(var(--band) + 4 * var(--u)) calc(10 * var(--u)) calc(3.6 * var(--u)); }

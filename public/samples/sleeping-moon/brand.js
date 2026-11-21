@@ -37,7 +37,7 @@
 
   $("#page").innerHTML = `
   <section class="stop b-stop" id="spec" data-label="I Brands" data-hint="${rest.length ? `${rest.length} more ${rest.length === 1 ? "piece" : "pieces"} below.` : "Two more brands below, either side of this one."}">
-    <div class="b-board">
+    <div class="b-board${b.name.split(" ").some((w) => w.length > 9) ? " b-long" : ""}">
       <div class="b-text">
         <h1 class="pk-name b-name">${esc(b.name)}</h1>
         <p class="pk-meta">${esc(b.org)}, ${esc(longDate(b.date))}</p>
