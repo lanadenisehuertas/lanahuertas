@@ -16,3 +16,5 @@ body:has(#talk.current) .mast, body:has(#talk.current) .foot { --ink: #2b1470 !i
 
 /* phones: the quiet switch is a full touch target */
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .switch { min-width: 44px; justify-content: center; } }
+/* the open phone menu covers the page, so the way on at the foot goes while it is open: it stood over the menu's foot */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .menu-open .foot { visibility: hidden; } }

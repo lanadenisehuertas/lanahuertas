@@ -252,6 +252,9 @@
     // each film's light blooms from its own point on the frame
     const AT = ["0.5 0.42", "0.32 0.38", "0.68 0.56", "0.44 0.64", "0.62 0.34"];
     frames.forEach((f, k) => (f.dataset.bloom = AT[k % AT.length]));
+    // every frame starts hidden through its bloom (SM.bloom), not through the stylesheet: a shown frame takes its
+    // visibility from the monitor that holds it, so a hidden rule on the frame itself would keep the monitor black
+    frames.forEach((f) => SM.bloom(f, 0, true));
     SM.scrub(update);
     const jump = (k, instant) => SM.glide(films.getBoundingClientRect().top + scrollY + (Math.max(0, Math.min(n - 1, k)) + 0.3) * STEP * SM.vh, instant);
     (SM.rooms ||= {}).films = { jump };

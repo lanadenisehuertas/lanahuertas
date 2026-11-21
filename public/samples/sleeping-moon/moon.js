@@ -597,7 +597,9 @@ const SM = (() => {
      many things that ask where a stop is each frame do not make the browser lay the page out again after every write;
      anything that is not a stop is measured as it is */
   const placed = new WeakMap();
-  const resized = new ResizeObserver(() => gen++);
+  /* a stop that changes size moves every stop under it, so the page is drawn again at once, not at the next scroll: a
+     fold opened in About pushes Contact down, and the dawn, still placed for where Contact was, would rise over it */
+  const resized = new ResizeObserver(() => { gen++; kick(); });
   let gen = 0;
   const rectOf = (el) => {
     if (el.parentElement?.tagName !== "MAIN") return el.getBoundingClientRect();

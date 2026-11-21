@@ -96,3 +96,8 @@
   .brand-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
   .tile .label { white-space: normal; }
 }
+
+/* phones turned sideways: the name is held to the window's height too, so both its lines fit on the short screen */
+@media (max-height: 500px) and (min-aspect-ratio: 1/1) {
+  .name { font-size: min(25vw, 150px, 22svh); margin-top: max(-12vw, -70px, -6svh); }
+}

@@ -52,7 +52,7 @@ main > .stop.pinned { display: block; padding: 0; min-height: 0; }
 /* the monitor: every film's frame in one cell; the current one shows, the next blooms in at the cut (SM.bloom) */
 .fr-screen { position: relative; aspect-ratio: 16 / 9; display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); overflow: hidden; background: #000;
   box-shadow: 0 0 calc(7 * var(--u)) calc(0.8 * var(--u)) rgb(255 241 201 / 0.09); }
-.fr-frame { position: relative; grid-area: 1 / 1; display: block; width: 100%; height: 100%; visibility: hidden; transform-origin: 50% 45%; }
+.fr-frame { position: relative; grid-area: 1 / 1; display: block; width: 100%; height: 100%; transform-origin: 50% 45%; }
 .fr-frame img { width: 100%; height: 100%; object-fit: cover; }
 /* the timecode counts with the scroll; each digit keeps its own width so the line never jitters */
 .fr-tc { display: flex; justify-content: end; align-items: baseline; gap: 12px; font: 400 16px/1 var(--lab); color: var(--text); }
@@ -238,4 +238,15 @@ main > .stop.products { --a-ink: #b9a2ff; }
   .phone .a-shot { border-radius: 18px; }
   .app .pk-text .say { display: block; }
   .acts { gap: 0 24px; }
+}
+
+/* ---------- phones turned sideways: the monitor on the right and the words beside it, over a lower timeline, so all
+   three fit the short window (stacked, the monitor alone was taller than the screen and the words fell below it) ---------- */
+@media (max-height: 500px) and (min-aspect-ratio: 1/1) {
+  .fr { --mon: calc(100svh - var(--band) - 10px - 60px - 84px - 18px - 34px); }
+  .fr-mon { left: auto; right: 24px; top: calc(var(--band) + 10px); width: calc(var(--mon) * 16 / 9); gap: 6px; }
+  .fr-text { left: 24px; right: calc(48px + var(--mon) * 16 / 9); top: calc(var(--band) + 10px); }
+  .fr-tl { left: 24px; right: 24px; bottom: 60px; }
+  .tl-g, .lanes { grid-template-rows: 20px 40px 16px; row-gap: 4px; }
+  .fr-tc span { white-space: nowrap; }
 }

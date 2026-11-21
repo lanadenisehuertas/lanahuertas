@@ -740,6 +740,9 @@
       // a jump straight past the room (a link, a reload further down) never draws its last frames, so what they would
       // have undone is undone here
       if (inRoom) { inRoom = false; document.body.classList.remove("in-room"); }
+      // the role's awake letters are made visible one by one, so hiding the room alone would leave them standing over
+      // the moon: past the room its words are faded right out as well (the next frame inside the room gives them back)
+      if (t > SPAN && words) op(words, 0);
       cover(false); return;
     }
     kick();

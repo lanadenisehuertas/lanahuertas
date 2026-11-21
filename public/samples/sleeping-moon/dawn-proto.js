@@ -75,7 +75,13 @@
     const b = $("[type=submit]", write);
     if (b.disabled) return;
     const name = field("name").value.trim(), email = field("email").value.trim(), message = field("message").value.trim();
-    const thanks = () => { done.textContent = `Sent. Thank you, ${name.split(" ")[0]}. I'll write back to ${email} within a few days.`; write.reset(); };
+    /* the answer is written on the envelope, which on a phone stands under the letter, below the screen when Send is
+       pressed: there the page is brought down to it, so the visitor sees whether the letter went */
+    const see = () => requestAnimationFrame(() => {
+      const r = done.getBoundingClientRect();
+      if (r.height && (r.bottom > SM.vh - 64 || r.top < 64)) done.scrollIntoView({ block: "center", behavior: SM.quiet() ? "instant" : "smooth" });
+    });
+    const thanks = () => { done.textContent = `Sent. Thank you, ${name.split(" ")[0]}. I'll write back to ${email} within a few days.`; write.reset(); see(); };
     // a bot fills the field people never see: it is thanked, and nothing is sent
     if (field("_honey").value) { thanks(); return; }
     b.disabled = true; b.firstChild.textContent = "Sending "; done.textContent = "";
@@ -92,6 +98,7 @@
     } catch {
       // the message stays in the form, so nothing typed is lost
       done.textContent = "That didn't send. Try again, or write to lanadenisehuertas@gmail.com.";
+      see();
     } finally {
       clearTimeout(timer); b.disabled = false; b.firstChild.textContent = "Send ";
     }

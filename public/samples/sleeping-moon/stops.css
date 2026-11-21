@@ -121,3 +121,5 @@ main > .stop.talk { display: block; padding: 0; overflow: hidden; }
   .dawnboard { width: 100%; height: auto; display: flex; flex-direction: column; align-items: center; text-align: center; padding: calc(var(--band) + 24px) 16px 0; }
   .env { position: relative; left: auto; top: auto; translate: none; width: min(84vw, 420px); }
 }
+/* the dawn's links and fields, reached by Tab, are brought clear of the masthead and the foot rather than left under them */
+#talk :is(a, button, input, textarea) { scroll-margin-block: calc(var(--band) + 12px); }

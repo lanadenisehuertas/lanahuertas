@@ -35,7 +35,10 @@
       const t = $(name);
       if (!t) return false;
       const text = () => {
-        const d = find(t.textContent.trim());
+        // once the name is spelled out letter by letter (SM.letters) it holds its words twice, once whole for screen
+        // readers and once as letters, so the whole copy is the one looked up: the doubled text matched no piece, and
+        // the description went blank
+        const d = find((t.querySelector(".vh")?.textContent ?? t.textContent).trim());
         let p = t.parentElement.querySelector("." + cls);
         if (!p) { p = document.createElement("p"); p.className = "say w-desc " + cls; t.parentElement.querySelector(".pk-meta").after(p); }
         if (p.textContent !== d) p.textContent = d;

@@ -178,6 +178,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   font: italic 400 clamp(19px, calc(1.5 * var(--u)), 23px) / 1 "Redaction", Georgia, serif; color: var(--mark);
   background: linear-gradient(var(--mark), var(--mark)) 0 calc(100% - 7px) / 0% 1px no-repeat, linear-gradient(var(--rule), var(--rule)) 0 calc(100% - 7px) / 100% 1px no-repeat;
   transition: background-size 260ms var(--enter); }
+/* a button the page has hidden stays hidden: the display above would otherwise outrank the hidden attribute (the stars'
+   "Leave yours" stood on beside the open maker) */
+.btn[hidden], .go[hidden] { display: none; }
 .btn:hover, .go:hover { background-size: 100% 1px, 100% 1px; }
 .btn:active, .go:active { transform: scale(0.98); }
 .btn svg, .go svg { width: 18px; height: 18px; flex: none; transition: transform 200ms var(--pop); }

@@ -98,8 +98,9 @@ strong.ach { font-weight: 600; color: var(--mark); }
    board, so it keeps its own length) */
 .yrs > .yr:not(:last-child) { min-height: 68svh; }
 /* a year far from the window is not styled, laid out, painted or hit-tested at all until it comes near (it keeps the
-   size it was last seen at) */
-.yrs > .yr { content-visibility: auto; contain-intrinsic-size: auto 600px; }
+   height it was last seen at). Only its height is held: a held width of its own would widen the column of years past
+   a phone's screen, and cut every entry off at the right edge */
+.yrs > .yr { content-visibility: auto; contain-intrinsic-block-size: auto 600px; }
 @media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .yrs > .yr:not(:last-child) { min-height: calc(80svh - 64px); } }
 /* under the system's reduced-motion setting only the prize star's own little spin is stilled; the lines still come in
    with the scroll, which the visitor drives */

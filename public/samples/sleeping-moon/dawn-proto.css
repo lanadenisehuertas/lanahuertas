@@ -74,7 +74,7 @@
 .w-done { margin: 0; font: italic 400 20px/1.35 "Redaction", Georgia, serif; color: var(--ink); }
 .w-done:empty { display: none; }
 /* the answer to a letter (sent, or not sent) is written across the envelope's front, under the point of its flap */
-.talk .w-done { position: absolute; z-index: 3; left: 15%; right: 15%; bottom: 15cqi; text-align: center; font-size: clamp(17px, 5.4cqi, 21px);
+.talk .w-done { position: absolute; z-index: 3; left: 15%; right: 15%; bottom: 19cqi; text-align: center; font-size: clamp(17px, 5.4cqi, 21px);
   color: #2b1470; text-shadow: 0 0 6px #f6e6f0, 0 0 12px #f6e6f0; }
 
 /* ---------- the last stars: the sky is two fields side by side; the words for it sit right under them ---------- */

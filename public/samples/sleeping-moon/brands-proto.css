@@ -118,3 +118,5 @@ main > .b-end { padding-top: calc(4 * var(--u)); }
   .b-list { left: 12px; right: 12px; bottom: calc(100% - 12px); translate: none; width: auto; min-width: 0; max-height: calc(100svh - var(--band) - 110px); }
 }
 .issue span { display: none; }
+/* a control reached by Tab is brought clear of the masthead and of the foot with its brand pager, never left under them */
+html { scroll-padding: calc(var(--band) + 12px) 0 calc(var(--band) + 56px); }
