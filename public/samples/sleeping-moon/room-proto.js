@@ -794,6 +794,8 @@
       inView = false; cover(false); return;
     }
     if (!ready) return;
+    // on a phone the room is not built while the page is more than a screen past it (takeDown, below)
+    if (!built && SM.COLUMN.matches) { if (!UNIT) stageSize(); if (scrollT() > SPAN + 1) { inView = false; cover(false); return; } }
     build();
     spoke = true;
     const t = scrollT();
@@ -807,9 +809,28 @@
       // the role's awake letters are made visible one by one, so hiding the room alone would leave them standing over
       // the moon: past the room its words are faded right out as well (the next frame inside the room gives them back)
       if (t > SPAN && words) op(words, 0);
+      if (t > SPAN + 1.5 && SM.COLUMN.matches) takeDown();
       cover(false); return;
     }
     kick();
+  };
+  /* On a phone the room is taken down altogether once the page is a screen and a half past it: its planes, its pictures,
+     their canvases and the bitmaps drawn for its walls are all let go, so the stops further down have the phone's memory
+     to themselves. It is built again, as it was (the things already woken stay awake), as soon as the page comes back
+     within a screen of it, so it is standing again before any of it can be seen. An iPhone keeps everything a page has
+     drawn until the page lets it go, and the room built again on top of all the stops the page had been through was
+     more than it would hold: the tab closed as the reader came back up to the top. */
+  const takeDown = () => {
+    if (!built) return;
+    cancelAnimationFrame(raf); raf = 0;
+    SM.forget(host);
+    host.textContent = "";
+    while (blobs.length) URL.revokeObjectURL(blobs.pop());
+    built = ""; els = {}; pics = []; loads = []; blooms = []; roleCh = []; roleN = -1; lastSpell = -1; softFor = -1;
+    fades = { near: [], lines: [], shades: [], room: [] };
+    view = world = words = night = circle = halo = flash = vig = sky = moon = skip = beam = glassEl = null;
+    echo = echoG = sharp = soft = cctx = null; echoOn = false;
+    memo.clear(); memoAt = ""; dollyKey = ""; host._v = "";
   };
   SM.scrub(run);
   // the quiet switch can be thrown while the page is still: the room then takes its words back at once
@@ -825,7 +846,8 @@
     Promise.all([...loads, ...imgs]).then(done, done);
   })));
   let rz = 0;
-  addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (!set) return; if (built !== roomKey()) build(); else fit(); run(); }, 160); });
+  // (a room taken down on a phone is left down: run builds it again if the page is near it)
+  addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (!set) return; if (!built) UNIT = 0; else if (built !== roomKey()) build(); else fit(); run(); }, 160); });
 
   /* skipping the intro goes straight to the moon's stop with its doors drawn in. From the keyboard, the focus goes on to
      the first door; a click or a tap leaves the doors asleep, so the stop is seen as it rests, with the name whole (a

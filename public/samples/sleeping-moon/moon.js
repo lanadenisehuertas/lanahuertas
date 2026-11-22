@@ -203,6 +203,8 @@ const SM = (() => {
       const cs = getComputedStyle(this.pic);
       this.ink = rgb(cs.getPropertyValue("--ink") || "#b9a2ff");
       this.paper = this.kind === "photo" || this.kind === "paint" ? rgb(cs.getPropertyValue("--ground") || "#0c0620") : null;
+      // colours asked for while the picture had let go of its images (recolour) are the ones it is built in
+      if (this.tint) { const [i, g] = this.tint; this.tint = null; if (i) this.ink = rgb(i); if (g && this.paper) this.paper = rgb(g); }
       // a bitmap's cells are the old size: coarse enough to read as cells, finer on small things (data-cell scales them);
       // a smooth picture's canvas is fine enough to look smooth when scaled, coarse enough to redraw every frame
       const cell = this.bits ? Math.max(2, Math.round(u() * (w > u() * 22 ? 0.28 : 0.14) * (parseFloat(this.pic.dataset.cell) || 1)))
@@ -356,6 +358,8 @@ const SM = (() => {
     /** read the colours again (after --ink or --ground changed) and redraw */
     recolour(inkC, groundC) {
       if (!this.image) return;
+      // a picture far from the screen has let go of its images (far, below): the colours wait for its next build
+      if (!this.imgs) { this.tint = [inkC, groundC]; return; }
       // the caller may say what the colours now are, which spares the browser a restyle to work them out
       const cs = inkC && (groundC || !this.paper) ? null : getComputedStyle(this.pic);
       const ink = rgb(inkC || cs.getPropertyValue("--ink") || "#b9a2ff"), paper = this.paper ? rgb(groundC || cs.getPropertyValue("--ground") || "#0c0620") : null;
@@ -383,6 +387,18 @@ const SM = (() => {
     if (e.isIntersecting) { near.add(bm); bm.load().then(() => { if (!bm.entered && !bm.pic.dataset.enter) { bm.entered = true; bm.to("show", 1, 320); } tick(); }).catch(() => bm.pic.classList.add("plain")); }
     else near.delete(bm);
   }), { rootMargin: "25% 0px" });
+  /* On a phone, a picture more than a screen and a half from the window lets go of its decoded images, and keeps only
+     the cells read from them, which are all it needs to be drawn. Each picture holds its images decoded so its cells
+     can be read again (on a resize, or a new colour), and with every picture of every stop the page had been through,
+     they came to some 75MB that an iPhone could never take back. As the picture comes near again they are decoded
+     afresh from the browser's cache and its cells read again, before it is on the screen. */
+  const far = new IntersectionObserver((es) => es.forEach((e) => {
+    const bm = e.target._bm;
+    if (!bm || !bm.image) return;
+    if (!e.isIntersecting) {
+      if (COLUMN.matches && bm.imgs) { bm.imgs.forEach((im) => im.close && im.close()); bm.imgs = null; bm.loading = null; }
+    } else if (!bm.loading) bm.load().catch(() => {});
+  }), { rootMargin: "150% 0px" });
   /** run fn once, as soon as el (or the stop it sits in) is within a screen of the window: rooms far down the page
       fetch and build their pictures then, not while the first screen is still arriving */
   const whenNear = (el, fn) => {
@@ -400,7 +416,7 @@ const SM = (() => {
   };
   /** make every .pic inside scope a bitmap; returns them. data-enter="manual" leaves the drawing-in to the page. */
   const pictures = (scope = document) => $$(".pic", scope).filter((p) => !p._bm).map((p) => {
-    const b = new Bitmap(p); io.observe(p);
+    const b = new Bitmap(p); io.observe(p); far.observe(p);
     // a picture that is not part of a link or button wakes under the pointer by itself, and stays revealed for a minute after
     if (!p.closest("a, button") && !p.hasAttribute("data-still")) {
       // the light spreads from where the pointer came in (read once, at the moment it comes in)
@@ -423,6 +439,18 @@ const SM = (() => {
     return b;
   });
   const bitmap = (el) => el && (el._bm || ($(".pic", el) || {})._bm);
+  /** let go of every picture inside scope, before scope is emptied: the engine stops watching and drawing them, any build
+      or fade still under way for them comes to nothing, and their cells and canvases can be freed (a room that takes
+      itself down on a phone hands its pictures back this way, room-proto.js) */
+  const forget = (scope) => all.forEach((b) => {
+    if (!scope.contains(b.pic)) return;
+    all.delete(b); near.delete(b); io.unobserve(b.pic); far.unobserve(b.pic);
+    Object.values(b.timers).forEach((t) => { cancelAnimationFrame(t); clearTimeout(t); });
+    b.gen = (b.gen || 0) + 1;
+    if (b.imgs) b.imgs.forEach((im) => im.close && im.close());
+    b.imgs = b.image = b.a = b.b = b.thr = b.seam = b.ord = b.pord = null;
+    b.canvas.width = b.canvas.height = 0;
+  });
 
   /* ====================================================================== pointing wakes
      A picture wakes whole when the pointer is on it (or its link is hovered, focused or tapped: see wakeable).
@@ -1321,5 +1349,5 @@ const SM = (() => {
     try { items[j].focus({ preventScroll: true }); } finally { arrowing = false; }
     go(j);
   });
-  return { $, $$, u, quiet, HOVER, COLUMN, Bitmap, pictures, bitmap, type, swap, say, go, glide, scrub, where, whenNear, smooth, bloom, band, tone, blend, travel, view, wakeable, arrows, stars, tick, moonSvg, start, arrow, corners, steps, setSteps, landing, pager, onStop: (fn) => listeners.push(fn), get stop() { return current; }, get placedGen() { return gen; }, get moving() { return !!frameReq; }, get arrowing() { return arrowing; }, measure: (fn) => { measures.add(fn); return () => measures.delete(fn); }, get y() { return readY(); }, get vw() { return VW; }, get vh() { return VH; } };
+  return { $, $$, u, quiet, HOVER, COLUMN, Bitmap, pictures, bitmap, forget, type, swap, say, go, glide, scrub, where, whenNear, smooth, bloom, band, tone, blend, travel, view, wakeable, arrows, stars, tick, moonSvg, start, arrow, corners, steps, setSteps, landing, pager, onStop: (fn) => listeners.push(fn), get stop() { return current; }, get placedGen() { return gen; }, get moving() { return !!frameReq; }, get arrowing() { return arrowing; }, measure: (fn) => { measures.add(fn); return () => measures.delete(fn); }, get y() { return readY(); }, get vw() { return VW; }, get vh() { return VH; } };
 })();
