@@ -863,7 +863,7 @@ body {
     z-index: 70;
     pointer-events: none;
     translate: -50% -50%;
-    animation: trail 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: trail 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   .trail-star svg {
@@ -873,8 +873,8 @@ body {
   }
 
   @keyframes trail {
-    0% { opacity: 1; transform: scale(0.2) rotate(0deg); }
-    40% { opacity: 1; transform: translate(calc(var(--dx) * 0.4), -6px) scale(1) rotate(var(--rot)); }
+    0% { opacity: 0.6; transform: scale(0.2) rotate(0deg); }
+    40% { opacity: 0.6; transform: translate(calc(var(--dx) * 0.4), -6px) scale(1) rotate(var(--rot)); }
     100% { opacity: 0; transform: translate(var(--dx), 18px) scale(0.3) rotate(calc(var(--rot) * 2)); }
   }
 
@@ -1553,18 +1553,44 @@ html[data-lite] .art-wing {
   animation: none;
 }
 
-@media (max-width: 640px) {
+/* Phones and touch tablets keep every loop, reveal and reaction but drop
+ * what costs GPU memory: blur (filter and backdrop), the speckle grain
+ * filter, and will-change layer promotion. Mobile Safari kills the tab when
+ * too many large layers are live at once, and scrolling re-composites all of
+ * them every frame. Panels get a more opaque fill in place of the frost. */
+@media (hover: none), (max-width: 767px) {
   .dof-far,
   .dof-mid,
-  .dof-near { filter: none; }
+  .dof-near,
+  .tile[data-rv],
+  .focus-rv[data-rv],
+  g[filter] { filter: none; }
   .dof-near { opacity: 0.55; }
   .sky-extra,
   .shoot { display: none; }
+
+  .glass,
+  .masthead.is-scrolled,
+  .bs-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .glass { background-color: color-mix(in srgb, #fffaf0 92%, transparent); }
+  .masthead.is-scrolled { background-color: color-mix(in srgb, var(--color-paper) 96%, transparent); }
+  .bs-card { background-color: color-mix(in srgb, #fffaf0 97%, transparent); }
+
+  .sway,
+  .spin-slow,
+  .drift-x,
+  .drift-y,
+  .flutter,
+  .orbit-spin,
+  .float-badge { will-change: auto; }
 }
 
 /* --- Opening screen (GardenLoader) --------------------------------------------
  * Dawn sky, a pixel flower blooming in dither order, a line of mono text.
- * Lifts when <html> gets .garden-ready; lifts on its own at 4.5s regardless.
+ * Lifts when <html> gets .garden-ready; lifts on its own at 3s regardless.
  */
 #garden-loader {
   position: fixed;
@@ -1578,7 +1604,7 @@ html[data-lite] .art-wing {
     radial-gradient(40% 36% at 50% 46%, #fff6ea 0%, transparent 72%),
     linear-gradient(180deg, #c8d0f6 0%, #c9b9ec 38%, #f2b8cf 72%, #f6d3c3 100%);
   transition: opacity 650ms var(--ease-mist), visibility 0s linear 650ms;
-  animation: loader-out 600ms ease-out 4.5s forwards;
+  animation: loader-out 600ms ease-out 3s forwards;
 }
 
 html.garden-ready #garden-loader {

@@ -6,7 +6,7 @@
  * Server-rendered HTML and CSS only, so it is there on the very first paint
  * with no JavaScript. The inline script in the layout lifts it once the page
  * has loaded (never sooner than ~0.7s, so it doesn't flash), and skips it on
- * later visits in the same session. If scripts fail, CSS lifts it at 4.5s.
+ * later visits in the same session. If scripts fail, CSS lifts it at 3s.
  */
 const FLOWER = [
   "...###...",

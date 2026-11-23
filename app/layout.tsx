@@ -169,14 +169,14 @@ export default function RootLayout({
         <GardenLoader />
         {/*
          * Lift the opening screen when the page has loaded — never before
-         * ~0.7s so it doesn't flash, never after 3.5s — then tell the page
+         * ~0.7s so it doesn't flash, never after 2.5s — then tell the page
          * (MorphName waits for this before its first wave). Seen once per
          * session; later loads skip straight in.
          */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}try{if(sessionStorage.getItem('garden-seen')){go();return}}catch(e){}var t0=performance.now();function later(){setTimeout(go,Math.max(0,700-(performance.now()-t0)))}if(document.readyState==='complete')later();else window.addEventListener('load',later);setTimeout(go,3500)})();",
+              "(function(){var d=document.documentElement,done=false;function go(){if(done)return;done=true;d.classList.add('garden-ready');window.__gardenReady=true;window.dispatchEvent(new Event('garden:ready'));try{sessionStorage.setItem('garden-seen','1')}catch(e){}}try{if(sessionStorage.getItem('garden-seen')){go();return}}catch(e){}var t0=performance.now();function later(){setTimeout(go,Math.max(0,700-(performance.now()-t0)))}if(document.readyState==='complete')later();else window.addEventListener('load',later);setTimeout(go,2500)})();",
           }}
         />
         {/*

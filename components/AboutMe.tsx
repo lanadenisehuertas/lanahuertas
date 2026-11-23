@@ -54,6 +54,8 @@ export default function AboutMe() {
             alt="Lana Denise Huertas"
             width={1136}
             height={1200}
+            loading="lazy"
+            decoding="async"
             className="relative block aspect-[1136/1200] w-full rounded-[4px] border border-ink/40 object-cover object-top"
           />
 

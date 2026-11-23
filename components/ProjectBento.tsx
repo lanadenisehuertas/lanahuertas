@@ -107,7 +107,7 @@ export default function ProjectBento({
                 alt=""
                 width={cover.w}
                 height={cover.h}
-                loading={i < 8 ? "eager" : "lazy"}
+                loading={i < 4 ? "eager" : "lazy"}
                 decoding="async"
                 className="tile-img absolute inset-0 h-full w-full object-cover"
               />
