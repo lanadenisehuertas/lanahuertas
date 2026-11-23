@@ -306,8 +306,9 @@
     const ext = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3L3 13"/></svg>`;
     const right = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h12M9 3l5 5-5 5"/></svg>`;
     const pauseIcon = `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2v10M10 2v10"/></svg>`, playIcon = `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 2l9 5-9 5z"/></svg>`;
-    let paused = false, atQ = 0;   // atQ: how far through the room the scroll is, in plates (from the reel)
-    /** the film plays on the current plate only, unless paused; quiet mode keeps the still */
+    let paused = false;
+    /** the film plays on the current plate only, while its tab is the one open and it is not paused; quiet mode keeps
+        the still. The landing page's recording plays only while its own tab is open */
     const seen = new IntersectionObserver((es) => { es.forEach((e) => (e.target._seen = e.isIntersecting)); play(); }, { rootMargin: "10% 0px" });
     // the films are fetched only once the room is near: until then every plate shows its still (a film is half a megabyte)
     let near = false;
@@ -315,22 +316,24 @@
     let close = false;
     new IntersectionObserver((es) => { close = es[es.length - 1].isIntersecting; play(); }, { rootMargin: "15% 0px" }).observe(products);
     const play = () => $$(".reel-plate", products).forEach((pl) => {
-      const on = near && (narrow.matches ? pl._seen : pl.classList.contains("now"));
-      const img = $(".a-loop", pl), want = on && !paused && !SM.quiet() ? img.dataset.loop : img.dataset.poster;
+      const on = near && (narrow.matches ? pl._seen : pl.classList.contains("now")), tab = pl._tab || "film";
+      const img = $(".a-loop", pl), want = on && tab === "film" && !paused && !SM.quiet() ? img.dataset.loop : img.dataset.poster;
       if (img.getAttribute("src") !== want) img.setAttribute("src", want);
-      // the landing page's recording plays with the film, and only then (it is fetched the first time it is wanted)
+      // the landing page's recording plays while its tab is open, and only then (it is fetched the first time it is wanted)
       const v = $(".a-land-v", pl);
       if (v) {
-        const go = on && close && !paused && !SM.quiet();
+        const go = on && close && tab === "land" && !paused && !SM.quiet();
         if (go && !v.getAttribute("src")) v.src = v.dataset.src;
         if (go && v.paused) v.play().catch(() => {});
         // a recording that stops lets its file go, so at most one keeps a media player alive (a phone closes a page
         // that holds many); its poster shows again in the meantime
         else if (!go && v.getAttribute("src")) { v.pause(); v.removeAttribute("src"); v.load(); }
       }
-      const b = $(".a-pause", pl);
+      const b = $(".a-pause", pl), what = tab === "land" ? "recording" : "film";
       b.setAttribute("aria-pressed", String(paused));
-      b.innerHTML = paused ? `${playIcon}<span>Play the film</span>` : `${pauseIcon}<span>Pause the film</span>`;
+      b.innerHTML = paused ? `${playIcon}<span>Play the ${what}</span>` : `${pauseIcon}<span>Pause the ${what}</span>`;
+      // the control is for what moves; on a still screen it steps aside
+      b.hidden = tab !== "film" && tab !== "land";
     });
     /* ---------- the working pieces ----------
        Parked: the plates now give their room to the app's own interface, so these are not drawn. They are kept here
@@ -417,22 +420,32 @@
         input.addEventListener("input", split); split();
       },
     };
-    /* the app's own screens, beside its film: the visitor sees the whole of what was made, and each opens large */
+    /* the app's own interface, in one frame: a browser window for a desktop app or a game, a phone for a phone app,
+       as on the case-study page. Its tabs are the film of the app in use, the landing page (where there is a recording
+       of it) and each of its screens; one shows at a time, in the same frame, and a screen opens large on a tap */
     const SMALL = new Set(["psyclick"]);   // apps whose screens also come as small copies (name-sm.webp)
     const shotName = (src) => { const b = src.split("/").pop().replace(/\.webp$/, "").replace(/^(app|shot)-/, ""); return /debt/.test(b) ? "home" : b.replace(/-/g, " "); };
+    const title = (s) => s.charAt(0).toUpperCase() + s.slice(1);
     const shotList = (p) => p.shots.map(([src, w, h]) => ({ src, w, h, alt: `${p.t}, the ${shotName(src)} screen`, cap: `${p.t}, ${shotName(src)}` }));
-    /* a recording of an app's landing page, scrolled from top to bottom, leads its strip of screens */
+    /* a recording of an app's landing page, scrolled from top to bottom */
     const LAND = { psyclick: ["loops/psyclick-landing.mp4", "loops/psyclick-landing-poster.webp", 960, 600] };
-    /* the screens ride in a strip that the scroll carries past the film (or, for a phone app, in two columns that drift
-       against each other), so every screen is seen without a click; each still opens large */
-    const shotsHtml = (p) => {
-      const land = LAND[p.id];
-      const lead = land ? `<li class="a-land"><figure data-bloom><video class="a-land-v" muted loop playsinline preload="none" poster="${land[1]}" data-src="${land[0]}" width="${land[2]}" height="${land[3]}" aria-label="The ${esc(p.t)} landing page, scrolled from top to bottom"></video><figcaption>The landing page</figcaption></figure></li>` : "";
-      const tiles = p.shots.map(([src, w, h], k) => `<li><button class="a-shot" type="button" data-bloom data-k="${k}" aria-label="Open the ${esc(shotName(src))} screen large"><img src="${SMALL.has(p.id) ? src.replace(/\.webp$/, "-sm.webp") : src}" width="${w}" height="${h}" alt="" loading="lazy" decoding="async"></button></li>`).join("");
-      return `<div class="a-shots"><ul class="a-track" aria-label="${esc(p.t)} screens">${lead}${tiles}</ul></div>`;
+    const viewHtml = (p, f) => {
+      const [src, poster, w, h] = f.film, land = LAND[p.id], id = `a-${p.id}`;
+      const tabs = [["film", "Film"], ...(land ? [["land", "Landing page"]] : []), ...p.shots.map(([s], k) => [`s${k}`, title(shotName(s))])];
+      const tab = ([t, label], k) => `<button class="a-tab" type="button" role="tab" id="${id}-t-${t}" data-tab="${t}" aria-controls="${id}-p-${t}" aria-selected="${k === 0}" tabindex="${k === 0 ? 0 : -1}">${esc(label)}</button>`;
+      // each pane carries its own shape (ar), which a browser frame takes on while that pane is open (a phone keeps its own)
+      const pane = (t, inner, ar) => `<div class="a-pan" role="tabpanel" id="${id}-p-${t}" aria-labelledby="${id}-t-${t}" data-tab="${t}" data-ar="${ar}"${t === "film" ? "" : " hidden"}>${inner}</div>`;
+      const film = pane("film", `<picture data-bloom="0.5 0.5"><img class="a-loop" loading="lazy" src="${poster}" data-loop="${src}" data-poster="${poster}" width="${w}" height="${h}" alt="${esc(f.alt)}"></picture>`, `${w} / ${h}`);
+      const landP = land ? pane("land", `<video class="a-land-v" muted loop playsinline preload="none" poster="${land[1]}" data-src="${land[0]}" width="${land[2]}" height="${land[3]}" aria-label="The ${esc(p.t)} landing page, scrolled from top to bottom"></video>`, `${land[2]} / ${land[3]}`) : "";
+      const shots = p.shots.map(([s, sw, sh], k) => pane(`s${k}`, `<button class="a-shot" type="button" data-k="${k}" aria-label="Open the ${esc(shotName(s))} screen large"><img src="${SMALL.has(p.id) ? s.replace(/\.webp$/, "-sm.webp") : s}" width="${sw}" height="${sh}" alt="${esc(p.t)}, the ${esc(shotName(s))} screen" loading="lazy" decoding="async"></button>`, `${sw} / ${sh}`)).join("");
+      return `<figure class="a-film a-view">
+            <div class="a-bar"><span class="a-dots" aria-hidden="true"><i></i><i></i><i></i></span><div class="a-tabs" role="tablist" aria-label="${esc(p.t)}: the film and its screens">${tabs.map(tab).join("")}</div></div>
+            <div class="a-stage" style="--ar: ${w} / ${h}">${film}${landP}${shots}</div>
+            <figcaption><button class="a-pause" type="button" aria-pressed="false">${pauseIcon}<span>Pause the film</span></button></figcaption>
+          </figure>`;
     };
     const room = SM.reel(products, A.map((p) => {
-      const f = FILMS[p.id], [src, poster, w, h, shape] = f.film;
+      const f = FILMS[p.id], shape = f.film[4];
       const world = SM.world(p.ground, p.ink);
       return {
         name: p.t, ground: world.ground, ink: world.ink, backdrop: p.backdrop,
@@ -450,11 +463,7 @@
             </div>
             ${SM.steps("app")}
           </div>
-          <figure class="a-film">
-            <picture data-bloom="0.5 0.5"><img class="a-loop" loading="lazy" src="${poster}" data-loop="${src}" data-poster="${poster}" width="${w}" height="${h}" alt="${esc(f.alt)}"></picture>
-            <figcaption><button class="a-pause" type="button" aria-pressed="false">${pauseIcon}<span>Pause the film</span></button></figcaption>
-          </figure>
-          ${shotsHtml(p)}
+          ${viewHtml(p, f)}
         </div>`,
         setup: (el, it, i) => {
           SM.setSteps(el, i, N);
@@ -464,100 +473,33 @@
           $(".steps .next", el).addEventListener("click", () => room.jump(room.current + 1));
           $(".a-pause", el).addEventListener("click", () => { paused = !paused; play(); });
           $$(".a-shot", el).forEach((b) => b.addEventListener("click", () => SM.view(shotList(p), +b.dataset.k)));
+          /* the tabs: a tap opens one; the arrow keys, Home and End move along them and open as they go */
+          const tabs = $$(".a-tab", el), pans = $$(".a-pan", el), list = $(".a-tabs", el);
+          const pick = (k, focus) => {
+            tabs.forEach((t, j) => { t.setAttribute("aria-selected", String(j === k)); t.tabIndex = j === k ? 0 : -1; });
+            pans.forEach((pn, j) => (pn.hidden = j !== k));
+            $(".a-stage", el).style.setProperty("--ar", pans[k].dataset.ar);
+            el._tab = tabs[k].dataset.tab;
+            if (focus) tabs[k].focus({ preventScroll: true });
+            // the open tab is kept in view in its row (on a phone the row of tabs scrolls sideways)
+            const t = tabs[k], l = t.getBoundingClientRect().left - list.getBoundingClientRect().left + list.scrollLeft, r = l + t.offsetWidth;
+            if (l < list.scrollLeft || r > list.scrollLeft + list.clientWidth) list.scrollTo({ left: Math.max(0, l - 12), behavior: SM.quiet() ? "auto" : "smooth" });
+            play();
+          };
+          tabs.forEach((t, k) => t.addEventListener("click", () => pick(k)));
+          list.addEventListener("keydown", (e) => {
+            const at = tabs.indexOf(document.activeElement);
+            const k = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: tabs.length - 1 }[e.key];
+            if (at < 0 || k === undefined) return;
+            e.preventDefault(); e.stopPropagation();
+            pick((k + tabs.length) % tabs.length, true);
+          });
           seen.observe(el);
           play();
         },
       };
-    }), { step: 0.85, stack: narrow, paged: "all", onScrub: (q) => (atQ = q), onChange: (i) => { play(); stage.style.setProperty("--ink", SM.world(A[i].ground, A[i].ink).ink); stage.style.setProperty("--ground", SM.world(A[i].ground, A[i].ink).ground); } });
+    }), { step: 0.85, stack: narrow, paged: "all", onChange: (i) => { play(); stage.style.setProperty("--ink", SM.world(A[i].ground, A[i].ink).ink); stage.style.setProperty("--ground", SM.world(A[i].ground, A[i].ink).ground); } });
     $("#quiet")?.addEventListener("click", play);
-
-    /* the strip of screens follows the scroll: --p runs from 0 as a plate arrives to 1 as it leaves (its own pass through
-       the window, when the plates are stacked), and --travel is how far the strip must move to show its last screen */
-    const measure = () => $$(".a-shots", products).forEach((box) => {
-      const track = $(".a-track", box);
-      box.style.setProperty("--travel", Math.max(0, track.scrollWidth - box.clientWidth + 12).toFixed(0) + "px");
-    });
-    const drive = () => {
-      if (!SM.where(products).near) return;
-      $$(".reel-plate", products).forEach((pl) => {
-        const box = pl._shots || (pl._shots = $(".a-shots", pl));
-        if (!box) return;
-        if (!box._measured) { box._measured = true; measure(); }
-        let p;
-        // on a phone the strip waits at its start and is slid by hand (slide, below), not carried by the scroll
-        if (narrow.matches) p = 0;
-        // the first plate is whole from the start, so its strip waits there; a later one starts as it comes in over the last
-        else { const k = pl._k ?? 0; p = k ? clamp((atQ - k + 0.25) / 1.2) : clamp((atQ - 0.1) / 0.85); }
-        // a screen that has the keyboard's focus is brought into view, whatever the scroll says
-        const fx = box.contains(document.activeElement) && document.activeElement.closest("li");
-        if (fx && !narrow.matches) {
-          const travel = parseFloat(box.style.getPropertyValue("--travel")) || 0;
-          if (travel > 0) p = clamp((fx.offsetLeft + fx.offsetWidth / 2 - box.clientWidth / 2) / travel);
-        }
-        // the visitor's own slide is added to where the scroll has the strip (slide, below)
-        if (box._u) { const t = box._t || 1; box._u = Math.max(-p * t, Math.min((1 - p) * t, box._u)); p = clamp(p + box._u / t); }
-        // written on the strip, not its box, so only the strip and its screens are restyled
-        const P = p.toFixed(3), tr = box._tr || (box._tr = $(".a-track", box));
-        if (box._p !== P) { box._p = P; tr.style.setProperty("--p", P); }
-      });
-    };
-    SM.scrub(drive);
-    /* The strip can also be slid by hand: a finger swiped sideways across it (the page still scrolls up and down under a
-       vertical swipe), a mouse dragged along it, or a trackpad's sideways scroll. The slide is kept as an offset from
-       where the scroll has the strip, so scrolling still carries it on, and it is held inside the strip's two ends. A
-       swipe let go while moving glides on a little and settles. A drag that moved is not also a click on a screen. */
-    const slide = (box) => {
-      const track = $(".a-track", box);
-      if (!track || track._slide) return;
-      track._slide = true;
-      let id = null, x0 = 0, u0 = 0, lastX = 0, lastT = 0, v = 0, moved = false, fling = 0;
-      const travel = () => (box._t = parseFloat(box.style.getPropertyValue("--travel")) || 0);
-      const set = (u) => { box._u = u; requestAnimationFrame(drive); };
-      track.addEventListener("pointerdown", (e) => {
-        if (e.button > 0 || travel() <= 0) return;
-        cancelAnimationFrame(fling);
-        id = e.pointerId; x0 = lastX = e.clientX; lastT = e.timeStamp; u0 = box._u || 0; v = 0; moved = false;
-      });
-      track.addEventListener("pointermove", (e) => {
-        if (e.pointerId !== id) return;
-        const dx = e.clientX - x0;
-        if (!moved && Math.abs(dx) > 6) { moved = true; track.classList.add("sliding"); try { track.setPointerCapture(id); } catch (_) {} }
-        if (!moved) return;
-        const dt = Math.max(1, e.timeStamp - lastT);
-        v = 0.8 * ((lastX - e.clientX) / dt) + 0.2 * v; lastX = e.clientX; lastT = e.timeStamp;
-        set(u0 - dx);
-      });
-      const end = (e) => {
-        if (e.pointerId !== id) return;
-        id = null; track.classList.remove("sliding");
-        if (!moved || e.type === "pointercancel") return;
-        // the glide after a swipe: the release speed (px a millisecond) dies away over about half a second
-        let last = performance.now();
-        const go = (now) => {
-          const dt = Math.min(32, now - last); last = now;
-          v *= Math.pow(0.994, dt);
-          if (Math.abs(v) < 0.02) return;
-          set((box._u || 0) + v * dt);
-          fling = requestAnimationFrame(go);
-        };
-        fling = requestAnimationFrame(go);
-      };
-      track.addEventListener("pointerup", end);
-      track.addEventListener("pointercancel", end);
-      // a drag that moved the strip does not open the screen under the pointer
-      track.addEventListener("click", (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
-      track.addEventListener("dragstart", (e) => e.preventDefault());
-      // a trackpad's sideways scroll slides it too (a mostly upright one is left to the page)
-      track.addEventListener("wheel", (e) => {
-        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || travel() <= 0) return;
-        cancelAnimationFrame(fling);
-        set((box._u || 0) + e.deltaX);
-      }, { passive: true });
-    };
-    $$(".a-shots", products).forEach(slide);
-    products.addEventListener("focusin", (e) => { if (e.target.closest(".a-shots")) requestAnimationFrame(drive); });
-    addEventListener("resize", () => requestAnimationFrame(measure));
-    addEventListener("load", measure);
 
   }
 })();

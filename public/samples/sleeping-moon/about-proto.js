@@ -533,7 +533,8 @@
     let boardRead = null;
     SM.measure(() => { boardRead = boardAt(); });
     const board = () => {
-      const { w, pics } = boardRead || boardAt(); boardRead = null;
+      // q: quiet mode, where the board is drawn whole and holds still (only the visitor's own switch)
+      const { w, pics } = boardRead || boardAt(), q = still(); boardRead = null;
       if (!w.near) return;
       const vb = SM.COLUMN.matches ? "0 0 100 196" : "0 0 100 62.5";
       if (svg.getAttribute("viewBox") !== vb) svg.setAttribute("viewBox", vb);

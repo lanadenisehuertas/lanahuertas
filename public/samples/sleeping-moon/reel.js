@@ -331,7 +331,7 @@
     };
     addEventListener("keydown", (e) => {
       if (SM.stop !== stop || document.querySelector("dialog[open]") || e.altKey || e.ctrlKey || e.metaKey) return;
-      if (e.target.closest?.("input, textarea, [role=group]")) return;
+      if (e.target.closest?.("input, textarea, [role=group], [role=tablist]")) return;
       if (e.key === "ArrowRight") { e.preventDefault(); jump(cur + 1); }
       if (e.key === "ArrowLeft") { e.preventDefault(); jump(cur - 1); }
     });
@@ -392,6 +392,11 @@
             </button>
             ${row}
           </div>
+          <div class="s-nav" role="group" aria-label="${esc(b.name)} pieces">
+            <button class="arw prev s-prev" type="button" aria-label="Previous ${esc(b.name)} piece" disabled>${SM.arrow(-1)}</button>
+            <p class="s-count label" aria-live="polite"><span>1</span> / ${Math.min(N, 1 + more.length)}</p>
+            <button class="arw next s-next" type="button" aria-label="Next ${esc(b.name)} piece">${SM.arrow(1)}</button>
+          </div>
         </div>`,
         setup: (el, it, i) => {
           SM.setSteps(el, i, B.length);
@@ -417,6 +422,33 @@
           const refit = () => { if (!fitReq) fitReq = requestAnimationFrame(fit); };
           pieces.forEach((p) => $("img", p).addEventListener("load", refit, { once: true }));
           new ResizeObserver((es) => { const w = Math.round(es[0].contentRect.width); if (w !== fitW) { fitW = w; refit(); } }).observe(strip);
+          /* on phones the row is the brand's own gallery: a swipe across it, or its two arrows, go from piece to piece
+             (the pager leaves a swipe that starts on it alone); the brand's own arrows and the packets change brand */
+          const items = [$(".pk-card", el), ...pieces], nav = $(".s-nav", el), cnt = $(".s-count span", nav);
+          const prev = $(".s-prev", nav), next = $(".s-next", nav);
+          // where each piece starts along the row's own scroll (read only on a scroll of the row or a press of an arrow)
+          const left = (p) => p.getBoundingClientRect().left - strip.getBoundingClientRect().left + strip.scrollLeft;
+          const at = () => {
+            const x = strip.scrollLeft + 8;
+            let k = 0;
+            items.forEach((p, j) => { if (left(p) <= x) k = j; });
+            return strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 4 ? items.length - 1 : k;
+          };
+          let navReq = 0;
+          const sync = () => {
+            navReq = 0;
+            const k = at();
+            if (cnt.textContent !== String(k + 1)) cnt.textContent = k + 1;
+            prev.disabled = strip.scrollLeft <= 4;
+            next.disabled = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 4;
+          };
+          strip.addEventListener("scroll", () => { if (!navReq) navReq = requestAnimationFrame(sync); }, { passive: true });
+          const goTo = (d) => {
+            const k = Math.max(0, Math.min(items.length - 1, at() + d));
+            strip.scrollTo({ left: left(items[k]), behavior: SM.quiet() ? "auto" : "smooth" });
+          };
+          prev.addEventListener("click", () => goTo(-1));
+          next.addEventListener("click", () => goTo(1));
         },
       };
     }), { step: 0.85, paged: true, onMake: () => aimSoon(), onScrub: (q) => lift(q), onChange: (i) => tint(i) });

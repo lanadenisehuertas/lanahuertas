@@ -100,62 +100,50 @@ main > .stop.products { --a-ink: #b9a2ff; }
 .acts .go { margin-top: 0; }
 .acts .live { font-size: 18px; color: var(--text); }
 .acts .live svg { width: 15px; height: 15px; }
+/* the app's frame (rooms.js): a bar of tabs over one screen, as on the case-study page. A desktop app or a game sits
+   in a browser window, its tabs in the bar beside three dots; a phone app stands in a phone, its tabs in a column
+   beside it. The film of the app in use is the first tab; the landing page (where there is one) and each screen follow,
+   one at a time in the same frame, so the interface reads at its own size rather than as a strip of thumbnails. */
+.a-view { margin: 0; }
+.a-bar { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 10px; border: 1px solid var(--rule); border-bottom: 0;
+  border-radius: 12px 12px 0 0; background: color-mix(in srgb, var(--ground) 55%, #000); }
+.a-dots { display: inline-flex; gap: 6px; flex: none; }
+.a-dots i { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--rule); }
+.a-tabs { display: flex; gap: 4px; min-width: 0; overflow-x: auto; scrollbar-width: none; padding: 6px 2px; }
+.a-tabs::-webkit-scrollbar { display: none; }
+.a-tab { flex: none; min-height: 32px; padding: 0 12px; border-radius: 999px; font: 400 14px/1 var(--lab); color: var(--text); opacity: 0.74;
+  white-space: nowrap; transition: color 160ms, background-color 160ms, opacity 160ms; }
+.a-tab:hover { opacity: 1; color: var(--mark); }
+.a-tab[aria-selected="true"] { opacity: 1; color: var(--ground); background: var(--mark); }
+.a-tab:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; }
+.a-stage { position: relative; aspect-ratio: var(--ar, 16 / 10); overflow: hidden; border: 1px solid var(--rule); border-radius: 0 0 12px 12px;
+  background: #07040f; box-shadow: 0 calc(1.6 * var(--u)) calc(4 * var(--u)) rgb(0 0 0 / 0.6); }
+.a-pan { position: absolute; inset: 0; }
+.a-pan[hidden] { display: none; }
 /* the film's picture is what blooms in a handover, so it is a box of its own for the rim of moonlight over it */
-.a-film picture { display: block; position: relative; }
-.a-film img { display: block; width: 100%; height: auto; box-shadow: 0 calc(1.6 * var(--u)) calc(4 * var(--u)) rgb(0 0 0 / 0.6); }
+.a-pan picture, .a-pan video, .a-shot { display: block; position: relative; width: 100%; height: 100%; }
+.a-pan img, .a-pan video { display: block; width: 100%; height: 100%; object-fit: contain; }
+.a-shot { padding: 0; cursor: zoom-in; }
+.a-shot:focus-visible { outline: 2px solid var(--mark); outline-offset: -4px; }
 .a-film figcaption { position: absolute; left: 0; top: calc(100% + 4px); }
 .a-pause { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font: 400 16px/1 var(--lab); color: var(--text); }
+.a-pause[hidden] { display: none; }
 .a-pause:hover { color: var(--mark); }
 .a-pause svg { width: 14px; height: 14px; }
 .a-pause path { fill: currentColor; stroke: currentColor; stroke-width: 1.6; }
-/* Per shape, the film fills the room to the right of the words, so the interface reads close to its own size. A wide
-   desktop app runs nearly to the right edge at the board's middle height, a game window takes most of the room, and a
-   phone stands nearly the full height of the board with its pause control beside its foot. */
-.wide .a-film { left: calc(35 * var(--u)); top: calc(17 * var(--u)); width: calc(61 * var(--u)); }
-.wide .a-film img { border-radius: calc(0.6 * var(--u)); }
-.desk .a-film { left: calc(35 * var(--u)); top: calc(8.4 * var(--u)); width: calc(55 * var(--u)); }
-.desk .a-film img { image-rendering: pixelated; border-radius: calc(0.4 * var(--u)); }
-.phone .a-film { left: calc(49 * var(--u)); top: calc(5.4 * var(--u)); }
-.phone .a-film img { width: auto; height: calc(51 * var(--u)); border-radius: calc(2.8 * var(--u)); }
-.phone .a-film figcaption { left: calc(100% + 1.6 * var(--u)); top: auto; bottom: 0; white-space: nowrap; }
-/* the app's own screens, in full colour beside the film (rooms.js). For a wide or desktop app they ride in one strip
-   under the film that the scroll carries to the left, from the film's edge out past the window's edge, so every screen
-   passes in view without a click; for a phone app they stand in two columns that drift against each other. An app's
-   landing page, where there is a recording of it, leads the strip at a larger size. Each screen lifts a little under
-   the pointer and opens large in the viewer. */
-.a-shots { overflow: clip; padding-bottom: calc(3 * var(--u)); pointer-events: none; }
-.a-track { list-style: none; margin: 0; padding: 0; display: flex; align-items: flex-start; gap: calc(1.6 * var(--u)); width: max-content;
-  translate: calc(var(--p, 0) * var(--travel, 0px) * -1) 0; will-change: translate; }
-.a-track li { flex: none; width: calc(22 * var(--u)); pointer-events: auto; }
-/* the strip slides by hand as well as with the scroll (rooms.js): a sideways swipe is the strip's, an upright one still
-   scrolls the page; a mouse sees a hand that grips while it drags */
-.a-track { touch-action: pan-y; cursor: grab; pointer-events: auto; }
-.a-track.sliding { cursor: grabbing; }
-.a-track.sliding .a-shot { pointer-events: none; }
-.a-track img { -webkit-user-drag: none; user-select: none; }
-.phone .a-track { cursor: auto; }
-.a-shot { display: block; width: 100%; padding: 0; border-radius: calc(0.4 * var(--u)); overflow: hidden; cursor: zoom-in;
-  box-shadow: 0 calc(0.8 * var(--u)) calc(2.4 * var(--u)) rgb(0 0 0 / 0.55); transition: translate 160ms var(--pop); }
-.a-shot img { display: block; width: 100%; height: auto; }
-.a-shot:hover { translate: 0 -4px; }
-.a-shot:focus-visible { outline: 2px solid var(--mark); outline-offset: 4px; }
-.a-track .a-land { width: calc(32 * var(--u)); }
-.a-land figure { margin: 0; }
-.a-land video { display: block; width: 100%; height: auto; border-radius: calc(0.6 * var(--u)); box-shadow: 0 calc(0.8 * var(--u)) calc(2.4 * var(--u)) rgb(0 0 0 / 0.55); }
-.a-land figcaption { margin-top: 8px; font-size: 16px; line-height: 1.3; color: var(--text); }
-/* from the film's left edge to the window's right edge (the board is 100u wide and centred) */
-.wide .a-film { top: calc(10 * var(--u)); }
-.wide .a-shots { left: calc(35 * var(--u)); top: calc(33 * var(--u)); width: calc((100vw + 100 * var(--u)) / 2 - 35 * var(--u)); }
-.desk .a-film { width: calc(52 * var(--u)); }
-.desk .a-shots { left: calc(35 * var(--u)); top: calc(44.6 * var(--u)); width: calc((100vw + 100 * var(--u)) / 2 - 35 * var(--u)); }
-.desk .a-track li { width: calc(16 * var(--u)); }
-.phone .a-shots { left: calc(75 * var(--u)); top: calc(8 * var(--u)); width: calc(23 * var(--u)); overflow: visible; padding: 0; }
-.phone .a-track { display: grid; grid-template-columns: repeat(2, calc(10 * var(--u))); width: auto; translate: none; will-change: auto; }
-.phone .a-track li { width: auto; }
-.phone .a-track li:nth-child(odd) { translate: 0 calc((0.5 - var(--p, 0)) * 6 * var(--u)); }
-.phone .a-track li:nth-child(even) { translate: 0 calc((var(--p, 0) - 0.5) * 6 * var(--u) + 5 * var(--u)); }
-.phone .a-track:has(li:only-child) { grid-template-columns: calc(11 * var(--u)); }
-.phone .a-shot { border-radius: calc(1.2 * var(--u)); }
+/* Per shape, the frame fills the room to the right of the words, so the interface reads close to its own size. */
+.wide .a-view { left: calc(35 * var(--u)); top: calc(8 * var(--u)); width: calc(61 * var(--u)); }
+.desk .a-view { left: calc(35 * var(--u)); top: calc(8 * var(--u)); width: calc(54 * var(--u)); }
+.desk .a-pan img { image-rendering: pixelated; }
+/* a phone app: the tabs in a column, the phone beside them, the pause control under the tabs */
+.phone .a-view { left: calc(38 * var(--u)); top: calc(5.4 * var(--u)); display: grid; grid-template-columns: auto auto; grid-template-rows: 1fr auto;
+  column-gap: calc(2.4 * var(--u)); align-items: start; }
+.phone .a-bar { grid-column: 1; grid-row: 1; flex-direction: column; align-items: stretch; padding: 0; border: 0; background: none; }
+.phone .a-dots { display: none; }
+.phone .a-tabs { flex-direction: column; align-items: stretch; overflow: visible; padding: 0; }
+.phone .a-tab { text-align: left; min-height: 40px; padding: 0 16px; }
+.phone .a-stage { grid-column: 2; grid-row: 1 / 3; height: calc(51 * var(--u)); aspect-ratio: 780 / 1688; border-radius: calc(2.8 * var(--u)); }
+.phone .a-film figcaption { position: static; grid-column: 1; grid-row: 2; align-self: end; }
 
 /* the working pieces */
 .a-try { display: grid; gap: 12px; align-content: start; color: var(--text); }
@@ -228,6 +216,8 @@ main > .stop.products { --a-ink: #b9a2ff; }
   .products.paged .stage { display: grid; }
   .products.paged .stage { align-items: start; }
   .products.paged .reel-plate { grid-area: 1 / 1; align-self: start; }
+  /* an app that is not on show stands over the one that is, so the room is only as tall as the app on show */
+  .products.paged .reel-plate:not(.now) { position: absolute; inset: 0 0 auto; }
   /* products: the four apps one under another, no sticking */
   main > .stop.products { height: auto !important; }
   .products .stage { position: relative; height: auto; overflow: visible; display: block; }
@@ -235,24 +225,17 @@ main > .stop.products { --a-ink: #b9a2ff; }
   .products .r-board { height: auto; padding-bottom: 40px; }
   .products .r-glow { display: none; }
   .r-board.app > * { position: relative; left: auto; top: auto; right: auto; width: auto; }
-  /* The interface comes first and large. A wide or desktop film runs edge to edge; the wide one is cut to the left of
-     its frame, where the typing happens, so it is tall enough to read. A phone film stands nearly the width of the
-     screen. */
+  /* The interface comes first and large: the frame runs the width of the page, its tabs in a row that scrolls sideways
+     under a finger (the pager leaves a swipe that starts on the tabs alone). A phone app's phone stands centred under
+     its tabs. */
   .r-board.app .a-film { order: -1; justify-self: stretch; }
-  /* the film sits inside the page's margins with its corners kept, so it reads as a screen, not as the page running off the edge */
-  .r-board.app:is(.wide, .desk) .a-film img { border-radius: 10px; }
-  /* the wide films are shown whole: a crop would cut the app card in the recording in half */
-  .r-board.app.phone .a-film { justify-self: center; }
+  .r-board.app.phone .a-view { display: block; }
+  .phone .a-bar { flex-direction: row; justify-content: center; }
+  .phone .a-tabs { flex-direction: row; overflow-x: auto; }
+  .phone .a-tab { text-align: center; padding: 0 12px; }
+  .phone .a-stage { height: min(60svh, 130vw); margin: 10px auto 0; border-radius: 24px; }
   .a-film figcaption { position: static; }
-  .phone .a-film img { height: auto; width: min(80vw, 340px); border-radius: 28px; }
-  /* the screens follow the film as a strip that the scroll carries sideways as the plate passes up the screen */
-  .r-board.app .a-shots { order: -1; overflow: clip; padding-bottom: 8px; }
-  .r-board.app .a-track { display: flex; gap: 10px; width: max-content; translate: calc(var(--p, 0) * var(--travel, 0px) * -1) 0; will-change: translate; }
-  .r-board.app .a-track li { width: min(62vw, 420px); translate: none; }
-  .r-board.app.phone .a-track li { width: min(34vw, 200px); }
-  .r-board.app .a-track .a-land { width: min(80vw, 520px); }
-  .a-shot { border-radius: 10px; }
-  .phone .a-shot { border-radius: 18px; }
+  .phone .a-film figcaption { text-align: center; }
   .app .pk-text .say { display: block; }
   .acts { gap: 0 24px; }
 }

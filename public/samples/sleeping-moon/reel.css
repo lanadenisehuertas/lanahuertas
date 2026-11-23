@@ -64,6 +64,8 @@ main > .stop.reel { display: block; padding: 0; min-height: 0; }
 .s-col .s-piece { height: calc(15.3 * var(--u)); }
 .s-piece img { width: 100%; height: 100%; object-fit: cover; }
 .reel-plate .s-piece:hover { translate: 0 -4px; }
+/* the row's own arrows and count: phones only (below), where the row is a gallery of its own */
+.s-nav { display: none; }
 
 /* the holder: packets standing behind a carved rail on the ground under the work; three layers, all asleep in lilac */
 .holder { position: absolute; z-index: 40; left: calc(50% + 11.5 * var(--u)); top: calc(50% + 11.6 * var(--u)); width: calc(46 * var(--u)); height: calc(12 * var(--u)); translate: -50% 0; }
@@ -93,9 +95,15 @@ main > .stop.reel { display: block; padding: 0; min-height: 0; }
   /* the row scrolls sideways only: a few pixels of height overflow made it take vertical swipes, so the page stuck */
   .s-row { order: -1; height: 42svh; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; gap: 10px; align-items: stretch; }
   .s-row::-webkit-scrollbar { display: none; }
-  /* paged (SM.pager), a sideways swipe across the brand's pictures goes to the next brand rather than scrolling them;
-     a tap on any of them opens all of the brand's pictures large, to swipe through there */
-  .paged .s-row { overflow-x: clip; touch-action: pan-y; }
+  /* the row is the brand's own gallery: a sideways swipe across it goes through its pieces, one at a time, and never
+     on to the next brand (SM.pager leaves a swipe that starts on it alone); a tap on any piece opens it large */
+  .s-row { scroll-snap-type: x mandatory; touch-action: pan-x pan-y; }
+  .s-row > .pk-card, .s-row .s-piece { scroll-snap-align: start; }
+  /* its arrows and count ride the foot of the row, over the pictures, so they take no room from the words */
+  .s-nav { order: -1; position: relative; z-index: 3; display: flex; align-items: center; justify-content: space-between; margin-top: -60px; padding: 0 6px; pointer-events: none; }
+  .s-nav .arw { pointer-events: auto; color: #fff; background: rgb(8 4 20 / 0.62); border-radius: 50%; }
+  .s-nav .arw[disabled] { opacity: 0; }
+  .s-count { padding: 4px 10px; border-radius: 999px; color: #fff; background: rgb(8 4 20 / 0.62); font-variant-numeric: tabular-nums; }
   .s-piece[hidden] { display: block; }
   .s-col, .s-col[hidden] { display: contents; }
   .s-col .s-piece { height: auto; }
@@ -111,5 +119,6 @@ main > .stop.reel { display: block; padding: 0; min-height: 0; }
   #brands .r-board { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); grid-template-rows: auto; column-gap: 24px; padding: calc(var(--edge) + var(--band) + 8px) 24px 0; }
   #brands .pk-text { grid-column: 1; grid-row: 1; }
   #brands .s-row { order: 0; grid-column: 2; grid-row: 1; height: calc(100svh - var(--edge) - var(--band) - 8px - 20svh - 64px); }
+  #brands .s-nav { order: 0; grid-column: 2; grid-row: 2; margin-top: -60px; }
   #brands .holder { left: auto; right: 24px; translate: none; bottom: 52px; width: calc(20svh * 3.85); height: 20svh; }
 }

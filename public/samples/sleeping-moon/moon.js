@@ -1314,9 +1314,11 @@ const SM = (() => {
     pg.at = () => Math.round(pg.t - rest);
     // a swipe: a finger (or a mouse) moved mostly sideways by more than 40px goes one work on or back; an upright one
     // is left to the page, which scrolls on past the room. A swipe is not also a tap on what it started on.
+    // A swipe that starts on something that slides sideways itself (a brand's row of pieces, a row of tabs) belongs to
+    // that thing: it moves through the work's own pieces, never on to the next work.
     let sx = 0, sy = 0, id = null, swiped = false;
     stop.addEventListener("pointerdown", (e) => {
-      if (!pg.on || e.button > 0 || e.target.closest(".a-track, input, textarea, select")) { id = null; return; }
+      if (!pg.on || e.button > 0 || e.target.closest(".s-row, .s-nav, [role=tablist], input, textarea, select")) { id = null; return; }
       id = e.pointerId; sx = e.clientX; sy = e.clientY; swiped = false;
     }, { passive: true });
     stop.addEventListener("pointerup", (e) => {
