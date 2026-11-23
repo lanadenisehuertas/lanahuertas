@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A brand by Lana Huertas</title>
+<meta name="description" content="A brand identity by Lana Huertas: the key visual, the pieces made for it and its palette.">
+<meta name="theme-color" content="#000000">
+<link rel="preload" href="/samples/sleeping-moon/fonts/atkinson-next-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/samples/brand/fonts/Redaction35-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<!-- the smooth cut and its italic set the brand's name and tagline on the first screen; fetched early, so the text
+     is not set again in them once it has been laid out -->
+<link rel="preload" href="/samples/brand/fonts/Redaction-Italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/samples/brand/fonts/Redaction-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<!-- build:css moon.css reel.css brand.css -->
+<link rel="stylesheet" href="/samples/sleeping-moon/dist/a200a369.css">
+<!-- /build -->
+<script>
+/* Phones: the address bar slides away and back as you scroll, which changes innerHeight and fires "resize" on nearly
+   every swipe. The rooms are measured against innerHeight, so they would jump and the pictures would be redrawn each
+   time. On a touch screen the page keeps the height it had and takes a new one only when the width changes (the phone
+   is turned) or the height changes by more than an address bar would (the keyboard opens). */
+(() => {
+  if (!matchMedia("(pointer: coarse)").matches) return;
+  const d = Object.getOwnPropertyDescriptor(window, "innerHeight") || Object.getOwnPropertyDescriptor(Window.prototype, "innerHeight");
+  if (!d || !d.get || !d.configurable) return;
+  const real = () => d.get.call(window);
+  let w = innerWidth, h = real();
+  try { Object.defineProperty(window, "innerHeight", { configurable: true, get: () => h }); } catch (e) { return; }
+  addEventListener("resize", (e) => {
+    const nw = innerWidth, nh = real();
+    if (nw !== w || Math.abs(nh - h) > 160) { w = nw; h = nh; return; }
+    e.stopImmediatePropagation();
+  }, true);
+})();
+</script>
+<script>document.documentElement.classList.add("js"); try { localStorage.removeItem("quiet"); if (sessionStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
+<!-- build:js data.js -->
+<script src="/samples/sleeping-moon/dist/c1df12f2.js"></script>
+<!-- /build -->
+<!-- the brand is chosen from the address; the page takes the brand's own world (brand.js) -->
+<script>
+  var BRAND_AT = Math.max(0, DATA.brands.findIndex(function (b) { return b.slug === new URLSearchParams(location.search).get("b"); }));
+  var BRAND = DATA.brands[BRAND_AT];
+  document.title = BRAND.name + ", a brand by Lana Huertas";
+</script>
+<script>
+/* The pictures come in smaller copies (art/w, made by scripts/moon/variants.py at these widths, never wider than the
+   picture itself), so a phone fetches a picture at the size it shows it. srcsetOf(src, width) lists the copies and the
+   original; kvSizes(a, h) says how wide a key visual of width-to-height a is shown: on a phone or an upright screen
+   the width of the column, no taller than 62% of the window, and beside the words no wider than 52u nor taller than
+   h u. These are shared with brand.js, which writes the same lists into the page. */
+var VARIANTS = [320, 480, 960, 1600];
+function variant(src, w) { return "/samples/sleeping-moon/art/w" + src.replace(/\.[a-z0-9]+$/i, "") + "-" + w + ".webp"; }
+function srcsetOf(src, ow) { return VARIANTS.filter(function (w) { return w < ow; }).map(function (w) { return variant(src, w) + " " + w + "w"; }).concat(src + " " + ow + "w").join(", "); }
+function kvSizes(a, h) {
+  var col = "min(calc(100vw - 32px), " + (62 * a).toFixed(1) + "vh)";
+  return "(max-width: 760px) " + col + ", (max-aspect-ratio: 1/1) " + col + ", (max-height: 500px) " + col + ", min(52vw, " + (h * a).toFixed(1) + "vw)";
+}
+/* the key visual is the largest thing on the first screen, so it is asked for now, first, rather than once the page
+   has been laid out */
+(function () {
+  var i = BRAND.imgs[0], l = document.createElement("link");
+  l.rel = "preload"; l.as = "image"; l.href = i[0];
+  l.setAttribute("imagesrcset", srcsetOf(i[0], i[2])); l.setAttribute("imagesizes", kvSizes(i[2] / i[3], 48)); l.setAttribute("fetchpriority", "high");
+  document.head.appendChild(l);
+})();
+</script>
+</head>
+<body class="past brand-page" data-route="always">
+<a class="skip" href="#spec">Skip to the brand</a>
+
+<div class="chrome">
+  <header class="mast">
+    <p class="issue">The night almanac <span id="issue-stop">I Brands</span></p>
+    <div class="centre">
+      <nav class="route" id="route" aria-label="Stops">
+        <a class="home" href="/#moon" data-stop="moon" aria-label="Back to the moon"></a>
+        <a href="/#brands" data-stop="brands" aria-current="true"><i>I</i>Brands</a>
+        <a href="/#posters" data-stop="posters"><i>II</i>Posters</a>
+        <a href="/#films" data-stop="films"><i>III</i>Films</a>
+        <a href="/#products" data-stop="products"><i>IV</i>Products</a>
+        <a href="/#about" data-stop="about"><i>V</i>About</a>
+        <a href="/#talk" data-stop="talk"><i>VI</i>Contact</a>
+      </nav>
+    </div>
+    <div class="tools">
+      <button class="menu-btn" type="button" id="menu" aria-expanded="false">Menu</button>
+      <button class="switch" type="button" role="switch" aria-checked="false" id="quiet" aria-label="Quiet mode"><span>Quiet mode</span><i></i></button>
+    </div>
+  </header>
+  <footer class="foot">
+    <p class="live" id="live" aria-live="polite">Everything here is asleep. Bring your light to wake it.</p>
+    <p>Manila, 2026</p>
+  </footer>
+</div>
+
+<main id="page">
+  <noscript>
+    <section class="stop"><div class="plate"><p>This page needs JavaScript to lay out a brand. <a href="/#brands">Go back to the ten brands.</a></p></div></section>
+  </noscript>
+</main>
+
+<!-- build:js moon.js | brand.js -->
+<script src="/samples/sleeping-moon/dist/e9ca91c9.js"></script><script src="/samples/sleeping-moon/dist/a7e8f158.js"></script>
+<!-- /build -->
+</body>
+</html>

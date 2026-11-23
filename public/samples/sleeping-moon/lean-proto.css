@@ -1,0 +1,3 @@
+/* Phones: each stop below the moon's is drawn only while it is near the screen, and skipped altogether further away,
+   at the height it last had (lean-proto.js) */
+.lean main > section.stop:not(.hero) { content-visibility: auto; }

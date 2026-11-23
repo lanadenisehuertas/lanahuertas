@@ -1,0 +1,121 @@
+/* Stops III, V and VI: films, about, contact. Placed in u, on the centre axis or in columns mirrored about it.
+   Spacing steps: 0.6, 1.2, 2.4, 4.2, 6.6 u. No boxes, no outlines: things are separated by space, type and colour. */
+
+/* each stop keeps its own two colours, whatever the body is showing */
+#films, #about { --ground: #000; --ink: #b9a2ff; --text: #d9cfff; --mark: #fff1c9; --rule: rgb(185 162 255 / 0.5); color: var(--text); }
+.stop.dawn { --ground: #f3d9d6; --ink: #5b3fc4; --text: #2b1470; --mark: #2b1470; --rule: rgb(43 20 112 / 0.4); color: var(--text); }
+
+/* ---------- V About ---------- */
+/* the about stop ends on a stretch of empty night, so first light comes up behind nothing but the dawn */
+main > .stop.about { display: block; padding: 0 0 32svh; }
+
+/* 1. who: the portrait on the left, the statement set large beside it, both on one left edge */
+.me { position: relative; width: calc(100 * var(--u)); min-height: 100svh; margin: 0 auto; padding: calc(var(--band) + 6.6 * var(--u)) calc(6 * var(--u)) calc(4.2 * var(--u));
+  display: grid; grid-template-columns: calc(34 * var(--u)) minmax(0, 1fr); column-gap: calc(5 * var(--u)); align-items: center; }
+/* the hand mirror: the frame sleeps in lilac like the doors; the portrait in the glass wakes into colour when you arrive */
+.mirror { position: relative; z-index: 1; width: 100%; aspect-ratio: 1000 / 1323; }
+.me-pic { position: absolute; left: 16.6%; top: 14.8%; width: 66.4%; height: 70.2%; --pos: 50% 26%; clip-path: ellipse(50% 50% at 50% 50%); }
+.m-frame { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; }
+.m-frame .full { width: 100%; height: 100%; }
+.me-say { position: relative; z-index: 1; display: grid; gap: calc(1.8 * var(--u)); max-width: 22ch; font-size: clamp(30px, calc(4 * var(--u)), 62px); }
+.me-say .display { font-size: 1em; line-height: 1.08; color: var(--ink); letter-spacing: -0.01em; }
+.current .me-say .display { font-family: var(--display-awake); }
+.me-say .kick { font-family: "Redaction", Georgia, serif; font-style: italic; color: var(--mark); }
+.me-roles { max-width: 40ch; font: 400 18px/1.5 var(--body); color: var(--text); }
+
+/* 2. year by year: the years down the right; on the left a moon that stays in the window and waxes with them */
+.cal { position: relative; width: calc(100 * var(--u)); margin: 0 auto; padding: calc(6.6 * var(--u)) calc(6 * var(--u)) 0;
+  display: grid; grid-template-columns: calc(34 * var(--u)) minmax(0, 1fr); column-gap: calc(5 * var(--u)); align-items: start; }
+.cal-sky { position: sticky; top: calc(var(--band) + 3 * var(--u)); display: grid; justify-items: start; gap: calc(1.2 * var(--u)); }
+.cal-intro, .cal-pin { display: grid; justify-items: start; gap: calc(1.2 * var(--u)); }
+.cal-h { font: 400 clamp(30px, calc(3.4 * var(--u)), 52px) / 1 var(--display-awake); color: var(--ink); }
+.cal-key { max-width: 34ch; font-size: 17px; line-height: 1.5; color: var(--text); }
+.cal-moon { width: min(calc(22 * var(--u)), 27svh); min-width: 150px; margin-top: calc(1.2 * var(--u)); }
+/* the year under the moon rolls from one to the next with the scroll */
+.cal-year { height: 1em; overflow: hidden; font: 400 min(calc(8.4 * var(--u)), 11svh) / 1 var(--display-awake); letter-spacing: -0.02em; color: var(--mark); }
+.cal-roll { display: grid; will-change: transform; }
+.cal-roll span { display: block; height: 1em; }
+.cal-moons { display: flex; gap: calc(1.6 * var(--u)); margin-top: calc(0.6 * var(--u)); }
+.mo { display: grid; justify-items: center; gap: 6px; min-width: 44px; min-height: 44px; color: var(--ink); transition: translate 160ms var(--pop); }
+.mo-pic { width: calc(3.4 * var(--u)); min-width: 28px; }
+.mo-y { font: 400 16px/1 var(--lab); }
+.mo.on { translate: 0 -3px; }
+.mo[aria-current] { color: var(--mark); }
+.yrs { list-style: none; display: grid; gap: calc(9 * var(--u)); padding: calc(10 * var(--u)) 0 calc(14 * var(--u)); }
+/* every year keeps at least a stretch of scroll of its own, so a year with one entry holds the calendar as long as the
+   reader needs to take it in, instead of rolling straight on to the next */
+.yr { min-height: 40svh; align-content: start; }
+.yr { --in: 1; display: grid; gap: calc(2.4 * var(--u)); opacity: var(--in); transform: translate3d(0, calc((1 - var(--in)) * 3 * var(--u)), 0); }
+.yr-n { font: 400 calc(6 * var(--u)) / 0.9 var(--display-awake); letter-spacing: -0.02em; color: var(--ink); }
+.yr-list { list-style: none; display: grid; gap: calc(3 * var(--u)); max-width: 62ch; }
+.e-t { font: 400 clamp(22px, calc(2.3 * var(--u)), 34px) / 1.18 var(--display-awake); color: var(--ink); }
+.e-w { margin-top: 8px; font: 400 16px/1.3 var(--lab); color: var(--mark); }
+.yr-list ul { list-style: none; display: grid; gap: 8px; margin-top: 12px; }
+.yr-list ul li { font-size: 17px; line-height: 1.5; color: var(--text); }
+
+/* 3. what I work with: a plain index */
+.idx { width: calc(100 * var(--u)); margin: 0 auto; padding: calc(9 * var(--u)) calc(6 * var(--u)) 0; }
+.idx { display: grid; grid-template-columns: calc(30 * var(--u)) minmax(0, 1fr); column-gap: calc(5 * var(--u)); align-items: start; }
+.idx-h { font: 400 clamp(30px, calc(3.4 * var(--u)), 52px) / 1 var(--display-awake); color: var(--ink); }
+/* the index as running text, the way an almanac sets it: each group a sentence, its name set in italic */
+.idx-text { columns: 2; column-gap: calc(4 * var(--u)); }
+.idx-text p { break-inside: avoid; margin-bottom: calc(1.4 * var(--u)); font-size: 17px; line-height: 1.55; color: var(--text); }
+.idx-text i { font: italic 400 1.15em/1 "Redaction", Georgia, serif; color: var(--mark); margin-right: 4px; }
+
+/* ---------- VI Contact: first light. The scene's places are set in dawn-proto.css; these are its parts ---------- */
+main > .stop.talk { display: block; padding: 0; overflow: hidden; }
+.dawnboard { position: relative; width: calc(100 * var(--u)); height: max(100svh, calc(62.5 * var(--u))); margin: 0 auto; }
+/* the dawn behind Contact is the sky's own layer, fixed to the window and raised by the scroll (moon.js), so a contrast
+   checker looking for the colour behind these words finds the night's black under them instead of the dawn they are
+   read on. An empty background image here tells it that the ground is a picture it cannot read, and it leaves those
+   words to be checked by eye (dark ink on the dawn passes). Nothing is drawn */
+.talk .dawnboard { background-image: linear-gradient(transparent, transparent); }
+/* the envelope: back, letter, front pocket. Everything inside is measured in the envelope's own width (cqi) */
+.env { position: absolute; z-index: 2; left: 50%; top: calc(15 * var(--u)); width: calc(30 * var(--u)); aspect-ratio: 815 / 1035; translate: -50% 0; container-type: inline-size; }
+.env-back, .env-front { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.env-back { z-index: 0; } .env-front { z-index: 2; }
+/* --up (stops.js, from the scroll): the letter rises out of the envelope as the dawn comes up the window; --lift
+   (dawn-proto.js) draws it a little further out while a long message needs the room */
+.env { --up: 0; }
+.letter { position: absolute; z-index: 1; left: 9cqi; top: 46cqi; width: 82cqi; height: 104cqi; padding: 7cqi 7cqi 0; display: grid; align-content: start; justify-items: start; gap: 3.2cqi;
+  background: linear-gradient(#fffaf1, #fbefdf); color: #2b1470; box-shadow: 0 2cqi 6cqi rgb(80 40 90 / 0.22); rotate: calc(-1.2deg * var(--up));
+  transform: translate3d(0, calc(var(--up) * (-70cqi - var(--lift, 0px))), 0); }
+.t-big { font: 400 clamp(56px, calc(8.2 * var(--u)), 144px) / 0.86 var(--display-awake); letter-spacing: -0.02em; color: #2b1470; }
+.t-addr { font: italic 400 clamp(20px, calc(1.8 * var(--u)), 28px) / 1.1 "Redaction", Georgia, serif; color: #2b1470; white-space: nowrap;
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+.t-addr:hover { color: #5b3fc4; }
+.t-links svg path { fill: none; stroke: currentColor; stroke-width: 1.4; }
+.t-links svg { width: 14px; height: 14px; }
+/* the statement and the index come up as the scroll brings them into the window (stops.js) */
+.me-say > p, .idx-h, .idx-text p { --in: 1; opacity: var(--in); transform: translate3d(0, calc((1 - var(--in)) * 2.4 * var(--u)), 0); }
+
+/* ---------- phones and upright tablets: one column ---------- */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  main > .stop.about { padding-bottom: 40px; }
+  .me { width: 100%; min-height: 0; grid-template-columns: minmax(0, 1fr); row-gap: 28px; padding: calc(var(--band) + 24px) 16px 0; }
+  .mirror { width: min(74vw, 380px); justify-self: center; }
+  .me-say { font-size: 28px; gap: 16px; }
+  .cal, .idx { width: 100%; padding: 64px 16px 0; }
+  /* phones: the moon and the rolling year ride along the top of the window while the years pass under them */
+  .cal { grid-template-columns: minmax(0, 1fr); }
+  .cal-sky { display: contents; }
+  .cal-intro { gap: 10px; }
+  .cal-pin { position: sticky; top: var(--band); z-index: 2; grid-template-columns: auto 1fr; align-items: center; column-gap: 16px; row-gap: 6px; padding: 10px 0 16px;
+    background: linear-gradient(#000 82%, transparent);}
+  .cal-moon { width: 18vw; min-width: 0; margin: 0; }
+  .cal-year { font-size: 14vw; }
+  .cal-moons { grid-column: 1 / -1; justify-content: space-between; gap: 0; margin: 0; }
+  .mo-pic { width: 7vw; min-width: 0; }
+  .mo-y { display: none; }
+  .yrs { padding-top: 24px; gap: 64px; }
+  .yr { min-height: 38svh; }
+  .yr-n { font-size: 14vw; }
+  .idx { grid-template-columns: minmax(0, 1fr); row-gap: 20px; }
+  .idx-text { columns: 1; }
+  main > .stop.about { padding-bottom: 30svh; }
+
+  .dawnboard { width: 100%; height: auto; display: flex; flex-direction: column; align-items: center; text-align: center; padding: calc(var(--band) + 24px) 16px 0; }
+  .env { position: relative; left: auto; top: auto; translate: none; width: min(84vw, 420px); }
+}
+/* the dawn's links and fields, reached by Tab, are brought clear of the masthead and the foot rather than left under them */
+#talk :is(a, button, input, textarea) { scroll-margin-block: calc(var(--band) + 12px); }

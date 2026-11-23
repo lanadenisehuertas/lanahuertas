@@ -1,0 +1,20 @@
+/* Prototype: accessibility fixes from the final audit (fix-proto.js). */
+
+/* the dawn ending: the masthead and foot in deep ink, which reads at AA on the pink sky (lilac ink did not, 3.95:1) */
+body:has(#talk.current) .mast, body:has(#talk.current) .foot { --ink: #2b1470 !important; --text: #2b1470 !important; }
+
+/* the phone menu's button stays above the open menu, so it can always close it */
+.menu-open #menu { position: relative; z-index: 61; }
+
+/* fields: the line under each one is clear at rest and thicker when focused, and every field is a full touch target */
+.fld input, .fld textarea { border-bottom-color: var(--ink); }
+.fld input { min-height: 44px; }
+.fld input:focus-visible, .fld textarea:focus-visible { box-shadow: 0 2px 0 var(--ink); }
+
+/* Bloom's day buttons sit on their world's ground, not see-through over a dithered picture */
+.bl-grid button { background: color-mix(in srgb, var(--a-ink, #b9a2ff) 16%, var(--ground, #0b1210)); }
+
+/* phones: the quiet switch is a full touch target */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .switch { min-width: 44px; justify-content: center; } }
+/* the open phone menu covers the page, so the way on at the foot goes while it is open: it stood over the menu's foot */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) { .menu-open .foot { visibility: hidden; } }

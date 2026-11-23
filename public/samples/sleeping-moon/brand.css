@@ -1,0 +1,77 @@
+/* A brand's page, on the same night as the first screen and the Brands room.
+   Each screen is a board 100u wide: the words in a left column 24u wide, the work to the right of them. Only the work
+   is in colour; the brands either side sleep in lilac until they are pointed at, like the doors. */
+
+.b-stop { color: var(--text); }
+/* the brand's world behind the page (brand.js): its ground, and its backdrop as flat tones, with a fall of the ground
+   colour on the left so the words read */
+.b-world { --a: 1; --f: 0; position: fixed; inset: 0; z-index: -1; overflow: hidden; background: var(--ground); pointer-events: none; }
+.b-world::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, var(--ground) 0%, color-mix(in srgb, var(--ground) 80%, transparent) 30%, color-mix(in srgb, var(--ground) 20%, transparent) 62%, transparent 85%); }
+.b-board { position: relative; width: calc(100 * var(--u)); min-height: calc(62.5 * var(--u)); display: grid;
+  grid-template-columns: calc(24 * var(--u)) minmax(0, 1fr); column-gap: calc(4 * var(--u)); align-items: start;
+  padding: calc(7.4 * var(--u)) calc(10 * var(--u)); }
+.b-board > :not(.corners) { position: relative; z-index: 1; }
+
+/* ---------- the words ---------- */
+.b-text { display: grid; gap: calc(0.9 * var(--u)); align-content: start; padding-top: calc(2.1 * var(--u)); }
+.b-name { font-size: clamp(38px, calc(4.4 * var(--u)), 68px); }
+/* a name with a long word (NEOSTALGIA) is set a size smaller, so it keeps to its column */
+.b-long .b-name { font-size: clamp(32px, calc(3.3 * var(--u)), 52px); }
+.b-text .say { font-size: 17px; line-height: 1.5; color: var(--text); max-width: 46ch; }
+.b-text .go { justify-self: start; }
+.b-text .go svg { width: 14px; height: 14px; }
+.swatches { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 4px 0; }
+.swatch { display: grid; justify-items: start; gap: 6px; font: 400 16px/1 var(--lab); color: var(--text); transition: transform 140ms var(--enter); }
+/* a near-black brand colour still shows on the night: each chip carries a faint lilac edge */
+.swatch i { display: block; width: 44px; height: 44px; background: var(--c); box-shadow: inset 0 0 0 1px rgb(185 162 255 / 0.28); }
+.swatch:hover { transform: translateY(-3px); color: var(--mark); }
+
+/* ---------- the key visual, with a soft light of the brand's own colour behind it, never a box ---------- */
+.b-work { display: grid; justify-items: start; }
+.b-glow { position: absolute; left: 50%; top: 50%; width: 130%; height: 120%; translate: -50% -50%; pointer-events: none; z-index: 0;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--glow) 20%, transparent), transparent); }
+/* the key visual is as wide as its column allows and no taller than --kvh. Its width is worked out from its own shape
+   (--a, width over height, set by the page) before the picture arrives, so nothing moves when it does */
+.kv { --kvh: calc(48 * var(--u)); position: relative; z-index: 1; display: block; width: min(100%, calc(var(--kvh) * var(--a, 1))); cursor: zoom-in; }
+.kv .pic .full { width: 100%; height: auto; }
+/* while the key visual sleeps, its photo lies under the canvas at a hundredth of its strength rather than none, which
+   no one can see but which lets the browser count it as painted when it arrives, as the canvas is. It is the same file
+   the canvas is drawn from, so nothing more is fetched */
+html.js:not(.quiet) .kv .pic:not(.awake):not(.plain) .full { opacity: 0.01; }
+
+/* ---------- the other pieces, each at its own shape, one height to a row ---------- */
+.b-sheet { grid-template-columns: minmax(0, 1fr); }
+.b-wall { display: flex; flex-wrap: wrap; align-items: end; gap: calc(1.8 * var(--u)) calc(1.4 * var(--u)); }
+.piece { flex: none; height: calc(19 * var(--u)); max-width: 100%; cursor: zoom-in; transition: transform 160ms var(--enter); }
+.piece img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.piece:hover, .piece.on { transform: translateY(-4px); }
+
+/* ---------- the brands either side ---------- */
+main > .b-end { min-height: 0; padding-bottom: calc(var(--edge) + var(--band) + 6 * var(--u)); }
+.b-onward { min-height: 0; padding-top: 0; padding-bottom: 0; align-items: end; }
+.b-near { display: flex; flex-wrap: wrap; gap: calc(4 * var(--u)); align-items: end; }
+.near { display: grid; justify-items: start; gap: 12px; transition: transform 160ms var(--enter); }
+.near .pic { height: calc(16 * var(--u)); min-height: 120px; width: auto; }
+.n-line { font: 400 clamp(22px, calc(2 * var(--u)), 30px) / 1.1 var(--display); color: var(--ink); }
+.n-line i { font-family: "Redaction", Georgia, serif; color: var(--mark); margin-right: 4px; }
+.near:hover, .near.on { transform: translateY(-4px); }
+.near.on .n-line { font-family: var(--display-awake); color: var(--mark); }
+
+.quiet .piece, .quiet .near, .quiet .swatch { transition: none; }
+
+/* ---------- phones and upright tablets: one column ---------- */
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .b-board { width: 100%; min-height: 0; grid-template-columns: minmax(0, 1fr); row-gap: 22px; padding: 8px 16px 24px; }
+  .b-glow { width: 100%; }
+  .b-world::after { background: color-mix(in srgb, var(--ground) 55%, transparent); }
+  .b-work { order: -1; justify-items: center; }
+  .b-text { padding-top: 0; }
+  .b-name { font-size: 40px; }
+  .kv { --kvh: 62svh; }
+  .b-wall { gap: 12px; }
+  .piece { height: auto; width: calc(50% - 6px); }
+  .b-near { gap: 16px; }
+  .near { width: calc(50% - 8px); }
+  .near .pic { height: auto; width: 100%; min-height: 0; }
+}

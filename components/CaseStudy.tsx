@@ -8,7 +8,7 @@ import { PixelFlower } from "./Ethereal";
  * Each project shows its real, live site as a device mockup. Add a project by
  * appending to `engineeringProjects` and giving it an entry here.
  */
-export const MOCKS = {
+const MOCKS = {
   psyclick: {
     kind: "browser" as const,
     // The live site opens on an animated intro, then lands on the hero. The
@@ -23,6 +23,13 @@ export const MOCKS = {
     src: "/work/shot-debtledger.webp",
     src2: undefined,
     url: "debt-ledger-puce.vercel.app",
+    app: false,
+  },
+  bloom: {
+    kind: "phone" as const,
+    src: "/work/bloom/today.webp",
+    src2: undefined,
+    url: "bloom-liart-delta.vercel.app",
     app: false,
   },
   algebrawl: {

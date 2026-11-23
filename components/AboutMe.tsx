@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { profile, toolkit, workTabs, engineeringProjects } from "@/lib/content";
+import { profile, toolkit, engineeringProjects } from "@/lib/content";
+import { displayTabs as workTabs } from "@/lib/tabs";
 import ToolBadge from "./ToolBadge";
 import { Lotus, Leaf, Sparkle4, Orb, Spiral, Bellflower } from "./Botanicals";
 import { Butterfly, PixelFlower, Star5, PixelArt } from "./Ethereal";
@@ -59,7 +60,7 @@ export default function AboutMe() {
             className="relative block aspect-[1136/1200] w-full rounded-[4px] border border-ink/40 object-cover object-top"
           />
 
-          <span className="type-pixel absolute -bottom-3 left-4 rounded-[3px] border border-ink/30 bg-paper px-2 py-0.5 text-[10px] text-ink/70">
+          <span className="type-pixel absolute -bottom-3 left-4 rounded-[3px] border border-ink/30 bg-paper px-2 py-0.5 text-[14px] text-ink/70">
             lana_huertas.jpg
           </span>
 
@@ -89,7 +90,8 @@ export default function AboutMe() {
             ))}
           </div>
 
-          <div aria-hidden className="pointer-events-none">
+          {/* on a phone only the first (lotus) and last (butterfly) stay */}
+          <div aria-hidden className="portrait-decor pointer-events-none">
             <div className="sl-sprout absolute -bottom-10 -left-12 z-10 w-28 sm:w-36" style={{ "--i": 1 } as CSSProperties} data-react="lotus">
               <span className="react block"><Lotus className="sway w-full" deep /></span>
             </div>
@@ -120,13 +122,13 @@ export default function AboutMe() {
 
       {/* Copy */}
       <div>
-        <p className="type-pixel text-[11px] text-ink/55">✦ Hello, I&apos;m Lana</p>
+        <p className="type-pixel text-[14px] text-ink/75">✦ Hello, I&apos;m Lana</p>
         <h3 className="type-display mt-3 text-[2rem] leading-[1.06] text-iris sm:text-[2.7rem]">
           {profile.aboutHeadline}
         </h3>
         <p className="type-display mt-2 text-3xl text-lavender italic sm:text-4xl">{profile.aboutKicker}</p>
 
-        <p className="mt-6 max-w-xl text-base leading-[1.75] text-ink/80 sm:text-[15px]">
+        <p className="mt-6 max-w-xl text-base leading-[1.75] text-ink/80 ">
           Publicity art, scalable templates and paced video edits for student organizations and clients, and,
           as a Computer Science student, the interfaces I design I can also build. Detail-obsessed and always on
           time.
@@ -146,7 +148,7 @@ export default function AboutMe() {
                 </p>
                 <Sparkle4 className="absolute top-2 right-2 h-3 w-3 text-white transition-transform duration-500 group-hover:rotate-180" />
               </div>
-              <p className="px-3 py-2 text-[12px] leading-snug text-ink/75">{s.label}</p>
+              <p className="px-3 py-2 text-[14px] leading-snug text-ink/75">{s.label}</p>
             </li>
           ))}
         </ul>

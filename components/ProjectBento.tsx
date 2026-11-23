@@ -128,7 +128,8 @@ export default function ProjectBento({
                 <span className="truncate text-[13px] leading-tight font-semibold tracking-[-0.01em]">
                   {p.title}
                 </span>
-                <span className="type-pixel shrink-0 text-[10px]">Open ↗</span>
+                {/* phones need the width for the title */}
+                <span className="type-pixel hidden shrink-0 text-[10px] sm:inline">Open ↗</span>
               </span>
             </span>
           </button>

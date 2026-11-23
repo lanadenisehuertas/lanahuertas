@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { workTabs, type Project } from "@/lib/content";
+import type { Project } from "@/lib/content";
+import { displayTabs as workTabs } from "@/lib/tabs";
 import Folder, { type FolderTab } from "./Folder";
 import ProjectModal from "./ProjectModal";
 import ProjectBento from "./ProjectBento";

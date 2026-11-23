@@ -5,14 +5,14 @@ import { useEffect } from "react";
 const STAR =
   '<svg viewBox="0 0 24 24"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>';
 const COLORS = ["#b9379d", "#e3a88a", "#a9b6f0", "#4f9a78", "#711e7b"];
-const DRIFT = ":is(.px, .orbit):not([data-idle] *)";
 
 /**
  * One pointer listener for the whole page:
  *
- *  - writes --px / --py (-1…1 from the viewport centre) on every on-screen
- *    `.px` / `.orbit` element, which reads them with its own --depth to
- *    drift in parallax;
+ *  - writes --px / --py (-1…1 from the viewport centre) into one style rule
+ *    that matches only `.px` and `.orbit`, which read them with their own
+ *    --depth to drift in parallax. Not on <html>: a custom property there
+ *    restyles every element on the page on every mouse move;
  *  - drops a short trail of four-point sparkles behind a mouse cursor.
  *
  * Both are skipped for touch input and for reduced motion.
@@ -21,6 +21,11 @@ export default function PointerFX() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+    const tag = document.createElement("style");
+    document.head.appendChild(tag);
+    const sheet = tag.sheet as CSSStyleSheet;
+    sheet.insertRule(":where(.px, .orbit) { --px: 0; --py: 0; }", 0);
+    const rule = (sheet.cssRules[0] as CSSStyleRule).style;
     let raf = 0;
     let x = 0;
     let y = 0;
@@ -53,15 +58,8 @@ export default function PointerFX() {
       if (!raf) {
         raf = requestAnimationFrame(() => {
           raf = 0;
-          // Written on each drifting element that is on screen, not on
-          // <html>: a custom property changed on the root restyles the whole
-          // page every frame. Sections off screen ([data-idle]) are skipped.
-          const vx = ((x / window.innerWidth) * 2 - 1).toFixed(3);
-          const vy = ((y / window.innerHeight) * 2 - 1).toFixed(3);
-          document.querySelectorAll<HTMLElement>(DRIFT).forEach((el) => {
-            el.style.setProperty("--px", vx);
-            el.style.setProperty("--py", vy);
-          });
+          rule.setProperty("--px", ((x / window.innerWidth) * 2 - 1).toFixed(3));
+          rule.setProperty("--py", ((y / window.innerHeight) * 2 - 1).toFixed(3));
         });
       }
       const now = performance.now();
@@ -78,6 +76,7 @@ export default function PointerFX() {
     return () => {
       window.removeEventListener("pointermove", onMove);
       cancelAnimationFrame(raf);
+      tag.remove();
     };
   }, []);
 

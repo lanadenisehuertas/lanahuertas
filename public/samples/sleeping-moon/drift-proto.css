@@ -1,0 +1,48 @@
+/* Prototype: everything alive (drift-proto.js). Idle motion runs as CSS animations on the individual transform
+   properties (translate, rotate, scale), which compose with the transform other scripts already own. The scroll's
+   wind and the pointer's pull reach the animations through three properties on each element: --lx and --ly (px) and
+   --w (deg). Each element gets its own amplitude (--a, --r), period and phase, so nothing moves in step. */
+
+@keyframes dr-bob { 0%, 100% { translate: var(--lx, 0px) calc(var(--ly, 0px) - var(--a, 4px)); } 50% { translate: var(--lx, 0px) calc(var(--ly, 0px) + var(--a, 4px)); } }
+@keyframes dr-sway { 0%, 100% { rotate: calc(var(--w, 0deg) - var(--r, 2deg)); } 50% { rotate: calc(var(--w, 0deg) + var(--r, 2deg)); } }
+@keyframes dr-breathe { 0%, 100% { scale: 1; rotate: calc(var(--w, 0deg) - var(--r, 1deg)); } 50% { scale: 1.02; rotate: calc(var(--w, 0deg) + var(--r, 1deg)); } }
+/* a moth's wings: two states, open and folded */
+@keyframes dr-flap { 0%, 100% { scale: 1 1; } 50% { scale: 0.78 1; } }
+/* a moth's wander: a slow loop with a dip in it */
+@keyframes dr-wander {
+  0%, 100% { translate: var(--lx, 0px) var(--ly, 0px); }
+  25% { translate: calc(var(--lx, 0px) + var(--a, 6px)) calc(var(--ly, 0px) - var(--a, 6px)); }
+  50% { translate: calc(var(--lx, 0px) + var(--a, 6px) * 0.4) calc(var(--ly, 0px) + var(--a, 6px) * 0.6); }
+  75% { translate: calc(var(--lx, 0px) - var(--a, 6px) * 0.8) calc(var(--ly, 0px) - var(--a, 6px) * 0.3); }
+}
+
+.dr-bob { animation: dr-bob var(--t, 5s) ease-in-out var(--d, 0s) infinite; }
+.dr-sway { animation: dr-sway var(--t, 6s) ease-in-out var(--d, 0s) infinite; }
+.dr-breathe { animation: dr-breathe var(--t, 8s) ease-in-out var(--d, 0s) infinite; }
+.dr-moth { animation: dr-flap var(--f, 900ms) steps(1, end) var(--d, 0s) infinite, dr-wander var(--t, 8s) ease-in-out var(--d, 0s) infinite; }
+.dr-float { animation: dr-wander var(--t, 8s) ease-in-out var(--d, 0s) infinite; }
+.dr-sway.lily, .dr-sway.t-lily { transform-origin: 50% 100%; }
+
+/* the corner moths and lilies and the letter at dawn: one loop each, on translate, scale or rotate alone, at fixed
+   sizes, and nothing written to them while the page moves (drift-proto.js), so the browser runs each loop by itself.
+   A moth wanders a slow loop and beats its wings four times on the way round */
+@keyframes dr-orn-moth {
+  0%, 100% { translate: 0 0; scale: 1 1; } 6% { scale: 0.8 1; } 12% { scale: 1 1; }
+  25% { translate: 6px -6px; scale: 1 1; } 31% { scale: 0.8 1; } 37% { scale: 1 1; }
+  50% { translate: 2px 4px; scale: 1 1; } 56% { scale: 0.8 1; } 62% { scale: 1 1; }
+  75% { translate: -5px -2px; scale: 1 1; } 81% { scale: 0.8 1; } 87% { scale: 1 1; }
+}
+@keyframes dr-orn-lily { 0%, 100% { rotate: -1.8deg; } 50% { rotate: 1.8deg; } }
+@keyframes dr-env { 0%, 100% { rotate: -0.6deg; } 50% { rotate: 0.6deg; } }
+.dr-orn-moth { animation: dr-orn-moth var(--t, 9s) ease-in-out var(--d, 0s) infinite; }
+.dr-orn-lily { animation: dr-orn-lily var(--t, 6s) ease-in-out var(--d, 0s) infinite; transform-origin: 50% 100%; }
+.dr-env { animation: dr-env var(--t, 8s) ease-in-out var(--d, 0s) infinite; transform-origin: 50% 100%; }
+
+/* off screen: the loop holds where it is until it comes back into view (drift-proto.js watches); the moon's stop holds
+   its loops too while the room's night still hides it whole (room-proto.js) */
+.dr-off, .room-covers #moon :is(.dr-bob, .dr-sway, .dr-breathe, .dr-moth, .dr-float, .dr-orn-moth, .dr-orn-lily) { animation-play-state: paused !important; }
+
+.quiet :is(.dr-bob, .dr-sway, .dr-breathe, .dr-moth, .dr-float, .dr-orn-moth, .dr-orn-lily, .dr-env) { animation: none; }
+
+/* the letter holds still while someone writes in it or reaches for its button */
+#talk .env.dr-env:hover, #talk .env.dr-env:focus-within { animation-play-state: paused; }

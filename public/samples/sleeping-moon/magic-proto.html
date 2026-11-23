@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lana Huertas, UI/UX and graphic designer in Manila</title>
+<meta name="description" content="Lana Huertas designs brands, posters, films and product screens in Manila, and builds some of them in code.">
+<meta name="theme-color" content="#000000">
+<link rel="canonical" href="https://portfolio-lanahuertas.vercel.app/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://portfolio-lanahuertas.vercel.app/">
+<meta property="og:title" content="Lana Huertas, UI/UX and graphic designer in Manila">
+<meta property="og:description" content="Lana Huertas designs brands, posters, films and product screens in Manila, and builds some of them in code.">
+<meta property="og:image" content="https://portfolio-lanahuertas.vercel.app/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/samples/sleeping-moon/fonts/atkinson-next-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/samples/brand/fonts/Redaction35-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<!-- the veil waits for the smooth cut and its italic too (magic-proto.js), so they are fetched with the coarse one -->
+<link rel="preload" href="/samples/brand/fonts/Redaction-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/samples/brand/fonts/Redaction-Italic.woff2" as="font" type="font/woff2" crossorigin>
+<!-- relative, like the images themselves, so the preload and the image are one request at "/" and at this file's own address -->
+<!-- the moon and the six doors are asked for at low priority: they are first seen only after the room, so the desk, the
+     type and the scripts come first, and the veil still waits for all of them (magic-proto.js) -->
+<link rel="preload" href="art/moon-asleep.webp" as="image" fetchpriority="low">
+<link rel="preload" href="art/room/desk-line.webp" as="image" fetchpriority="high">
+<!-- build:css moon.css journey.css reel.css rooms.css stops.css dawn-proto.css magic-proto.css spell-proto.css room-proto.css depth-proto.css trail-proto.css drift-proto.css words-proto.css about-proto.css fix-proto.css lean-proto.css -->
+<link rel="stylesheet" href="/samples/sleeping-moon/dist/9dbed7ee.css">
+<!-- /build -->
+<script>
+/* Phones: the address bar slides away and back as you scroll, which changes innerHeight and fires "resize" on nearly
+   every swipe. The rooms are measured against innerHeight, so they would jump and the pictures would be redrawn each
+   time. On a touch screen the page keeps the height it had and takes a new one only when the width changes (the phone
+   is turned) or the height changes by more than an address bar would (the keyboard opens). */
+(() => {
+  if (!matchMedia("(pointer: coarse)").matches) return;
+  const d = Object.getOwnPropertyDescriptor(window, "innerHeight") || Object.getOwnPropertyDescriptor(Window.prototype, "innerHeight");
+  if (!d || !d.get || !d.configurable) return;
+  const real = () => d.get.call(window);
+  // the width is kept the same way: on a phone, asking the browser for either measure makes it lay the whole page out
+  // first, so while the page loads, each script that asked would wait for a layout the next frame does again anyway.
+  // The kept width is the real one, taken afresh at every resize, so it never differs from what the browser would say
+  const dw = Object.getOwnPropertyDescriptor(window, "innerWidth") || Object.getOwnPropertyDescriptor(Window.prototype, "innerWidth");
+  const realW = dw && dw.get && dw.configurable ? () => dw.get.call(window) : null;
+  let w = realW ? realW() : innerWidth, h = real();
+  try { Object.defineProperty(window, "innerHeight", { configurable: true, get: () => h }); } catch (e) { return; }
+  if (realW) try { Object.defineProperty(window, "innerWidth", { configurable: true, get: () => w }); } catch (e) {}
+  addEventListener("resize", (e) => {
+    const nw = realW ? realW() : innerWidth, nh = real();
+    if (nw !== w || Math.abs(nh - h) > 160) { w = nw; h = nh; return; }
+    e.stopImmediatePropagation();
+  }, true);
+})();
+</script>
+<script>document.documentElement.classList.add("js", "loading", "has-study"); try { localStorage.removeItem("quiet"); if (sessionStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
+</head>
+<body data-route="room">
+<div class="veil" id="veil" role="status" aria-label="Loading"><div class="veil-moon" aria-hidden="true"></div><p class="veil-word display" aria-hidden="true">Waking the night</p></div>
+<a class="skip" href="#brands">Skip to the work</a>
+
+<!-- the fixed window every stop is seen through -->
+<div class="chrome">
+  <header class="mast">
+    <p class="issue">The night almanac <span id="issue-stop"></span></p>
+    <div class="centre">
+      <p class="sub" id="sub" aria-live="polite">UI/UX and graphic design, film and code, made in Manila by moonlight.</p>
+      <nav class="route" id="route" aria-label="Stops">
+        <a class="home" href="#moon" data-stop="moon" aria-label="Back to the moon"></a>
+        <a href="#brands" data-stop="brands"><i aria-hidden="true">I</i>Brands</a>
+        <a href="#posters" data-stop="posters"><i aria-hidden="true">II</i>Posters</a>
+        <a href="#films" data-stop="films"><i aria-hidden="true">III</i>Films</a>
+        <a href="#products" data-stop="products"><i aria-hidden="true">IV</i>Products</a>
+        <a href="#about" data-stop="about"><i aria-hidden="true">V</i>About</a>
+        <a href="#talk" data-stop="talk"><i aria-hidden="true">VI</i>Contact</a>
+      </nav>
+    </div>
+    <div class="tools">
+      <button class="menu-btn" type="button" id="menu" aria-expanded="false">Menu</button>
+      <button class="switch" type="button" role="switch" aria-checked="false" id="quiet" aria-label="Quiet mode"><span aria-hidden="true">Quiet mode</span><i></i></button>
+    </div>
+  </header>
+  <footer class="foot">
+    <p class="live" id="live">Everything here is asleep. Bring your light to wake it.</p>
+    <p>Manila, 2026</p>
+  </footer>
+</div>
+
+<main>
+  <!-- The moon: six doors around a sleeping moon -->
+  <!-- the room the page opens in (room-proto.js builds it); its place is held from the first paint so nothing moves -->
+  <section class="room-intro" aria-label="Intro"></section>
+  <section class="cast-ph" aria-hidden="true"></section>
+  <section class="stop hero" id="moon" data-name="The moon" data-land="end" data-hint="Everything here is asleep. Bring your light to wake it.">
+    <div class="hero-pin">
+    <div class="board" id="board">
+      <div class="stars" aria-hidden="true"></div>
+      <svg class="chart" viewBox="0 0 100 62.5" preserveAspectRatio="none" aria-hidden="true"></svg>
+
+      <!-- the corner flowers and moths are hidden on phones, so they wait to be near before they are fetched (the doors'
+           pictures are not cut smaller: the room at the start of the page shows the same files, larger) -->
+      <span class="pic orn o-tl" data-kind="line" data-enter="manual"><img class="full" src="art/e_moth.webp" width="744" height="396" alt="" loading="lazy"></span>
+      <span class="pic orn o-tr" data-kind="line" data-enter="manual"><img class="full" src="art/e_lily.webp" width="457" height="904" alt="" loading="lazy"></span>
+      <span class="pic orn o-bl" data-kind="line" data-enter="manual"><img class="full" src="art/e_lily.webp" width="457" height="904" alt="" loading="lazy"></span>
+      <span class="pic orn o-br" data-kind="line" data-enter="manual"><img class="full" src="art/e_moth.webp" width="744" height="396" alt="" loading="lazy"></span>
+
+      <!-- one 1-bit group: black is nothing, lilac is ink -->
+      <div class="xor">
+        <div class="pic moon" id="moonpic" data-kind="moon" data-alt="art/moon-awake.webp" data-enter="manual">
+          <img class="full" src="art/moon-asleep.webp" width="640" height="640" alt="" fetchpriority="low">
+        </div>
+        <h1 class="name display" id="name" aria-label="Lana Huertas"><span class="n-rest type" aria-hidden="true">Lana Huertas</span><span class="n-door" id="door" aria-hidden="true"></span></h1>
+      </div>
+
+      <nav class="doors" id="doors" aria-label="Lana's work">
+        <a class="door" href="#brands" data-stop="brands" data-door="Brands" data-line="Ten brands, each with a page of its own." style="--dx: -34.8; --cy: 12.2">
+          <span class="pic" data-enter="manual"><img class="full" src="art/c_brands.webp" width="520" height="336" alt="" fetchpriority="low"></span>
+          <span class="label"><i aria-hidden="true">I</i>Brands</span>
+        </a>
+        <a class="door" href="#posters" data-stop="posters" data-door="Posters" data-line="Eight one-off posters." style="--dx: -34.8; --cy: 25.4">
+          <span class="pic" data-enter="manual"><img class="full" src="art/c_posters.webp" width="267" height="520" alt="" fetchpriority="low"></span>
+          <span class="label"><i aria-hidden="true">II</i>Posters</span>
+        </a>
+        <a class="door" href="#films" data-stop="films" data-door="Films" data-line="Eleven films and edits." style="--dx: -34.8; --cy: 38.6">
+          <span class="pic" data-enter="manual"><img class="full" src="art/c_films.webp" width="520" height="473" alt="" fetchpriority="low"></span>
+          <span class="label"><i aria-hidden="true">III</i>Films</span>
+        </a>
+        <a class="door" href="#products" data-stop="products" data-door="Products" data-line="Four apps I designed and built." style="--dx: 34.8; --cy: 12.2">
+          <span class="pic" data-enter="manual"><img class="full" src="art/c_products.webp" width="264" height="520" alt="" fetchpriority="low"></span>
+          <span class="label"><i aria-hidden="true">IV</i>Products</span>
+        </a>
+        <a class="door" href="#about" data-stop="about" data-door="About" data-line="Who I am and where I have worked." style="--dx: 34.8; --cy: 25.4">
+          <span class="pic" data-enter="manual"><img class="full" src="art/c_about.webp" width="396" height="520" alt="" fetchpriority="low"></span>
+          <span class="label"><i aria-hidden="true">V</i>About</span>
+        </a>
+        <a class="door" href="#talk" data-stop="talk" data-door="Contact" data-line="Write to me. I reply within two days." style="--dx: 34.8; --cy: 38.6">
+          <span class="pic" data-enter="manual"><img class="full" src="art/c_contact.webp" width="520" height="434" alt="" fetchpriority="low"></span>
+          <span class="label"><i aria-hidden="true">VI</i>Contact</span>
+        </a>
+      </nav>
+
+      <!-- before the moon is up: the first screen is night falling, the moon under the horizon; scrolling raises it (journey.js) -->
+      <div class="prelude" id="prelude">
+        <p class="pl-title display type">Night falls in Manila.</p>
+        <p class="pl-line">Brands, posters, films and apps by Lana Huertas, asleep until the moon is up.</p>
+      </div>
+      <div class="horizon" aria-hidden="true"><svg viewBox="0 0 100 2" preserveAspectRatio="none"><line x1="0" y1="1" x2="100" y2="1"/></svg></div>
+    </div>
+    </div>
+  </section>
+
+  <!-- I Brands: a reel, one brand at a time (reel.js) -->
+  <section class="stop reel" id="brands" tabindex="-1" data-label="I Brands" data-hint="Ten brands, one at a time." aria-label="Brands">
+    <h2 class="vh">Brands</h2>
+    <div class="stage"></div>
+  </section>
+
+  <!-- II Posters, III Films and IV Products are rooms (rooms.js): the line, the timeline, the phone -->
+  <section class="stop pinned posters-room" id="posters" data-label="II Posters" data-hint="Eight posters on the line. Scroll to draw it along." aria-labelledby="posters-h">
+    <h2 class="vh" id="posters-h">Posters</h2>
+    <div class="stage" id="m-posters"></div>
+  </section>
+  <section class="stop pinned films-room" id="films" data-label="III Films" data-hint="Eleven films on one timeline. Scroll to play it." aria-labelledby="films-h">
+    <h2 class="vh" id="films-h">Films</h2>
+    <div class="stage" id="m-films"></div>
+  </section>
+  <section class="stop reel products" id="products" data-label="IV Products" data-hint="Four apps I designed and built." aria-labelledby="products-h">
+    <h2 class="vh" id="products-h">Products</h2>
+    <div class="stage"></div>
+  </section>
+  <section class="stop about" id="about" data-label="V About" data-hint="Lana Huertas, Manila." aria-labelledby="about-h">
+    <h2 class="vh" id="about-h">About</h2>
+    <div id="m-about"></div>
+  </section>
+  <section class="stop dawn talk" id="talk" data-sky="dawn" data-label="VI Contact" data-hint="First light. The moon goes to sleep.">
+    <div id="m-talk"></div>
+  </section>
+</main>
+
+<!-- build:js data.js moon.js journey.js | reel.js rooms.js stops.js | dawn-proto.js spell-proto.js room-proto.js depth-proto.js | magic-proto.js trail-proto.js drift-proto.js words-proto.js | about-proto.js fix-proto.js desc-proto.js lean-proto.js -->
+<script src="/samples/sleeping-moon/dist/330b84d3.js"></script><script src="/samples/sleeping-moon/dist/392ad36b.js"></script><script src="/samples/sleeping-moon/dist/ac23a8ec.js"></script><script src="/samples/sleeping-moon/dist/d53c8f8e.js"></script><script src="/samples/sleeping-moon/dist/15eb9f0c.js"></script>
+<!-- /build -->
+</body>
+</html>

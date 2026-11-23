@@ -1,0 +1,24 @@
+/* Prototype: words that answer the pointer (words-proto.js).
+   --wg is the light a word catches: the world's gold on the night, deep ink on the pink dawn. */
+main { --wg: var(--mark, #fff1c9); }
+#talk { --wg: #5b3fc4; }
+
+/* headings and titles, split into letters: near the pointer they lift, catch the light and wake into the smooth cut */
+/* (a letter is positioned only while something is laid over it, the decode's rune here and About's writing in
+   about-proto.css: a positioned element is a layer of its own, and a page of positioned letters makes every hit test
+   of the pointer slow) */
+.wl .ch { display: inline-block; transition: color 140ms linear; pointer-events: none; }
+.wl .ch.rn { position: relative; }
+.wl .ch.wk { font-family: var(--display-awake); color: var(--wg); }
+.wl.focus-lit .ch { font-family: var(--display-awake); color: var(--wg); }
+
+/* the decode: a letter shows a rune on top of itself while it is still being spelled; its own width never changes */
+.wl .ch.rn { color: transparent; }
+.wl .ch.rn::after { content: attr(data-g); position: absolute; left: 50%; top: 0; translate: -50% 0; color: var(--wg); font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "Apple Symbols", var(--body); font-style: normal; }
+
+/* body lines: the word under the pointer glows and its neighbours a little */
+.wd { display: inline-block; transition: color 420ms linear, text-shadow 420ms linear, translate 420ms var(--enter); }
+.wd.w1 { color: color-mix(in srgb, var(--wg) 55%, currentColor); transition-duration: 120ms; }
+.wd.w2 { color: var(--wg); translate: 0 -2px; text-shadow: 0 0 10px color-mix(in srgb, var(--wg) 45%, transparent); transition-duration: 120ms; }
+#talk .wd.w2 { text-shadow: none; }
+

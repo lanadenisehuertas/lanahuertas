@@ -1,0 +1,210 @@
+/* The dawn ending: the night almanac's last page, one scene at sunrise.
+   1. "Let's talk", set large on the left, with the address and its copy button under it, then the two profiles;
+   2. the envelope in the middle, its letter the form ("Dear Lana,": name, email, message, Send in the fold);
+   3. the last stars on the right: the visitors' stars in the upper sky, their words under them;
+   4. the horizon: a pixel sun coming up behind the envelope, so its disc and rays show either side of it, and a
+      valley of pixel hills in front, the six door objects standing on its steps in a shallow arc around the sun;
+   5. on the ground under all of it, the way back to the moon.
+   They are grouped by the space between them, never by boxes. On wide screens the envelope is sized from the window's
+   height, so the whole ending fits one screen. Phones: one column, from the sky down to the ground: the words, the
+   letter, the stars, the horizon, the way back. */
+
+.talk { --halo: #f3d9d6; }
+.end-h { margin: 0 0 6px; font: 400 clamp(32px, calc(3.2 * var(--u)), 54px) / 1 var(--display-awake); color: #2b1470; }
+.end-line { margin: 0 0 4px; font: 400 18px/1.45 var(--body); color: var(--text); }
+.talk form button, .ls button { border: 0; background-color: transparent; cursor: pointer; }
+
+/* ---------- the words: the headline, the address with its button, the profiles ---------- */
+.t-head { position: absolute; z-index: 5; display: grid; justify-items: start; text-align: left; }
+.talk .t-big { margin: 0 0 calc(2 * var(--u)) -0.04em; }
+.t-mail { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 calc(1.8 * var(--u)); margin: 0; }
+.talk .t-addr { min-height: 44px; display: inline-flex; align-items: center; }
+.t-links { display: flex; flex-wrap: wrap; gap: 0 calc(2.4 * var(--u)); margin-top: 2px; }
+.talk .t-links .go { font-size: 19px; color: #4a2f86; }
+
+/* ---------- the letter, set as a form, opening the way a letter does ---------- */
+.talk .letter { padding: 6cqi 6cqi 0; gap: 0; display: block; justify-items: stretch; overflow: visible; }
+.t-dear { margin: 0 0 1cqi; font: italic 400 clamp(24px, 9cqi, 40px) / 1.1 "Redaction", Georgia, serif; color: #2b1470; }
+.letter .fld { margin-top: 1.8cqi; }
+.letter .fld input, .letter .fld textarea { padding: 3px 0 4px; font-size: 17px; line-height: 1.4; }
+/* the letter's lines sit closer on a small envelope, so the message keeps its three lines and Send stays in sight */
+.letter .write { gap: clamp(4px, calc(5.5cqi - 12px), 12px); }
+/* the message is three lines tall at rest (two on the smallest envelopes, whose pocket would cover a third) and grows
+   as it is written (dawn-proto.js); past its room it scrolls, and only then shows a thin scrollbar in the letter's ink */
+.letter .fld textarea { height: calc(3lh + 9px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
+@container (max-width: 340px) { .letter .fld textarea { height: calc(2lh + 9px); } }
+/* while lines are scrolled away above it, the one cut at its top edge fades out instead of ending in a hard slice */
+.letter .fld textarea.over { mask-image: linear-gradient(transparent 3px, #000 0.8lh); }
+.lr { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+/* name and email share a line on the letter; a field that needs fixing says so where its label was */
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+.lr:has(.err:not(:empty)) .l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.lr .err { text-align: left; }
+.lr .err, .lr .more { margin: 0; font: 400 16px/1.3 var(--body); text-align: right; }
+/* Send sits in the fold of the envelope, under the last line */
+.letter .send-row { display: flex; justify-content: center; margin-top: 1.4cqi; }
+.letter .vs-make .row { justify-content: center; margin-top: 1cqi; }
+.letter .vs-make { gap: 0; }
+.letter .vs-make fieldset { margin-top: 1cqi; }
+.letter .vs-make legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.letter .opt { width: 44px; height: 44px; }
+/* a note the sky turns down says so where its counter was */
+.lr .err:not(:empty) ~ .more { display: none; }
+
+/* fields: words over a line, no boxes */
+.fld { display: block; }
+.fld .l { display: block; margin: 0 0 2px; font: 400 17px/1.3 var(--lab); color: var(--ink); }
+.fld input, .fld textarea { display: block; width: 100%; padding: 6px 0; border: 0; border-bottom: 2px solid var(--rule); border-radius: 0;
+  background: transparent; color: var(--text); font: 400 18px/1.45 var(--body); resize: none; }
+.fld input:focus, .fld textarea:focus { outline: none; border-bottom-color: var(--ink); }
+/* the field being written in also draws its line a pixel heavier, so the focus reads at a glance; the field's box
+   (fixed for the message, and pulled back a pixel for the others) keeps its size, so nothing under it moves */
+.fld input:focus, .fld textarea:focus { border-bottom-width: 3px; }
+.fld input:focus { margin-bottom: -1px; }
+.fld input[aria-invalid="true"], .fld textarea[aria-invalid="true"] { border-bottom-style: dashed; border-bottom-color: var(--ink); }
+.fld .err, .fld .more { display: block; margin-top: 3px; font: 400 16px/1.35 var(--body); }
+.fld .err { color: var(--ink); }
+.fld .err:empty { display: none; }
+.fld .more { color: #4a2f86; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 24px; }
+.btn.quiet { color: var(--ink); }
+.write { display: grid; gap: 12px; }
+.write[hidden] { display: none; }
+.write .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.w-done { margin: 0; font: italic 400 20px/1.35 "Redaction", Georgia, serif; color: var(--ink); }
+.w-done:empty { display: none; }
+/* the answer to a letter (sent, or not sent) is written across the envelope's front, under the point of its flap */
+.talk .w-done { position: absolute; z-index: 3; left: 15%; right: 15%; bottom: 19cqi; text-align: center; font-size: clamp(17px, 5.4cqi, 21px);
+  color: #2b1470; text-shadow: 0 0 6px #f6e6f0, 0 0 12px #f6e6f0; }
+
+/* ---------- the last stars: the sky is two fields side by side; the words for it sit right under them ---------- */
+.ls { position: absolute; z-index: 5; display: grid; justify-items: start; text-align: left; }
+.vs-skybox { position: absolute; z-index: 4; inset: 0; pointer-events: none; }
+.vs-sky { position: absolute; pointer-events: auto; }
+.making .vs-sky { cursor: crosshair; }
+.vs-count { font-variant-numeric: tabular-nums; }
+/* the night's own stars, pale crosses of four cells round one, fading with the night (--night, dawn-proto.js) */
+.vs-dust { position: absolute; width: 3px; height: 3px; background: #fffaf1; opacity: var(--night, 1); pointer-events: none; }
+.vs-dust.big { box-shadow: -3px 0 #fffaf1, 3px 0 #fffaf1, 0 -3px #fffaf1, 0 3px #fffaf1; }
+.vs-star { position: absolute; left: calc(var(--x) * 100%); top: calc(var(--y) * 100%); width: 44px; height: 44px; translate: -50% -50%;
+  display: grid; place-items: center; padding: 0; border: 0; background: none; color: var(--c); cursor: pointer; opacity: calc(var(--o, 0) * var(--dim, 1)); }
+.vs-star svg, .vs-new svg, .opt svg { display: block; }
+.vs-star .sp-w { display: block; }
+.vs-star svg { width: var(--sz, 22px); height: var(--sz, 22px); transition: scale 180ms var(--pop); }
+.vs-star.seed { --sz: 30px; z-index: 1; }
+.vs-star.mine { z-index: 2; }
+.vs-star:hover svg, .vs-star.on svg, .vs-star:focus-visible svg { scale: 1.5; }
+.vs-star:focus-visible, .vs-new:focus-visible { outline: 2px dotted var(--ink); outline-offset: 2px; border-radius: 50%; }
+.sp path { fill: currentColor; }
+.sp path.dim { opacity: 0.3; }
+.making .vs-star { --dim: 0.4; }
+.vs-star.mine::after { content: ""; position: absolute; right: 4px; top: 4px; width: 3px; height: 3px; background: var(--ink);
+  box-shadow: -3px 0 var(--ink), 3px 0 var(--ink), 0 -3px var(--ink), 0 3px var(--ink); }
+.vs-note { position: absolute; z-index: 4; max-width: 24ch; pointer-events: none; translate: 18px -50%; opacity: 0; transition: opacity 160ms linear;
+  text-shadow: 0 0 6px var(--halo), 0 0 14px var(--halo), 0 0 22px var(--halo); }
+.vs-note.left { translate: calc(-100% - 18px) -50%; text-align: right; }
+.vs-note.on { opacity: 1; }
+.vs-note b { display: block; font: 400 22px/1.1 var(--display-awake); color: var(--ink); }
+.vs-note span { display: block; margin-top: 4px; font: 400 17px/1.45 var(--body); color: var(--text); }
+.vs-note span:empty { display: none; }
+.vs-new { position: absolute; left: 0; top: 0; z-index: 3; width: 60px; height: 60px; margin: -30px 0 0 -30px; display: grid; place-items: center; padding: 0;
+  border: 2px dotted var(--ink); border-radius: 50%; background: none; color: var(--c); cursor: pointer; transition: transform 220ms var(--enter); }
+.vs-new[hidden] { display: none; }
+.vs-new svg { width: 28px; height: 28px; }
+/* the maker */
+.vs-make { display: grid; gap: 12px; }
+.vs-make[hidden] { display: none; }
+.vs-make fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+.vs-make legend { display: block; padding: 0; margin: 0 0 2px; font: 400 17px/1.3 var(--lab); color: var(--ink); }
+.hint { margin: 0; font: italic 400 19px/1.3 "Redaction", Georgia, serif; color: var(--ink); }
+.opts { display: flex; flex-wrap: wrap; gap: 2px; }
+.opt { position: relative; display: grid; place-items: center; width: 46px; height: 46px; cursor: pointer; color: var(--ink); }
+/* the radio itself covers the whole option and draws nothing (no opacity, so its focus ring still shows); the picked
+   and focused looks follow it with sibling selectors, never :has(), which would make the browser re-check the form's
+   option on every frame the page moves */
+.opt input { position: absolute; inset: 0; margin: 0; appearance: none; background: none; border: 0; border-radius: 50%; cursor: pointer; }
+.opt svg { width: 26px; height: 26px; opacity: 0.45; transition: scale 160ms var(--pop); }
+.opt:hover svg { opacity: 0.75; }
+.opt input:checked ~ svg { opacity: 1; scale: 1.2; color: var(--pick); }
+.opt input:focus-visible { outline: 2px dotted var(--ink); outline-offset: -2px; }
+.sw i { width: 22px; height: 22px; background: var(--c); }
+.sw input:checked ~ i { box-shadow: 0 0 0 3px var(--halo), 0 0 0 5px var(--ink); }
+
+/* ---------- the horizon: the sun, the hills, the six (all placed by dawn-proto.js) ----------
+   The sun and the hills are drawn one pixel a cell and scaled up unsmoothed. Nothing here makes a stacking context of
+   its own, so the sun sits behind the envelope and the hills and the six in front of it. */
+.t-dawn { pointer-events: none; }
+.t-sun, .t-hills { position: absolute; display: block; image-rendering: pixelated; pointer-events: none; }
+.t-sun { z-index: 1; transform: translate3d(0, 100vh, 0); }
+.t-hills { z-index: 3; }
+.t-six { margin: 0; }
+.t-six a { position: absolute; z-index: 4; display: grid; place-items: end center; min-width: 44px; min-height: 44px; pointer-events: auto; }
+.t-six .pic { display: block; height: var(--six-h, 64px); width: auto; aspect-ratio: var(--ar, 1); }
+.t-six a:focus-visible { outline: 2px dotted var(--ink); outline-offset: 4px; }
+/* the moths and the lilies (placed by dawn-proto.js): the moths behind the hills, the lilies standing in front of them;
+   the left lily is mirrored, so the two lean towards the sun */
+.talk .t-moth { z-index: 2; width: calc(5.6 * var(--u)); }
+.talk .t-lily { z-index: 4; width: calc(4.4 * var(--u)); }
+.talk .t-lily.l { scale: -1 1; }
+/* the way back, on the ground */
+.t-back { margin: 0; z-index: 5; }
+.talk .t-back .go { color: #2b1470; }
+
+@media (min-width: 761px) and (min-aspect-ratio: 1/1) and (min-height: 501px) {
+  /* --top: where the risen letter's top edge sits, a breath under the masthead. --below: everything under the
+     envelope's foot (the way back to the moon and the foot's own band). The envelope takes what is left (never under
+     305px, or the form would sink into its flap, and never over 29u), and the horizon runs along its foot
+     (--ground-y). The letter rises a quarter of the envelope's width above its top. --col: the width of each side of
+     the scene, the words on the left and the stars on the right. */
+  .talk { --below: calc(1.6 * var(--u) + 44px + 10px + var(--band));
+    --board-h: max(100svh, calc(62.5 * var(--u)));
+    --top: calc(var(--band) + 14px + clamp(0px, calc(var(--board-h) - var(--band) - 14px - var(--below) - 465px), calc(0.5 * var(--band) - 6px)));
+    --env-w: clamp(305px, calc((var(--board-h) - var(--top) - var(--below)) / 1.525), calc(29 * var(--u)));
+    --ground-y: calc(var(--top) + 1.525 * var(--env-w));
+    --col: calc(41 * var(--u) - var(--env-w) / 2);
+    --sky-h: calc(0.4 * (var(--ground-y) - var(--top)));
+    --six-h: calc(4.4 * var(--u)); }
+  .talk .dawnboard { height: max(var(--board-h), calc(var(--ground-y) + var(--below))); }
+  /* the envelope stands in front of the hills, so the lavender at its foot lies on the ground */
+  .talk .env { z-index: 4; width: var(--env-w); top: calc(var(--top) + 0.255 * var(--env-w)); }
+  /* the words, level with the top of the letter */
+  .t-head { left: calc(5 * var(--u)); top: calc(var(--top) + 1.4 * var(--u)); width: var(--col); }
+  /* the stars' sky across the upper right, and their words under it */
+  .vs-sky { top: var(--top); height: var(--sky-h); width: calc(var(--col) / 2); }
+  .vs-sky.l { left: calc(50% + var(--env-w) / 2 + 4 * var(--u)); }
+  .vs-sky.r { left: calc(50% + var(--env-w) / 2 + 4 * var(--u) + var(--col) / 2); }
+  .ls { left: calc(50% + var(--env-w) / 2 + 4 * var(--u)); top: calc(var(--top) + var(--sky-h) + 1.2 * var(--u)); width: var(--col); }
+  /* the horizon spans the whole window, from well above the envelope's foot down to the end of the page */
+  .t-dawn { position: absolute; left: calc(50% - 50vw); width: 100vw; top: calc(var(--ground-y) - 22 * var(--u)); bottom: 0; }
+  .t-back { position: absolute; left: 50%; translate: -50% 0; top: calc(var(--ground-y) + 1.6 * var(--u)); }
+}
+
+@media (max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px) {
+  .talk { --six-h: 46px; }
+  /* the night's corner ornaments are left off phones (journey.css), but the dawn keeps its moths and lilies */
+  .talk .t-dawn .orn { display: block; }
+  .talk .t-moth { width: 56px; }
+  .talk .t-lily { width: 40px; }
+  .t-head { position: relative; justify-items: center; text-align: center; width: 100%; }
+  .talk .t-big { font-size: clamp(60px, 19vw, 110px); margin: 0 0 20px; }
+  .t-mail { flex-direction: column; align-items: center; gap: 0; }
+  .talk .t-addr { font-size: 22px; }
+  .t-links { justify-content: center; gap: 0 28px; margin-top: 4px; }
+  /* the letter is as tall as its form; its foot tucks into the envelope's pocket */
+  .talk .env { width: min(88vw, 440px); margin-top: 48px; aspect-ratio: auto; display: block; padding-bottom: 74cqi; }
+  .talk .env-back, .talk .env-front { inset: auto 0 0 0; height: auto; aspect-ratio: 815 / 1035; }
+  .talk .letter { position: relative; left: auto; top: auto; width: 82cqi; height: auto; margin: 0 auto -52cqi; padding: 6cqi 6cqi 58cqi; transform: none; rotate: -1deg; text-align: left; }
+  .letter .fld { margin-top: 10px; }
+  .letter .write { gap: 12px; }
+  .letter .fld textarea { height: calc(3lh + 9px); }
+  .two { display: block; }
+  .letter .send-row { justify-content: flex-start; margin-top: 12px; }
+  /* the stars: their words, then their sky, the two fields side by side */
+  .ls { position: relative; width: 100%; margin-top: 64px; padding: 0 2vw; justify-items: center; text-align: center; }
+  .ls .vs-make { margin-top: 12px; width: 100%; text-align: left; }
+  .vs-skybox { position: relative; inset: auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; pointer-events: auto; }
+  .vs-sky { position: relative; width: 100%; height: 44vw; }
+  /* the horizon, edge to edge, then the ground with the way back on it */
+  .t-dawn { position: relative; align-self: center; width: 100vw; height: calc(var(--six-h) + min(46vw, 200px)); }
+  .t-back { position: relative; align-self: center; width: 100vw; padding: 0 16px calc(var(--edge, 0px) + 48px); background: #bfa3da; }
+}
