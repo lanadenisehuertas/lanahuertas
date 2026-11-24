@@ -316,7 +316,9 @@
     let close = false;
     new IntersectionObserver((es) => { close = es[es.length - 1].isIntersecting; play(); }, { rootMargin: "15% 0px" }).observe(products);
     const play = () => $$(".reel-plate", products).forEach((pl) => {
-      const on = near && (narrow.matches ? pl._seen : pl.classList.contains("now")), tab = pl._tab || "film";
+      // paged (phones too), the plates lie on top of one another, so every plate counts as seen: only the current one
+      // plays. Each film is an animated picture a phone keeps decoded, and four at once were enough to close the page
+      const now = pl.classList.contains("now"), on = near && (products.classList.contains("paged") ? now && pl._seen !== false : narrow.matches ? pl._seen : now), tab = pl._tab || "film";
       const img = $(".a-loop", pl), want = on && tab === "film" && !paused && !SM.quiet() ? img.dataset.loop : img.dataset.poster;
       if (img.getAttribute("src") !== want) img.setAttribute("src", want);
       // the landing page's recording plays while its tab is open, and only then (it is fetched the first time it is wanted)

@@ -198,7 +198,9 @@ strong.ach { font-weight: 600; color: var(--mark); }
   .tb-hits { display: none; }
   .tb-hint { left: calc(8 * var(--u)); right: 16px; top: calc(10 * var(--u) + 36px); max-width: none; }
   .tb-say { pointer-events: auto; }
-  .tb .grp { transition: opacity 200ms linear; }
+  /* the constellations hold still on a phone: each was a layer as big as the board, three of them, kept only for a
+     slide of a few pixels, and a phone's memory is better spent on the pictures */
+  .tb .grp { transition: opacity 200ms linear; will-change: auto; transform: none !important; }
   .tb.telling .grp:not(:has(.tb-tag)) { opacity: 0.3; }
 }
 

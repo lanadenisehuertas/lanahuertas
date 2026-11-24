@@ -556,7 +556,7 @@
         l.style.opacity = f > 0 ? 1 : 0;
       });
       // the three constellations sit at different depths, so they slide past each other a little
-      const drift = q ? 0 : (0.5 - clamp((-w.top + w.vh * 0.5) / (w.vh * 1.5))) * SM.u();
+      const drift = q || SM.COLUMN.matches ? 0 : (0.5 - clamp((-w.top + w.vh * 0.5) / (w.vh * 1.5))) * SM.u();
       grps.forEach((g) => { const tf = `translate3d(0, ${(drift * 3 * +g.dataset.depth).toFixed(1)}px, 0)`; if (g._tf !== tf) { g._tf = tf; g.style.transform = tf; } });
       // the sparkles turn with the scroll, never on a timer
       sparks.forEach((s, k) => { const o = q ? "1" : (0.25 + 0.75 * (0.5 + 0.5 * Math.sin(SM.y / 85 + k * 2.3))).toFixed(2); if (s._o !== o) { s._o = o; s.style.opacity = o; } });
@@ -591,7 +591,10 @@
     // the film under the playhead is the first frame the monitor shows in full; which one that is gets read in the
     // page's read pass, before any scrub writes, and only while the films are near
     SM.measure(() => {
-      near = SM.where(filmsEl).near && !still();
+      // only while the films are on screen: a loop left playing a screen away still holds a media player (and on a
+      // phone, its memory) while the next rooms are drawn
+      const w = SM.where(filmsEl);
+      near = w.bottom > 0 && w.top < w.vh && !still();
       shown = near ? vids.find((y) => y && y.ok && getComputedStyle(y.f).visibility === "visible") || null : null;
     });
     const pick = () => {

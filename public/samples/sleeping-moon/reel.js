@@ -115,7 +115,8 @@
         // when it visibly moves
         const l = lvAt(lv, L.k), e = enAt(en, L.k), a = Math.round((1 - l) * e * 20) / 20, y = Math.round((l * -0.6 + (1 - e) * 0.35) * 50) / 50;
         set(L.el, "opacity", a >= 1 ? "" : String(a));
-        set(L.el, "transform", y === 0 ? "" : `translate3d(0, ${y}em, 0)`);
+        // a flat offset, not a 3D one: a 3D one made each moving letter a layer of its own, dozens per handover
+        set(L.el, "transform", y === 0 ? "" : `translateY(${y}em)`);
       }
     }
   };

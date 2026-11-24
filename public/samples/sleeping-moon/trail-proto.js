@@ -10,7 +10,8 @@
   document.body.append(cv);
   const ctx = cv.getContext("2d");
   let W = 0, H = 0, dpr = 1;
-  const size = () => { dpr = Math.min(2, devicePixelRatio || 1); W = SM.vw; H = SM.vh; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
+  // (a touch screen only sees the motes of a tap or a landing word: soft dots, drawn at one pixel each to spare its memory)
+  const size = () => { dpr = Math.min(SM.HOVER ? 2 : 1, devicePixelRatio || 1); W = SM.vw; H = SM.vh; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
   size(); addEventListener("resize", size);
   SM.trail = true;
 

@@ -42,9 +42,12 @@
         const d = find((t.querySelector(".vh")?.textContent ?? t.textContent).trim());
         let p = t.parentElement.querySelector("." + cls);
         if (!p) { p = document.createElement("p"); p.className = "say w-desc " + cls; t.parentElement.querySelector(".pk-meta").after(p); }
+        // the title is rewritten for its letters' handover far more often than it changes: the description, and the
+        // layouts its fitting takes, are touched only when the words themselves change
+        if (p.textContent === d && p._fit) return;
         if (p.textContent !== d) p.textContent = d;
         p.hidden = !d;
-        if (cls === "fr-d") fitFilm(p);
+        if (cls === "fr-d") { p._fit = true; fitFilm(p); } else p._fit = true;
       };
       text();
       new MutationObserver(text).observe(t, { childList: true, characterData: true, subtree: true });

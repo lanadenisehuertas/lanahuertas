@@ -84,15 +84,18 @@ const SM = (() => {
      milliseconds (at least one part of a picture: a build comes in parts, see steps) and leaves the rest to the next. */
   const queued = [];
   let builder = 0;
-  const buildSoon = (bm) => new Promise((done, fail) => { queued.push([bm, done, fail]); if (!builder) builder = setTimeout(buildSome, 0); });
-  const buildSome = () => {
-    const t0 = performance.now();
+  /* The builds wait for the quiet between frames (requestIdleCallback) where the browser has it, so a scroll's frames come
+     first; one held off for a fifth of a second runs anyway, so a picture is never left unbuilt for long */
+  const idle = window.requestIdleCallback ? (fn) => requestIdleCallback(fn, { timeout: 200 }) : (fn) => setTimeout(fn, 0);
+  const buildSoon = (bm) => new Promise((done, fail) => { queued.push([bm, done, fail]); if (!builder) builder = idle(buildSome); });
+  const buildSome = (deadline) => {
+    const t0 = performance.now(), budget = deadline && !deadline.didTimeout ? Math.max(1, Math.min(4, deadline.timeRemaining())) : 4;
     while (queued.length) {
       const job = queued[0], [bm, done, fail] = job;
       try { job.it = job.it || bm.steps(); if (job.it.next().done) { queued.shift(); done(); } } catch (e) { queued.shift(); fail(e); }
-      if (performance.now() - t0 > 4) break;
+      if (performance.now() - t0 > budget) break;
     }
-    builder = queued.length ? setTimeout(buildSome, 0) : 0;
+    builder = queued.length ? idle(buildSome) : 0;
   };
   class Bitmap {
     constructor(pic) {
@@ -421,8 +424,11 @@ const SM = (() => {
     if (!p.closest("a, button") && !p.hasAttribute("data-still")) {
       // the light spreads from where the pointer came in (read once, at the moment it comes in)
       const at = (e) => { const r = p.getBoundingClientRect(); return r.width && r.height ? [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height] : null; };
-      p.addEventListener("pointerenter", (e) => e.pointerType !== "touch" && b.wakeUp(320, 0, at(e)));
-      p.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") b.rest(); });
+      // a picture the scroll carries under a pointer that is not moving waits for the pointer to move before it wakes:
+      // woken as they slid past, the pictures were drawn over and over in the very frames the scroll needed
+      p.addEventListener("pointerenter", (e) => { if (e.pointerType === "touch") return; if (scrolling()) { p._pend = true; return; } b.wakeUp(320, 0, at(e)); });
+      p.addEventListener("pointermove", (e) => { if (p._pend && !scrolling()) { p._pend = false; b.wakeUp(320, 0, at(e)); } }, { passive: true });
+      p.addEventListener("pointerleave", (e) => { if (e.pointerType === "touch") return; if (p._pend) { p._pend = false; return; } b.rest(); });
       // on a touch screen a tap does what hovering does: the picture wakes and stays awake for a while. The wake waits for
       // the finger to lift in place, so a swipe that starts on a picture only scrolls: the browser cancels the pointer
       // once it takes the gesture for a scroll, and a finger that slides further than a tap never wakes anything.
@@ -438,6 +444,10 @@ const SM = (() => {
     }
     return b;
   });
+  // whether the page has scrolled in the last moment (a pointer the scroll slid things under has not itself moved)
+  let scrolledAt = -1e9;
+  addEventListener("scroll", () => { scrolledAt = performance.now(); }, { passive: true, capture: true });
+  const scrolling = () => performance.now() - scrolledAt < 250;
   const bitmap = (el) => el && (el._bm || ($(".pic", el) || {})._bm);
   /** let go of every picture inside scope, before scope is emptied: the engine stops watching and drawing them, any build
       or fade still under way for them comes to nothing, and their cells and canvases can be freed (a room that takes

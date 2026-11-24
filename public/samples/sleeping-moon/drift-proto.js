@@ -65,12 +65,11 @@
   const kick = () => { if (!raf && !still()) raf = requestAnimationFrame(frame); };
   /* while the page moves, its own frame measures (SM.measure, before anything is written) and a scrub moves things; the
      frame here runs only to let things settle once the page is still, or to follow the pointer */
-  let read = null;
-  SM.measure(() => { read = nearNow(); });
-  SM.scrub(() => {
-    const y = SM.y; vel += (y - lastY - vel) * 0.35; lastY = y;
-    if (read) { const r = read; read = null; if (step(r)) kick(); } else kick();
-  });
+  /* the scroll's wind is no longer blown: it wrote --lx, --ly and --w on every drifting thing in every frame of a scroll,
+     and since those feed the idle loops' keyframes, each write rebuilt the loop on the page's main thread instead of
+     leaving it to the compositor, which made a laptop's scroll stutter. While the page moves, the loops run by
+     themselves; the pointer's pull takes up again once it is still (frame, below). lastY and vel stay at rest */
+  SM.scrub(() => { lastY = SM.y; });
   if (SM.HOVER) addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; px = e.clientX; py = e.clientY; kick(); }, { passive: true });
   document.addEventListener("pointerleave", () => { px = py = -1e4; kick(); });
   const R = 280;
