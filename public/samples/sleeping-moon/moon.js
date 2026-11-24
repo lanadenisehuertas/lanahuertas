@@ -580,7 +580,12 @@ const SM = (() => {
     runScrubs();
     if (gliding) frameReq = requestAnimationFrame(frameLoop);
   };
-  const kick = () => { if (!frameReq) frameReq = requestAnimationFrame(frameLoop); };
+  /* no frame of the page's own runs while the page is still being read: the scripts come one after another, and a frame
+     between them laid out a page half built, only for the next script to add to it and the next frame to lay it all out
+     again, over a second of a phone's first moments, all under the veil. The first frame comes once it is all there */
+  let parsed = document.readyState !== "loading";
+  if (!parsed) document.addEventListener("DOMContentLoaded", () => { parsed = true; kick(); }, { once: true });
+  const kick = () => { if (!frameReq && parsed) frameReq = requestAnimationFrame(frameLoop); };
   /** move the page to y: glides when it can; instant jumps at once */
   const glide = (y, instant) => {
     y = Math.max(0, Math.min(maxY(), y));

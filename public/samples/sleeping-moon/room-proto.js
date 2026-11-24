@@ -311,7 +311,7 @@
     const bs = r.r * 0.8;
     host.innerHTML = `<div class="rm-view" aria-hidden="true" style="width:${vw}px;height:${vh}px;perspective:${P}px">
         <div class="rm-world">
-          <img class="rm-sky" width="1600" height="1000" alt="">
+          <img class="rm-sky" src="art/room/sky-stars.png" width="1600" height="1000" alt="" fetchpriority="high">
           <div class="rm-moon"><span class="pic moon" data-kind="moon" data-enter="manual" data-still><img class="full" src="art/moon-asleep.webp" width="640" height="640" alt=""></span></div>
           ${planes(set)}
           ${set.items.map(piece).join("")}
@@ -344,7 +344,9 @@
       shades: $$(".rm-shade", host),
       room: [...$$(".rm-leaf", host).filter((el) => el.dataset.id !== "window"), $(".rm-dust", host)].filter(Boolean),
     };
-    rasterize(); drawSky();
+    // (the star sky is a picture drawn once ahead of time, art/room/sky-stars.png, 380 stars from a fixed seed, as it was drawn
+    // here: drawing and encoding it held up the room, and the page's largest picture, by a long moment on a phone)
+    rasterize();
     for (const [id] of set.items) if (!SIX.includes(id)) place(els[id], pos[id], 0);
     pics = SM.pictures(host);
     loads = pics.map((b) => b.load().then(() => b.setShow(1)).catch(() => {}));
@@ -362,22 +364,9 @@
   const roomKey = () => (!SM.COLUMN.matches ? "wide" : SM.vw > SM.vh ? "side" : "tall");
   /** a standing picture at its place in the room, turned to face the camera */
   const place = (el, p, yaw) => { el.style.transform = `translate3d(${(p.x - p.w / 2).toFixed(1)}px,${p.top.toFixed(1)}px,${p.z}px) rotateY(${yaw.toFixed(2)}deg)`; };
-  /** the night beyond the window: a far plane of sparse stars, kept as single pixels, the room's one wide bitmap. Its
-      canvas is drawn at one pixel a cell and stretched five times by CSS (room-proto.css), unsmoothed */
-  const drawSky = () => {
-    const cv = document.createElement("canvas"), g = cv.getContext("2d");
-    cv.width = 1600; cv.height = 1000;
-    let s = 5; const rnd = () => ((s = (s * 16807) % 2147483647) - 1) / 2147483646;
-    for (let i = 0; i < 380; i++) {
-      const x = Math.floor(rnd() * 1600), y = Math.floor(rnd() * 1000), b = rnd();
-      g.fillStyle = b > 0.92 ? "#fff1c9" : INK;
-      g.fillRect(x, y, 1, 1);
-      if (b > 0.97) { g.fillRect(x - 1, y, 3, 1); g.fillRect(x, y - 1, 1, 3); }
-    }
-    // shown as a bitmap picture, which the graphics chip enlarges as it is (see rasterize)
-    const im = $(".rm-sky", host);
-    cv.toBlob((b) => { if (!b || !im) return; const u = URL.createObjectURL(b); blobs.push(u); im.src = u; });
-  };
+  /* the night beyond the window, a far plane of sparse stars kept as single pixels, the room's one wide bitmap, is the
+     picture art/room/sky-stars.png (.rm-sky, in build): drawn at one pixel a cell and stretched five times by CSS
+     (room-proto.css), unsmoothed */
 
   /* ------------------------------------------------------------------ fitting the view to the screen; one size of cell */
   let kv = 1;
