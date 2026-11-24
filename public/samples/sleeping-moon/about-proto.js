@@ -76,7 +76,9 @@
      are all whole once it is held, so a jump to About lands on them whole. Where each line is gets read once, and
      again only when the page changes size, in the page's read pass; the scrub only does sums and writes the letters
      whose number changed. Quiet mode sets every letter whole. */
-  when(() => $(".me-cat") && $(".yrs .yr-n"), () => {
+  // the lines are split into letters only once About is within a screen of the window: splitting them all as the page
+  // opened made thousands of letters at once and held a phone's first seconds (the letters start whole, so nothing shows)
+  when(() => $(".me-cat") && $(".yrs .yr-n"), () => SM.whenNear($("#about"), () => {
     const RUNES = ["☾", "☽", "✶", "✧", "⋆", "ᚱ", "ᛟ", "ᚦ", "ᛉ", "ᚠ", "◇", "✦", "ᛃ", "ᛗ"];
     // each title's key word, the one that catches the light as it lands
     const KEYS = { "UI/UX design intern": ["UI/UX"], "1st runner-up": ["1st", "runner-up"], "PMI Project": ["PMI"], "IT Specialist": ["Python"],
@@ -100,6 +102,8 @@
       }).join("");
       const build = (node) => [...node.childNodes].map((n) => n.nodeType === 3 ? words(n.textContent)
         : n.nodeType === 1 ? `<${n.localName}${n.className ? ` class="${esc(n.className)}"` : ""}>${build(n)}</${n.localName}>` : "").join("");
+      // a line the pointer's letters (words-proto.js) split first is taken back to its words, so its text is not doubled
+      const vh = el.querySelector(":scope > .vh"); if (vh) el.textContent = vh.textContent;
       const text = el.textContent.trim().replace(/\s+/g, " ");
       el.innerHTML = `<span class="vh">${esc(text)}</span><span aria-hidden="true">${build(el).trim()}</span>`;
       return el;
@@ -163,9 +167,14 @@
        when the page has changed size, in the read pass, never in the scrub */
     let gen = -1, gw = -1, dirty = true, holdTop = 0, holdH = 0, landAt = 0;
     const meEl = $(".me"), aboutEl = $("#about");
+    /* nothing is read while About is far from the window: on a phone it is skipped (content-visibility, lean-proto.css),
+       and reading a line inside it made the browser lay the whole of About out, every time the page grew as a picture
+       loaded, which took seconds of a phone's first moments. Placed is false until the lines have been read */
+    let placed = false;
     const place = () => {
       if (!dirty && gen === SM.placedGen && gw === SM.vw) return;
-      dirty = false; gen = SM.placedGen; gw = SM.vw;
+      if (aboutEl) { const w = SM.where(aboutEl); if (w.top > 3 * w.vh || w.bottom < -3 * w.vh) { placed = false; return; } }
+      dirty = false; gen = SM.placedGen; gw = SM.vw; placed = true;
       const y = SM.y;
       const hr = holdEl?.isConnected ? holdEl.getBoundingClientRect() : null;
       if (hr) { holdTop = hr.top + y; holdH = hr.height; }
@@ -207,6 +216,7 @@
     // handful of letters change (and are restyled) in any one frame
     const Q = 24;
     const run = () => {
+      if (!placed) return;
       const y = SM.y, H = SM.vh, held = !!holdEl?.isConnected && !SM.COLUMN.matches;
       // the hold: the statement comes up the window, sticks while the hold passes, then goes on up. Each of its lines
       // is written as it comes up, from the window's foot to 72% of the way down, or only to where it sits when a jump
@@ -260,7 +270,7 @@
       if (sparks.length) { for (const c of sparks.slice(0, 6)) { const r = c.getBoundingClientRect(); SM.sparkle?.(r.left + r.width / 2, r.top + r.height * 0.4, c.parentNode.classList.contains("em") ? 4 : 2); } sparks = []; }
     });
     SM.scrub(run);
-  });
+  }));
 
   /* ---------------------------------------------------------------- "What I work with", in words
      The constellations already name the skills, so the whole list under the board is folded away behind one quiet

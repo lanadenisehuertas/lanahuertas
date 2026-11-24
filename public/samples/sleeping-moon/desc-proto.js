@@ -60,6 +60,8 @@
   const fitFilm = (p) => {
     const box = p.closest(".fr-text"), tl = box?.parentElement.querySelector(".fr-tl");
     if (!box || !tl) return;
+    // fitted only once the films are near: measuring them while a phone skips their stop lays the whole stop out
+    if (!p._near) { if (!p._waiting) { p._waiting = true; SM.whenNear(p, () => { p._near = true; fitFilm(p); }); } return; }
     p.style.display = "-webkit-box"; p.style.webkitBoxOrient = "vertical"; p.style.overflow = "hidden";
     const room = () => tl.offsetTop - 20 - (box.offsetTop + box.offsetHeight);
     /* each try lays the whole page out, so the count is worked out from one line first: the room left under one line,
