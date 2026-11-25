@@ -971,6 +971,7 @@ const DATA = {
    "year": "2025 to 2026",
    "kind": "desk",
    "p": "A desktop app that reads typing rhythm and mouse movement to support clinician-guided mental health screening. It flags patterns for the clinician and never diagnoses.",
+   "more": "A desktop app that reads typing rhythm and mouse movement in real time to support clinician-guided mental health screening. It flags; it does not diagnose. I designed the whole experience, from clinician dashboards and intake to calibration tasks and session reports, and led a four-person team through thesis defense.",
    "role": "Lead UI/UX, backend, project manager",
    "stack": [
     "Electron",
@@ -1018,6 +1019,7 @@ const DATA = {
    "year": "2026",
    "kind": "phone",
    "p": "A mobile-first app that turns a strength and nutrition plan into a coach that adapts. It installs to the home screen, works offline and keeps every log on the phone.",
+   "more": "A mobile-first app that turns a strength and nutrition plan into a coach that adapts: workouts ease off during your period and push harder in your strongest week, targets come from your own stats, and progress is read on a seven-day average. It installs to the home screen, works offline and keeps every log on the phone. No login, no backend.",
    "role": "Design and full-stack",
    "stack": [
     "React",
@@ -1060,6 +1062,7 @@ const DATA = {
    "year": "January 2025",
    "kind": "desk",
    "p": "A turn-based math game where you duel Gauss, Newton and Fibonacci. I designed the whole interface and hand-drew every sprite.",
+   "more": "An arcade-style, turn-based math game where you duel Gauss, Newton and Fibonacci; right answers land hits, wrong ones cost lives. Built as a four-person college project in Java, later ported to the web. I designed the entire UI and hand-drew every sprite: the title screen, menus, buttons, boss animations and battle backgrounds.",
    "role": "UI and pixel art",
    "stack": [
     "Pixel art",
@@ -1102,6 +1105,7 @@ const DATA = {
    "year": "2026",
    "kind": "phone",
    "p": "A student budget app that sets aside food and school money from a weekly allowance, then puts the rest toward whichever debt is due soonest.",
+   "more": "A student budget app: it sets aside food and school money from a weekly allowance, then puts the rest toward whichever debt is due soonest. Rebuilt from a one-file prototype into a tested Next.js app, with the original look refined into a token-based design system. Local-first and private by default.",
    "role": "Design and full-stack",
    "stack": [
     "Next.js",

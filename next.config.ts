@@ -14,6 +14,25 @@ const MOON = "/samples/sleeping-moon";
 
 const nextConfig: NextConfig = {
   turbopack: { root: inWorktree ? path.normalize(inWorktree[1]) : __dirname },
+  // the pages of earlier designs, and the addresses people may still have from them, go to the same work in this one
+  // (the old pages' files are still in app/, but a redirect is answered before any page is)
+  async redirects() {
+    const to = (source: string, destination: string) => [
+      { source, destination, permanent: true },
+      { source: `${source}/:path*`, destination, permanent: true },
+    ];
+    return [
+      ...to("/design", "/#brands"),
+      ...to("/ui-ux", "/#products"),
+      ...to("/videos", "/#films"),
+      ...to("/work", "/#brands"),
+      ...to("/about", "/#about"),
+      ...to("/contact", "/#talk"),
+      ...to("/garden", "/#talk"),
+      ...to("/made-here", "/"),
+      { source: "/index.html", destination: "/", permanent: true },
+    ];
+  },
   async rewrites() {
     return {
       beforeFiles: [{ source: "/", destination: `${MOON}/magic-proto.html` }],

@@ -13,6 +13,17 @@
     if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); step(e.key === "ArrowRight" ? 1 : -1); }
   });
 
+  /* an app's longer story takes the place of its short one, so reading more never leaves the room (it used to go to
+     the old design's /ui-ux page); "Show less" puts the short one back (the one desc-proto.js sets) */
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest?.(".pk-text .cs[aria-controls]");
+    const say = b && document.getElementById(b.getAttribute("aria-controls"));
+    const app = say && DATA.products.find((x) => `say-${x.id}` === say.id);
+    if (!app) return;
+    const open = b.getAttribute("aria-expanded") !== "true";
+    b.setAttribute("aria-expanded", String(open)); say.textContent = open ? app.more : app.p; b.textContent = open ? "Show less" : "Read more";
+  });
+
   const clamp = (v) => Math.min(1, Math.max(0, v));
   const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
   const mix = (a, b, t) => "#" + hex(a).map((v, i) => Math.round(v + (hex(b)[i] - v) * t).toString(16).padStart(2, "0")).join("");
@@ -304,7 +315,6 @@
     const A = DATA.products.filter((p) => FILMS[p.id]), N = A.length, stage = $(".stage", products);
     const list3 = (a) => a.length > 1 ? `${a.slice(0, -1).join(", ")} and ${a[a.length - 1]}` : a[0];
     const ext = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h8v8M13 3L3 13"/></svg>`;
-    const right = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h12M9 3l5 5-5 5"/></svg>`;
     const pauseIcon = `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2v10M10 2v10"/></svg>`, playIcon = `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 2l9 5-9 5z"/></svg>`;
     let paused = false;
     /** the film plays on the current plate only, while its tab is the one open and it is not paused; quiet mode keeps
@@ -457,10 +467,10 @@
             <h3 class="pk-name">${esc(p.t)}</h3>
             <p class="pk-meta">${esc(p.year)}</p>
             <p class="pk-tag">${esc(p.tag)}</p>
-            <p class="say">${esc(f.say)}</p>
+            <p class="say" id="say-${p.id}">${esc(f.say)}</p>
             <p class="a-role">${esc(p.role)}. ${esc(list3(p.stack.filter((t) => !p.role.toLowerCase().includes(t.toLowerCase()))))}.</p>
             <div class="acts">
-              <a class="go cs" href="/ui-ux#${p.id}">Read the case study ${right}</a>
+              ${p.more ? `<button class="go cs" type="button" aria-expanded="false" aria-controls="say-${p.id}">Read more</button>` : ""}
               <a class="go live" href="${p.href}" target="_blank" rel="noopener">${esc(p.cta)} ${ext}<span class="vh"> (opens a new tab)</span></a>
             </div>
             ${SM.steps("app")}

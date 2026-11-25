@@ -93,6 +93,7 @@ main > .stop.products { --a-ink: #b9a2ff; }
 #products .pk-tag { margin-top: 16px; }
 #products .say { margin-top: 10px; }
 #products .a-role { margin-top: 12px; }
+#products .cs { border: 0; cursor: pointer; }
 #products .steps { margin-top: 14px; }
 /* The case study is the way in, so it comes first in the mark colour; the live app sits beside it, a step quieter in
    the text colour, and wraps under it when the column is too narrow for both. Each keeps a reach of 44px. */
