@@ -1,7 +1,7 @@
 /* Prototype: the magic layer (see magic-proto.css). Loads after every other script. */
 (() => {
   const { $, $$ } = SM, root = document.documentElement;
-  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
+  const still = () => SM.quiet();   // quiet mode stills the page: the visitor's switch, on from the start under reduced motion (moon.js)
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const arrow = `<svg viewBox="0 0 26 14" aria-hidden="true"><path d="M1 7h23M18.5 1.5L24 7l-5.5 5.5"/></svg>`;
@@ -163,20 +163,22 @@
   /* ================================================================ the star chart: every work, one click away */
   const D = typeof DATA !== "undefined" ? DATA : { brands: [], posters: [], films: [], products: [] };
   const first = (im) => (Array.isArray(im) ? (Array.isArray(im[0]) ? im[0] : im) : null);
+  // each room says in plain words what is in it, so the chart reads as the site's table of contents
   const ROOMS = [
-    { id: "brands", num: "I", name: "Brands", items: D.brands.map((b) => ({ t: b.name, im: first(b.imgs), c: b.ink })) },
-    { id: "posters", num: "II", name: "Posters", items: D.posters.map((p) => ({ t: p.t, im: first(p.img), c: p.ink })) },
-    { id: "films", num: "III", name: "Films", items: D.films.map((f) => ({ t: f.t, im: first(f.img) })) },
-    { id: "products", num: "IV", name: "Products", items: D.products.map((p) => ({ t: p.t, im: first(p.shots), c: p.ink })) },
-    { id: "about", num: "V", name: "About", items: [] },
-    { id: "talk", num: "VI", name: "Contact", items: [] },
+    { id: "brands", num: "I", name: "Brands", what: "Event identities and social campaigns", items: D.brands.map((b) => ({ t: b.name, im: first(b.imgs), c: b.ink })) },
+    { id: "posters", num: "II", name: "Posters", what: "Single posters for events and causes", items: D.posters.map((p) => ({ t: p.t, im: first(p.img), c: p.ink })) },
+    { id: "films", num: "III", name: "Films", what: "Trailers, short films and edits", items: D.films.map((f) => ({ t: f.t, im: first(f.img) })) },
+    { id: "products", num: "IV", name: "Products", what: "Apps and sites I designed and built", items: D.products.map((p) => ({ t: p.t, im: first(p.shots), c: p.ink })) },
+    { id: "about", num: "V", name: "About", what: "Who I am, my studies and the tools I use", items: [] },
+    { id: "talk", num: "VI", name: "Contact", what: "Write to me, or leave a star in the sky", items: [] },
   ];
+  const ALL = ROOMS.reduce((n, r) => n + r.items.length, 0);
   const atlas = document.createElement("dialog");
-  atlas.className = "atlas"; atlas.setAttribute("aria-labelledby", "at-h");
-  const group = (r) => `<div><button class="at-room" type="button" data-room="${r.id}"><i>${r.num}</i>${r.name}</button>${r.items.length ? `<ul>${r.items.map((w, i) =>
+  atlas.className = "atlas"; atlas.setAttribute("aria-labelledby", "at-h"); atlas.setAttribute("aria-describedby", "at-lead");
+  const group = (r) => `<div><button class="at-room" type="button" data-room="${r.id}" aria-describedby="at-d-${r.id}"><i>${r.num}</i>${r.name}</button><p class="at-what" id="at-d-${r.id}">${r.what}${r.items.length ? ` · ${r.items.length}` : ""}</p>${r.items.length ? `<ul>${r.items.map((w, i) =>
     `<li><button class="at-w" type="button" data-room="${r.id}" data-i="${i}" style="--c:${w.c || "#b9a2ff"}"><i></i>${esc(w.t)}</button></li>`).join("")}</ul>` : ""}</div>`;
   atlas.innerHTML = `<div class="stars" aria-hidden="true"></div>
-    <div class="at-top"><h2 id="at-h">Star chart</h2><p>Every work is a star. Pick one.</p><button class="btn at-close" type="button">Close</button></div>
+    <div class="at-top"><h2 id="at-h">Star chart</h2><p id="at-lead">The table of contents: all ${ALL} pieces on this site, in six rooms. Pick a piece to go straight to it, or a room's name to start at its beginning.</p><button class="btn at-close" type="button">Close</button></div>
     <div class="at-map">${group(ROOMS[0])}${group(ROOMS[1])}${group(ROOMS[2])}<div>${ROOMS.slice(3).map(group).join("")}</div></div>
     <div class="at-peek" aria-hidden="true"><img alt="" width="720" height="900"></div>`;
   document.body.append(atlas);
@@ -206,9 +208,12 @@
   atlas.addEventListener("pointerover", showPeek); atlas.addEventListener("focusin", showPeek);
   // ways in: the masthead and the phone menu
   const tools = $(".tools");
-  tools?.insertAdjacentHTML("afterbegin", `<button class="chart-btn" type="button" aria-haspopup="dialog"><i></i>Star chart</button>`);
-  $(".route")?.insertAdjacentHTML("beforeend", `<a class="chart-link" href="#" role="button">Star chart</a>`);
+  // the way in is named for what it holds ("All work"); the chart it opens says it is the star chart
+  tools?.insertAdjacentHTML("afterbegin", `<button class="chart-btn" type="button" aria-haspopup="dialog" aria-label="All work: the star chart, this site's table of contents"><i></i>All work</button>`);
+  $(".route")?.insertAdjacentHTML("beforeend", `<a class="chart-link" href="#" role="button">All work (star chart)</a>`);
   $$(".chart-btn, .chart-link").forEach((b) => b.addEventListener("click", (e) => { e.preventDefault(); openChart(); }));
+  // the room's "See all work" (room-proto.js) opens it too
+  SM.chart = openChart;
 
   /* the way out of a long room: the next stop, always in the foot */
   const stops = $$("main > .stop"), foot = $(".foot");

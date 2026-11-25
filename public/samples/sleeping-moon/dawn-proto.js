@@ -206,6 +206,14 @@
     if (ln && !end.classList.contains("making")) ln.innerHTML = !n ? "Only Lana's and Peanut's so far."
       : `<span class="vs-count">${n}</span> left by ${n === 1 ? "a visitor" : "visitors"}, with Lana's and Peanut's.`;
   };
+  /* The guestbook is read before anything shows (moderated unless GARDEN_MODERATE=0), so a visitor's own star would be
+     gone from the sky the next time they came. This browser keeps the ones its visitor left, where they put them, and
+     shows them again until the guestbook sends them back as shown; until then only this visitor sees them, and the
+     note says so. */
+  const MINE = "sm-sky-mine";
+  const mine = (() => { try { const m = JSON.parse(localStorage.getItem(MINE) || "[]"); return Array.isArray(m) ? m.filter((v) => v && v.name && KINDS[v.kind] && COLS[v.color]) : []; } catch { return []; } })();
+  const keepMine = () => { try { localStorage.setItem(MINE, JSON.stringify(mine.slice(-20))); } catch {} };
+  mine.forEach((m) => list.push({ ...m, mine: true }));
   list.forEach((v) => zones[zoneOf(v.x)].append(starEl(v)));
   // the night's own stars, small and pale, are still out among them, and fade as the sun comes up (the scrub below
   // turns --night down); they are only sky, so a click passes through them to the field
@@ -221,9 +229,15 @@
       // the guestbook sends Lana's and Peanut's along with the visitors' (their ids start "seed-"); they are already
       // in the sky above, so they are left out here and never counted as a visitor's
       if (!f || !f.name || String(f.id || "").startsWith("seed-")) return;
+      // one this visitor left is already in the sky where they put it: it is now shown for everyone, so it stops
+      // saying it is waiting
+      const own = list.find((v) => v.mine && v.id && v.id === f.id);
+      if (own) { own.pending = false; return; }
       const v = { name: String(f.name), note: String(f.note || ""), kind: FROM_KIND[f.kind] || "star", color: FROM_COL[f.color] || "lilac", ...spot(f.id || f.name + f.t) };
       list.push(v); zones[zoneOf(v.x)].append(starEl(v));
     });
+    mine.forEach((m) => { if (m.pending && list.some((v) => v.mine && v.id === m.id && !v.pending)) m.pending = false; });
+    keepMine();
     count();
   }).catch(() => {});
 
@@ -233,7 +247,8 @@
     lit = b; b.classList.add("on");
     const box = boxEl.getBoundingClientRect(), r = b.getBoundingClientRect();
     const x = r.left + r.width / 2 - box.left, y = r.top + r.height / 2 - box.top;
-    $("b", note).textContent = b._v.name; $("span", note).textContent = b._v.note;
+    $("b", note).textContent = b._v.name;
+    $("span", note).textContent = b._v.note + (b._v.pending ? `${b._v.note ? " " : ""}(Only you can see this until Lana reads it.)` : "");
     // the note stays in the sky: it opens towards whichever side of the two fields has more room
     const z0 = zones[0].getBoundingClientRect(), z1 = zones[1].getBoundingClientRect();
     const zl = Math.min(z0.left, z1.left), zr = Math.max(z0.right, z1.right), mid = r.left + r.width / 2, right = mid < (zl + zr) / 2;
@@ -357,7 +372,8 @@
         if (d.field) { inp.setAttribute("aria-invalid", "true"); inp.focus(); }
         return;
       }
-      const v = { name, note, ...picked, ...pos, mine: true };
+      const v = { id: d.flower && d.flower.id, name, note, ...picked, ...pos, mine: true, pending: d.status === "pending" };
+      mine.push({ id: v.id, name, note, kind: v.kind, color: v.color, x: v.x, y: v.y, pending: v.pending }); keepMine();
       list.push(v); const b = starEl(v); b.style.setProperty("--o", 1); zones[zoneOf(v.x)].insertBefore(b, null);
       make.reset(); more.textContent = "90 left";
       close(true); count();

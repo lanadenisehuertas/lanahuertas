@@ -20,6 +20,10 @@
 /* while the room shows the name and the role, the masthead does not repeat the role */
 /* (quiet mode keeps the room, as it keeps every scroll-driven scene) */
 .in-room #sub { visibility: hidden; }
+/* the room is its own opening: while any of it shows, the masthead's title and role and the foot's place and year are
+   not drawn over it. The page opens with .in-intro on the body, so the first paint is already clear; room-proto.js
+   takes it off once the room is done, or when the page is opened further down */
+.in-intro :is(.issue, #sub, .foot > p:not(.live)) { visibility: hidden; }
 
 .rm-stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 /* the view: a fixed-size box scaled to the screen; its perspective is the camera's lens */
@@ -51,7 +55,7 @@ img.rm-sky { display: block; image-rendering: pixelated; }
 /* the planes are bitmap pictures, each carrying its own 3D transform (room-proto.js) */
 img.rm-pl, img.rm-beam, .rm-hang img { display: block; max-width: none; }
 
-/* the circle: a square plane; its rings are drawn smooth on the canvas (only its runes are small bitmaps), with a soft moonlit halo behind them and a
+/* the circle: a square plane; its rings are drawn smooth on the canvas (only its runes are small bitmaps), and a
    bloom of light at each point that flares as a thing arrives there and again as the circle lands */
 /* the moon's light lies on the floor as the moon rises */
 .rm-beam { opacity: 0; pointer-events: none; }
@@ -63,7 +67,6 @@ img.rm-pl, img.rm-beam, .rm-hang img { display: block; max-width: none; }
 .rm-soft { opacity: 0; visibility: hidden; }
 /* the echoes that trail the six as they fly: one flat canvas over the room, drawn only while they fly (room-proto.js) */
 .rm-echo { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; visibility: hidden; }
-.rm-halo { inset: 8%; border-radius: 50%; opacity: 0; background: radial-gradient(closest-side, rgb(185 162 255 / 0) 62%, rgb(185 162 255 / 0.22) 80%, rgb(185 162 255 / 0) 100%); }
 .rm-bloom { border-radius: 50%; opacity: 0; background: radial-gradient(closest-side, rgb(255 241 201 / 0.85), rgb(185 162 255 / 0.32) 45%, rgb(185 162 255 / 0) 100%); }
 
 /* the room's focus while the six gather (a darkening round the edges), and the moonlight flash at the glass */
@@ -78,7 +81,12 @@ img.rm-pl, img.rm-beam, .rm-hang img { display: block; max-width: none; }
 @font-face { font-family: "Redaction room"; font-style: italic; src: local("Georgia Italic"), local("Georgia-Italic");
   size-adjust: 94%; ascent-override: 95.7%; descent-override: 31.9%; line-gap-override: 0%; }
 .rm-words { position: absolute; left: 0; right: 0; display: grid; justify-items: center; padding: 0 4%; text-align: center; }
-.rm-role { margin: 0; font-family: "Redaction", "Redaction room", Georgia, serif; font-style: italic; line-height: 1.3; color: var(--mark); text-shadow: 0 0 10px #000, 0 0 4px #000; }
+.rm-role { margin: 0; font-family: "Redaction", "Redaction room", Georgia, serif; font-style: italic; line-height: 1.3; color: var(--mark); text-shadow: 0 0 10px #000, 0 0 4px #000;
+  position: relative; isolation: isolate; }
+/* the room's own night, laid soft behind the role, so the floor's dashed lines and the wall's edge never run through its
+   letters like strike-throughs; it is the colour of the room around it, so it is never seen as a shape of its own */
+.rm-role::after { content: ""; position: absolute; inset: -30% -6%; z-index: -1; pointer-events: none;
+  background: radial-gradient(closest-side, rgb(6 4 20) 60%, rgb(6 4 20 / 0)); }
 /* the role sleeps in a 1-bit cut (the finer one, 35, so it reads from the first frame) and wakes letter by letter into
    the smooth italic as the scroll carries the light along it (room-proto.js). Each letter keeps the italic's own width from the first paint, and its sleeping glyph
    is drawn over that place, so waking changes only what is painted and never moves a word. A letter is either asleep
@@ -108,8 +116,11 @@ img.rm-pl, img.rm-beam, .rm-hang img { display: block; max-width: none; }
 .room-intro.lifted .rm-six:not(:hover) .rm-nm { opacity: 0; }
 .room-intro.lifted .rm-nm { transform-origin: 50% 0; }
 
-/* the way past the room, for anyone who would rather go straight to the work */
-.rm-skip { position: absolute; right: 24px; bottom: 64px; z-index: 2; min-height: 44px; display: inline-flex; align-items: center; pointer-events: auto; }
+/* the ways past the room, for anyone who would rather go straight to the work: the list of every work, or the moon */
+.rm-ways { position: absolute; right: 24px; bottom: 64px; z-index: 2; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; pointer-events: auto; }
+.rm-ways .go { min-height: 44px; }
+/* a button dressed as the link beside it (.go, moon.css) */
+.rm-all { border: 0; cursor: pointer; }
 
 /* the night behind the room; it thins at the end to show the moon's board under it */
 .rm-night { position: absolute; inset: 0; z-index: -1; background: #000; will-change: opacity; }

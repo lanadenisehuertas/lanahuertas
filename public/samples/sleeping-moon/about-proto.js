@@ -5,7 +5,7 @@
      playhead. The list is empty until the loops are cut from the films. */
 (() => {
   const { $, $$ } = SM;
-  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
+  const still = () => SM.quiet();   // quiet mode stills the page: the visitor's switch, on from the start under reduced motion (moon.js)
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const when = (test, fn) => {
     if (test()) return fn();

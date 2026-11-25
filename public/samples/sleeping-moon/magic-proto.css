@@ -98,6 +98,9 @@ dialog.atlas[open] { animation: at-in 200ms linear both; }
 .at-map { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 calc(3 * var(--u)); align-items: start; }
 .at-room { display: inline-flex; align-items: baseline; gap: 10px; min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer; color: var(--ink); font: 400 clamp(24px, calc(2.2 * var(--u)), 34px) / 1 var(--display-awake); }
 .at-room i { font: 400 16px/1 var(--lab); font-style: normal; color: var(--text); }
+.at-what { margin: 0 0 6px; max-width: 34ch; font-size: 15px; line-height: 1.4; color: var(--text); opacity: 0.85; }
+/* a room with no list under it (About, Contact) keeps the same gap before the next room */
+.at-what:last-child { margin-bottom: calc(2 * var(--u)); }
 .at-room:hover, .at-room[aria-current="true"] { color: var(--mark); }
 .at-map ul { list-style: none; margin: 2px 0 calc(2 * var(--u)); padding: 0; background: radial-gradient(circle, var(--rule) 1px, transparent 1.5px) 6px 0 / 3px 9px repeat-y; }
 .at-w { position: relative; display: flex; align-items: center; gap: 14px; width: 100%; min-height: 44px; padding: 0 0 0 2px; border: 0; background: none; color: var(--text); font: 400 17px/1.25 var(--body); text-align: left; cursor: pointer; }

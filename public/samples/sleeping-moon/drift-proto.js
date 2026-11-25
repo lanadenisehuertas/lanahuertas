@@ -7,7 +7,7 @@
    would restyle, and the ornaments are too many and too small for the wind to be worth a write a frame. */
 (() => {
   const { $$ } = SM, root = document.documentElement;
-  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
+  const still = () => SM.quiet();   // quiet mode stills the page: the visitor's switch, on from the start under reduced motion (moon.js)
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   let seed = 3;
   const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;

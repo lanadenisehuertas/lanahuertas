@@ -16,8 +16,8 @@
      it lands exactly on the moon's board's own circle, where the six dissolve into the light of its points
      as the night thins to show the board (spell-proto.js takes over from there).
    The camera follows the scroll on a spring, so it has weight but settles exactly where the scroll says, and everything
-   reverses when you scroll back. Quiet mode (the visitor's own switch) skips the room; the system's reduced-motion
-   setting does not, since the room moves only as the visitor scrolls it. */
+   reverses when you scroll back. Quiet mode keeps the room, which moves only as the visitor scrolls it, and stills what
+   moves on its own in it (the blur and trails of the flight, the sway and drift). */
 (() => {
   const { $, $$ } = SM;
   const hero = $("#moon"), board = $("#board");
@@ -30,7 +30,7 @@
   const inOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
   const out3 = (x) => 1 - (1 - x) ** 3;
   const bell = (x) => (x > 0 && x < 1 ? Math.sin(Math.PI * x) : 0);
-  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
+  const still = () => SM.quiet();   // quiet mode stills the page: the visitor's switch, on from the start under reduced motion (moon.js)
 
   /* the beats, in screens of scroll through the room (the stage holds for five screens; SPAN is where the room is done
      with: on phones a little past the five, as the night opens while the stage goes on up the page with the moon's stop) */
@@ -265,7 +265,7 @@
 
   const N = 300, RC = 100;
   const awake = new Set();
-  let glassEl = null, beam, set, B = BEAT, sky, moon, skip, view, world, words, night, circle, halo, flash, vig, blooms = [], cctx, els = {}, pos = {}, pics = [], built = "", lastSpell = -1;
+  let glassEl = null, beam, set, B = BEAT, sky, moon, skip, view, world, words, night, circle, flash, vig, blooms = [], cctx, els = {}, pos = {}, pics = [], built = "", lastSpell = -1;
   // the role's letters, and how far along them the light has come
   let roleCh = [], roleN = -1;
   // what dims with the room, each written on its own element (op, below) rather than through custom properties on the
@@ -316,7 +316,7 @@
           ${planes(set)}
           ${set.items.map(piece).join("")}
           <div class="rm-circle" style="width:${r.r * 3}px;height:${r.r * 3}px">
-            <i class="rm-halo"></i><canvas class="rm-sharp"></canvas><canvas class="rm-soft"></canvas>
+            <canvas class="rm-sharp"></canvas><canvas class="rm-soft"></canvas>
             ${SIX.map((_, k) => { const a = (DOORMAP[k] * Math.PI) / 3 + 0.5, x = r.r * 1.5 + Math.cos(a) * r.r * 0.84, y = r.r * 1.5 + Math.sin(a) * r.r * 0.84; return `<i class="rm-bloom" style="left:${(x - bs / 2).toFixed(1)}px;top:${(y - bs / 2).toFixed(1)}px;width:${bs}px;height:${bs}px"></i>`; }).join("")}
           </div>
         </div>
@@ -325,11 +325,11 @@
       <canvas class="rm-echo" aria-hidden="true"></canvas>
       <i class="rm-vig" aria-hidden="true"></i><i class="rm-flash" aria-hidden="true"></i>
       <div class="rm-night" aria-hidden="true"></div>
-      <a class="go rm-skip" href="#moon">Skip the intro</a>`;
+      <div class="rm-ways"><button class="go rm-all" type="button">See all work</button><a class="go rm-skip" href="#moon">Skip the intro</a></div>`;
     beam = $(".rm-beam", host);
     view = $(".rm-view", host); world = $(".rm-world", host); words = $(".rm-words", host); night = $(".rm-night", host);
-    circle = $(".rm-circle", host); halo = $(".rm-halo", host); flash = $(".rm-flash", host); vig = $(".rm-vig", host);
-    sky = $(".rm-sky", host); moon = $(".rm-moon", host); skip = $(".rm-skip", host); blooms = $$(".rm-bloom", host);
+    circle = $(".rm-circle", host); flash = $(".rm-flash", host); vig = $(".rm-vig", host);
+    sky = $(".rm-sky", host); moon = $(".rm-moon", host); skip = $(".rm-ways", host); blooms = $$(".rm-bloom", host);
     sharp = $(".rm-sharp", circle); soft = $(".rm-soft", circle); cctx = SM.spell.hires(sharp, N, N, 3.5); lastSpell = -1; softFor = -1;
     echo = $(".rm-echo", host); echoG = echo.getContext("2d"); echoOn = false;
     glassEl = $(".rm-glass", host);
@@ -619,7 +619,8 @@
   };
 
   /* ------------------------------------------------------------------ one frame */
-  let spoke = false, inRoom = null, lifted = null;
+  let spoke = false, inRoom = null, lifted = null, intro = true;
+  const showing = (on) => { if (intro !== on) { intro = on; document.body.classList.toggle("in-intro", on); } };
   const HINT = SM.HOVER ? "Point at things to wake them, then scroll." : "Tap things to wake them, then scroll.";
   // once the six lift, the footer says what the board will go on to say, so it never calls them asleep while they fly
   const RISE = "Keep scrolling: the moon wakes the rooms.";
@@ -628,6 +629,7 @@
     const f = sm(B.land[0], B.land[1], p);
     const hv = p > SPAN - 0.005 ? "hidden" : "";
     if (host._v !== hv) { host._v = hv; host.style.visibility = hv; }
+    showing(!hv);
     if (inRoom !== p < B.lift) { inRoom = p < B.lift; document.body.classList.toggle("in-room", inRoom); }
     const wq = sm(BEAT.name[0], BEAT.name[1], p), wt = `translate3d(0, ${(-wq * 40).toFixed(1)}px, 0)`;
     op(words, 1 - wq);
@@ -687,7 +689,6 @@
     if (circle._t !== ct) { circle._t = ct; circle.style.transform = ct; }
     const co = sm(BEAT.draw[0] - 0.25, BEAT.draw[0] + 0.1, p) * (1 - sm(B.cout[0], B.cout[1], p));
     op(circle, co);
-    op(halo, 0.5 * s + 0.4 * bell(lin(0.1, 0.6, q)));
     if (co > 0 && s !== lastSpell) { lastSpell = s; SM.spell.cast(cctx, N, N, { cx: N / 2, cy: N / 2, R: RC, targets: null }, s, 0, null); }
     // its motion blur, as the speed carries it out through the glass: the softened copy fades in over the sharp one
     const kb = cblur > 0.15 && s === 1 && !still() ? Math.min(1, cblur / 3) : 0;
@@ -780,11 +781,11 @@
   const run = () => {
     if (!SM.where(sec).h) {   // the section's height as the scroll keeps it, so no layout each frame
       if (spoke) { spoke = false; hero.dataset.hint = REST; SM.say(); document.body.classList.remove("in-room"); inRoom = false; }
-      inView = false; cover(false); return;
+      showing(false); inView = false; cover(false); return;
     }
     if (!ready) return;
     // on a phone the room is not built while the page is more than a screen past it (takeDown, below)
-    if (!built && SM.COLUMN.matches) { if (!UNIT) stageSize(); if (scrollT() > SPAN + 1) { inView = false; cover(false); return; } }
+    if (!built && SM.COLUMN.matches) { if (!UNIT) stageSize(); if (scrollT() > SPAN + 1) { showing(false); inView = false; cover(false); return; } }
     build();
     spoke = true;
     const t = scrollT();
@@ -792,6 +793,7 @@
     rest(!inView || lastNear <= 0);
     if (!inView) {
       const hv = t > SPAN ? "hidden" : ""; if (host._v !== hv) { host._v = hv; host.style.visibility = hv; }
+      showing(!hv);
       // a jump straight past the room (a link, a reload further down) never draws its last frames, so what they would
       // have undone is undone here
       if (inRoom) { inRoom = false; document.body.classList.remove("in-room"); }
@@ -817,7 +819,7 @@
     while (blobs.length) URL.revokeObjectURL(blobs.pop());
     built = ""; els = {}; pics = []; loads = []; blooms = []; roleCh = []; roleN = -1; lastSpell = -1; softFor = -1;
     fades = { near: [], lines: [], shades: [], room: [] };
-    view = world = words = night = circle = halo = flash = vig = sky = moon = skip = beam = glassEl = null;
+    view = world = words = night = circle = flash = vig = sky = moon = skip = beam = glassEl = null;
     echo = echoG = sharp = soft = cctx = null; echoOn = false;
     memo.clear(); memoAt = ""; dollyKey = ""; host._v = "";
   };
@@ -842,6 +844,8 @@
      the first door; a click or a tap leaves the doors asleep, so the stop is seen as it rests, with the name whole (a
      focused door wakes and lends the name its own word) */
   host.addEventListener("click", (e) => {
+    // the other way past the room: the star chart, every work in one list (magic-proto.js)
+    if (e.target.closest(".rm-all")) { SM.chart?.(); return; }
     if (!e.target.closest(".rm-skip")) return;
     e.preventDefault();
     const at = hero.offsetTop + (SM.COLUMN.matches ? 0 : (+hero.dataset.riseAt || 0.65) + 0.95) * SM.vh;

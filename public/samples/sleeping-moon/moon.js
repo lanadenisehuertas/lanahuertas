@@ -23,9 +23,10 @@ const SM = (() => {
   const COLUMN = matchMedia("(max-width: 760px), (max-aspect-ratio: 1/1), (max-height: 500px)");
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
-  /* quiet mode is only ever the visitor's own switch, kept for this visit alone (sessionStorage, read in the page's head).
-     The system's reduced-motion setting does not turn it on: everything here moves with the scroll, which the visitor
-     drives, so the whole site shows under that setting, and only things that move on their own are stilled by CSS.
+  /* quiet mode is the visitor's own switch, kept for this visit alone (sessionStorage, read in the page's head). A visit
+     starts quiet when the system asks for reduced motion (the sparkles, drifting pieces and moving pictures are a lot for
+     anyone who has asked their device for less), and the switch can still turn it off; once switched either way, the
+     switch is what counts for the rest of the visit.
      An older version kept the switch for good in localStorage; that key is cleared, so no one comes back to a quiet site
      they never chose this visit */
   try { localStorage.removeItem("quiet"); } catch (e) {}

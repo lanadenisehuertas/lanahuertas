@@ -4,7 +4,7 @@
    The motes are soft dots and four-point glints, drawn from small sprites made once per colour; one in twelve is a tiny
    bitmap rune of square pixels, a trace of the board's 1-bit hand. The loop sleeps when nothing is alive. */
 (() => {
-  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
+  const still = () => SM.quiet();   // quiet mode stills the page: the visitor's switch, on from the start under reduced motion (moon.js)
   const cv = document.createElement("canvas");
   cv.className = "trail"; cv.setAttribute("aria-hidden", "true");
   document.body.append(cv);

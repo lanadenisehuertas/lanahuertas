@@ -4,7 +4,7 @@
    reduced motion keep the planes still. */
 (() => {
   const { $ } = SM;
-  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
+  const still = () => SM.quiet();   // quiet mode stills the page: the visitor's switch, on from the start under reduced motion (moon.js)
   const setup = () => {
     const sky = $(".sky"), field = sky && $(".field", sky);
     if (!field || $(".neb", sky)) return;

@@ -28,7 +28,7 @@
 <link rel="preload" href="art/room/desk-line.webp" as="image" fetchpriority="high">
 <link rel="preload" href="art/room/sky-stars.png" as="image" fetchpriority="high">
 <!-- build:css moon.css journey.css reel.css rooms.css stops.css dawn-proto.css magic-proto.css spell-proto.css room-proto.css depth-proto.css trail-proto.css drift-proto.css words-proto.css about-proto.css fix-proto.css lean-proto.css -->
-<link rel="stylesheet" href="/samples/sleeping-moon/dist/0ca26eea.css">
+<link rel="stylesheet" href="/samples/sleeping-moon/dist/4f21756e.css">
 <!-- /build -->
 <script>
 /* Phones: the address bar slides away and back as you scroll, which changes innerHeight and fires "resize" on nearly
@@ -55,9 +55,9 @@
   }, true);
 })();
 </script>
-<script>document.documentElement.classList.add("js", "loading", "has-study"); try { localStorage.removeItem("quiet"); if (sessionStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
+<script>document.documentElement.classList.add("js", "loading", "has-study"); try { localStorage.removeItem("quiet"); var q = sessionStorage.getItem("quiet"); if (q === "1" || (q === null && matchMedia("(prefers-reduced-motion: reduce)").matches)) document.documentElement.classList.add("quiet"); } catch (e) {}</script>
 </head>
-<body data-route="room">
+<body data-route="room" class="in-intro">
 <div class="veil" id="veil" role="status" aria-label="Loading"><div class="veil-moon" aria-hidden="true"></div><p class="veil-word display" aria-hidden="true">Waking the night</p></div>
 <a class="skip" href="#brands">Skip to the work</a>
 
@@ -79,7 +79,7 @@
     </div>
     <div class="tools">
       <button class="menu-btn" type="button" id="menu" aria-expanded="false">Menu</button>
-      <button class="switch" type="button" role="switch" aria-checked="false" id="quiet" aria-label="Quiet mode"><span aria-hidden="true">Quiet mode</span><i></i></button>
+      <button class="switch" type="button" role="switch" aria-checked="false" id="quiet" aria-label="Less motion" title="Stops the sparkles, drifting pieces and moving pictures"><span aria-hidden="true">Less motion</span><i></i></button>
     </div>
   </header>
   <footer class="foot">
@@ -180,7 +180,7 @@
 </main>
 
 <!-- build:js data.js moon.js journey.js | reel.js rooms.js stops.js | dawn-proto.js spell-proto.js room-proto.js depth-proto.js | magic-proto.js trail-proto.js drift-proto.js words-proto.js | about-proto.js fix-proto.js desc-proto.js lean-proto.js -->
-<script src="/samples/sleeping-moon/dist/9b9d7049.js"></script><script src="/samples/sleeping-moon/dist/6e8b3ec5.js"></script><script src="/samples/sleeping-moon/dist/375c203c.js"></script><script src="/samples/sleeping-moon/dist/914e24c1.js"></script><script src="/samples/sleeping-moon/dist/d9b7d578.js"></script>
+<script src="/samples/sleeping-moon/dist/9b9d7049.js"></script><script src="/samples/sleeping-moon/dist/6e8b3ec5.js"></script><script src="/samples/sleeping-moon/dist/09977620.js"></script><script src="/samples/sleeping-moon/dist/04334a3b.js"></script><script src="/samples/sleeping-moon/dist/d9b7d578.js"></script>
 <!-- /build -->
 </body>
 </html>

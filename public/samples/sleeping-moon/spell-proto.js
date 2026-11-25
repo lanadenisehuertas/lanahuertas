@@ -11,7 +11,7 @@
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const lin = (a, b, v) => clamp((v - a) / (b - a));
   const sm = (a, b, v) => SM.smooth(lin(a, b, v));
-  const still = () => SM.quiet();   // only the visitor's own quiet switch stills the page, never the system setting (moon.js)
+  const still = () => SM.quiet();   // quiet mode stills the page: the visitor's switch, on from the start under reduced motion (moon.js)
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const CAST = 1.15;                      // screens of scroll the casting takes, before the moon starts to rise
   const INK = "#b9a2ff", DIM = "rgba(185,162,255,0.42)", GOLD = "#fff1c9";
@@ -183,8 +183,6 @@
   /* ================================================================ wide screens: the spell on the moon's own board */
   const canvas = Object.assign(document.createElement("canvas"), { className: "spell" });
   canvas.setAttribute("aria-hidden", "true");
-  const glow = Object.assign(document.createElement("div"), { className: "spell-glow" });
-  $(".xor", board).before(glow);
   const incant = Object.assign(document.createElement("p"), { className: "incant" });
   board.append(canvas, incant);
   const names = namer(board);
@@ -223,8 +221,6 @@
     if (byEl) { const q = sm(0.02, 0.16, s); byEl.style.opacity = (1 - q).toFixed(3); byEl.style.transform = `translate3d(0, ${(-q * 4 * U).toFixed(1)}px, 0)`; }
     write(lin(0.16, 0.72, s));
     incant.style.opacity = st ? "0" : (1 - sm(0, 0.22, p)).toFixed(3);
-    glow.style.opacity = (sm(0.2, 0.9, s) * (1 - sm(0.35, 0.85, p))).toFixed(3);
-    glow.style.transform = `scale(${(0.7 + 0.35 * s + 0.25 * sm(0.3, 0.8, p)).toFixed(3)})`;
     // the stars of the sky are drawn in towards the circle while it is cast, and thrown back out when it breaks
     SM._fs = 1 - 0.05 * SM.smooth(s) + 0.05 * sm(0.3, 0.8, p) + 0.035 * Math.sin(Math.PI * sm(0.3, 0.9, p));
     const h = s < 1 ? hint.cast : hint.rise;
@@ -251,12 +247,12 @@
   const ph = $(".cast-ph") || Object.assign(document.createElement("section"), { className: "cast-ph" });
   ph.removeAttribute("aria-hidden");
   ph.setAttribute("aria-label", titleText);
-  ph.innerHTML = `<div class="cp-stage"><div class="cp-night"></div><div class="cp-glow"></div><canvas aria-hidden="true"></canvas>
+  ph.innerHTML = `<div class="cp-stage"><div class="cp-night"></div><canvas aria-hidden="true"></canvas>
     <p class="cp-title display" aria-hidden="true">${titleText.split(" ").map((w) => `<span>${esc(w)}</span>`).join(" ")}</p>
     <p class="cp-by">${esc(BY)}</p>
     <p class="incant cp-incant"></p><span class="pl-cue cp-cue" aria-hidden="true"><i></i></span></div>`;
   if (!ph.isConnected) hero.before(ph);
-  const pc = $("canvas", ph), pglow = $(".cp-glow", ph), pnight = $(".cp-night", ph), pWords = $$(".cp-title > span", ph), pcue = $(".cp-cue", ph);
+  const pc = $("canvas", ph), pnight = $(".cp-night", ph), pWords = $$(".cp-title > span", ph), pcue = $(".cp-cue", ph);
   const pincant = $(".cp-incant", ph), pwrite = incantation(pincant, words), pby = $(".cp-by", ph);
   const pnames = namer(ph.firstElementChild);
   let pw = 0, pcell = 3, pgeo = null, plast = "", pctx = null;
@@ -283,8 +279,6 @@
     pwrite(lin(0.16, 0.72, s));
     pincant.style.opacity = (1 - sm(0, 0.3, p)).toFixed(3);
     pnight.style.opacity = (1 - sm(0.15, 0.85, p)).toFixed(3);
-    pglow.style.opacity = (sm(0.2, 0.9, s) * (1 - sm(0.35, 0.85, p))).toFixed(3);
-    pglow.style.transform = `scale(${(0.7 + 0.35 * s + 0.25 * sm(0.3, 0.8, p)).toFixed(3)})`;
     const key = `${s.toFixed(4)}|${p.toFixed(4)}`;
     if (key !== plast) { plast = key; pnames(cast(pctx, pw, pgeo.H, pgeo, s, p, null), pcell, pgeo.cx * pcell); }
   };

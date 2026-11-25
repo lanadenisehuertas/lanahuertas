@@ -34,7 +34,7 @@
   }, true);
 })();
 </script>
-<script>document.documentElement.classList.add("js"); try { localStorage.removeItem("quiet"); if (sessionStorage.getItem("quiet") === "1") document.documentElement.classList.add("quiet"); } catch (e) {}</script>
+<script>document.documentElement.classList.add("js"); try { localStorage.removeItem("quiet"); var q = sessionStorage.getItem("quiet"); if (q === "1" || (q === null && matchMedia("(prefers-reduced-motion: reduce)").matches)) document.documentElement.classList.add("quiet"); } catch (e) {}</script>
 <!-- build:js data.js -->
 <script src="/samples/sleeping-moon/dist/c1df12f2.js"></script>
 <!-- /build -->
@@ -86,7 +86,7 @@ function kvSizes(a, h) {
     </div>
     <div class="tools">
       <button class="menu-btn" type="button" id="menu" aria-expanded="false">Menu</button>
-      <button class="switch" type="button" role="switch" aria-checked="false" id="quiet" aria-label="Quiet mode"><span>Quiet mode</span><i></i></button>
+      <button class="switch" type="button" role="switch" aria-checked="false" id="quiet" aria-label="Less motion" title="Stops the sparkles, drifting pieces and moving pictures"><span aria-hidden="true">Less motion</span><i></i></button>
     </div>
   </header>
   <footer class="foot">
