@@ -353,10 +353,12 @@
     awake.forEach((id) => SM.bitmap(els[id])?.wakeUp(0));
     SIX.forEach((id) => {
       els[id].addEventListener("pointerenter", (e) => { if (e.pointerType !== "touch") wake(id); });
-      els[id].addEventListener("pointerdown", () => {
+      const el = els[id];
+      el.addEventListener("pointerdown", () => {
         wake(id);
-        // a tap shows the room's name for a moment, as pointing at it does
-        els[id].classList.add("named"); clearTimeout(els[id]._nt); els[id]._nt = setTimeout(() => els[id].classList.remove("named"), 1800);
+        // a tap shows the room's name for a moment, as pointing at it does (on this element: the room may be built
+        // again before the name goes, and els then holds the new one)
+        el.classList.add("named"); clearTimeout(el._nt); el._nt = setTimeout(() => el.classList.remove("named"), 1800);
       });
     });
     fit();
@@ -846,6 +848,10 @@
   host.addEventListener("click", (e) => {
     // the other way past the room: the star chart, every work in one list (magic-proto.js)
     if (e.target.closest(".rm-all")) { SM.chart?.(); return; }
+    // each of the six things in the room opens its own stop (the contact's stop is #talk), through the same iris as
+    // the masthead's names, from where it was clicked
+    const it = e.target.closest(".rm-six");
+    if (it) { SM.travel(it.dataset.id === "contact" ? "talk" : it.dataset.id, { x: e.clientX, y: e.clientY }); return; }
     if (!e.target.closest(".rm-skip")) return;
     e.preventDefault();
     const at = hero.offsetTop + (SM.COLUMN.matches ? 0 : (+hero.dataset.riseAt || 0.65) + 0.95) * SM.vh;
