@@ -25,7 +25,8 @@ const nextConfig: NextConfig = {
       ...to("/design", "/#brands"),
       ...to("/ui-ux", "/#products"),
       ...to("/videos", "/#films"),
-      ...to("/work", "/#brands"),
+      // the exact address only: public/work/ holds this design's own pictures
+      { source: "/work", destination: "/#brands", permanent: true },
       ...to("/about", "/#about"),
       ...to("/contact", "/#talk"),
       ...to("/garden", "/#talk"),
